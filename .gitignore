@@ -1,0 +1,11 @@
+/node_modules
+/vendor
+/public/build
+/public/hot
+/.env
+/.env.backup
+/storage/pail
+/storage/*.key
+*.log
+.DS_Store
+/.claude/settings.local.json
