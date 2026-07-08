@@ -19,10 +19,3 @@ Route::get('/tutors/{slug}',     [TutorController::class, 'show'])->name('api.tu
 
 Route::post('/demo-requests',    [DemoRequestController::class, 'store']);
 Route::post('/contact',          [ContactController::class, 'store']);
-
-// Deploy heartbeat — bump 'release' to confirm an auto-deploy landed.
-Route::get('/version', fn () => [
-    'app'     => 'IndiaTutors Online',
-    'release' => 'deploy-test-1',
-    'time'    => now()->toDateTimeString(),
-]);
