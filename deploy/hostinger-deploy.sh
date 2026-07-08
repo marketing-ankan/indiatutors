@@ -15,6 +15,9 @@ LARAVEL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DOCROOT="$(dirname "$LARAVEL_DIR")"
 cd "$LARAVEL_DIR"
 
+# Log to file here (Hostinger's cron field rejects shell redirects)
+exec >> "$LARAVEL_DIR/storage/logs/deploy.log" 2>&1
+
 BEFORE="$(git rev-parse HEAD)"
 git pull --ff-only origin main
 AFTER="$(git rev-parse HEAD)"
