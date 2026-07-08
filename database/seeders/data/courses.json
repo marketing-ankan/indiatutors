@@ -1,0 +1,5198 @@
+[
+ {
+  "sku": null,
+  "name": "Customized Online Guitar Lessons for Kids — Basics to Mastery",
+  "slug": "customized-online-guitar-lessons-for-kids-basics-to-mastery",
+  "subtitle": "One-on-one, song-driven guitar coaching for ages 8–16.",
+  "age": "Age 8+",
+  "pills": [
+   "Music",
+   "Guitar",
+   "Beginner Friendly",
+   "Live 1:1"
+  ],
+  "curriculum": [
+   {
+    "title": "Level 1: Introduction to Guitar",
+    "age": "Age 8+",
+    "duration": "20 hours",
+    "topics": [
+     "Meet the guitar — types, parts and how it works",
+     "Holding and posture — sit and stand like a player",
+     "Tuning your guitar — by ear and by tuner",
+     "Open strings — your very first notes",
+     "Finger placement fundamentals — clean, buzz-free notes",
+     "Your first chords — Em, C, G and D",
+     "Keeping the beat — basic strumming patterns",
+     "Your first song — putting it together"
+    ]
+   },
+   {
+    "title": "Level 2: Building Real Skills",
+    "age": "Age 8+",
+    "duration": "24 hours",
+    "topics": [
+     "Reading tabs and notation — the guitar language",
+     "Chord changes — switching smoothly",
+     "Barre chords — unlocking the whole fretboard",
+     "Major and minor scales — fingers in motion",
+     "Fingerpicking basics — patterns and arpeggios",
+     "Rhythm toolkit — syncopation and dynamics",
+     "Playing along — songs at full tempo"
+    ]
+   },
+   {
+    "title": "Level 3: Performance & Style",
+    "age": "Age 8+",
+    "duration": "24 hours",
+    "topics": [
+     "Lead guitar — your first solos and licks",
+     "Music theory for guitarists — keys and progressions",
+     "Improvisation — soloing over a backing track",
+     "Genre styles — acoustic, rock and classical",
+     "Building a setlist — songs you love",
+     "Stage confidence — perform for an audience",
+     "Recording yourself — review and refine"
+    ]
+   }
+  ],
+  "short_description": "One-on-one, song-driven guitar coaching for ages 8–16.",
+  "description": "Personalised online guitar coaching designed for young learners. Every class is one-on-one, paced to your child, and built around songs they love — so motivation stays high while technique builds steadily from the very first note.",
+  "regular_price": 1500.0,
+  "sale_price": 750.0,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Guitar",
+   "Music"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Online Piano & Keyboard Classes for Kids and Beginners",
+  "slug": "online-piano-keyboard-classes-for-kids-and-beginners",
+  "subtitle": "Certified mentors · personalised plan · ages 6+.",
+  "age": "Age 6+",
+  "pills": [
+   "Music",
+   "Piano",
+   "Keyboard",
+   "Live 1:1"
+  ],
+  "curriculum": [
+   {
+    "title": "Level 1: Piano Foundations",
+    "age": "Age 6+",
+    "duration": "18 hours",
+    "topics": [
+     "Keyboard geography and posture",
+     "Note reading — treble & bass",
+     "First melodies with the right hand",
+     "Adding the left hand",
+     "Simple songs and rhythm"
+    ]
+   },
+   {
+    "title": "Level 2: Building Fluency",
+    "age": "Age 6+",
+    "duration": "22 hours",
+    "topics": [
+     "Scales, chords and arpeggios",
+     "Two-hand coordination",
+     "Sight-reading practice",
+     "Expression and dynamics",
+     "Performance pieces"
+    ]
+   }
+  ],
+  "short_description": "Certified mentors · personalised plan · ages 6+.",
+  "description": "A complete piano journey from first finger placement to confident two-hand playing. Lessons blend technique, theory and the pieces your child wants to play.",
+  "regular_price": 1600.0,
+  "sale_price": 800.0,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Music",
+   "Piano"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Python Programming for Kids — Code Your First Projects",
+  "slug": "python-programming-for-kids-code-your-first-projects",
+  "subtitle": "Project-first Python for curious minds, ages 10+.",
+  "age": "Age 10+",
+  "pills": [
+   "Coding",
+   "Python",
+   "Projects",
+   "Live 1:1"
+  ],
+  "curriculum": [
+   {
+    "title": "Level 1: Python Basics",
+    "age": "Age 10+",
+    "duration": "20 hours",
+    "topics": [
+     "Setup and your first program",
+     "Variables and data types",
+     "Input, output and simple maths",
+     "Conditions — making decisions",
+     "Loops — repeating with purpose",
+     "Functions — reusable code",
+     "Mini project — a number-guessing game"
+    ]
+   },
+   {
+    "title": "Level 2: Building Things",
+    "age": "Age 10+",
+    "duration": "24 hours",
+    "topics": [
+     "Lists, tuples and dictionaries",
+     "Strings and text processing",
+     "Working with files",
+     "Errors and debugging skills",
+     "Using libraries and modules",
+     "Project — a quiz app",
+     "Project — a simple to-do tracker"
+    ]
+   },
+   {
+    "title": "Level 3: Real Projects",
+    "age": "Age 10+",
+    "duration": "26 hours",
+    "topics": [
+     "Object-oriented programming basics",
+     "Drawing and games with turtle/pygame",
+     "Fetching data from the web",
+     "Intro to data and charts",
+     "Version control basics",
+     "Capstone — design and build your own app",
+     "Showcase — present your project"
+    ]
+   }
+  ],
+  "short_description": "Project-first Python for curious minds, ages 10+.",
+  "description": "A hands-on introduction to real programming. Learners write actual Python, debug their own code, and finish each level with a project they can show off.",
+  "regular_price": 1800.0,
+  "sale_price": 900.0,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Python-1.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Coding",
+   "Python"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Spoken English & Confident Communication",
+  "slug": "spoken-english-confident-communication",
+  "subtitle": "Conversation-led English for school and life.",
+  "age": "Age 9+",
+  "pills": [
+   "Languages",
+   "Spoken English",
+   "Communication",
+   "Live 1:1"
+  ],
+  "curriculum": [
+   {
+    "title": "Level 1: Speaking Foundations",
+    "age": "Age 9+",
+    "duration": "16 hours",
+    "topics": [
+     "Everyday conversation",
+     "Pronunciation essentials",
+     "Building vocabulary in context",
+     "Asking and answering confidently"
+    ]
+   },
+   {
+    "title": "Level 2: Fluency & Confidence",
+    "age": "Age 9+",
+    "duration": "20 hours",
+    "topics": [
+     "Storytelling and description",
+     "Opinions and discussions",
+     "Presentations and public speaking",
+     "Interview and exam readiness"
+    ]
+   }
+  ],
+  "short_description": "Conversation-led English for school and life.",
+  "description": "Move beyond grammar drills to real conversation. Every session is interactive, with structured feedback that targets fluency, pronunciation and confidence.",
+  "regular_price": 1300.0,
+  "sale_price": 650.0,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Languages",
+   "Spoken English"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Vedic Maths (Grade 3-6)",
+  "slug": "vedic-maths-grade-3-6",
+  "subtitle": "Personalised live Vedic Maths (Grade 3-6) coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — Elementary & Middle School",
+   "Vedic Maths",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Vedic Maths (Grade 3-6) coaching.",
+  "description": "",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — Elementary & Middle School",
+   "Academics — Elementary & Middle School > Vedic Maths"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Social Studies Grade 1-7",
+  "slug": "social-studies-grade-1-7",
+  "subtitle": "Personalised live Social Studies Grade 1-7 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — Elementary & Middle School",
+   "Social Studies",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Social Studies Grade 1-7 coaching.",
+  "description": "",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Social-Studies-.jpg-3.jpeg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — Elementary & Middle School",
+   "Academics — Elementary & Middle School > Social Studies"
+  ]
+ },
+ {
+  "sku": "ito-ai-ml",
+  "name": "Artificial Intelligence & Machine Learning",
+  "slug": "artificial-intelligence-machine-learning",
+  "subtitle": "",
+  "age": "",
+  "pills": [],
+  "curriculum": [],
+  "short_description": "Hands-on AI/ML course covering model basics, practical datasets, and guided mini projects.",
+  "description": "Hands-on AI/ML course covering model basics, practical datasets, and guided mini projects.",
+  "regular_price": 1000.0,
+  "sale_price": 750.0,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/04/AIML.webp",
+  "is_featured": true,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies for Kids"
+  ]
+ },
+ {
+  "sku": "ito-python",
+  "name": "Python Programming for Beginners",
+  "slug": "python-programming-for-beginners",
+  "subtitle": "",
+  "age": "",
+  "pills": [],
+  "curriculum": [],
+  "short_description": "Start coding with Python through live sessions, assignments, and mentor feedback.",
+  "description": "Start coding with Python through live sessions, assignments, and mentor feedback.",
+  "regular_price": 1000.0,
+  "sale_price": 750.0,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/04/PythonCarouselCover.webp",
+  "is_featured": true,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies for Kids"
+  ]
+ },
+ {
+  "sku": "ito-robotics",
+  "name": "Robotics & Computational Thinking",
+  "slug": "robotics-computational-thinking",
+  "subtitle": "",
+  "age": "",
+  "pills": [],
+  "curriculum": [],
+  "short_description": "Build logic and automation skills with beginner robotics concepts and project work.",
+  "description": "Build logic and automation skills with beginner robotics concepts and project work.",
+  "regular_price": 1000.0,
+  "sale_price": 750.0,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/04/RoboticsCarouselCover.webp",
+  "is_featured": true,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies for Kids"
+  ]
+ },
+ {
+  "sku": "ito-algebra",
+  "name": "Algebra I Foundation",
+  "slug": "algebra-i-foundation",
+  "subtitle": "",
+  "age": "",
+  "pills": [],
+  "curriculum": [],
+  "short_description": "Concept-to-application algebra training for middle and high school learners.",
+  "description": "Concept-to-application algebra training for middle and high school learners.",
+  "regular_price": 1000.0,
+  "sale_price": 750.0,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/04/Algebra1Carousel.webp",
+  "is_featured": true,
+  "position": 0,
+  "category_chains": [
+   "Academics"
+  ]
+ },
+ {
+  "sku": "ito-chess",
+  "name": "Chess Strategy & Mind Sports",
+  "slug": "chess-strategy-mind-sports",
+  "subtitle": "",
+  "age": "",
+  "pills": [],
+  "curriculum": [],
+  "short_description": "Structured chess coaching focused on openings, tactics, and tournament readiness.",
+  "description": "Structured chess coaching focused on openings, tactics, and tournament readiness.",
+  "regular_price": 1000.0,
+  "sale_price": 750.0,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/04/Chess.jpg",
+  "is_featured": true,
+  "position": 0,
+  "category_chains": [
+   "Mind Sports"
+  ]
+ },
+ {
+  "sku": "ito-violin",
+  "name": "Violin/Viola Lessons for Beginners",
+  "slug": "violin-viola-lessons-for-beginners",
+  "subtitle": "",
+  "age": "",
+  "pills": [],
+  "curriculum": [],
+  "short_description": "Beginner-friendly violin and viola classes with technique drills and repertoire guidance.",
+  "description": "Beginner-friendly violin and viola classes with technique drills and repertoire guidance.",
+  "regular_price": 1000.0,
+  "sale_price": 750.0,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/04/Violin.webp",
+  "is_featured": true,
+  "position": 0,
+  "category_chains": [
+   "Music"
+  ]
+ },
+ {
+  "sku": "ito-ap-physics",
+  "name": "AP Physics Prep",
+  "slug": "ap-physics-prep",
+  "subtitle": "",
+  "age": "",
+  "pills": [],
+  "curriculum": [],
+  "short_description": "AP-aligned physics prep with concept boosters, timed practice, and exam strategy.",
+  "description": "AP-aligned physics prep with concept boosters, timed practice, and exam strategy.",
+  "regular_price": 1000.0,
+  "sale_price": 750.0,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/04/App-Developement.jpg",
+  "is_featured": true,
+  "position": 0,
+  "category_chains": [
+   "AP Courses"
+  ]
+ },
+ {
+  "sku": "ito-sat-math",
+  "name": "SAT/PSAT Math Mastery",
+  "slug": "sat-psat-math-mastery",
+  "subtitle": "",
+  "age": "",
+  "pills": [],
+  "curriculum": [],
+  "short_description": "Targeted SAT and PSAT math preparation with diagnostics and score-improvement plans.",
+  "description": "Targeted SAT and PSAT math preparation with diagnostics and score-improvement plans.",
+  "regular_price": 1000.0,
+  "sale_price": 750.0,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/04/AIMLCarouselCover.webp",
+  "is_featured": true,
+  "position": 0,
+  "category_chains": [
+   "Standardized Tests"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "English Grade 9-10",
+  "slug": "english-grade-9-10",
+  "subtitle": "Personalised live English Grade 9-10 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "English",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live English Grade 9-10 coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/English-6.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — Elementary & Middle School > English"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Integrated Math I/II/III",
+  "slug": "integrated-math-i-ii-iii",
+  "subtitle": "Personalised live Integrated Math I/II/III coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Mathematics",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Integrated Math I/II/III coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Integeated-Math.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — Elementary & Middle School > Mathematics"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Geometry",
+  "slug": "geometry",
+  "subtitle": "Personalised live Geometry coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Geometry",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Geometry coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/drum.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — High School > Geometry"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Economics",
+  "slug": "economics",
+  "subtitle": "Personalised live Economics coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Economics",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Economics coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — High School > Economics"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP Physics 1/2",
+  "slug": "ap-physics-1-2",
+  "subtitle": "Personalised live AP Physics 1/2 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Physics",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP Physics 1/2 coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-13.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses",
+   "AP Courses > AP Physics"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP Chemistry",
+  "slug": "ap-chemistry",
+  "subtitle": "Personalised live AP Chemistry coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Chemistry",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP Chemistry coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/AP-Chemistry.png",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses > AP Chemistry",
+   "AP Courses"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP English Language",
+  "slug": "ap-english-language",
+  "subtitle": "Personalised live AP English Language coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Languages",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP English Language coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-28.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses",
+   "AP Courses > AP Languages"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP Computer Science Principles",
+  "slug": "ap-computer-science-principles",
+  "subtitle": "Personalised live AP Computer Science Principles coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Computer Science",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP Computer Science Principles coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/AP-Computer-Science-Principles-2.png",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses > AP Computer Science",
+   "AP Courses"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP Micro Economics",
+  "slug": "ap-micro-economics",
+  "subtitle": "Personalised live AP Micro Economics coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Economics",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP Micro Economics coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses",
+   "AP Courses > AP Economics"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "NMSQT",
+  "slug": "nmsqt",
+  "subtitle": "Personalised live NMSQT coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Standardized Tests",
+   "NMSQT",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live NMSQT coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Standardized Tests > NMSQT",
+   "Standardized Tests"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Art and Craft",
+  "slug": "art-and-craft",
+  "subtitle": "Personalised live Art and Craft coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Creative Skills",
+   "Art and Craft",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Art and Craft coaching.",
+  "description": "",
+  "regular_price": 200.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Creative Skills > Art and Craft",
+   "Creative Skills"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Digital SAT/PSAT Math",
+  "slug": "digital-sat-psat-math",
+  "subtitle": "Personalised live Digital SAT/PSAT Math coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Standardized Tests",
+   "Digital SAT/PSAT Math",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Digital SAT/PSAT Math coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Standardized Tests > Digital SAT/PSAT Math",
+   "Standardized Tests"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Piano",
+  "slug": "piano",
+  "subtitle": "Personalised live Piano coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Piano",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "Curriculum",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "About the Curriculum:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Associated Board of the Royal Schools of Music:",
+     "https://www.abrsm.org/en-in",
+     "Trinity College London",
+     "https://www.trinitycollege.com/qualifications/music",
+     "Rockschool Limited",
+     "https://www.rslawards.com/rockschool/"
+    ]
+   },
+   {
+    "title": "Level 1",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Age Group: 6+",
+     "Duration: 6-8 months for each grade",
+     "Prep for Rockschool Piano Debut and Rockschool Piano Grade 1",
+     "Prep for Trinity Piano Initial and Trinity Piano Grade 1",
+     "Prep for ABRSM Piano Initial and ABRSM Piano Grade 1"
+    ]
+   },
+   {
+    "title": "Prerequisites:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "A piano"
+    ]
+   },
+   {
+    "title": "Course Content",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Introduction to Piano",
+     "Basic Elements of Piano (Keys & Notes)",
+     "Posture and fingers",
+     "Rhythm and Timing",
+     "Beats, rhythm & time signature",
+     "Concepts like dynamics, slurs, tie notes, and dotted rhythms",
+     "Music Notation",
+     "Staff notations (Clef, Notes values, etc.)",
+     "Introduction to Playing",
+     "Learn songs in Middle 'C', 'C', and 'G' Position",
+     "Introduction to chords & basic music theory",
+     "Technique Development",
+     "Techniques and form",
+     "Major Scales and Chords",
+     "Major Scales",
+     "Primary chords and Inversions",
+     "Introduction to Voice Learning",
+     "Basics of voice learning"
+    ]
+   },
+   {
+    "title": "Intermediate Music Notation",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Key Signature and Syncopation"
+    ]
+   },
+   {
+    "title": "Advanced Techniques",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Key of 'C', 'G', and 'F' Major",
+     "Minor Keys and Transposition",
+     "Minor Keys",
+     "Transposition",
+     "Rhythm Variation",
+     "Swing Rhythm",
+     "Repertoire Expansion",
+     "Repertoire building"
+    ]
+   },
+   {
+    "title": "Learning Outcomes",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Understand piano keyboard layout and note names.",
+     "Develop proper posture and finger technique.",
+     "Read and interpret rhythms accurately.",
+     "Familiarity with staff notation and music symbols.",
+     "Play simple songs using basic music theory concepts.",
+     "Develop proper piano playing techniques and form.",
+     "Learn major scales and basic chord structures.",
+     "Understand basic vocal techniques.",
+     "Learn about key signatures and syncopation.",
+     "Explore advanced playing techniques and fingerings.",
+     "Understand minor keys and transposition.",
+     "Experiment with different rhythmic styles.",
+     "Build a diverse repertoire of music."
+    ]
+   },
+   {
+    "title": "Sample Repertoire",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "ABRSM Initial and Grade 1",
+     "1. Piece A:",
+     "\"Mary Had a Little Lamb\" (Traditional)",
+     "\"Twinkle, Twinkle, Little Star\" (Traditional)",
+     "\"Ode to Joy\" (Beethoven, arranged for beginner piano)",
+     "2. Piece B:",
+     "\"Allegro in F\" (Diabelli)",
+     "\"Minuet in G\" (Petzold)",
+     "\"Russian Folk Song\" (Traditional, arranged for beginner piano)",
+     "3. Piece C:",
+     "\"Raindrops\" (Gurlitt)",
+     "\"The Clown\" (Kabalevsky)",
+     "\"The Swing\" (Cornick)",
+     "4. Alternative Pieces (choose one):",
+     "\"In the Hall of the Mountain King\" (Grieg, arranged for beginner piano)",
+     "\"Sonatina in C\" (Clementi, 1st movement)",
+     "ABRSM Grade 1 Piano Exam:",
+     "1. Piece A:",
+     "\"Minuet in G\" (Bach)",
+     "\"Sonatina in C\" (Clementi, 1st movement)",
+     "\"Waltz in A Minor\" (Chopin, simplified arrangement)",
+     "2. *Piece B:",
+     "\"Aria in F\" (Handel)",
+     "\"Allegretto in C\" (Köhler)",
+     "\"Berceuse\" (Burgmüller)",
+     "3. Piece C:",
+     "\"Bagatelle in G Minor\" (Diabelli)",
+     "\"The Merry Farmer\" (Schumann)",
+     "\"The Ghost in the Chimney\" (Gillock)"
+    ]
+   }
+  ],
+  "short_description": "Personalised live Piano coaching.",
+  "description": "<p>1. Convenience: You can attend classes from the comfort of your own home or any location with internet access. This eliminates the need for commuting, saving you time and money.</p><p>2. Flexibility: Online classes often offer flexible scheduling options, allowing you to choose the time that works best for you. This flexibility is especially beneficial for those with busy schedules or irregular working hours.</p><p>3. Access to Quality Instructors: Online platforms often have a wide selection of qualified instructors from around the world. This means you can find a teacher whose teaching style and expertise align with your learning goals.</p><p>4. Cost-effectiveness: Online classes can be more affordable than in-person lessons since they eliminate overhead costs associated with maintaining a physical location. Additionally, you can often find a variety of pricing options to suit your budget.</p><p>5. Variety of Resources: Online piano classes often come with a variety of supplementary resources such as video tutorials, practice exercises, and interactive learning tools, enhancing the overall learning experience.</p><p>6.Online Certifications: Opt for online examinations through various esteemed institutions and get certified for your skills.</p><p>At IndiaTutorsOnline, we believe that everyone has the potential to unlock their musical talents and start their journey of self-expression. IndiaTutorsOnline provides high-quality, accessible, and engaging online music classes for learners of all ages and skill levels.</p><p>We strive to break down barriers to learning and empower individuals from diverse backgrounds to pursue their passion for music, regardless of their geographical location, financial means, or previous experience.</p>",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Piano-1.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments",
+   "Piano"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Guitar",
+  "slug": "guitar",
+  "subtitle": "Personalised live Guitar coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Guitar",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "Curriculum",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "About the Curriculum:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Associated Board of the Royal Schools of Music:",
+     "https://www.abrsm.org/en-in",
+     "Trinity College London",
+     "https://www.trinitycollege.com/qualifications/music",
+     "Rockschool Limited",
+     "https://www.rslawards.com/rockschool/"
+    ]
+   },
+   {
+    "title": "Course Content",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "Acoustic Guitar",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "Level 1",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Age Group: 6+",
+     "Duration: 6-8 months for each grade",
+     "Prerequisites:",
+     "None",
+     "Requirements:",
+     "Acoustic Guitar",
+     "A device to join the session",
+     "Stable Internet Connection",
+     "Topics Covered:",
+     "Anatomy of the Guitar",
+     "Parts of the guitar",
+     "Understanding how each part affects sound and playability",
+     "Fundamental Techniques",
+     "Basic finger techniques",
+     "Proper hand positioning",
+     "Scales and Chords",
+     "Major and minor scales",
+     "Pentatonic scale",
+     "Basic three-string chords (C, G major)",
+     "Introduction to harmonizing with two-note and four-note chords",
+     "Rhythm and Strumming",
+     "Basic rhythm reading",
+     "Strumming patterns and rhythm techniques",
+     "Basic touch controls and steady pulse",
+     "Playing Techniques",
+     "Left and right-hand techniques",
+     "Concept and application of riffs",
+     "Melodies and Songs",
+     "Learning 30+ jingles, melodies, and songs",
+     "Demonstration of 20+ melodies and songs with riffs and chords",
+     "Reading and Notation",
+     "Learning staff notation and reading sheet music",
+     "Understanding ties and dotted rhythms",
+     "Harmonization",
+     "Harmonizing two-note and four-note harmonies",
+     "Preparation for Exams",
+     "Familiarity with RSL Acoustic Guitar Debut and Grade 1 requirements",
+     "Familiarity with Trinity Acoustic Guitar Initial and Level 1 requirements",
+     "Practice pieces and exam-style questions",
+     "Learning Outcomes",
+     "Recognize notes on the guitar and play basic rhythms and pieces with a steady pulse and flow.",
+     "Play major, minor, and pentatonic scales with ease.",
+     "Interpret and play various rhythm patterns effortlessly.",
+     "Demonstrate proficiency in 10+ songs with riffs and chords strumming.",
+     "Be well-prepared to clear RSL Acoustic Guitar Debut and Grade 1, and Trinity Acoustic Guitar Initial and Level 1 exams.",
+     "Read and interpret staff notation effectively, apply rhythm techniques, and harmonize basic chords.",
+     "RSL Acoustic Guitar Repertoire",
+     "Debut Grade",
+     "Requirements:",
+     "Pieces: Perform 2 pieces (one traditional, one contemporary).",
+     "Sample Repertoire:",
+     "Traditional:",
+     "\"Twinkle, Twinkle, Little Star\"",
+     "\"Mary Had a Little Lamb\"",
+     "Contemporary:",
+     "\"You Are My Sunshine\"",
+     "\"Let It Be\" by The Beatles (simplified version)",
+     "Grade 1",
+     "Requirements:",
+     "Pieces: Perform 3 pieces (one traditional, one contemporary, one of choice).",
+     "Sample Repertoire:",
+     "Traditional:",
+     "\"Ode to Joy\" (Ludwig van Beethoven, simplified version)",
+     "\"This Old Man\"",
+     "Contemporary:",
+     "\"Here Comes the Sun\" by The Beatles",
+     "\"I’m Yours\" by Jason Mraz (simplified version)",
+     "Choice:",
+     "\"Canon in D\" by Johann Pachelbel (simplified)",
+     "\"Riptide\" by Vance Joy (simplified version)"
+    ]
+   },
+   {
+    "title": "Trinity Acoustic Guitar Sample Repertoire",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Initial Grade",
+     "Requirements:",
+     "Pieces: Perform 2 pieces (one traditional, one contemporary).",
+     "Sample Repertoire:",
+     "Traditional:",
+     "\"London Bridge\"",
+     "\"Hickory Dickory Dock\"",
+     "Contemporary:"
+    ]
+   }
+  ],
+  "short_description": "Personalised live Guitar coaching.",
+  "description": "<p>At IndiaTutorsOnline, we believe in the limitless potential within everyone to discover and develop their musical talents. We are dedicated to providing high-quality, accessible, and engaging online music classes that cater to learners of all ages and skill levels.</p><p>Our mission is to eliminate barriers to music education, empowering individuals from all walks of life to pursue their passion for music, no matter their location, financial situation, or prior experience.</p><p>Whether your dream is to master the piano, rock out on the guitar, or compose your own symphonies, IndiaTutorsOnline is here to help you bring your musical aspirations to life. Join us today and experience the joy of making music with IndiaTutorsOnline—where your journey to excellence begins.</p>",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Guitar.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Guitar",
+   "Musical Instruments"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Ukulele",
+  "slug": "ukulele",
+  "subtitle": "Personalised live Ukulele coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Ukulele",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "🎵 About IndiaTutorsOnline",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "Curriculum",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "About the Curriculum:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Associated Board of the Royal Schools of Music:",
+     "https://www.abrsm.org/en-in",
+     "Trinity College London",
+     "https://www.trinitycollege.com/qualifications/music",
+     "🎵 Curriculum Overview (Ukulele)",
+     "This curriculum is aligned with:",
+     "ABRSM (Grades Initial–8)",
+     "Trinity College London",
+     "Focus areas:",
+     "Chord technique and transitions",
+     "Strumming patterns and rhythm",
+     "Fingerpicking technique",
+     "Ear training and aural skills",
+     "Sight reading",
+     "Musical expression and interpretation",
+     "🎵 Level 1",
+     "Age Group: 6+",
+     "Duration: 6–8 months for each grade",
+     "Prep for Trinity Ukulele Initial and Trinity Ukulele Grade 1, Prep for ABRSM Ukulele Initial and Grade 1",
+     "Prerequisites:",
+     "None",
+     "Requirements:",
+     "Soprano Ukulele (recommended for beginners)",
+     "A device to join the session",
+     "Stable Internet Connection",
+     "Topics Covered:"
+    ]
+   },
+   {
+    "title": "Anatomy of the Ukulele",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Parts of the ukulele (Headstock, Tuning Pegs, Nut, Fretboard, Body, Soundhole, Bridge, Saddle)",
+     "Understanding string names and standard tuning (G-C-E-A)",
+     "How the ukulele produces sound"
+    ]
+   },
+   {
+    "title": "Fundamental Techniques",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Proper posture and hand positioning",
+     "Correct strumming hand technique",
+     "Fretting hand placement and finger pressure",
+     "Producing clean, clear chord tones"
+    ]
+   },
+   {
+    "title": "Basic Chords and Notes",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Introduction to chord diagrams and tablature",
+     "Open chords: C, Am, F, G",
+     "Basic chord transitions",
+     "Single-string melody playing"
+    ]
+   },
+   {
+    "title": "Rhythm and Timing",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Basic strumming patterns (down strokes)",
+     "Note values (whole, half, quarter, eighth)",
+     "Counting exercises",
+     "Playing with a metronome"
+    ]
+   },
+   {
+    "title": "Playing Techniques",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Basic down-up strumming",
+     "Simple fingerpicking introduction",
+     "Smooth chord transitions",
+     "Basic dynamics"
+    ]
+   },
+   {
+    "title": "Melodies and Songs",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Learning 30+ beginner melodies and ukulele exercises",
+     "Playing simple chord-based songs"
+    ]
+   },
+   {
+    "title": "Reading and Notation",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Reading chord charts and tablature",
+     "Understanding standard notation basics (Treble Clef)",
+     "Playing simple sheet music"
+    ]
+   },
+   {
+    "title": "Musical Expression",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Introduction to dynamics",
+     "Basic phrasing and feel",
+     "Playing with confidence and rhythm"
+    ]
+   },
+   {
+    "title": "Preparation for Exams",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Trinity Ukulele Initial and Grade 1 requirements",
+     "ABRSM Ukulele Initial and Grade 1 requirements",
+     "Practice pieces and exercises"
+    ]
+   },
+   {
+    "title": "Learning Outcomes",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Play basic chords with clear, clean tone",
+     "Strum simple songs with steady rhythm",
+     "Demonstrate smooth chord transitions",
+     "Read basic chord charts and tabs",
+     "Perform 10+ beginner pieces",
+     "Prepare for Initial/Grade 1 exams",
+     "ABRSM Ukulele Repertoire",
+     "Initial Grade",
+     "Perform 2 pieces",
+     "Sample:",
+     "\"Hot Cross Buns\"",
+     "\"Mary Had a Little Lamb\"",
+     "\"Twinkle Twinkle Little Star\"",
+     "\"You Are My Sunshine\"",
+     "Grade 1",
+     "Perform 3 pieces",
+     "Sample:",
+     "\"Ode to Joy\" – Beethoven",
+     "\"Jingle Bells\"",
+     "\"Amazing Grace\""
+    ]
+   }
+  ],
+  "short_description": "Personalised live Ukulele coaching.",
+  "description": "<p>Accessible Across USA, UK, Europe, Australia, Singapore, Dubai, and More</p><p>Certificates of Completion / Participation Available</p><p>This program develops coordination, rhythm, listening skills, and musical creativity, while building confidence through performance and a love for music.</p><p>👉 Soprano Ukulele is strongly recommended for beginners</p><p>🎵 About Ukulele vs Guitar (Short Understanding)</p><p>The ukulele is a small, four-stringed instrument originally from Hawaii, traditionally strung with nylon strings and tuned G-C-E-A.</p><p>The guitar is a larger six-stringed instrument available in acoustic, classical, and electric variants, with a wider range of tones.</p><p>The ukulele offers a lighter, cheerful tone and is generally easier for young beginners, while the guitar provides a broader tonal range and greater repertoire depth.</p>",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Ukulele.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments",
+   "Musical Instruments > Ukulele"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Keyboard",
+  "slug": "keyboard",
+  "subtitle": "Personalised live Keyboard coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Keyboard",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "Curriculum",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "About the Curriculum:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Associated Board of the Royal Schools of Music:",
+     "https://www.abrsm.org/en-in",
+     "Trinity College London",
+     "https://www.trinitycollege.com/qualifications/music",
+     "Rockschool Limited",
+     "https://www.rslawards.com/rockschool/"
+    ]
+   },
+   {
+    "title": "Course Content",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "Level 1",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Age Group: 6+",
+     "Duration: 6-8 months for each grade",
+     "Prerequisites:",
+     "Dedicated to learning the keyboard.",
+     "A keyboard",
+     "Basic Elements of the Keyboard:",
+     "Identify keys and notes on the keyboard.",
+     "Introduce posture and finger positioning.",
+     "Rhythm and Timing:",
+     "Understand beats, rhythm, and time signatures.",
+     "Practice basic rhythms and timing exercises.",
+     "Introduction to Notation:",
+     "Learn staff notations including clefs, note values, etc.",
+     "Explore concepts like dynamics, slurs, tie notes, and dotted rhythms.",
+     "Playing in Key Positions:",
+     "Learn songs in Middle 'C', 'C', and 'G' positions.",
+     "Introduce chords and basic music theory in context.",
+     "Techniques and Forms:",
+     "Focus on proper technique and hand form.",
+     "Practice various forms of music such as staccato, legato, etc.",
+     "Major Scales and Chords:",
+     "Master major scales and primary chords.",
+     "Explore chord inversions and their applications.",
+     "Introduction to Voice Learning:",
+     "Basic understanding of singing along with playing.",
+     "Incorporate singing exercises to improve musicality.",
+     "Key Signatures and Advanced Rhythms:",
+     "Study key signatures and syncopation.",
+     "Introduce swing rhythm and its applications."
+    ]
+   },
+   {
+    "title": "Advanced Keys and Scales:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Focus on key of 'F' Major and minor keys.",
+     "Practice transposition exercises to familiarize with different keys.",
+     "Repertoire Building:",
+     "Build a repertoire of pieces covering various styles and genres.",
+     "Prepare pieces suitable for the exam requirements of RSL Debut, ABRSM Initial, and Trinity Initial.",
+     "Preparation for Certification Exams:",
+     "Review all previously learned concepts.",
+     "Practice exam-style questions and pieces.",
+     "Work on performance skills and stage presence.",
+     "Learning Outcomes",
+     "Identify keys and notes on the keyboard.",
+     "Demonstrate proper posture and finger positioning.",
+     "Understand beats, rhythm, and time signatures.",
+     "Read staff notations and apply dynamics and articulations.",
+     "Play confidently in different key positions.",
+     "Master major scales, primary chords, and inversions.",
+     "Integrate voice learning with keyboard playing.",
+     "Study key signatures, syncopation, and swing rhythm.",
+     "Master advanced keys and transposition techniques.",
+     "Build a diverse repertoire for certification exams.",
+     "Review concepts, practice exam-style questions, and enhance performance skills for certification readiness.",
+     "Sample Repertoire",
+     "ABRSM Initial Keyboard Exam:",
+     "Piece 1: Traditional Song Arrangement",
+     "Example: \"Twinkle, Twinkle, Little Star\" arranged for keyboard",
+     "This piece will assess basic note reading and hand coordination.",
+     "Piece 2: Simple Classical Piece",
+     "Example: \"Minuet in G\" by Johann Sebastian Bach",
+     "This piece introduces students to playing music from the classical repertoire and focuses on phrasing and articulation.",
+     "Piece 3: Contemporary Piece",
+     "Example: \"Clocks\" by Coldplay (simplified arrangement)",
+     "This piece allows students to explore modern keyboard playing techniques, such as chord progressions and rhythmic patterns.",
+     "ABRSM Grade 1 Keyboard Exam:",
+     "Piece 1: Baroque Piece",
+     "Example: \"Musette in D Major\" by Johann Sebastian Bach",
+     "This piece emphasizes clear articulation, dynamics, and ornamentation typical of Baroque music.",
+     "Piece 2: Classical Piece",
+     "Example: \"Sonatina in C Major, Op. 36, No. 1, 1st Movement\" by Muzio Clementi",
+     "This piece introduces students to classical sonata form and requires attention to detail in dynamics, phrasing, and expression.",
+     "Piece 3: Romantic or Contemporary Piece",
+     "Example: \"In the Hall of the Mountain King\" by Edvard Grieg (simplified arrangement)",
+     "This piece offers a contrast to the classical repertoire and may focus on expressive playing, dynamics, and character interpretation.",
+     "Trinity Initial Keyboard Exam:",
+     "Piece 1: Traditional Song Arrangement",
+     "Example: \"London Bridge Is Falling Down\" arranged for keyboard",
+     "This piece assesses basic note reading, hand coordination, and simple rhythms.",
+     "Piece 2: Classical Piece",
+     "Example: \"Minuet in G\" by Ludwig van Beethoven (simplified arrangement)",
+     "This piece introduces students to classical music and emphasizes clear phrasing and articulation.",
+     "Piece 3: Contemporary Piece"
+    ]
+   }
+  ],
+  "short_description": "Personalised live Keyboard coaching.",
+  "description": "<p>1. Convenience: You can attend classes from the comfort of your own home or any location with internet access. This eliminates the need for commuting, saving you time and money.</p><p>2. Flexibility: Online classes often offer flexible scheduling options, allowing you to choose the time that works best for you. This flexibility is especially beneficial for those with busy schedules or irregular working hours.</p><p>3. Access to Quality Instructors: Online platforms often have a wide selection of qualified instructors from around the world. This means you can find a teacher whose teaching style and expertise align with your learning goals.</p><p>4. Cost-effectiveness: Online classes can be more affordable than in-person lessons since they eliminate overhead costs associated with maintaining a physical location. Additionally, you can often find a variety of pricing options to suit your budget.</p><p>5. Variety of Resources: Online keyboard classes often come with a variety of supplementary resources such as video tutorials, practice exercises, and interactive learning tools, enhancing the overall learning experience.</p><p>6.Online Certifications: Opt for online examinations through various esteemed institutions and get certified for your skills.</p><p>At IndiaTutorsOnline, we believe that everyone has the potential to unlock their musical talents and start their journey of self-expression. IndiaTutorsOnline provides high-quality, accessible, and engaging online music classes for learners of all ages and skill levels.</p><p>We strive to break down barriers to learning and empower individuals from diverse backgrounds to pursue their passion for music, regardless of their geographical location, financial means, or previous experience.</p>",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Keyboard.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments > Keyboard",
+   "Musical Instruments"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Drums",
+  "slug": "drums",
+  "subtitle": "Personalised live Drums coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Drums",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Drums coaching.",
+  "description": "",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments > Drums",
+   "Musical Instruments"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Violin",
+  "slug": "violin",
+  "subtitle": "Personalised live Violin coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Violin",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Violin coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Violin.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments",
+   "Musical Instruments > Violin"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Veena",
+  "slug": "veena",
+  "subtitle": "Personalised live Veena coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Veena",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Veena coaching.",
+  "description": "",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Veena.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments",
+   "Musical Instruments > Veena"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Cello",
+  "slug": "cello",
+  "subtitle": "Personalised live Cello coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Cello",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Cello coaching.",
+  "description": "",
+  "regular_price": 1500.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Cello.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments > Cello",
+   "Musical Instruments"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Viola",
+  "slug": "viola",
+  "subtitle": "Personalised live Viola coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Viola",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Viola coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/AI-Prompting-1.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments",
+   "Musical Instruments > Viola"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Clarinet",
+  "slug": "clarinet",
+  "subtitle": "Personalised live Clarinet coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Clarinet",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "🎼 About Clarinet vs Flute (Short Understanding)",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "🎼 About IndiaTutorsOnline",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "Curriculum",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "About the Curriculum:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Associated Board of the Royal Schools of Music:",
+     "https://www.abrsm.org/en-in",
+     "Trinity College London",
+     "https://www.trinitycollege.com/qualifications/music",
+     "🎼 Curriculum Overview (Clarinet)",
+     "This curriculum is aligned with:",
+     "ABRSM (Grades Initial–8)",
+     "Trinity College London",
+     "Focus areas:",
+     "Tone production",
+     "Embouchure and breath control (single reed technique)",
+     "Fingering technique (including register key use)",
+     "Articulation",
+     "Sight reading",
+     "Musical expression and interpretation",
+     "🎼 Level 1",
+     "Age Group: 6+Duration: 6–8 months for each grade",
+     "Prep for Trinity Clarinet Initial and Trinity Clarinet Grade 1, Prep for ABRSM Clarinet Initial and Grade 1",
+     "Prerequisites:",
+     "• None",
+     "Requirements:",
+     "• Bb Clarinet (recommended for beginners)• A device to join the session• Stable Internet Connection",
+     "Topics Covered:",
+     "Anatomy of the Clarinet",
+     "Fundamental Techniques",
+     "Scales and Notes",
+     "Rhythm and Timing",
+     "Playing Techniques",
+     "• Basic tonguing (ta articulation)• Legato playing• Basic staccato• Smooth note transitions",
+     "Melodies and Songs",
+     "• Learning 30+ beginner melodies and clarinet exercises• Demonstration of 20+ simple pieces with proper tone",
+     "Reading and Notation",
+     "• Reading staff notation (Treble Clef)• Understanding rests, ties, dotted rhythms• Playing simple sheet music",
+     "Musical Expression",
+     "• Introduction to dynamics• Basic phrasing• Tone shaping",
+     "Preparation for Exams",
+     "Learning Outcomes",
+     "ABRSM Clarinet Repertoire",
+     "Initial Grade",
+     "● Perform 2 pieces",
+     "Sample:● \"Hot Cross Buns\"● \"Mary Had a Little Lamb\"● \"Lightly Row\"● \"When the Saints Go Marching In\"",
+     "Grade 1",
+     "● Perform 3 pieces",
+     "Sample:● \"Ode to Joy\" – Beethoven● \"Minuet in G\" – Bach (simplified)● \"Jingle Bells\"● \"Amazing Grace\"",
+     "Trinity Clarinet Sample Repertoire",
+     "Initial Grade",
+     "● Perform 2 pieces",
+     "Sample:● \"London Bridge\"● \"Twinkle Twinkle Little Star\"● \"You Are My Sunshine\"",
+     "Grade 1",
+     "● Perform 3 pieces",
+     "Sample:● \"Greensleeves\"● \"Scarborough Fair\"● \"Ode to Joy\"",
+     "🎼 Level 2",
+     "Age Group: 8+Duration: 6–8 months per grade",
+     "Prep for Trinity Clarinet Grades 2–4 and ABRSM Grades 2–4",
+     "Prerequisites:",
+     "• Completion of Level 1",
+     "Requirements:",
+     "• Bb Clarinet• Device + Internet",
+     "Topics Covered:",
+     "Scales and Technical Skills",
+     "Tone Development",
+     "Articulation",
+     "o Single tonguingo Introduction to double tonguingo Legato vs staccatoo Dynamic shaping",
+     "Rhythm",
+     "o Triplets, dotted rhythmso Compound timeo Syncopation",
+     "Playing Techniques",
+     "o Register key usage (clarion register)o Smooth register transitionso Ornamentation",
+     "Aural Skills",
+     "o Pitch recognitiono Playing by earo Call-response",
+     "Repertoire",
+     "o 20+ pieces across classical and light styleso Focus on phrasing",
+     "Exam Preparation",
+     "o Trinity + ABRSM Grades 2–4o Sight reading and aural",
+     "Learning Outcomes",
+     "ABRSM Clarinet Repertoire",
+     "Grade 2",
+     "o \"Minuet in G\" – Bacho \"Folk Song\"o \"Lightly Row\"",
+     "Grade 3",
+     "o \"Menuett\" – Mozarto \"Air\" – Purcell",
+     "Grade 4",
+     "o \"Sonatina\" – Clementio \"Greensleeves\"",
+     "Trinity Clarinet Repertoire",
+     "Grade 2",
+     "o \"Scarborough Fair\"o \"Amazing Grace\"",
+     "Grade 3",
+     "o \"Bourrée\" – Handelo \"Folk Variations\""
+    ]
+   }
+  ],
+  "short_description": "Personalised live Clarinet coaching.",
+  "description": "<p>• Learn from home with proper posture and embouchure guidance• Flexible scheduling for students• Access to trained clarinet instructors• Focus on tone production, breath control, and articulation• Preparation for internationally recognized certifications</p><p>For Parents:This program develops breath control, discipline, coordination, listening skills, and musical expression, while building confidence through performance.</p><p>• Standard clarinet used by beginners and professionals• Balanced, warm tone• Widely used in classical, jazz, and band music• Recommended for most students</p><p>• Slightly longer than Bb clarinet• Warmer, darker tone• Common in orchestral repertoire• Used in advanced classical performance</p><p>• Larger instrument with deeper pitch• Rich, resonant sound• Used in orchestras, bands, and modern compositions• Requires more air support</p><p>• Smaller and higher-pitched• Bright, sharp tone• Used in orchestras and wind ensembles• More advanced and less common for beginners</p><p>👉 Bb Clarinet is strongly recommended for beginners</p><p>• Standard learning instrument• Easier fingering system• Comfortable size and handling• Used in ABRSM / Trinity exams</p>",
+  "regular_price": 1500.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/clarinet.png",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments > Clarinet",
+   "Musical Instruments"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Tabla",
+  "slug": "tabla",
+  "subtitle": "Personalised live Tabla coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Tabla",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "Beginner",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Sargam Geet",
+     "Simple Bhajans",
+     "Basic Folk Tunes"
+    ]
+   },
+   {
+    "title": "Intermediate",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Bandish in Yaman",
+     "Bandish in Kafi"
+    ]
+   }
+  ],
+  "short_description": "Personalised live Tabla coaching.",
+  "description": "<p>• Interactive and engaging live classes• 1:1 and group sessions available• Accessible globally (India, USA, UK, Europe, etc.)• Flexible scheduling• No contracts or hidden fees• Free demo class• Suitable for kids aged 6+• Focus on Hindustani classical rhythm system• Performance-based learning approach• Certificates of completion available</p><p>• Learn from home with proper hand technique and posture guidance• Flexible scheduling for students• Access to trained Indian classical tabla instructors• Focus on Bol, Taal, Layakari, and rhythmic clarity• Develop timing, coordination, and musical understanding</p><p>This program develops rhythm sense, coordination, discipline, concentration, and mathematical thinking, while enhancing creativity and confidence through structured rhythmic training and performance.</p><p>(Keep same as your file — no change needed)</p><p>The Tabla is the primary percussion instrument in Hindustani classical music, consisting of:</p><p>• Dayan (right drum) – tuned, melodic• Bayan (left drum) – bass, modulation</p><p>It is used in:• Classical music• Semi-classical (Bhajan, Ghazal)• Film & fusion music</p><p>• Hindustani Classical Tradition (Guru-Shishya Parampara)• Institutional frameworks (Prayag Sangeet Samiti / Gandharva Mahavidyalaya)</p>",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Tabla-1.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments",
+   "Musical Instruments > Tabla"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Indian Flute",
+  "slug": "indian-flute",
+  "subtitle": "Personalised live Indian Flute coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Indian Flute",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "Curriculum",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "About the Curriculum:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Associated Board of the Royal Schools of Music:",
+     "https://www.abrsm.org/en-in",
+     "Trinity College London",
+     "https://www.trinitycollege.com/qualifications/music",
+     "Rockschool Limited",
+     "https://www.rslawards.com/rockschool/"
+    ]
+   },
+   {
+    "title": "Level 1",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Age Group: 6+Duration: 6–8 months for each grade",
+     "Prep for Trinity Flute Initial and Trinity Flute Grade 1, Prep for ABRSM Flute Initial and Grade 1",
+     "Prerequisites:",
+     "• None",
+     "Requirements:",
+     "Topics Covered:",
+     "Anatomy of the Flute",
+     "Parts of the flute (Headjoint, Body, Footjoint, Keys)",
+     "Understanding how each part affects tone and pitch",
+     "Introduction to Boehm key system",
+     "Fundamental Techniques",
+     "Embouchure formation (lip shape and air direction)",
+     "Proper posture and hand positioning",
+     "Breath control (diaphragmatic breathing)",
+     "Tone production (clear and steady sound)",
+     "Scales and Notes",
+     "Introduction to staff notation (Treble Clef)",
+     "First octave notes (C–B)",
+     "Basic fingering system",
+     "Major scales (C Major, G Major – 1 octave)",
+     "Rhythm and Timing",
+     "Basic rhythm reading",
+     "Note values (whole, half, quarter, eighth notes)",
+     "Counting and clapping exercises",
+     "Playing with metronome",
+     "Playing Techniques",
+     "Basic tonguing (ta / da articulation)",
+     "Legato playing (smooth transitions)",
+     "Basic staccato (short notes)",
+     "Smooth note transitions using controlled airflow",
+     "Melodies and Songs",
+     "Learning 30+ beginner melodies and flute exercises",
+     "Demonstration of 20+ simple pieces with proper tone and articulation",
+     "Reading and Notation",
+     "Reading staff notation (Treble Clef)",
+     "Understanding rests, ties, and dotted rhythms",
+     "Playing simple sheet music",
+     "Musical Expression",
+     "Introduction to dynamics (loud/soft)",
+     "Basic phrasing",
+     "Breath-controlled musical shaping",
+     "Preparation for Exams",
+     "Familiarity with Trinity Flute Initial and Grade 1 requirements",
+     "Familiarity with ABRSM Flute Initial and Grade 1 requirements",
+     "Practice pieces and exam-style exercises",
+     "Learning Outcomes",
+     "ABRSM Flute Repertoire",
+     "Initial Grade",
+     "Requirements:● Pieces: Perform 2 pieces",
+     "Grade 1",
+     "Requirements:● Pieces: Perform 3 pieces",
+     "Trinity Flute Sample Repertoire",
+     "Initial Grade",
+     "Requirements:● Perform 2 pieces",
+     "Grade 1",
+     "Requirements:● Perform 3 pieces",
+     "🪈 Level 2",
+     "Age Group: 8+Duration: 6–8 months for each grade",
+     "Prep for Trinity Flute Grade 2, Grade 3, Grade 4 and Prep for ABRSM Flute Grade 2, Grade 3, Grade 4",
+     "Prerequisites:",
+     "• Completion of Level 1 or equivalent experience",
+     "Requirements:",
+     "• Western Concert Flute (C Flute)• A device to join the session• Stable Internet Connection",
+     "Topics Covered:",
+     "Scales and Technical Skills:",
+     "Tone Development and Control:",
+     "Articulation and Expression:",
+     "Rhythm and Timing:",
+     "Playing Techniques:",
+     "Aural Skills:",
+     "o Pitch recognition exerciseso Playing by ear (simple melodies)o Call-and-response exercises",
+     "Repertoire:",
+     "Exam Preparation:",
+     "Learning Outcomes",
+     "ABRSM Flute Sample Repertoire",
+     "Grade 2",
+     "o \"Minuet in G\" – Bacho \"Folk Song\" (Traditional)o \"Lightly Row\" (Variation)",
+     "Grade 3",
+     "o \"Menuett\" – Mozarto \"Air\" – Purcello \"Simple Waltz\" (Classical adaptation)",
+     "Grade 4",
+     "o \"Sonatina\" – Clementi (adapted)o \"Greensleeves\" (arranged)o \"Study Piece\" – ABRSM selection"
+    ]
+   }
+  ],
+  "short_description": "Personalised live Indian Flute coaching.",
+  "description": "<p>For Parents:This program develops breath control, focus, discipline, and musical sensitivity, while improving cognitive coordination and listening skills.</p><p>What is the difference between Indian Bansuri Flute and Western Concert Flute?</p><p>The Bansuri is a bamboo flute without keys, used mainly in Indian classical music, focusing on expressive playing and improvisation.The Western Concert Flute is a metal, key-based instrument (Boehm system) used in Western classical, orchestral, and modern music.Bansuri relies on breath control and finger placement, while the Western flute allows faster, more precise note changes using keys.The sound of the Bansuri is warm and earthy, whereas the Western flute is bright and versatile.Bansuri learning is largely oral, while Western flute follows structured notation and exams (ABRSM, Trinity).Choose Bansuri for Indian classical expression, and Western flute for global music and certifications.</p><p>At IndiaTutorsOnline, we believe in the limitless potential within everyone to discover and develop their musical talents. We are dedicated to providing high-quality, accessible, and engaging online music classes that cater to learners of all ages and skill levels.</p><p>Our mission is to eliminate barriers to music education, empowering individuals from all walks of life to pursue their passion for music, no matter their location, financial situation, or prior experience.</p><p>Whether your dream is to master the piano, rock out on the Flute, or compose your own symphonies, IndiaTutorsOnline is here to help you bring your musical aspirations to life. Join us today and experience the joy of making music with IndiaTutorsOnline—where your journey to excellence begins.</p>",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments > Indian Flute",
+   "Musical Instruments"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Western Flute",
+  "slug": "western-flute",
+  "subtitle": "Personalised live Western Flute coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Western Flute",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "Curriculum",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "About the Curriculum:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Associated Board of the Royal Schools of Music:",
+     "https://www.abrsm.org/en-in",
+     "Trinity College London",
+     "https://www.trinitycollege.com/qualifications/music",
+     "Rockschool Limited",
+     "https://www.rslawards.com/rockschool/"
+    ]
+   },
+   {
+    "title": "Level 1",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Age Group: 6+Duration: 6–8 months for each grade",
+     "Prep for Trinity Flute Initial and Trinity Flute Grade 1, Prep for ABRSM Flute Initial and Grade 1",
+     "Prerequisites:",
+     "• None",
+     "Requirements:",
+     "Topics Covered:",
+     "Anatomy of the Flute",
+     "Parts of the flute (Headjoint, Body, Footjoint, Keys)",
+     "Understanding how each part affects tone and pitch",
+     "Introduction to Boehm key system",
+     "Fundamental Techniques",
+     "Embouchure formation (lip shape and air direction)",
+     "Proper posture and hand positioning",
+     "Breath control (diaphragmatic breathing)",
+     "Tone production (clear and steady sound)",
+     "Scales and Notes",
+     "Introduction to staff notation (Treble Clef)",
+     "First octave notes (C–B)",
+     "Basic fingering system",
+     "Major scales (C Major, G Major – 1 octave)",
+     "Rhythm and Timing",
+     "Basic rhythm reading",
+     "Note values (whole, half, quarter, eighth notes)",
+     "Counting and clapping exercises",
+     "Playing with metronome",
+     "Playing Techniques",
+     "Basic tonguing (ta / da articulation)",
+     "Legato playing (smooth transitions)",
+     "Basic staccato (short notes)",
+     "Smooth note transitions using controlled airflow",
+     "Melodies and Songs",
+     "Learning 30+ beginner melodies and flute exercises",
+     "Demonstration of 20+ simple pieces with proper tone and articulation",
+     "Reading and Notation",
+     "Reading staff notation (Treble Clef)",
+     "Understanding rests, ties, and dotted rhythms",
+     "Playing simple sheet music",
+     "Musical Expression",
+     "Introduction to dynamics (loud/soft)",
+     "Basic phrasing",
+     "Breath-controlled musical shaping",
+     "Preparation for Exams",
+     "Familiarity with Trinity Flute Initial and Grade 1 requirements",
+     "Familiarity with ABRSM Flute Initial and Grade 1 requirements",
+     "Practice pieces and exam-style exercises",
+     "Learning Outcomes",
+     "ABRSM Flute Repertoire",
+     "Initial Grade",
+     "Requirements:● Pieces: Perform 2 pieces",
+     "Grade 1",
+     "Requirements:● Pieces: Perform 3 pieces",
+     "Trinity Flute Sample Repertoire",
+     "Initial Grade",
+     "Requirements:● Perform 2 pieces",
+     "Grade 1",
+     "Requirements:● Perform 3 pieces",
+     "🪈 Level 2",
+     "Age Group: 8+Duration: 6–8 months for each grade",
+     "Prep for Trinity Flute Grade 2, Grade 3, Grade 4 and Prep for ABRSM Flute Grade 2, Grade 3, Grade 4",
+     "Prerequisites:",
+     "• Completion of Level 1 or equivalent experience",
+     "Requirements:",
+     "• Western Concert Flute (C Flute)• A device to join the session• Stable Internet Connection",
+     "Topics Covered:",
+     "Scales and Technical Skills:",
+     "Tone Development and Control:",
+     "Articulation and Expression:",
+     "Rhythm and Timing:",
+     "Playing Techniques:",
+     "Aural Skills:",
+     "o Pitch recognition exerciseso Playing by ear (simple melodies)o Call-and-response exercises",
+     "Repertoire:",
+     "Exam Preparation:",
+     "Learning Outcomes",
+     "ABRSM Flute Sample Repertoire",
+     "Grade 2",
+     "o \"Minuet in G\" – Bacho \"Folk Song\" (Traditional)o \"Lightly Row\" (Variation)",
+     "Grade 3",
+     "o \"Menuett\" – Mozarto \"Air\" – Purcello \"Simple Waltz\" (Classical adaptation)",
+     "Grade 4",
+     "o \"Sonatina\" – Clementi (adapted)o \"Greensleeves\" (arranged)o \"Study Piece\" – ABRSM selection"
+    ]
+   }
+  ],
+  "short_description": "Personalised live Western Flute coaching.",
+  "description": "<p>For Parents:This program develops breath control, focus, discipline, and musical sensitivity, while improving cognitive coordination and listening skills.</p><p>What is the difference between Indian Bansuri Flute and Western Concert Flute?</p><p>The Bansuri is a bamboo flute without keys, used mainly in Indian classical music, focusing on expressive playing and improvisation.The Western Concert Flute is a metal, key-based instrument (Boehm system) used in Western classical, orchestral, and modern music.Bansuri relies on breath control and finger placement, while the Western flute allows faster, more precise note changes using keys.The sound of the Bansuri is warm and earthy, whereas the Western flute is bright and versatile.Bansuri learning is largely oral, while Western flute follows structured notation and exams (ABRSM, Trinity).Choose Bansuri for Indian classical expression, and Western flute for global music and certifications.</p><p>At IndiaTutorsOnline, we believe in the limitless potential within everyone to discover and develop their musical talents. We are dedicated to providing high-quality, accessible, and engaging online music classes that cater to learners of all ages and skill levels.</p><p>Our mission is to eliminate barriers to music education, empowering individuals from all walks of life to pursue their passion for music, no matter their location, financial situation, or prior experience.</p><p>Whether your dream is to master the piano, rock out on the Flute, or compose your own symphonies, IndiaTutorsOnline is here to help you bring your musical aspirations to life. Join us today and experience the joy of making music with IndiaTutorsOnline—where your journey to excellence begins.</p>",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Sanskrit-1.webp",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments",
+   "Musical Instruments > Western Flute"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Saxophone",
+  "slug": "saxophone",
+  "subtitle": "Personalised live Saxophone coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Saxophone",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "Curriculum",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "About the Curriculum:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Associated Board of the Royal Schools of Music:",
+     "https://www.abrsm.org/en-in",
+     "Trinity College London",
+     "https://www.trinitycollege.com/qualifications/music",
+     "Rockschool Limited",
+     "https://www.rslawards.com/rockschool/",
+     "🎷 Curriculum Overview",
+     "This curriculum is aligned with:",
+     "ABRSM (Grades Initial–8)",
+     "Trinity College London",
+     "Rockschool (for contemporary styles)",
+     "Focus areas:",
+     "Tone production",
+     "Embouchure and breath control",
+     "Fingering technique",
+     "Articulation",
+     "Sight reading",
+     "Improvisation (advanced levels)",
+     "🎷 Level 1",
+     "Age Group: 6+Duration: 6–8 months for each grade",
+     "Prerequisites:",
+     "• None",
+     "Requirements:",
+     "• Alto Saxophone (recommended for beginners)• A device to join the session• Stable Internet Connection",
+     "Topics Covered:",
+     "Anatomy of the Saxophone",
+     "Fundamental Techniques",
+     "Scales and Notes",
+     "Rhythm and Timing",
+     "Playing Techniques",
+     "Melodies and Songs",
+     "Reading and Notation",
+     "Musical Expression",
+     "• Introduction to dynamics (loud/soft)• Basic phrasing• Tone shaping through breath",
+     "Preparation for Exams",
+     "Learning Outcomes",
+     "ABRSM Saxophone Repertoire",
+     "Initial Grade",
+     "Requirements:● Perform 2 pieces",
+     "Grade 1",
+     "Requirements:● Perform 3 pieces",
+     "Trinity Saxophone Sample Repertoire",
+     "Initial Grade",
+     "Requirements:● Perform 2 pieces",
+     "Grade 1",
+     "Requirements:● Perform 3 pieces",
+     "🎷 Level 2",
+     "Age Group: 8+Duration: 6–8 months for each grade",
+     "Prep for Trinity Saxophone Grade 2, Grade 3, Grade 4 and Prep for ABRSM Saxophone Grade 2, Grade 3, Grade 4",
+     "Prerequisites:",
+     "• Completion of Level 1 or equivalent experience",
+     "Requirements:",
+     "• Alto Saxophone• A device to join the session• Stable Internet Connection",
+     "Topics Covered:",
+     "Scales and Technical Skills:",
+     "Tone Development and Control:",
+     "Articulation and Expression:",
+     "o Single tonguing clarityo Introduction to double tonguingo Legato vs staccato contrasto Dynamic control",
+     "Rhythm and Timing:",
+     "o Triplets and dotted rhythmso Compound time signatureso Syncopation basicso Playing with backing tracks",
+     "Playing Techniques:",
+     "o Smooth register transitionso Finger coordination across octaveso Breath phrasingo Basic ornamentation",
+     "Aural Skills:",
+     "o Pitch recognitiono Playing by earo Call-and-response",
+     "Repertoire:",
+     "o Learning 20+ pieces across classical, jazz, and contemporary styleso Focus on phrasing and tone",
+     "Exam Preparation:",
+     "o Trinity and ABRSM Grades 2–4 requirementso Sight-reading and aural practice",
+     "Learning Outcomes",
+     "ABRSM Saxophone Sample Repertoire",
+     "Grade 2",
+     "o \"Minuet in G\" – Bacho \"Folk Song\"o \"Lightly Row\"",
+     "Grade 3",
+     "o \"Menuett\" – Mozarto \"Air\" – Purcello \"Simple Waltz\"",
+     "Grade 4",
+     "o \"Sonatina\" – Clementio \"Greensleeves\"o \"Study Piece\"",
+     "Trinity Saxophone Sample Repertoire",
+     "Grade 2",
+     "o \"Scarborough Fair\"o \"Amazing Grace\"o \"Simple Study\"",
+     "Grade 3",
+     "o \"Bourrée\" – Handelo \"Folk Variations\"o \"Baroque Study\"",
+     "Grade 4",
+     "o \"Sonatina Movement\"o \"Minuet & Trio\"o \"Romantic Study\"",
+     "🎷 Level 3",
+     "Age Group: 10+Duration: 6–8 months for each grade",
+     "Prep for Trinity Saxophone Grade 5–8 and ABRSM Saxophone Grade 5–8",
+     "Prerequisites:",
+     "• Completion of Level 2"
+    ]
+   }
+  ],
+  "short_description": "Personalised live Saxophone coaching.",
+  "description": "<p>For Parents:This program develops breath control, discipline, coordination, listening skills, and musical expression, while building confidence through performance.</p><p>2. Alto Saxophone (Most Recommended for Beginners)</p><p>👉 Alto Saxophone is strongly recommended for beginners</p><p>What is the difference between Indian Bansuri Flute and Western Concert Flute?</p><p>The Bansuri is a bamboo flute without keys, used mainly in Indian classical music, focusing on expressive playing and improvisation.The Western Concert Flute is a metal, key-based instrument (Boehm system) used in Western classical, orchestral, and modern music.Bansuri relies on breath control and finger placement, while the Western flute allows faster, more precise note changes using keys.The sound of the Bansuri is warm and earthy, whereas the Western flute is bright and versatile.Bansuri learning is largely oral, while Western flute follows structured notation and exams (ABRSM, Trinity).Choose Bansuri for Indian classical expression, and Western flute for global music and certifications.</p><p>At IndiaTutorsOnline, we believe in the limitless potential within everyone to discover and develop their musical talents. We are dedicated to providing high-quality, accessible, and engaging online music classes that cater to learners of all ages and skill levels.</p><p>Our mission is to eliminate barriers to music education, empowering individuals from all walks of life to pursue their passion for music, no matter their location, financial situation, or prior experience.</p><p>Whether your dream is to master the piano, rock out on the Saxophone, or compose your own symphonies, IndiaTutorsOnline is here to help you bring your musical aspirations to life. Join us today and experience the joy of making music with IndiaTutorsOnline—where your journey to excellence begins.</p>",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Saxophone.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments",
+   "Musical Instruments > Saxophone"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Music Theory",
+  "slug": "music-theory",
+  "subtitle": "Personalised live Music Theory coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Music Theory",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "Curriculum",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "About the Curriculum:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Associated Board of the Royal Schools of Music:",
+     "https://www.abrsm.org/en-in",
+     "Trinity College London",
+     "https://www.trinitycollege.com/qualifications/music",
+     "Rockschool Limited",
+     "https://www.rslawards.com/rockschool/",
+     "AP Music Theory",
+     "https://apstudents.collegeboard.org/courses/ap-music-theory"
+    ]
+   },
+   {
+    "title": "Level 1: Introduction to Music Theory",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Age Group: 6+",
+     "Duration: 6-8 months for each grade",
+     "Prep for ABRSM Music Theory Grade 1",
+     "Prep for Trinity Music Theory Grade 1",
+     "Prep for RSL Music Theory Debut and Grade 1",
+     "Prerequisites",
+     "No prior knowledge of music theory required.",
+     "Basic understanding of reading and writing skills.",
+     "Interest in learning about music notation and theory.",
+     "1. Basics of Notation:",
+     "Introduction to the staff, clefs (treble and bass), and note values (whole, half, quarter, eighth).",
+     "Identifying notes on the staff and understanding their duration.",
+     "2. Rhythm and Meter:",
+     "Understanding time signatures (4/4, 3/4) and basic rhythmic patterns.",
+     "Practicing counting rhythms and clapping exercises.",
+     "3. Scales and Key Signatures:",
+     "Introduction to major scales (C, G, D, F) and their key signatures.",
+     "Identifying tonic, dominant, and subdominant notes within scales.",
+     "4. Intervals and Chords:",
+     "Learning about intervals (unison, second, third) and their qualities (major, minor).",
+     "Introduction to basic triads (major, minor) and their inversions.",
+     "5. Ear Training:",
+     "Recognizing intervals and simple melodies by ear.",
+     "Call and response exercises to develop listening skills.",
+     "Learning Outcomes",
+     "Develop foundational understanding of music theory, including notation, rhythm, scales, intervals, chords, and ear training.",
+     "Read and interpret basic musical notation.",
+     "Perform rhythmic patterns accurately.",
+     "Identify key signatures and scales.",
+     "Recognize intervals and chords.",
+     "Demonstrate basic ear training skills."
+    ]
+   },
+   {
+    "title": "Level 2: Intermediate Music Theory",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Age Group: 8+",
+     "Duration: 6-8 months for each grade",
+     "Prep for Trinity Music Theory Grade 2, Trinity Music Theory Grade 3, and Trinity Music Theory Grade 4",
+     "Prep for ABRSM Music Theory Grade 2, ABRSM Music Theory Grade 3 and ABRSM Music Theory Grade 4",
+     "Prerequisites",
+     "Completion of a foundational music theory course or equivalent knowledge.",
+     "Proficiency in basic music notation, rhythm, scales, intervals, and chords.",
+     "Familiarity with reading and interpreting musical scores.",
+     "1. Advanced Notation:",
+     "Studying complex rhythms including dotted notes, syncopation, and ties.",
+     "Introduction to ledger lines and extended note values.",
+     "2. Harmony and Chord Progressions:",
+     "Building upon triads to learn about seventh chords (major 7th, dominant 7th).",
+     "Analyzing chord progressions in popular songs and classical pieces.",
+     "3. Modes and Minor Scales:",
+     "Introduction to natural, harmonic, and melodic minor scales.",
+     "Understanding modes (Ionian, Dorian, Aeolian) and their characteristics.",
+     "4. Melodic Dictation:",
+     "Practicing transcribing melodies by ear, focusing on pitch and rhythm accuracy.",
+     "Dictation exercises with increasing complexity.",
+     "5. Form and Structure:",
+     "Exploring musical forms such as binary, ternary, and rondo forms.",
+     "Analyzing compositions to identify structural elements.",
+     "Learning Outcomes:",
+     "Develop advanced skills in music notation, including the ability to read and interpret complex rhythms, dotted notes, syncopation, and ties.",
+     "Understand advanced concepts in harmony, including seventh chords (major 7th, dominant 7th) and their inversions, and analyze chord progressions in diverse musical repertoire.",
+     "Gain proficiency in understanding and applying modes (Ionian, Dorian, Aeolian) and minor scales (natural, harmonic, melodic).",
+     "Improve their ability to transcribe melodies by ear accurately, focusing on pitch and rhythm precision, and tackle dictation exercises of increasing complexity.",
+     "Explore various musical forms such as binary, ternary, and rondo forms, and analyze compositions to identify structural elements, enhancing their understanding of musical form and structure."
+    ]
+   },
+   {
+    "title": "Level 3: Advanced Music Theory",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Age Group: 8+",
+     "Duration: 6-8 months for each grade",
+     "Prerequisites:",
+     "Completion of intermediate-level music theory coursework or equivalent knowledge.",
+     "Proficiency in music notation, rhythm, scales, intervals, chords, and basic harmonic concepts.",
+     "Familiarity with reading and interpreting musical scores across various styles and time periods.",
+     "1. Advanced Harmony:",
+     "Studying extended chords (augmented 7th, diminished 7th) and their inversions.",
+     "Introduction to modulation and chromatic harmony.",
+     "2. Counterpoint:",
+     "Learning about species counterpoint and contrapuntal techniques.",
+     "Writing and analyzing simple contrapuntal exercises.",
+     "3. Analysis and Score Reading:",
+     "Analyzing complex compositions from various musical periods (Baroque, Classical, Romantic).",
+     "Score reading exercises to improve sight-reading skills.",
+     "4. Composition and Arranging:",
+     "Introduction to composition techniques and principles."
+    ]
+   }
+  ],
+  "short_description": "Personalised live Music Theory coaching.",
+  "description": "<p>1. Convenience: You can attend classes from the comfort of your own home or any location with internet access. This eliminates the need for commuting, saving you time and money.</p><p>2. Flexibility: Online classes often offer flexible scheduling options, allowing you to choose the time that works best for you. This flexibility is especially beneficial for those with busy schedules or irregular working hours.</p><p>3. Access to Quality Instructors: Online platforms often have a wide selection of qualified instructors from around the world. This means you can find a teacher whose teaching style and expertise align with your learning goals.</p><p>4. Cost-effectiveness: Online classes can be more affordable than in-person lessons since they eliminate overhead costs associated with maintaining a physical location. Additionally, you can often find a variety of pricing options to suit your budget.</p><p>5. Variety of Resources: Online music theory classes often come with a variety of supplementary resources such as video tutorials, practice exercises, and interactive learning tools, enhancing the overall learning experience.</p><p>6.Online Certifications: Opt for online examinations through various esteemed institutions and get certified for your skills.</p><p>At IndiaTutorsOnline, we believe that everyone has the potential to unlock their musical talents and start their journey of self-expression. IndiaTutorsOnline provides high-quality, accessible, and engaging online music classes for learners of all ages and skill levels.</p><p>We strive to break down barriers to learning and empower individuals from diverse backgrounds to pursue their passion for music, regardless of their geographical location, financial means, or previous experience.</p>",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/music-theory.jpg.jpeg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments > Music Theory",
+   "Musical Instruments"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Trumpet",
+  "slug": "trumpet",
+  "subtitle": "Personalised live Trumpet coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Trumpet",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "Advanced instrument, not for beginners",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "4. Flugelhorn",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Wider conical bore than the Bb trumpet",
+     "Warm, mellow tone similar to a French horn",
+     "Commonly used in jazz and brass bands",
+     "A natural progression for experienced Bb trumpet players"
+    ]
+   },
+   {
+    "title": "🎼 Which Trumpet Should You Start With?",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "👉 Bb Trumpet is strongly recommended for beginners",
+     "Standard learning instrument",
+     "Easier fingering system",
+     "Comfortable size and handling",
+     "Used in ABRSM / Trinity exams"
+    ]
+   },
+   {
+    "title": "🎼 About Trumpet vs French Horn (Short Understanding)",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "The French horn uses rotary valves and a much larger, coiled tube, producing a warmer, more mellow tone.",
+     "Both follow structured notation and global exam systems like ABRSM and Trinity."
+    ]
+   },
+   {
+    "title": "🎼 About IndiaTutorsOnline",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "Curriculum",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "About the Curriculum:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Associated Board of the Royal Schools of Music:",
+     "https://www.abrsm.org/en-in",
+     "Trinity College London",
+     "https://www.trinitycollege.com/qualifications/music",
+     "🎼  Curriculum Overview (Trumpet)",
+     "This curriculum is aligned with:",
+     "ABRSM (Grades Initial–8)",
+     "Trinity College London",
+     "Focus areas:",
+     "Tone production",
+     "Embouchure and breath control (lip buzzing technique)",
+     "Valve technique and fingering",
+     "Articulation",
+     "Sight reading",
+     "Musical expression and interpretation",
+     "🎼  Level 1",
+     "Age Group: 6+",
+     "Duration: 6–8 months for each grade",
+     "Prep for Trinity Trumpet Initial and Trinity Trumpet Grade 1, Prep for ABRSM Trumpet Initial and Grade 1",
+     "Prerequisites:",
+     "None",
+     "Requirements:",
+     "Bb Trumpet (recommended for beginners)",
+     "A device to join the session",
+     "Stable Internet Connection",
+     "Topics Covered:",
+     "Anatomy of the Trumpet",
+     "Parts of the trumpet (Mouthpiece, Lead Pipe, Valves, Bell, Water Key)",
+     "Understanding how valves change pitch",
+     "Introduction to the valve system",
+     "Fundamental Techniques",
+     "Embouchure formation (lip buzzing and mouthpiece placement)",
+     "Proper posture and hand positioning",
+     "Breath control (steady airflow support)",
+     "Tone production (clear and open sound)",
+     "Scales and Notes",
+     "Introduction to staff notation (Treble Clef)",
+     "Basic notes (C to G range – lower register)",
+     "Valve fingering system",
+     "Major scales (C Major, G Major – 1 octave)",
+     "Rhythm and Timing",
+     "Basic rhythm reading",
+     "Note values (whole, half, quarter, eighth notes)",
+     "Counting exercises",
+     "Playing with metronome",
+     "Playing Techniques",
+     "Basic tonguing (ta articulation)",
+     "Legato playing",
+     "Basic staccato",
+     "Smooth note transitions",
+     "Melodies and Songs",
+     "Learning 30+ beginner melodies and trumpet exercises",
+     "Demonstration of 20+ simple pieces with proper tone",
+     "Reading and Notation",
+     "Reading staff notation (Treble Clef)",
+     "Understanding rests, ties, dotted rhythms",
+     "Playing simple sheet music",
+     "Musical Expression",
+     "Introduction to dynamics",
+     "Basic phrasing",
+     "Tone shaping",
+     "Preparation for Exams",
+     "Trinity Trumpet Initial and Grade 1 requirements",
+     "ABRSM Trumpet Initial and Grade 1 requirements",
+     "Practice pieces and exercises",
+     "Learning Outcomes",
+     "Produce a clear tone with correct embouchure",
+     "Play basic melodies with accuracy",
+     "Demonstrate breath and articulation control",
+     "Read basic sheet music",
+     "Perform 10+ beginner pieces",
+     "Prepare for Initial/Grade 1 exams"
+    ]
+   }
+  ],
+  "short_description": "Personalised live Trumpet coaching.",
+  "description": "<p>This program develops breath control, discipline, coordination, listening skills, and musical expression, while building confidence through performance.</p>",
+  "regular_price": 1500.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Trumpet.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments",
+   "Musical Instruments > Trumpet"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Sitar",
+  "slug": "sitar",
+  "subtitle": "Personalised live Sitar coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Sitar",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "🏫 Institutional Frameworks (Prayag / Gandharva)",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "These are formal music education systems that provide:",
+     "Structured syllabus (levels/grades)",
+     "Written + practical examinations",
+     "Certification (recognized across India)",
+     "Standardized progression (Beginner → Advanced)",
+     "👉 Emphasis: Structure, assessment, and certification"
+    ]
+   },
+   {
+    "title": "🎓 Prayag Sangeet Samiti",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "🎓 Akhil Bharatiya Gandharva Mahavidyalaya Mandal",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "🎓 Pracheen Kala Kendra",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "🎵 Curriculum Focus Areas",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "This curriculum is based on the Hindustani Classical Music System, focusing on:",
+     "Mizrab Technique (plectrum technique and stroke patterns)",
+     "Raga (melodic framework and grammar)",
+     "Taal (rhythmic cycles and accompaniment)",
+     "Meend (string bending and glide ornaments)",
+     "Gamak (vigorous ornamental striking)",
+     "Alaap, Jod, Jhala, and Gat (classical performance formats)",
+     "Layakari (rhythmic improvisation)",
+     "🎵  Level 1 – Foundation Course",
+     "🎯 Age Group",
+     "7+",
+     "⏱️ Duration",
+     "6–8 months",
+     "📋 Prerequisites",
+     "Interest in music and willingness to practice regularly",
+     "🔧 Requirements",
+     "Sitar (beginner model recommended)",
+     "Mizrab (finger plectrum)",
+     "Device for online class",
+     "Stable internet connection",
+     "📚 Topics Covered",
+     "🎵 Basic Elements of Sitar",
+     "Introduction to parts of the Sitar",
+     "Correct sitting posture and holding technique",
+     "Understanding string names, tuning, and pegs",
+     "Right-hand Mizrab technique and basic stroke patterns",
+     "🎯 Basic Swaras & Strokes",
+     "Sa, Re, Ga, Ma, Pa, Dha, Ni, Sa (Aroha / Avaroha)",
+     "Da (downstroke) and Ra (upstroke) introduction",
+     "Single-string melodic exercises",
+     "Basic plucking clarity and tone production",
+     "🎼 Swara Practice",
+     "Repetition exercises for clarity and tonal control",
+     "Right-hand Mizrab stroke control",
+     "Left-hand finger pressure and fret accuracy",
+     "Slow tempo practice for accuracy",
+     "⏱️ Taal Introduction",
+     "Concept of Taal",
+     "Teentaal (16 beats) and Keherwa (8 beats) – introductory",
+     "Clapping (Taali) and waving (Khali)",
+     "Counting and maintaining rhythm",
+     "🎶 Basic Compositions",
+     "Basic Sargam (note exercise) in simple ragas",
+     "Introduction to Raga Yaman (basic notes)",
+     "Simple Gat (fixed composition) in slow tempo",
+     "Basic Alankars (melodic patterns)",
+     "🎼 Coordination & Tonal Development",
+     "Right-left hand synchronization exercises",
+     "Playing along with drone (tanpura)",
+     "Developing clean tone and picking consistency",
+     "🎓 Learning Outcomes You Can Expect",
+     "Develop correct posture and Mizrab technique",
+     "Play basic swaras with tonal clarity",
+     "Maintain steady rhythm in simple taals",
+     "Perform basic Alankars and simple Gat confidently",
+     "Understand basic taal structure (Taali/Khali)",
+     "Develop left-hand finger dexterity",
+     "Build a strong foundation for advanced melodic learning",
+     "🎵  Level 2 – Intermediate Course",
+     "🎯 Age Group",
+     "9+",
+     "⏱️ Duration",
+     "6–8 months",
+     "📋 Prerequisites",
+     "Completion of Level 1 or equivalent knowledge",
+     "Ability to play basic swaras and maintain simple taals",
+     "🔧 Requirements",
+     "Sitar",
+     "Mizrab",
+     "Device for online class",
+     "Stable internet connection",
+     "📚 Topics Covered",
+     "🎵 Intermediate Sitar Techniques",
+     "Refinement of Mizrab technique and posture"
+    ]
+   }
+  ],
+  "short_description": "Personalised live Sitar coaching.",
+  "description": "<p>Indian Classical Sitar Program (Hindustani Tradition)</p><p>Level 1 → Foundation (6–8 months)Level 2 → Raga Development & Technique (6–8 months)Level 3 → Advanced Performance & Mastery (8–12 months)</p><p>• Live online classes (1:1 or group)• Weekly structured sessions• Guided riyaz (practice routines)• Assignment-based progression• Periodic performance reviews• Feedback-driven learning• Optional certification pathway</p><p>This program develops concentration, finger dexterity, disciplined practice, tonal awareness, and cultural appreciation, while enhancing creativity and confidence through structured melodic training and performance.</p><p>(Keep same as your file — no change needed)</p><p>The Sitar is one of the most iconic string instruments in Hindustani classical music, renowned globally for its rich, resonant tone and versatility. The Sitar consists of:</p><p>🎓 Hindustani Classical Tradition (Guru–Shishya Parampara)</p><p>This is the traditional way of learning Indian classical music, where the student learns directly from a Guru (master) through:</p>",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments",
+   "Musical Instruments > Sitar"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Recorder",
+  "slug": "recorder",
+  "subtitle": "Personalised live Recorder coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Recorder",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Recorder coaching.",
+  "description": "",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments",
+   "Musical Instruments > Recorder"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Carnatic Violin",
+  "slug": "carnatic-violin",
+  "subtitle": "Personalised live Carnatic Violin coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Musical Instruments",
+   "Carnatic Violin",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Carnatic Violin coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Carnatic-3.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Musical Instruments > Carnatic Violin",
+   "Musical Instruments"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Carnatic Vocal Music",
+  "slug": "carnatic-vocal-music",
+  "subtitle": "Personalised live Carnatic Vocal Music coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Vocal Music",
+   "Carnatic",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "Curriculum",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "About BSPM",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Website: https://www.gandharvapune.org/cms/About-Bharatiya-Sangeet-Prasarak-Mandal%2c-Pune.html",
+     "Exam levels in BSPM:",
+     "Prarambhik – Preliminary",
+     "Praveshika Pratham - Elementary, Part I",
+     "Praveshika Purna - Elementary, Part II",
+     "Madhyama Pratham - Intermediate, Part I",
+     "Madhyama Purna - Intermediate, Part II",
+     "Vishaarad Pratham - Advanced, Part I",
+     "Vishaarad Purna - Advanced, Part II",
+     "Alankar Pratham - Master's, Part I",
+     "Alankar Purna - Master's, Part II",
+     "Sangitacharya - Ph.D.",
+     "Here are a few other certifications"
+    ]
+   },
+   {
+    "title": "Level 1(6-8 months)",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Prerequisites:",
+     "For kids aged 6 years and above",
+     "Interest in music",
+     "No Prior Musical Knowledge Required",
+     "Overview",
+     "Introduction to Carnatic music, its origin, and key features.",
+     "Brief introduction to Saint Purandara Dasa and his contributions.",
+     "Basic Concepts",
+     "Explanation of Shruthi, Swaras, Thalam, Kaalam, and Sthayis.",
+     "Interactive activities to help kids grasp these concepts.",
+     "Sarali Varase",
+     "Introduction to Sarali Varase (simple note patterns).",
+     "Practice sessions to sing Sarali Varase in different ragas.",
+     "Janti Varase",
+     "Progress to Janti Varase (two-note patterns).",
+     "Practice sessions and rhythm exercises.",
+     "Tharasthayi Varase",
+     "Introduction to Tharasthayi Varase (three-note patterns).",
+     "Emphasis on proper pronunciation and tone.",
+     "Mandrasthayi Varase",
+     "Move on to Mandrasthayi Varase (patterns covering lower octaves).",
+     "Incorporate simple compositions in these sessions.",
+     "Dhattu Varase",
+     "Introduce Dhattu Varase (four-note patterns).",
+     "Expand repertoire with more complex compositions.",
+     "Application and Practical Training",
+     "Carnatic Light + Classical Songs",
+     "Explore light and classical Carnatic songs suitable for children.",
+     "Focus on expression and emotion in singing.",
+     "Performance Techniques",
+     "Guidance on stage presence, microphone usage, and connecting with the audience.",
+     "Mock performance sessions and constructive feedback.",
+     "Certification Preparation",
+     "Review of all learned concepts.",
+     "Mock exams and assessments to prepare for certifications.",
+     "Learning Outcomes",
+     "Acquire a sound knowledge of the historical evolution of Carnatic music.",
+     "Understand the contributions of Saint Purandara Dasa to the Carnatic music tradition.",
+     "Demonstrate a comprehensive understanding of fundamental concepts such as Shruthi, Swara, Thaala, Kaala, etc.",
+     "Identify and sing all seven swaras in their correct Swarasthanas/positions.",
+     "Execute swaras accurately in both ascending and descending orders.",
+     "Sing all five Varase in three different speeds with precision.",
+     "Showcase a thorough understanding of rhythm and maintain alignment with Thaala.",
+     "Comfortably sing notes in both higher and lower octaves.",
+     "Demonstrate control and accuracy in navigating between octaves.",
+     "Sing a repertoire of five or more Carnatic light music songs.",
+     "Interpret the lyrics with appropriate emotion and expressiveness."
+    ]
+   },
+   {
+    "title": "Level 2(6-8 months)",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Preparation for BSPM Level 1 Prarambhik"
+    ]
+   },
+   {
+    "title": "Prerequisites",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "For kids aged 8 years and above.",
+     "Interest in music",
+     "Willingness to practise",
+     "3-4 months of Carnatic singing experience recommended."
+    ]
+   },
+   {
+    "title": "General Curriculum:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Introduction to Carnatic Music:",
+     "Trinity of Carnatic Music:",
+     "Differences between Carnatic and Hindustani Music:",
+     "Basic Terminologies:",
+     "Sarali Varisais:",
+     "Concept Explanation:",
+     "Provide a detailed explanation of Sarali Varisais, emphasizing their role in developing swara precision.",
+     "Practical Exercises:",
+     "Conduct exercises to help students identify and sing swaras accurately within the context of Sarali Varisais.",
+     "Janti Varisais:",
+     "Janti Varisais Instruction:",
+     "Introduce Janti Varisais and guide students in understanding their rhythmic patterns.",
+     "Rhythmic Exercises:",
+     "Tharasthayi Varisais:",
+     "Tharasthayi Varisais Exploration:",
+     "Explore Tharasthayi Varisais and delve into their complexity compared to earlier varisais.",
+     "Geethams Introduction:"
+    ]
+   }
+  ],
+  "short_description": "Personalised live Carnatic Vocal Music coaching.",
+  "description": "<p>Carnatic vocal music is a classical tradition originating from South India, characterized by its emphasis on intricate melodies, rhythmic precision, and devotional themes. In this art form, vocalists play a central role, rendering compositions that follow specific ragas and talas. The music often carries spiritual depth and cultural significance, making Carnatic vocal music a revered classical genre.</p><p>Start learning Carnatic Vocal Music from the comfort of your home!</p><p>Why Choose Online Carnatic Vocal Music Classes?</p><p>Rich Cultural Heritage: Carnatic vocal music is deeply embedded in the cultural fabric of South India, carrying centuries-old traditions and spiritual depth. Choosing this genre allows you to connect with a profound cultural heritage.</p><p>Melodic Complexity: The intricate melodic patterns of Carnatic music, expressed through a vast array of ragas, provide a unique and challenging musical journey. Learning to navigate these melodies enhances your understanding of musical intricacies.</p><p>Spiritual and Devotional Essence: Many Carnatic compositions carry devotional and spiritual themes, offering a transcendent and emotional musical experience. Engaging with these compositions allows you to explore the spiritual dimensions of music.</p><p>Rhythmic Precision: Carnatic music places a strong emphasis on rhythmic precision through talas. Mastering the rhythmic intricacies contributes to a well-rounded musical education, fostering a sense of discipline and control.</p><p>Vocal Expression: Carnatic vocal music places the human voice at the forefront, allowing for nuanced expression and emotional depth. Choosing to specialize in vocal music enables you to convey intricate musical nuances with your voice.</p>",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Carnatic-4.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Vocal Music > Carnatic",
+   "Vocal Music"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Hindustani Vocal Music",
+  "slug": "hindustani-vocal-music",
+  "subtitle": "Personalised live Hindustani Vocal Music coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Vocal Music",
+   "Hindustani",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "About IndiaTutorsOnline",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Welcome to IndiaTutorsOnline, your premier destination for high-quality online Vocal Music Classes!"
+    ]
+   },
+   {
+    "title": "Curriculum",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "About the Curriculum",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Preparing students for ABGMVM exams.",
+     "ABGMVM",
+     "https://abgmvm.org/",
+     "Each level of ABGMVM:",
+     "Prarambhik (Beginner Level)",
+     "Praveshika Pratham",
+     "Praveshika Purna",
+     "Madhyama Pratham",
+     "Madhyama Purna",
+     "Visharad Pratham / Upantya Visharad",
+     "Visharad Purna (Equivalent to a bachelor’s degree)",
+     "Sangeet Alankar (Equivalent to a master’s degree)",
+     "Sangeet Acharya (Equivalent to a Ph.D.)",
+     "Exam details form: https://abgmvm-exam.org/gmm-ioec/instructions.php",
+     "In our courses we prepare students for Level 1 (Prarambhik) to Level 3 (Praveshika Purna).",
+     "For further levels, we prepare students with 1:1 classes based on the specific curriculum.",
+     "Here are a few other certifications"
+    ]
+   },
+   {
+    "title": "Level 1",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Age Group: 7+",
+     "Course Duration: 6-8 months",
+     "Prerequisites:",
+     "Interest is hindustani music",
+     "Willingness to practise",
+     "Foundations of Hindustani Music",
+     "Understanding Swaras (Notes), Shuddha Swar, Komal Swar, and Teevra Swar",
+     "Basics of Shruti, Naad, Aaroh-Avroh, and Saptak (Octave)",
+     "Simple Alankaars (Patterns) with Shuddha Swaras",
+     "Posture and Hand/Finger Placement for Singing",
+     "Introduction to Singing with Tanpura (Sa.. Pa... Sa)",
+     "Basic Bandish/Songs in Raag Durga, Bhoop, Kafi, Des, and more",
+     "Introduction to Rhythm and Taal",
+     "Understanding Taal, Matra, Laya, Vibhag, Sum, Taali, and Khaali",
+     "Introduction to Dadra Taal and Alankars in Dadra Taal",
+     "Practice of Sargam Geet in Dadra Taal (with only Shuddha Swar)",
+     "Introduction to Keherwa Taal and Alankars in Keherwa Taal",
+     "Introduction to Teentaal/Tritaal and Alankars in Teentaal",
+     "Practice of the National Anthem (based on Raag Bilawal) in Teentaal",
+     "Introduction to Raag",
+     "Understanding Thaat and Its Notes",
+     "Introduction to Raag and Its Characteristics",
+     "Identifying Vaadi, Samvadi, Anuvadi, and Vivadi Swaras",
+     "Understanding Varjit and Nyas Swaras",
+     "Introduction to Raag Jaati and Lakshan Geet",
+     "Practice of Chhota Khayal in Raag Bilawal (Madhyalay Tritaal)",
+     "Prayer based on Raag Alhaiya Bilawal",
+     "Introduction to Musical Forms and Repertoire",
+     "Introduction to Sargam Geet and Lakshan Geet",
+     "Practice of Chhota Khayal and Bhajan based on Raag Kafi",
+     "Introduction to Shlok based on Raag Bhoop and Geet based on Raag Bhoop",
+     "Introduction to Pandit Vishnu Narayan Bhatkhande and His Contributions to Music",
+     "Preparation for ABGMVM Prarambik - Level 1 Examination",
+     "Revision of Swaras, Alankaars, and Taal Concepts",
+     "Advanced Practice of Alankaars with Shuddha and Vikrit Swaras",
+     "Comprehensive Study of Taal, Matra, Laya, and Vibhag",
+     "Advanced Alankars in Dadra, Keherwa, and Teentaal",
+     "Detailed Analysis of Raag Characteristics, Vaadi, Samvadi, and Anuvadi Swaras",
+     "Revision and Performance of Bhajans in Raag Kafi and Bhoop",
+     "In-depth Study of Pandit Vishnu Narayan Bhatkhande's Contributions to Music",
+     "Learning Outcomes",
+     "Students will develop a comprehensive understanding of the different types of notes (shuddha, komal, and teevara swaras) and their roles in Hindustani music.",
+     "Students will gain proficiency in understanding and performing various taals (rhythmic cycles) including Dadra Taal, Keherwa Taal, and Teentaal.",
+     "Students will learn about different ragas, their characteristics, and how to identify key elements such as vaadi, samvadi, and anuvadi swaras.",
+     "Students will develop proper vocal technique including posture, breath control, and hand/finger placement for singing.",
+     "Students will be introduced to a variety of bandishes (compositions) and bhajans based on different ragas, allowing them to build a repertoire of songs.",
+     "The curriculum prepares students for the ABGMVM Prarambik - Level 1 Examination, covering a range of topics including swaras, alankaars, taal concepts, raag characteristics, and performance of compositions.",
+     "Students will gain an understanding of the cultural and historical significance of Hindustani music, including the contributions of notable figures such as Pandit Vishnu Narayan Bhatkhande."
+    ]
+   },
+   {
+    "title": "Level 2",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Age Group: 9+",
+     "Course Duration: 6-8 months",
+     "Prerequisites:",
+     "Students should have a strong foundation in the basics of Hindustani music, including an understanding of swaras, taal, and ragas. The Level 1 curriculum will serve as a suitable prerequisite.",
+     "Proficiency in basic vocal techniques, including proper posture, breath control, and hand/finger placement for singing."
+    ]
+   },
+   {
+    "title": "Advanced Technical Concepts",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Technical Terminology: Exploring advanced terminology in Hindustani vocal music",
+     "Understanding the Time Cycle of Ragas: Exploring the time cycles and characteristics of different ragas",
+     "Raga Khamaj, Yaman, Desh, Bhairav: Detailed study and practice of these important ragas"
+    ]
+   },
+   {
+    "title": "Advanced Musical Forms and Techniques",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Dhrupad and Bhajans: Introduction to other classical forms and devotional music",
+     "Chota Khayal in Different Ragas: Practicing and performing Chota Khayal compositions in various ragas",
+     "Learning Outcomes:",
+     "Students will acquire a more advanced vocabulary in Hindustani vocal music, including technical terminology related to singing and musical concepts.",
+     "Develop proficiency in executing complex melodic phrases in various ragas, showcasing an increased level of musical expressiveness and creativity.",
+     "Gain an in-depth understanding of the time cycles and characteristics specific to different ragas, enabling more nuanced and insightful performances.",
+     "Explore various styles and forms of singing within Hindustani classical music, expanding the student's versatility and expressive range.",
+     "Conduct a detailed study and practice of important ragas such as Khamaj, Yaman, Desh, and Bhairav, demonstrating a deeper understanding of their nuances and emotive qualities.",
+     "Understand the life and contributions of the legendary musician \"Miyan Tansen,\" placing the musical learning in a historical and cultural context."
+    ]
+   }
+  ],
+  "short_description": "Personalised live Hindustani Vocal Music coaching.",
+  "description": "<p>Hindustani vocal music, a classical tradition originating in the Indian subcontinent, is characterized by its emphasis on improvisation, intricate melodic patterns, and the use of ragas and talas. The genre's rich history involves contributions from various musicians and scholars, with a profound connection between performers and audiences. In Hindustani vocal music, artists express deep emotions and narratives through their voices, employing techniques such as ornamentation and vibrato. The diverse repertoire spans devotional, classical, semi-classical, and experimental compositions. Gharanas, distinct musical schools, have played a significant role in shaping the tradition.</p><p>Start learning Hindustani Vocal Music from the comfort of your home!</p><p>Why Choose Online Hindustani Vocal Music Classes?</p><p>Expert Instructors: We have a team of experienced and talented vocal instructors who are master’s degree holders in Hindustani music or equivalent and are dedicated to helping you develop your vocal skills and achieve your musical goals. They possess a deep understanding of Hindustani vocal music and are passionate about sharing their knowledge with students.</p><p>Cultural Connection: Hindustani vocal music is deeply rooted in Indian culture and heritage, offering learners a profound connection to centuries-old traditions and artistic expressions.</p><p>Artistic Expression: Hindustani vocal music provides a platform for creative self-expression through melody, rhythm, and emotion, allowing learners to explore their artistic potential and develop their unique voice.</p><p>Musical Proficiency: Hindustani vocal training equips learners with essential musical skills such as pitch control, breath control, voice modulation, and improvisation, enhancing overall vocal proficiency and musicianship.</p><p>Emotional Intelligence: Engaging with Hindustani music fosters emotional intelligence as learners delve into the evocative expressions of different ragas and compositions, deepening their understanding of human emotions and cultural nuances.</p>",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Hindustani-Vocal.jpg.jpeg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Vocal Music > Hindustani",
+   "Vocal Music"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Western Vocal Music",
+  "slug": "western-vocal-music",
+  "subtitle": "Personalised live Western Vocal Music coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Vocal Music",
+   "Western",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "About IndiaTutorsOnline",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Here are the top reasons to Choose Us?",
+     "Experienced and Accomplished Instructors",
+     "Comprehensive Curriculum",
+     "Individualized Instruction",
+     "Flexibility and Convenience",
+     "Diverse Musical Repertoire"
+    ]
+   },
+   {
+    "title": "Curriculum",
+    "age": "",
+    "duration": "",
+    "topics": []
+   },
+   {
+    "title": "About the Curriculum:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Below are three internationally recognized music institutions.",
+     "Associated Board of the Royal Schools of Music:",
+     "https://www.abrsm.org/en-in",
+     "Trinity College London",
+     "https://www.trinitycollege.com/qualifications/music",
+     "Rockschool Limited",
+     "https://www.rslawards.com/rockschool/"
+    ]
+   },
+   {
+    "title": "Beginner:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Prep for Rockschool Vocals Debut and Rockschool Vocals Grade 1",
+     "Prep for Trinity Singing Initial and Trinity Singing Grade 1",
+     "Prep for ABRSM Singing Grade 1",
+     "Age Group: 6+",
+     "Course Duration: 4-6 months (Weekly 2 sessions)"
+    ]
+   },
+   {
+    "title": "Prerequisites:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "No prior vocal experience is required",
+     "Commitment to regular practice",
+     "Term 1: Fundamental Techniques and Foundations",
+     "1. Understanding Voice as an Instrument",
+     "Overview of vocal registers and their role as an instrument.",
+     "2. Posture, Breath Management, and Warm-up Techniques",
+     "Establishing effective singing posture, including the role of fingers.",
+     "Differentiating between diaphragmatic and chest breathing.",
+     "Strategies for breath management in songs.",
+     "Identifying optimal points for breathing within a song.",
+     "3. Supported Voice and Physical Warm-up",
+     "Techniques for singing with a supported voice.",
+     "Importance of physical warm-up for the body and face.",
+     "4. Vocal Warm-up Practices",
+     "Practical exercises: lip trills and humming.",
+     "5. Rhythmic Foundations",
+     "Learning spoken rhythms for enhanced rhythmic awareness.",
+     "6. Solfa Singing",
+     "Solfa singing using sheet music.",
+     "7. Introduction to Scales",
+     "Introduction to major scales, tonic chords, and arpeggios.",
+     "8. Basic Terms and Definitions",
+     "Introduction to essential terms used in Western Music.",
+     "Term 2: Advanced Techniques and Tonal Elements",
+     "1. Addressing Throat Tension and Jaw Position",
+     "Techniques for singing with a relaxed throat.",
+     "Achieving a neutral jaw position for optimal vocal production.",
+     "2. Understanding Tones, Semitones, and Vocal Registers",
+     "In-depth exploration of tones and semitones.",
+     "Revision of rhythms learned in term 1.",
+     "3. Melodic Exploration:",
+     "Revision of 5-tone and Pentatonic Melodies",
+     "Review and application of 5-tone and pentatonic melodies.",
+     "4. Introduction to Rests and Dotted Quarter Notes",
+     "Understanding and applying rests in vocal music.",
+     "Exploring dotted quarter notes in various time signatures.",
+     "5. Solfa Singing and Vocal Registration",
+     "Solfa singing: Major scale using slurs and dotted crotchets in 3/4 time.",
+     "Exploration of vocal registration and voice types.",
+     "6. Pentatonic Scale, Anacrusis, and Spoken Rhythms",
+     "Practical application of the pentatonic scale and anacrusis.",
+     "Incorporating spoken rhythms with an 8th note rest.",
+     "7. Solfa Singing with Leaps and Introductions to Slides",
+     "Solfa singing: Major scales using leaps of 4th, incorporating ties and 8th note rests.",
+     "Exploration of vocal slides, transitions, and blending.",
+     "Term 3: Advanced Concepts and Repertoire Development",
+     "1. Exploration of Intervals and Minor Pentatonic Melodies",
+     "Understanding intervals and incorporating them into vocal exercises.",
+     "Solfa singing: Minor pentatonic melodies.",
+     "2. Practice Planning and Structure",
+     "Strategies for effective practice planning.",
+     "Structuring vocal practice sessions for optimal progress.",
+     "3. Understanding Primary Triads in Major Scales",
+     "Exploration of primary triads within major scales.",
+     "4. Spoken Rhythms: ti ke (Dotted 8th and 16th)",
+     "Advanced spoken rhythms incorporating dotted 8th and 16th notes.",
+     "5. Solfa Singing:",
+     "8-bar Melodies Highlighting Primary Chords and Sequences",
+     "Practical application of solfa singing with 8-bar melodies, emphasizing primary chords and sequences.",
+     "Term 4: Exam Preparation and Performance Skills",
+     "1. Mock Exams and Confidence Building",
+     "Simulated exam conditions for practice.",
+     "Detailed feedback on performance, focusing on confidence-building.",
+     "2. Fine-Tuning and Artistic Development",
+     "Refinement of vocal technique.",
+     "Polishing repertoire and incorporating expressive elements.",
+     "3. Final Rehearsals and Exam Ready"
+    ]
+   }
+  ],
+  "short_description": "Personalised live Western Vocal Music coaching.",
+  "description": "<p>Why Choose Online Western Vocal Music Classes?</p><p>Expert Instructors: We have a team of experienced and talented vocal instructors who are certified from Trinity College London/Associated Board of the Royal Schools of Music/Rockschool or equivalent, who are dedicated to helping you develop your vocal skills and achieve your musical goals. They possess a deep understanding of Western vocal techniques and are passionate about sharing their knowledge with students.</p><p>Flexible Learning: With our online classes, you can enjoy the convenience of learning from the comfort of your own home, at your own pace. We offer flexible scheduling options to accommodate your busy lifestyle, allowing you to pursue your passion for music without disrupting your daily routine.</p><p>Comprehensive Curriculum: Our curriculum is carefully crafted to provide a well-rounded education in Western vocal music. Through our coaching students can apply for certifications from Trinity College London/Associated Board of the Royal Schools of Music/Rockschool. From vocal warm-ups and breathing exercises to exploring various musical genres and styles, our classes cover a wide range of topics to enhance your vocal abilities and musical understanding.</p><p>Personalized Approach: We understand that every student is unique, with different learning styles and goals. That's why our instructors tailor their teaching methods to meet your individual needs and coach you for the certification of your choice. Whether you're interested in pop, rock, jazz, or classical music, we'll help you develop a versatile voice that can adapt to any genre.</p><p>Affordable Pricing: We believe that high-quality music education should be accessible to everyone. That's why we offer competitive pricing options that fit various budgets. We are committed to providing exceptional value for your investment in your musical journey.</p><p>Enhanced Academic Performance: Studies have shown a positive correlation between music education and academic performance. Learning to sing involves various cognitive skills such as memory, attention, and pattern recognition, which can contribute to improved academic abilities.</p><p>Improved Discipline and Time Management: Committing to regular online classes fosters discipline and time management skills. These qualities are transferable to academic pursuits, helping children develop effective study habits and meet deadlines.</p>",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Western-Music-.jpg.jpeg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Vocal Music",
+   "Vocal Music > Western"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Scratch",
+  "slug": "scratch",
+  "subtitle": "Personalised live Scratch coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "Scratch",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Scratch coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Scratch.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies",
+   "IT Technologies > Scratch"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Blockly",
+  "slug": "blockly",
+  "subtitle": "Personalised live Blockly coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "Blockly",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Blockly coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Blockly.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies > Blockly",
+   "IT Technologies"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Roblox & Minecraft",
+  "slug": "roblox-minecraft",
+  "subtitle": "Personalised live Roblox & Minecraft coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "Roblox & Minecraft",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Roblox & Minecraft coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies",
+   "IT Technologies > Roblox & Minecraft"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Python",
+  "slug": "python",
+  "subtitle": "Personalised live Python coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "Python",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Python coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Python.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies",
+   "Python"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Java",
+  "slug": "java",
+  "subtitle": "Personalised live Java coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "Java",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Java coaching.",
+  "description": "",
+  "regular_price": 425.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/JAva.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies",
+   "IT Technologies > Java"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "C++",
+  "slug": "c",
+  "subtitle": "Personalised live C++ coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "C++",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live C++ coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/content-writing-course1s-1.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies > C++",
+   "IT Technologies"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Web Development",
+  "slug": "web-development",
+  "subtitle": "Personalised live Web Development coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "Web Development",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Web Development coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Web-Developement.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies",
+   "IT Technologies > Web Development"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "MIT App Inventor",
+  "slug": "mit-app-inventor",
+  "subtitle": "Personalised live MIT App Inventor coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "MIT App Inventor",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live MIT App Inventor coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-29.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies",
+   "IT Technologies > MIT App Inventor"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Robotics",
+  "slug": "robotics",
+  "subtitle": "Personalised live Robotics coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "Robotics",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Robotics coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Robotics.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies",
+   "IT Technologies > Robotics"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AI & ML",
+  "slug": "ai-ml",
+  "subtitle": "Personalised live AI & ML coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "AI & ML",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AI & ML coaching.",
+  "description": "",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/AIML.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies > AI & ML",
+   "IT Technologies"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Data Science",
+  "slug": "data-science",
+  "subtitle": "Personalised live Data Science coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "Data Science",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Data Science coaching.",
+  "description": "",
+  "regular_price": 450.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Data-Science.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies > Data Science",
+   "IT Technologies"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AI Prompting",
+  "slug": "ai-prompting",
+  "subtitle": "Personalised live AI Prompting coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "AI Prompting",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AI Prompting coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/AI-Prompting.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies > AI Prompting",
+   "IT Technologies"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Graphics Design",
+  "slug": "graphics-design",
+  "subtitle": "Personalised live Graphics Design coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "Graphics Design",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Graphics Design coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Graphics-Design.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies > Graphics Design",
+   "IT Technologies"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Video Editing",
+  "slug": "video-editing",
+  "subtitle": "Personalised live Video Editing coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "Video Editing",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Video Editing coaching.",
+  "description": "",
+  "regular_price": 450.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Video-Editing.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies",
+   "IT Technologies > Video Editing"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Animation",
+  "slug": "animation",
+  "subtitle": "Personalised live Animation coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "Animation",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Animation coaching.",
+  "description": "",
+  "regular_price": 450.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Animation.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies > Animation",
+   "IT Technologies"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "VFX",
+  "slug": "vfx",
+  "subtitle": "Personalised live VFX coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "VFX",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live VFX coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/VFX.jpg.jpeg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies",
+   "IT Technologies > VFX"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AWS",
+  "slug": "aws",
+  "subtitle": "Personalised live AWS coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "AWS",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AWS coaching.",
+  "description": "",
+  "regular_price": 450.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies > AWS",
+   "IT Technologies"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "DevOps",
+  "slug": "devops",
+  "subtitle": "Personalised live DevOps coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "IT Technologies",
+   "DevOps",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live DevOps coaching.",
+  "description": "",
+  "regular_price": 450.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "IT Technologies > DevOps",
+   "IT Technologies"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Rubik's Cube",
+  "slug": "rubiks-cube",
+  "subtitle": "Personalised live Rubik's Cube coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Mind Sports",
+   "Rubik's Cube",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Rubik's Cube coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Rubik-pixabay-54101.png",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Mind Sports",
+   "Mind Sports > Rubik's Cube"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Chess",
+  "slug": "chess",
+  "subtitle": "Personalised live Chess coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Mind Sports",
+   "Chess",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Chess coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Chess.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Mind Sports > Chess",
+   "Mind Sports"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Arts & Painting",
+  "slug": "arts-painting",
+  "subtitle": "Personalised live Arts & Painting coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Creative Skills",
+   "Arts & Painting",
+   "Live"
+  ],
+  "curriculum": [
+   {
+    "title": "Level 1",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Age: 5+",
+     "Prerequisites:",
+     "None",
+     "Duration: 12 sessions",
+     "Requirements:",
+     "Basic art supplies such as pencils, color pencils, crayons, Oil pastels watercolor paints, tempera paints, brushes, and paper. Access to a suitable workspace with adequate lighting and a flat surface for drawing and painting activities.",
+     "A device to connect to the session.",
+     "Parental or guardian supervision may be required, especially for younger children, to ensure safety and assistance with certain activities."
+    ]
+   },
+   {
+    "title": "Course Content:",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Introduction to Arts: Meaning and Definition of Art, Types, Functions, Scope and Purpose of Art.",
+     "Elements of Art: Line, Form, Shapes, Space, Colour, Tone and Texture",
+     "Principles of Art: Rhythm, Unity, Harmony, Contrast, Dominance, Balance and Perspective. Study of proportion, line, colour, form, tone, texture and graphic representation including understanding of Colour Wheel.",
+     "Exploring Colors and Shapes: Introduction to primary and secondary colors through fun activities and games. Basic understanding of shapes and their use in art. Simple color mixing experiments and shape recognition exercises",
+     "Introduction to Drawing: Learning basic drawing techniques using pencils, crayons, and markers. Introduction to still life drawing by depicting simple objects such as fruits or toys, Cartoon characters etc. Exploring landscape elements like trees, houses, and clouds through drawing exercises",
+     "Introduction to Painting: Introduction to different types of paint (watercolor, tempera, acrylic). Basic painting techniques such as brushstrokes, washes, and layering. Painting simple landscapes and still life scenes using basic shapes and colors.",
+     "Calligraphy: Introduction to different calligraphy styles and techniques. Practicing basic strokes and letterforms to create calligraphic artworks.",
+     "Drawing from memory: Develop the sense of observation and the capacity to retain and recall images and their co- ordination.",
+     "Learning Outcome: Develop fine motor skills, hand-eye coordination, and creativity through art activities."
+    ]
+   },
+   {
+    "title": "Level 2",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Age: 6+",
+     "Prerequisites:",
+     "Completion of the Level 1 curriculum or equivalent foundational knowledge.",
+     "Duration: 24 sessions",
+     "Requirements:",
+     "Expanded art supplies including pastels, charcoal, collage materials, various painting mediums, brushes, and textured surfaces."
+    ]
+   },
+   {
+    "title": "Course Content",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Classification of Colours: Colour Wheel, Primary, Secondary, Tertiary, Warm and Cool colours",
+     "Various Mediums and its Application: Pastel, Water Colour, Oil, Acrylic",
+     "Study of different types of pencil and its application: Graphite, charcoal etc.",
+     "Tools and Techniques: Types of Brushes, Preparation of Canvas stretching, priming, sizing and preparation of other ground surface of the Painting, Tools, Brushes, Spatula etc.",
+     "Developing Drawing Skills",
+     "Sketching techniques like hatching, stippling etc."
+    ]
+   },
+   {
+    "title": "Advanced drawing techniques such as shading, perspective, and proportions",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Introduction to portrait drawing by studying facial features and expressions",
+     "Exploring still life drawing with a focus on composition, lighting, and texture",
+     "Introduction to soft pastel art:",
+     "Exploring blending, layering, and shading techniques with soft pastels",
+     "Acrylic Painting",
+     "Exploring texture and layering techniques in acrylic painting",
+     "Painting still life compositions using acrylics.",
+     "Exploring Landscape Painting",
+     "Studying different types of landscapes (urban, rural, coastal) and their elements",
+     "Learning advanced painting techniques such as blending, layering, and creating depth",
+     "Light and shadows",
+     "Painting landscapes from imagination or observation using various mediums.",
+     "Exploring Craft Work and Origami",
+     "Introduction to basic origami folds and terminology.",
+     "Exploration of intermediate and advanced origami techniques.",
+     "Introduction to paper cutting, quilling, and other craft techniques.",
+     "Hands-on projects to enhance creativity and manual dexterity.",
+     "Culminating in a final project showcasing skills learned throughout the course.",
+     "Introduction to Doodling",
+     "Introduction to the history and significance of doodling as an art form.",
+     "Exploration of basic drawing techniques and tools for doodling.",
+     "Practice with various doodle patterns, motifs, and themed doodling."
+    ]
+   },
+   {
+    "title": "Advanced doodling techniques including zentangle and mandalas.",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Culmination in a final doodle art piece showcasing personal style and creativity.Top of Form",
+     "Introduction to Animation",
+     "Introduction to the principles and history of animation.",
+     "Hands-on practice with traditional animation techniques such as frame-by-frame animation.",
+     "Exploration of digital animation software and tools.",
+     "Projects focusing on character design, movement, and storytelling.",
+     "Introduction to Sculpture:",
+     "Creating basic shapes and forms using air-dry clay or modeling clay",
+     "Using clay creating basic sculptures focusing on form and texture",
+     "Exploring Different Mediums",
+     "Introduction to various art mediums such as charcoal and collage",
+     "Experimenting with different textures and effects through mixed media projects",
+     "Exploring abstract art by experimenting with non-representational forms and techniques"
+    ]
+   },
+   {
+    "title": "Level 3: Advanced Arts and Painting",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Age Group: 8+",
+     "Prerequisites:",
+     "Completion of the Intermediate curriculum or equivalent proficiency",
+     "Duration: 24+ sessions",
+     "Requirements:",
+     "Expanded art supplies including impasto mediums, glazes, palette knives, high-quality brushes (0.2.6, 8,12 round brush and 1/2 or 1inch flat brush), canvas, and various drawing materials.",
+     "Watercolour paper (Has to be watercolor, not regular paper – Brustro, canson, chitrapat, or any other watercolor paper brand)",
+     "Graphite Pencils, Charcoal stick, Blending Tools, Pastel Colours, Poster Colours, Water Colours, Palette, Pen and Inks, Masking tape, etc."
+    ]
+   },
+   {
+    "title": "Course Content",
+    "age": "",
+    "duration": "",
+    "topics": [
+     "Sketching and Pencil Shading:",
+     "fundamentals of sketching and different types of shading",
+     "Basic types of strokes like: Hatching, Stippling, Smudging, Shading, Scrumbling",
+     "Learning shape and form fundamentals: Drawing a character with geometric shapes, learn how light and shadow work on 3D forms, advanced form/highlight and shadow, finding geometric forms in the human face, creating a landscape out of geometric forms etc.",
+     "Learning values and contrast: Drawing still life value drawings, creating amazing artwork with value contrast etc.",
+     "Learning Texture creation on wood, stone, steel, paper, liquid etc.",
+     "Material guidance in using graphite, charcoal etc.",
+     "Watercolor Techniques",
+     "Three types of washes: Flat, Graded, and Variegated",
+     "Exploring advanced watercolor techniques such as floral, wet-on-wet and dry brushing"
+    ]
+   }
+  ],
+  "short_description": "Personalised live Arts & Painting coaching.",
+  "description": "<p>Why Choose Online Arts and Painting Classes?</p><p>In a world where screens dominate our daily lives, it's no surprise that the realm of education has also shifted its focus to the digital sphere. Online learning platforms have revolutionized how we acquire new skills, and the realm of arts and painting is no exception. Whether you're a seasoned artist or an eager beginner, the benefits of enrolling in online arts and painting classes are boundless. Here's why you should consider embracing the virtual canvas:</p>",
+  "regular_price": 200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Arts-And-Painting-1.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Creative Skills > Arts & Painting",
+   "Creative Skills"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Creative Writing",
+  "slug": "creative-writing",
+  "subtitle": "Personalised live Creative Writing coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Creative Skills",
+   "Creative Writing",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Creative Writing coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/content-writing-course1s.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Creative Skills",
+   "Creative Skills > Creative Writing"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Public Speaking",
+  "slug": "public-speaking",
+  "subtitle": "Personalised live Public Speaking coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Creative Skills",
+   "Public Speaking",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Public Speaking coaching.",
+  "description": "<p>Online Public Speaking – Trial Class Plan (Session 1)</p><p>Duration: 60–75 MinutesMode: Online (Teacher + 5 Students)Theme: Introduction to Public Speaking & SWOT-Based Speaking Activity</p><p>Objective: Make students comfortable and start speaking immediately.</p><p>“When you hear the words Public Speaking, what comes to your mind?”</p><p>2. What Exactly is Public Speaking? (8–10 minutes)</p><p>Public Speaking is the ability to speak clearly, confidently, and effectively in front of an audience with the purpose of:</p><p>It is not only about talking. It is about:✅ Confidence✅ Clear thoughts✅ Strong body language✅ Knowing your audience✅ Structuring your ideas✅ Using voice effectively</p><p>Public speaking is a life skill. It helps in:</p>",
+  "regular_price": 150.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Public-Speaking.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Creative Skills",
+   "Creative Skills > Public Speaking"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Spelling Competition",
+  "slug": "spelling-competition",
+  "subtitle": "Personalised live Spelling Competition coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Creative Skills",
+   "Spelling Competition",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Spelling Competition coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Creative Skills",
+   "Creative Skills > Spelling Competition"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Bollywood Dance",
+  "slug": "bollywood-dance",
+  "subtitle": "Personalised live Bollywood Dance coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Dance",
+   "Bollywood",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Bollywood Dance coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Bollywood.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Dance > Bollywood",
+   "Dance"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Kuchipudi Dance",
+  "slug": "kuchipudi-dance",
+  "subtitle": "Personalised live Kuchipudi Dance coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Dance",
+   "Kuchipudi",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Kuchipudi Dance coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Kuchipudi.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Dance",
+   "Dance > Kuchipudi"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Bharatnatyam Dance",
+  "slug": "bharatnatyam-dance",
+  "subtitle": "Personalised live Bharatnatyam Dance coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Dance",
+   "Bharatnatyam",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Bharatnatyam Dance coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Bharatnatyam.jpg.jpeg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Dance > Bharatnatyam",
+   "Dance"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Kathak Dance",
+  "slug": "kathak-dance",
+  "subtitle": "Personalised live Kathak Dance coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Dance",
+   "Kathak",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Kathak Dance coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Kathak.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Dance",
+   "Dance > Kathak"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Hip Hop Dance",
+  "slug": "hip-hop-dance",
+  "subtitle": "Personalised live Hip Hop Dance coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Dance",
+   "Hip Hop",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Hip Hop Dance coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Dance",
+   "Dance > Hip Hop"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Zumba Dance",
+  "slug": "zumba-dance",
+  "subtitle": "Personalised live Zumba Dance coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Dance",
+   "Zumba",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Zumba Dance coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Dance",
+   "Dance > Zumba"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Western Dance Dance",
+  "slug": "western-dance-dance",
+  "subtitle": "Personalised live Western Dance Dance coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Dance",
+   "Western Dance",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Western Dance Dance coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Sanskrit.webp",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Dance",
+   "Dance > Western Dance"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Spanish",
+  "slug": "spanish",
+  "subtitle": "Personalised live Spanish coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Languages",
+   "Spanish",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Spanish coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Spanish.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Languages",
+   "Languages > Spanish"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "French",
+  "slug": "french",
+  "subtitle": "Personalised live French coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Languages",
+   "French",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live French coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/French.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Languages > French",
+   "Languages"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "German",
+  "slug": "german",
+  "subtitle": "Personalised live German coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Languages",
+   "German",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live German coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/German.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Languages > German",
+   "Languages"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Mandarin",
+  "slug": "mandarin",
+  "subtitle": "Personalised live Mandarin coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Languages",
+   "Mandarin",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Mandarin coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Mandarin.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Languages",
+   "Languages > Mandarin"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Russian",
+  "slug": "russian",
+  "subtitle": "Personalised live Russian coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Languages",
+   "Russian",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Russian coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Russian.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Languages",
+   "Languages > Russian"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Sanskrit",
+  "slug": "sanskrit",
+  "subtitle": "Personalised live Sanskrit coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Languages",
+   "Sanskrit",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Sanskrit coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Sanskrit.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Languages",
+   "Languages > Sanskrit"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Hindi",
+  "slug": "hindi",
+  "subtitle": "Personalised live Hindi coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Languages",
+   "Hindi",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Hindi coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Hindi.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Languages > Hindi",
+   "Languages"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Tamil",
+  "slug": "tamil",
+  "subtitle": "Personalised live Tamil coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Languages",
+   "Tamil",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Tamil coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Languages",
+   "Languages > Tamil"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Telugu",
+  "slug": "telugu",
+  "subtitle": "Personalised live Telugu coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Languages",
+   "Telugu",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Telugu coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Languages",
+   "Languages > Telugu"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Kannada",
+  "slug": "kannada",
+  "subtitle": "Personalised live Kannada coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Languages",
+   "Kannada",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Kannada coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Kannada.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Languages > Kannada",
+   "Languages"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Malayalam",
+  "slug": "malayalam",
+  "subtitle": "Personalised live Malayalam coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Languages",
+   "Malayalam",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Malayalam coaching.",
+  "description": "",
+  "regular_price": 300.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Malayalam.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Languages",
+   "Languages > Malayalam"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Phonics, Numbers & Language Development",
+  "slug": "phonics-numbers-language-development",
+  "subtitle": "Personalised live Phonics, Numbers & Language Development coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — Elementary & Middle School",
+   "Phonics",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Phonics, Numbers & Language Development coaching.",
+  "description": "",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — Elementary & Middle School",
+   "Academics — Elementary & Middle School > Phonics"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Mathematics Grade 1-7",
+  "slug": "mathematics-grade-1-7",
+  "subtitle": "Personalised live Mathematics Grade 1-7 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — Elementary & Middle School",
+   "Mathematics",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Mathematics Grade 1-7 coaching.",
+  "description": "",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — Elementary & Middle School",
+   "Academics — Elementary & Middle School > Mathematics"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Mathematics Grade 8",
+  "slug": "mathematics-grade-8",
+  "subtitle": "Personalised live Mathematics Grade 8 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — Elementary & Middle School",
+   "Mathematics",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Mathematics Grade 8 coaching.",
+  "description": "",
+  "regular_price": 750.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — Elementary & Middle School",
+   "Academics — Elementary & Middle School > Mathematics"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Vedic Maths (Advanced)",
+  "slug": "vedic-maths-advanced",
+  "subtitle": "Personalised live Vedic Maths (Advanced) coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — Elementary & Middle School",
+   "Vedic Maths",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Vedic Maths (Advanced) coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Vedic-Math.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — Elementary & Middle School",
+   "Academics — Elementary & Middle School > Vedic Maths"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "English Grade 1-7",
+  "slug": "english-grade-1-7",
+  "subtitle": "Personalised live English Grade 1-7 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — Elementary & Middle School",
+   "English",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live English Grade 1-7 coaching.",
+  "description": "",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/English-8.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — Elementary & Middle School",
+   "Academics — Elementary & Middle School > English"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "English Grade 8",
+  "slug": "english-grade-8",
+  "subtitle": "Personalised live English Grade 8 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — Elementary & Middle School",
+   "English",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live English Grade 8 coaching.",
+  "description": "",
+  "regular_price": 750.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/English-9.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — Elementary & Middle School",
+   "Academics — Elementary & Middle School > English"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Science Grade 1-7",
+  "slug": "science-grade-1-7",
+  "subtitle": "Personalised live Science Grade 1-7 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — Elementary & Middle School",
+   "Science",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Science Grade 1-7 coaching.",
+  "description": "",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Kids-Science-1.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — Elementary & Middle School",
+   "Academics — Elementary & Middle School > Science"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Science Grade 8",
+  "slug": "science-grade-8",
+  "subtitle": "Personalised live Science Grade 8 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — Elementary & Middle School",
+   "Science",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Science Grade 8 coaching.",
+  "description": "",
+  "regular_price": 750.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Kids-Science-2.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — Elementary & Middle School",
+   "Academics — Elementary & Middle School > Science"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Social Studies Grade 8",
+  "slug": "social-studies-grade-8",
+  "subtitle": "Personalised live Social Studies Grade 8 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — Elementary & Middle School",
+   "Social Studies",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Social Studies Grade 8 coaching.",
+  "description": "",
+  "regular_price": 750.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Social-Studies-.jpg-2.jpeg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — Elementary & Middle School",
+   "Academics — Elementary & Middle School > Social Studies"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Abacus",
+  "slug": "abacus",
+  "subtitle": "Personalised live Abacus coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — Elementary & Middle School",
+   "Abacus",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Abacus coaching.",
+  "description": "",
+  "regular_price": 600.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — Elementary & Middle School > Abacus",
+   "Academics — Elementary & Middle School"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Mathematics Grade 9-10",
+  "slug": "mathematics-grade-9-10",
+  "subtitle": "Personalised live Mathematics Grade 9-10 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Mathematics",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Mathematics Grade 9-10 coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — Elementary & Middle School > Mathematics"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Mathematics Grade 11-12",
+  "slug": "mathematics-grade-11-12",
+  "subtitle": "Personalised live Mathematics Grade 11-12 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Mathematics",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Mathematics Grade 11-12 coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — Elementary & Middle School > Mathematics"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "English Grade 11-12",
+  "slug": "english-grade-11-12",
+  "subtitle": "Personalised live English Grade 11-12 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "English",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live English Grade 11-12 coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/English-7.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — Elementary & Middle School > English"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Science Grade 9-10",
+  "slug": "science-grade-9-10",
+  "subtitle": "Personalised live Science Grade 9-10 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Science",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Science Grade 9-10 coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Kids-Science.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — Elementary & Middle School > Science"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Physics Grade 11-12",
+  "slug": "physics-grade-11-12",
+  "subtitle": "Personalised live Physics Grade 11-12 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Physics",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Physics Grade 11-12 coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Physics.jpg.jpeg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — High School > Physics"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Chemistry Grade 11-12",
+  "slug": "chemistry-grade-11-12",
+  "subtitle": "Personalised live Chemistry Grade 11-12 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Chemistry",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Chemistry Grade 11-12 coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/AP-Chemistry.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — High School > Chemistry"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Biology Grade 11-12",
+  "slug": "biology-grade-11-12",
+  "subtitle": "Personalised live Biology Grade 11-12 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Biology",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Biology Grade 11-12 coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Biology.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — High School > Biology"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Social Studies Grade 9-10",
+  "slug": "social-studies-grade-9-10",
+  "subtitle": "Personalised live Social Studies Grade 9-10 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Social Studies",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Social Studies Grade 9-10 coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Social-Studies-.jpg.jpeg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — Elementary & Middle School > Social Studies"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Social Studies Grade 11-12",
+  "slug": "social-studies-grade-11-12",
+  "subtitle": "Personalised live Social Studies Grade 11-12 coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Social Studies",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Social Studies Grade 11-12 coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Social-Studies-.jpg-1.jpeg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — Elementary & Middle School > Social Studies"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Algebra I",
+  "slug": "algebra-i",
+  "subtitle": "Personalised live Algebra I coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Algebra",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Algebra I coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Untitled-design-73.png",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — High School > Algebra"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Algebra II",
+  "slug": "algebra-ii",
+  "subtitle": "Personalised live Algebra II coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Algebra",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Algebra II coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/11ae09ff89924f31a22bcef65cf1326c119f6d9abd6bb437a7271b84a7c7623f.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — High School > Algebra"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Pre-Calculus",
+  "slug": "pre-calculus",
+  "subtitle": "Personalised live Pre-Calculus coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Calculus",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Pre-Calculus coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Pre-Calculus.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — High School > Calculus"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Calculus",
+  "slug": "calculus",
+  "subtitle": "Personalised live Calculus coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Calculus",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Calculus coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — High School > Calculus"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Essay Writing",
+  "slug": "essay-writing",
+  "subtitle": "Personalised live Essay Writing coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Essay Writing",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Essay Writing coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — High School > Essay Writing"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Honors Chemistry",
+  "slug": "honors-chemistry",
+  "subtitle": "Personalised live Honors Chemistry coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Honors",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Honors Chemistry coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — High School > Honors"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Honors Biology",
+  "slug": "honors-biology",
+  "subtitle": "Personalised live Honors Biology coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Honors",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Honors Biology coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — High School > Honors"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Honors Physics",
+  "slug": "honors-physics",
+  "subtitle": "Personalised live Honors Physics coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Academics — High School",
+   "Honors",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Honors Physics coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Academics — High School",
+   "Academics — High School > Honors"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP Physics C",
+  "slug": "ap-physics-c",
+  "subtitle": "Personalised live AP Physics C coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Physics",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP Physics C coaching.",
+  "description": "",
+  "regular_price": 1500.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-14.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses",
+   "AP Courses > AP Physics"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP Physics C Mechanics",
+  "slug": "ap-physics-c-mechanics",
+  "subtitle": "Personalised live AP Physics C Mechanics coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Physics",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP Physics C Mechanics coaching.",
+  "description": "",
+  "regular_price": 1500.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-19.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses",
+   "AP Courses > AP Physics"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP Biology",
+  "slug": "ap-biology",
+  "subtitle": "Personalised live AP Biology coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Biology",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP Biology coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/AP-Biology-1.png",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses > AP Biology",
+   "AP Courses"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP Pre-Calculus",
+  "slug": "ap-pre-calculus",
+  "subtitle": "Personalised live AP Pre-Calculus coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Calculus",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP Pre-Calculus coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-24.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses > AP Calculus",
+   "AP Courses"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP Calculus AB",
+  "slug": "ap-calculus-ab",
+  "subtitle": "Personalised live AP Calculus AB coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Calculus",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP Calculus AB coaching.",
+  "description": "",
+  "regular_price": 1500.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-25.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses > AP Calculus",
+   "AP Courses"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP Calculus BC",
+  "slug": "ap-calculus-bc",
+  "subtitle": "Personalised live AP Calculus BC coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Calculus",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP Calculus BC coaching.",
+  "description": "",
+  "regular_price": 1500.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-26.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses > AP Calculus",
+   "AP Courses"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP Spanish",
+  "slug": "ap-spanish",
+  "subtitle": "Personalised live AP Spanish coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Languages",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP Spanish coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/AP-Calculus-AB-BC-2.png",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses",
+   "AP Courses > AP Languages"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP French",
+  "slug": "ap-french",
+  "subtitle": "Personalised live AP French coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Languages",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP French coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/AP-Calculus-AB-BC-4.png",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses",
+   "AP Courses > AP Languages"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP Computer Science",
+  "slug": "ap-computer-science",
+  "subtitle": "Personalised live AP Computer Science coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Computer Science",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP Computer Science coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/AP-Computer-Science.png",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses > AP Computer Science",
+   "AP Courses"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP US History",
+  "slug": "ap-us-history",
+  "subtitle": "Personalised live AP US History coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP History",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP US History coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-12.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses",
+   "AP Courses > AP History"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP European History",
+  "slug": "ap-european-history",
+  "subtitle": "Personalised live AP European History coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP History",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP European History coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-3.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses",
+   "AP Courses > AP History"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP Statistics",
+  "slug": "ap-statistics",
+  "subtitle": "Personalised live AP Statistics coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Statistics",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP Statistics coaching.",
+  "description": "",
+  "regular_price": 1500.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-5.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses",
+   "AP Courses > AP Statistics"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP Music Theory",
+  "slug": "ap-music-theory",
+  "subtitle": "Personalised live AP Music Theory coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Music Theory",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP Music Theory coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-8.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses",
+   "AP Courses > AP Music Theory"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "AP Macro Economics",
+  "slug": "ap-macro-economics",
+  "subtitle": "Personalised live AP Macro Economics coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "AP Courses",
+   "AP Economics",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live AP Macro Economics coaching.",
+  "description": "",
+  "regular_price": 1000.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-1.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "AP Courses",
+   "AP Courses > AP Economics"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "English SAT/PSAT",
+  "slug": "english-sat-psat",
+  "subtitle": "Personalised live English SAT/PSAT coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Standardized Tests",
+   "English SAT/PSAT",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live English SAT/PSAT coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/English-2.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Standardized Tests > English SAT/PSAT",
+   "Standardized Tests"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "Math SAT/PSAT",
+  "slug": "math-sat-psat",
+  "subtitle": "Personalised live Math SAT/PSAT coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Standardized Tests",
+   "Math SAT/PSAT",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live Math SAT/PSAT coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "https://indiatutorsonline.com/wp-content/uploads/2026/05/Carnatic-2.jpg",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Standardized Tests > Math SAT/PSAT",
+   "Standardized Tests"
+  ]
+ },
+ {
+  "sku": null,
+  "name": "ACT",
+  "slug": "act",
+  "subtitle": "Personalised live ACT coaching.",
+  "age": "All ages · kids & adults",
+  "pills": [
+   "Standardized Tests",
+   "ACT",
+   "Live"
+  ],
+  "curriculum": [],
+  "short_description": "Personalised live ACT coaching.",
+  "description": "",
+  "regular_price": 1200.0,
+  "sale_price": null,
+  "image_url": "",
+  "is_featured": false,
+  "position": 0,
+  "category_chains": [
+   "Standardized Tests > ACT",
+   "Standardized Tests"
+  ]
+ }
+]

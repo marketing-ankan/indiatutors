@@ -7,62 +7,63 @@ use Illuminate\Support\Str;
 
 class CourseSeeder extends Seeder {
     public function run(): void {
-        $csvPath = storage_path('app/imports/products.csv');
-        if (!file_exists($csvPath)) {
-            $this->command->error("CSV not found: $csvPath — skipping seeder.");
+        $path = __DIR__.'/data/courses.json';
+        if (!file_exists($path)) {
+            $this->command->error("Course data not found: $path — skipping seeder.");
             return;
         }
-        $handle = fopen($csvPath, 'r');
-        $bom = fread($handle, 3);
-        if ($bom !== "\xEF\xBB\xBF") rewind($handle);
-        $headers = array_map('trim', fgetcsv($handle));
+        $courses = json_decode(file_get_contents($path), true);
+        if (!is_array($courses)) {
+            $this->command->error('Could not parse courses.json — skipping seeder.');
+            return;
+        }
+
         $categoryCache = [];
-        $created = 0;
-        while (($row = fgetcsv($handle)) !== false) {
-            if (count($row) < count($headers)) $row = array_pad($row, count($headers), '');
-            $data = array_combine($headers, $row);
-            if (empty($data['Name']) || (int)($data['Published'] ?? 0) !== 1) continue;
-            $name = trim($data['Name']);
-            $slug = Str::slug($name); $base = $slug; $n = 2;
-            while (Course::where('slug', $slug)->exists()) $slug = $base.'-'.$n++;
-            $reg  = (float)preg_replace('/[^\d.]/', '', $data['Regular price'] ?? '');
-            $sale = (float)preg_replace('/[^\d.]/', '', $data['Sale price'] ?? '');
-            $course = Course::create([
-                'sku'               => trim($data['SKU'] ?? '') ?: null,
-                'name'              => $name,
-                'slug'              => $slug,
-                'short_description' => trim($data['Short description'] ?? ''),
-                'description'       => trim($data['Description'] ?? ''),
-                'regular_price'     => $reg,
-                'sale_price'        => $sale > 0 ? $sale : null,
-                'image_url'         => trim(explode(',', $data['Images'] ?? '')[0]),
-                'is_featured'       => (int)($data['Is featured?'] ?? 0) === 1,
-                'is_published'      => true,
-                'position'          => (int)($data['Position'] ?? 0),
-            ]);
+        $count = 0;
+        foreach ($courses as $data) {
+            $slug = $data['slug'] ?: Str::slug($data['name']);
+            $course = Course::updateOrCreate(
+                ['slug' => $slug],
+                [
+                    'sku'               => $data['sku'] ?? null,
+                    'name'              => $data['name'],
+                    'subtitle'          => $data['subtitle'] ?? null,
+                    'short_description' => $data['short_description'] ?? '',
+                    'description'       => $data['description'] ?? '',
+                    'age'               => $data['age'] ?? null,
+                    'pills'             => $data['pills'] ?? [],
+                    'curriculum'        => $data['curriculum'] ?? [],
+                    'regular_price'     => $data['regular_price'] ?? 0,
+                    'sale_price'        => ($data['sale_price'] ?? null) ?: null,
+                    'image_url'         => $data['image_url'] ?: null,
+                    'is_featured'       => (bool)($data['is_featured'] ?? false),
+                    'is_published'      => true,
+                    'position'          => (int)($data['position'] ?? 0),
+                ]
+            );
+
+            // Resolve hierarchical categories from "Parent > Child" chains
             $ids = [];
-            foreach (explode(',', $data['Categories'] ?? '') as $chain) {
-                $chain = trim($chain);
-                if (!$chain || str_contains($chain, 'Legacy Assets')) continue;
-                $parentId = null; $path = '';
+            foreach ($data['category_chains'] ?? [] as $chain) {
+                $parentId = null; $path2 = '';
                 foreach (array_map('trim', explode('>', $chain)) as $part) {
-                    if (!$part) continue;
-                    $path = $path ? "$path > $part" : $part;
-                    if (!isset($categoryCache[$path])) {
+                    if ($part === '') continue;
+                    $path2 = $path2 ? "$path2 > $part" : $part;
+                    if (!isset($categoryCache[$path2])) {
                         $cat = Category::firstOrCreate(
                             ['name' => $part, 'parent_id' => $parentId],
                             ['slug' => Str::slug($part).($parentId ? '-'.$parentId : '')]
                         );
-                        $categoryCache[$path] = $cat->id;
+                        $categoryCache[$path2] = $cat->id;
                     }
-                    $parentId = $categoryCache[$path];
+                    $parentId = $categoryCache[$path2];
                 }
                 if ($parentId) $ids[$parentId] = true;
             }
-            if ($ids) $course->categories()->sync(array_keys($ids));
-            $created++;
+            $course->categories()->sync(array_keys($ids));
+            $count++;
         }
-        fclose($handle);
-        $this->command->info("Imported $created courses. Categories: ".Category::count());
+
+        $this->command->info("Imported/updated $count courses. Categories: ".Category::count());
     }
 }
