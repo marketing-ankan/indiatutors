@@ -30,10 +30,11 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 **Kickoff decision needed:** SEO rendering strategy. The current SPA is client-rendered; a content/commerce site replacing WordPress needs server-rendered meta/content. Choose: SSR (Inertia+SSR) · prerendering · or per-route server-injected meta tags + sitemap. Decide before building Phase 2 pages.
 
 **Catalog**
-- ⬜ Migrate all 144 courses from the WP XML (reconcile vs the 134 currently seeded) incl. tiers (`_ito_tier_*`), subtitle, age, pills, curriculum, regular/sale price, category assignments, images
-- ⬜ Hierarchical category taxonomy (parent/child) + category landing pages
-- ⬜ Course listing filters: category, grade/class, board (CBSE/IGCSE/ICSE), mode (1:1 / group / self-paced video), price, search, sort, pagination
-- ⬜ Course detail: pricing tiers (1:1 vs group), age, curriculum, pills, related courses, CTA (Book Demo for live / Buy for video)
+- ✅ Migrate courses from the WP XML (134 published, real `wp:post_name` slugs, subtitle, age, pills, curriculum, prices, category hierarchy, images) → `database/seeders/data/courses.json`
+- ✅ Hierarchical category taxonomy (parent/child) from the export (112 categories)
+- ⬜ Category landing pages
+- ⬜ Course listing filters: grade/class, board (CBSE/IGCSE/ICSE), mode (1:1 / group / self-paced video), price range (category + search + sort + pagination already work)
+- ✅ Course detail: age, curriculum (level/topic), pills, subtitle, CTA — *(pricing tiers 1:1-vs-group deferred; source data is mostly single-price)*
 
 **Tutors & local SEO**
 - ⬜ Full tutor profiles (qualification, subjects, city/localities, hourly+trial fee, languages, verified, experience) — migrate 13 from XML
