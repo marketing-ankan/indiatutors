@@ -29,8 +29,12 @@ LARAVEL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DOCROOT="$(dirname "$LARAVEL_DIR")"
 cd "$LARAVEL_DIR"
 
-echo ">> [1/6] composer install (no proc_* needed)"
-composer install --optimize-autoloader --no-interaction --no-scripts
+echo ">> [1/6] dependencies"
+if [ -f vendor/autoload.php ]; then
+  echo "   vendor/ shipped via git — skipping composer (Hostinger disables proc_*)"
+else
+  composer install --optimize-autoloader --no-interaction --no-scripts
+fi
 php artisan package:discover --ansi || true
 
 echo ">> [2/6] writing .env"
