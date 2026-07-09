@@ -1,7 +1,8 @@
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Search } from 'lucide-react';
-import { fetchTutors, fetchTutorFilters } from '../lib/api.js';
+import { Link } from 'react-router-dom';
+import { Search, MapPin } from 'lucide-react';
+import { fetchTutors, fetchTutorFilters, fetchCities } from '../lib/api.js';
 import TutorCard from '../components/TutorCard.jsx';
 
 export default function FindTutorsPage() {
@@ -13,6 +14,7 @@ export default function FindTutorsPage() {
   const sort    = params.get('sort') || 'default';
 
   const { data: filters } = useQuery({ queryKey:['tutor-filters'], queryFn: fetchTutorFilters });
+  const { data: cities = [] } = useQuery({ queryKey:['cities'], queryFn: fetchCities });
   const { data: tutors = [], isLoading } = useQuery({
     queryKey: ['tutors', { subject, city, mode, search, sort }],
     queryFn: () => fetchTutors({ subject, city, mode, search, sort }),
@@ -35,6 +37,19 @@ export default function FindTutorsPage() {
           <p className="mt-3 text-slate-300 max-w-2xl">Every tutor is verified and qualification-checked. Browse by subject, city, or mode — then book a free trial class.</p>
         </div>
       </div>
+
+      {cities.length > 0 && (
+        <div className="border-b border-slate-100 bg-white">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center gap-3">
+            <span className="text-sm font-semibold text-slate-500 inline-flex items-center gap-1"><MapPin className="h-4 w-4"/>Tutors by city:</span>
+            {cities.map(c => (
+              <Link key={c.slug} to={`/tutors-in/${c.slug}`} className="rounded-full bg-slate-100 hover:bg-brand-50 hover:text-brand-700 px-3 py-1 text-sm font-medium text-slate-700">
+                {c.name} <span className="text-slate-400">({c.tutor_count})</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 grid lg:grid-cols-[260px_1fr] gap-8">
         {/* FILTERS */}

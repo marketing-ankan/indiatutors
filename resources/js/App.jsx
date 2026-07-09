@@ -9,6 +9,7 @@ import BookDemoPage from './pages/BookDemoPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
 import FindTutorsPage from './pages/FindTutorsPage.jsx';
 import TutorProfilePage from './pages/TutorProfilePage.jsx';
+import CityPage from './pages/CityPage.jsx';
 import ReferEarnPage from './pages/ReferEarnPage.jsx';
 import BecomeTeacherPage from './pages/BecomeTeacherPage.jsx';
 import LegalPage from './pages/LegalPage.jsx';
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/find-tutors" element={<FindTutorsPage />} />
         <Route path="/tutors/:slug" element={<TutorProfilePage />} />
+        <Route path="/tutors-in/:city" element={<CityPage />} />
         <Route path="/refer-earn" element={<ReferEarnPage />} />
         <Route path="/become-a-teacher" element={<BecomeTeacherPage />} />
         <Route path="/privacy" element={<LegalPage doc="privacy" />} />

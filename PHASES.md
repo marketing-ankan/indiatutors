@@ -39,7 +39,7 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 **Tutors & local SEO**
 - ✅ Full tutor profiles (qualification, subjects, city/localities, hourly+trial fee, languages, verified, experience) — 13 seeded
 - ✅ Tutor directory filters (subject, city, mode) + sort
-- ⬜ City pages (`ito_city`) — "Online/Home Tutors in {City}", template built to scale beyond Kolkata
+- ✅ City pages — `/tutors-in/{city}` local-SEO landing (tutors + subjects + localities), derived from tutor data; scales to any city. Discoverable from Find Tutors.
 
 **Content & pages**
 - ⬜ Landing pages: Group Classes, Free Classes, Video Courses, Events & Workshops, Competitive Exams, Skill Programmes

@@ -17,5 +17,7 @@ export const fetchCourse         = async (slug) => { const { data } = await api.
 export const fetchTutors         = async (p={}) => { const { data } = await api.get('/tutors', { params:p }); return data.data; };
 export const fetchTutor          = async (slug) => { const { data } = await api.get(`/tutors/${slug}`); return data.data; };
 export const fetchTutorFilters   = async () => { const { data } = await api.get('/tutors/filters'); return data; };
+export const fetchCities         = async () => { const { data } = await api.get('/cities'); return data.data; };
+export const fetchCity           = async (slug) => { const { data } = await api.get(`/cities/${slug}`); return data; };
 export const submitDemoRequest   = async (p) => { const { data } = await api.post('/demo-requests', p); return data; };
 export const submitContact       = async (p) => { const { data } = await api.post('/contact', p); return data; };

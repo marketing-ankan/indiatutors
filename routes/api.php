@@ -1,5 +1,6 @@
 <?php
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\DemoRequestController;
@@ -16,6 +17,9 @@ Route::get('/courses/{slug}',    [CourseController::class, 'show'])->name('api.c
 Route::get('/tutors',            [TutorController::class, 'index']);
 Route::get('/tutors/filters',    [TutorController::class, 'filters']);
 Route::get('/tutors/{slug}',     [TutorController::class, 'show'])->name('api.tutors.show');
+
+Route::get('/cities',            [CityController::class, 'index']);
+Route::get('/cities/{slug}',     [CityController::class, 'show']);
 
 Route::post('/demo-requests',    [DemoRequestController::class, 'store']);
 Route::post('/contact',          [ContactController::class, 'store']);
