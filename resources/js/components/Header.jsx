@@ -1,6 +1,7 @@
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Phone, Mail, MapPin, Search, Menu, X } from 'lucide-react';
+import { Phone, Mail, MapPin, Search, Menu, X, LayoutDashboard } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '../lib/auth.jsx';
 
 const primaryNav = [
   { to:'/about', label:'About Us' },
@@ -29,6 +30,7 @@ export default function Header() {
   const [sq, setSq] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const nav = useNavigate();
+  const { isAuthed } = useAuth();
   const onSearch = e => { e.preventDefault(); if(sq.trim()) { nav(`/courses?search=${encodeURIComponent(sq.trim())}`); setShowSearch(false); setSq(''); }};
 
   return (
@@ -63,7 +65,9 @@ export default function Header() {
             ):(
               <button onClick={()=>setShowSearch(true)} className="p-2 text-slate-600 hover:text-brand-600 hidden md:inline-flex"><Search className="h-5 w-5"/></button>
             )}
-            <Link to="/login" className="hidden sm:inline-flex rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Login</Link>
+            {isAuthed
+              ? <Link to="/dashboard" className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"><LayoutDashboard className="h-4 w-4"/>Dashboard</Link>
+              : <Link to="/login" className="hidden sm:inline-flex rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Login</Link>}
             <Link to="/book-demo" className="rounded-md bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-700 whitespace-nowrap">Book Free Demo</Link>
             <button className="lg:hidden p-2" onClick={()=>setOpen(!open)}>{open?<X className="h-6 w-6"/>:<Menu className="h-6 w-6"/>}</button>
           </div>

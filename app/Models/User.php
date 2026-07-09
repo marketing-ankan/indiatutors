@@ -2,42 +2,31 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    public const ROLES = ['parent', 'student', 'teacher', 'admin'];
+
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role',
+        'phone',
+        'phone_country_code',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -45,4 +34,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // Relationships
+    public function students() { return $this->hasMany(Student::class); }
+    public function teacherProfile() { return $this->hasOne(TeacherProfile::class); }
+    public function kycDocuments() { return $this->hasMany(KycDocument::class); }
+
+    // Role helpers
+    public function hasRole(string $role): bool { return $this->role === $role; }
+    public function isParent(): bool { return $this->role === 'parent'; }
+    public function isTeacher(): bool { return $this->role === 'teacher'; }
+    public function isAdmin(): bool { return $this->role === 'admin'; }
 }

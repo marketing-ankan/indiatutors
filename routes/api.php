@@ -1,10 +1,13 @@
 <?php
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\DemoRequestController;
+use App\Http\Controllers\Api\KycController;
+use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\TutorController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,3 +30,18 @@ Route::get('/posts/{slug}',      [BlogController::class, 'show'])->name('api.pos
 
 Route::post('/demo-requests',    [DemoRequestController::class, 'store']);
 Route::post('/contact',          [ContactController::class, 'store']);
+
+// --- Auth (bearer-token, Sanctum) ---
+Route::post('/auth/register',    [AuthController::class, 'register'])->middleware('throttle:10,1');
+Route::post('/auth/login',       [AuthController::class, 'login'])->middleware('throttle:10,1');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/auth/me',       [AuthController::class, 'me']);
+    Route::post('/auth/logout',  [AuthController::class, 'logout']);
+
+    Route::apiResource('students', StudentController::class)->except(['show']);
+
+    Route::get('/kyc',           [KycController::class, 'index']);
+    Route::post('/kyc',          [KycController::class, 'store']);
+    Route::delete('/kyc/{document}', [KycController::class, 'destroy']);
+});
