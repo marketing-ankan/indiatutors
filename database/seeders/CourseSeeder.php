@@ -18,11 +18,18 @@ class CourseSeeder extends Seeder {
             return;
         }
 
+        // Slugs present in the source (WP post_name).
+        $sourceSlugs = array_map(fn ($d) => ($d['slug'] ?? '') ?: Str::slug($d['name']), $courses);
+
+        // Prune stale courses FIRST so old rows release their unique keys (sku)
+        // before we upsert. Non-destructive: demo_requests.course_id is
+        // nullOnDelete, so any linked requests are preserved.
+        $pruned = Course::whereNotIn('slug', $sourceSlugs)->count();
+        if ($pruned > 0) Course::whereNotIn('slug', $sourceSlugs)->delete();
+
         $categoryCache = [];
-        $seededSlugs = [];
         foreach ($courses as $data) {
-            $slug = $data['slug'] ?: Str::slug($data['name']);
-            $seededSlugs[] = $slug;
+            $slug = ($data['slug'] ?? '') ?: Str::slug($data['name']);
             $course = Course::updateOrCreate(
                 ['slug' => $slug],
                 [
@@ -64,15 +71,9 @@ class CourseSeeder extends Seeder {
             $course->categories()->sync(array_keys($ids));
         }
 
-        // Prune courses no longer present in the source (e.g. old slugs after a
-        // slug change, or discontinued courses). Non-destructive to user data:
-        // demo_requests.course_id is nullOnDelete, so requests are preserved.
-        $pruned = Course::whereNotIn('slug', $seededSlugs)->count();
-        if ($pruned > 0) Course::whereNotIn('slug', $seededSlugs)->delete();
-
         // Drop categories that ended up empty (no courses and no children).
         Category::doesntHave('courses')->doesntHave('children')->delete();
 
-        $this->command->info("Imported/updated ".count($seededSlugs)." courses (pruned $pruned stale). Categories: ".Category::count());
+        $this->command->info("Imported/updated ".count($sourceSlugs)." courses (pruned $pruned stale). Categories: ".Category::count());
     }
 }
