@@ -37,6 +37,7 @@ php artisan migrate --force
 php artisan db:seed --class=CourseSeeder --force
 php artisan db:seed --class=TutorSeeder --force
 php artisan db:seed --class=PostSeeder --force
+php artisan db:seed --class=AdminSeeder --force
 
 # Refresh built front-end assets exposed at the web root
 rm -rf "$DOCROOT/build"

@@ -62,11 +62,13 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 - ✅ **Dashboard** (`/dashboard`, protected): profile, students management, KYC upload/list; auth-aware header; real Login/Register
 - ⬜ Deferred: email/OTP verification; an admin login UI (admin user created manually via tinker/seeder for now)
 
-## Phase 4 — Demo → enrollment engine 🔨 (v1 done 2026-07-09)
-- ✅ **Requirement capture linked to accounts**: signed-in parents book demos tied to their account + a chosen student (ownership-checked); guests still work
-- ✅ Book-demo prefills contact + student details; **dashboard "My demo requests"** with status
-- ⬜ Teacher matching/allocation (subject/grade/pincode); call & confirm; schedule demo (online/offline)
-- ⬜ Conversion → **enrollment** record (student + teacher + course) — needs the admin/staff UI (Phase 9) to drive status changes
+## Phase 4 — Demo → enrollment engine ✅ (2026-07-09)
+- ✅ **Requirement capture linked to accounts**: signed-in parents book demos tied to account + chosen student (ownership-checked); guests still work; book-demo prefills contact/student
+- ✅ **Teacher matching**: admin gets tutors matched by subject/city per demo
+- ✅ **Assign + schedule** (assigned_tutor_id, status, scheduled_at) via a role-gated **Staff Console** (`/admin`)
+- ✅ **Conversion → enrollment** (student + tutor + course + plan); parent sees **"My demo requests"** + **"My enrollments"** on the dashboard
+- Admin user is env-gated (`ADMIN_EMAIL`/`ADMIN_PASSWORD`) — no default-password admin
+- Deferred to later: call/confirm telephony, pincode-level matching, richer scheduling calendar
 
 ## Phase 5 — Teacher portal ⬜
 - Onboarding: CV, KYC, service areas by pincode, schedule/availability

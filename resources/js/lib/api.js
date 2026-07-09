@@ -51,8 +51,16 @@ export const createStudent = async (p) => { const { data } = await api.post('/st
 export const updateStudent = async (id, p) => { const { data } = await api.put(`/students/${id}`, p); return data.data; };
 export const deleteStudent = async (id) => { await api.delete(`/students/${id}`); };
 
-// My demo requests (signed-in parent)
+// My demo requests + enrollments (signed-in parent)
 export const fetchMyDemoRequests = async () => { const { data } = await api.get('/my/demo-requests'); return data.data; };
+export const fetchMyEnrollments  = async () => { const { data } = await api.get('/my/enrollments'); return data.data; };
+
+// Admin (staff)
+export const fetchAdminDemoRequests = async (status='') => { const { data } = await api.get('/admin/demo-requests', { params:{ status } }); return data; };
+export const fetchDemoTutors  = async (id) => { const { data } = await api.get(`/admin/demo-requests/${id}/tutors`); return data.data; };
+export const assignDemo       = async (id, payload) => { const { data } = await api.patch(`/admin/demo-requests/${id}`, payload); return data.data; };
+export const convertDemo      = async (id, payload) => { const { data } = await api.post(`/admin/demo-requests/${id}/convert`, payload); return data.data; };
+export const fetchAdminEnrollments = async () => { const { data } = await api.get('/admin/enrollments'); return data; };
 
 // KYC documents
 export const fetchKyc  = async () => { const { data } = await api.get('/kyc'); return data.data; };

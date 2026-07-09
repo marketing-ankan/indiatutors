@@ -57,6 +57,7 @@ class SeoMeta {
             'refer-earn'       => ['title' => 'Refer & Earn — ' . self::SITE, 'description' => 'Refer friends to Indiatutors Online and earn rewards.'],
             'login'            => ['title' => 'Login — ' . self::SITE, 'robots' => 'noindex, follow'],
             'dashboard'        => ['title' => 'My Account — ' . self::SITE, 'robots' => 'noindex, nofollow'],
+            'admin'            => ['title' => 'Staff Console — ' . self::SITE, 'robots' => 'noindex, nofollow'],
             'blog'             => ['title' => 'Blog — ' . self::SITE, 'description' => 'Practical advice on tutoring, study skills and helping your child learn.'],
             'privacy'          => ['title' => 'Privacy Policy — ' . self::SITE],
             'terms'            => ['title' => 'Terms of Service — ' . self::SITE],

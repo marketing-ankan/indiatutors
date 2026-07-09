@@ -1,6 +1,8 @@
 <?php
+use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BlogController;
+use App\Http\Controllers\Api\EnrollmentController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\ContactController;
@@ -46,4 +48,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/kyc/{document}', [KycController::class, 'destroy']);
 
     Route::get('/my/demo-requests', [DemoRequestController::class, 'myIndex']);
+    Route::get('/my/enrollments',   [EnrollmentController::class, 'myIndex']);
+
+    // --- Admin (staff): match tutors, schedule, convert demo -> enrollment ---
+    Route::middleware(\App\Http\Middleware\EnsureAdmin::class)->prefix('admin')->group(function () {
+        Route::get('/demo-requests',                     [AdminController::class, 'demoRequests']);
+        Route::get('/demo-requests/{demoRequest}/tutors',[AdminController::class, 'suggestTutors']);
+        Route::patch('/demo-requests/{demoRequest}',     [AdminController::class, 'assignDemo']);
+        Route::post('/demo-requests/{demoRequest}/convert',[AdminController::class, 'convert']);
+        Route::get('/enrollments',                       [AdminController::class, 'enrollments']);
+    });
 });

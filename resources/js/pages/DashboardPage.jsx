@@ -2,11 +2,11 @@ import { useState, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { LogOut, Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock } from 'lucide-react';
+import { LogOut, Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import {
   fetchStudents, createStudent, deleteStudent,
-  fetchKyc, uploadKyc, deleteKyc, fetchMyDemoRequests,
+  fetchKyc, uploadKyc, deleteKyc, fetchMyDemoRequests, fetchMyEnrollments,
 } from '../lib/api.js';
 
 const inp = "w-full rounded-md ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
@@ -34,13 +34,39 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      <RequestsCard />
+      <div className="grid lg:grid-cols-2 gap-6">
+        <RequestsCard />
+        <EnrollmentsCard />
+      </div>
 
       <div className="grid lg:grid-cols-2 gap-6 mt-6">
         {user.role !== 'teacher' && <StudentsCard />}
         <KycCard />
       </div>
     </div>
+  );
+}
+
+function EnrollmentsCard() {
+  const { data: items = [], isLoading } = useQuery({ queryKey:['my-enrollments'], queryFn: fetchMyEnrollments });
+  const statusColor = { active:'bg-green-50 text-green-700', paused:'bg-amber-50 text-amber-700', completed:'bg-blue-50 text-blue-700', cancelled:'bg-slate-100 text-slate-600' };
+  return (
+    <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
+      <h2 className="text-lg font-bold flex items-center gap-2 mb-4"><GraduationCap className="h-5 w-5 text-brand-600"/>My enrollments</h2>
+      {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : items.length ? (
+        <ul className="divide-y divide-slate-100">
+          {items.map(e => (
+            <li key={e.id} className="flex items-center justify-between py-3">
+              <div>
+                <div className="font-semibold text-sm text-slate-800">{e.course?.name || e.plan || 'Enrollment'}</div>
+                <div className="text-xs text-slate-500">{[e.student, e.tutor?.name && `with ${e.tutor.name}`, e.plan].filter(Boolean).join(' · ')}</div>
+              </div>
+              <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor[e.status]||'bg-slate-100 text-slate-600'}`}>{e.status}</span>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="text-sm text-slate-500">No active enrollments yet. Once you complete a demo, your enrolled classes appear here.</p>}
+    </section>
   );
 }
 

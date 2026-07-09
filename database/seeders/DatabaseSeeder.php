@@ -8,6 +8,7 @@ class DatabaseSeeder extends Seeder {
             CourseSeeder::class,
             TutorSeeder::class,
             PostSeeder::class,
+            AdminSeeder::class,
         ]);
     }
 }

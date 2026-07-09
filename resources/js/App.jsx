@@ -17,6 +17,7 @@ import BecomeTeacherPage from './pages/BecomeTeacherPage.jsx';
 import LegalPage from './pages/LegalPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
+import AdminPage from './pages/AdminPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
 export default function App() {
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="/refund" element={<LegalPage doc="refund" />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
