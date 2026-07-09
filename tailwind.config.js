@@ -4,10 +4,11 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Aligned to indiatutorsonline.com brand: primary #1E40AF, navy darks.
         brand: {
-          50:  '#eef4ff', 100: '#dbe6ff', 200: '#bccfff', 300: '#8faeff',
-          400: '#5c82ff', 500: '#3559ff', 600: '#1e3bff', 700: '#1a2fd6',
-          800: '#1a2a9e', 900: '#0f1b5c', 950: '#0a1140',
+          50:  '#eff4ff', 100: '#dbe6fe', 200: '#bfd1fd', 300: '#93b0fb',
+          400: '#6086f5', 500: '#3b61ea', 600: '#1e40af', 700: '#1c3a9c',
+          800: '#1e3a8a', 900: '#16276b', 950: '#0b1220',
         },
       },
       fontFamily: { sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'] },
