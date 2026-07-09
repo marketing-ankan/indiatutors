@@ -1,15 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
-import { submitDemoRequest } from '../lib/api.js';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { submitDemoRequest, fetchCourse, fetchTutor } from '../lib/api.js';
 
-const empty = { name:'',email:'',phone_country_code:'+91',phone:'',subject:'',grade:'',board:'',mode:'online',city:'',country:'India',timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,message:'',whatsapp_consent:true,marketing_consent:false };
+const empty = { name:'',email:'',phone_country_code:'+91',phone:'',subject:'',grade:'',board:'',mode:'online',city:'',country:'India',timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,message:'',whatsapp_consent:true,marketing_consent:false,course_id:null };
 const inp = "w-full rounded-md ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
 
 export default function BookDemoPage() {
   const [params] = useSearchParams();
-  const [form, setForm] = useState({...empty, subject: params.get('course') ? decodeURIComponent(params.get('course')) : ''});
+  const courseSlug = params.get('course');
+  const tutorSlug = params.get('tutor');
+  const [form, setForm] = useState(empty);
   const [ok, setOk] = useState(false);
+
+  // If arriving from a course or tutor page, resolve it to prefill nicely + link it.
+  const { data: course } = useQuery({ queryKey:['course', courseSlug], queryFn:()=>fetchCourse(courseSlug), enabled: !!courseSlug });
+  const { data: tutor }  = useQuery({ queryKey:['tutor', tutorSlug], queryFn:()=>fetchTutor(tutorSlug), enabled: !!tutorSlug });
+  useEffect(() => { if (course) setForm(f => ({ ...f, subject: f.subject || course.name, course_id: course.id })); }, [course]);
+  useEffect(() => { if (tutor) setForm(f => ({ ...f, message: f.message || `I'd like to request a demo with ${tutor.name}.` })); }, [tutor]);
+
   const mutation = useMutation({ mutationFn: submitDemoRequest, onSuccess: ()=>{ setOk(true); setForm(empty); } });
   const set = k => e => setForm({...form, [k]: e.target.type==='checkbox'?e.target.checked:e.target.value});
 
@@ -26,6 +35,11 @@ export default function BookDemoPage() {
     <div className="mx-auto max-w-2xl px-4 py-12">
       <h1 className="text-3xl font-extrabold tracking-tight">Book a Free Demo</h1>
       <p className="text-slate-500 mt-2">Fill this in and we'll match you with a verified tutor. The demo is free with no commitment.</p>
+      {(course || tutor) && (
+        <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand-50 text-brand-700 px-3 py-1.5 text-sm font-medium ring-1 ring-brand-100">
+          Booking a demo for <b>{course?.name || tutor?.name}</b>
+        </div>
+      )}
       <form onSubmit={e=>{e.preventDefault();mutation.mutate(form);}} className="mt-8 space-y-4 bg-white p-6 rounded-xl ring-1 ring-slate-100">
         <div className="grid sm:grid-cols-2 gap-4">
           <div><label className="block text-xs font-semibold text-slate-700 mb-1">Full name*</label><input required value={form.name} onChange={set('name')} className={inp}/></div>
