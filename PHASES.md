@@ -48,8 +48,9 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 - ⬜ Refer & Earn, Plans & Pricing (driven by real tiers), polish About/Contact
 
 **SEO / technical**
-- ⬜ Per-page meta/title, Open Graph, structured data (Course, LocalBusiness), `sitemap.xml`, `robots.txt`
-- ⬜ 301 redirects from old WordPress URLs (preserve rankings)
+- ✅ Per-route server-rendered meta/title + Open Graph + Twitter (via `SeoMeta`), dynamic `sitemap.xml` (272 URLs) + `robots.txt`
+- ⬜ Structured data / JSON-LD (Course, LocalBusiness, Breadcrumb)
+- ⬜ 301 redirects from old WordPress URLs (needs old permalink map; do at real-domain go-live)
 - ⬜ GA4 / analytics, performance pass
 
 ---

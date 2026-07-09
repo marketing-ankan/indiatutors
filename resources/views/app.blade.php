@@ -6,8 +6,27 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-    <title>Indiatutors Online — Live Online Tutoring & Verified Home Tutors Across India</title>
-    <meta name="description" content="Live 1-on-1 classes, group sessions, and self-paced video courses across Academics, Coding, Music, Dance, Languages & more." />
+
+    @php($m = $meta ?? [])
+    <title>{{ $m['title'] ?? 'Indiatutors Online — Live Online Tutoring & Verified Home Tutors Across India' }}</title>
+    <meta name="description" content="{{ $m['description'] ?? 'Live 1-on-1 classes, group sessions, and self-paced video courses across Academics, Coding, Music, Dance, Languages & more.' }}" />
+    <meta name="robots" content="{{ $m['robots'] ?? 'index, follow' }}" />
+    @isset($m['canonical'])<link rel="canonical" href="{{ $m['canonical'] }}" />@endisset
+
+    {{-- Open Graph --}}
+    <meta property="og:site_name" content="{{ $m['site_name'] ?? 'Indiatutors Online' }}" />
+    <meta property="og:type" content="{{ $m['type'] ?? 'website' }}" />
+    <meta property="og:title" content="{{ $m['title'] ?? 'Indiatutors Online' }}" />
+    <meta property="og:description" content="{{ $m['description'] ?? '' }}" />
+    @isset($m['canonical'])<meta property="og:url" content="{{ $m['canonical'] }}" />@endisset
+    @if(!empty($m['image']))<meta property="og:image" content="{{ $m['image'] }}" />@endif
+
+    {{-- Twitter --}}
+    <meta name="twitter:card" content="{{ !empty($m['image']) ? 'summary_large_image' : 'summary' }}" />
+    <meta name="twitter:title" content="{{ $m['title'] ?? 'Indiatutors Online' }}" />
+    <meta name="twitter:description" content="{{ $m['description'] ?? '' }}" />
+    @if(!empty($m['image']))<meta name="twitter:image" content="{{ $m['image'] }}" />@endif
+
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/main.jsx'])
   </head>

@@ -41,6 +41,10 @@ php artisan db:seed --class=TutorSeeder --force
 rm -rf "$DOCROOT/build"
 cp -r "$LARAVEL_DIR/public/build" "$DOCROOT/build"
 
+# robots.txt is served by a Laravel route (dynamic sitemap URL); make sure no
+# static file at the web root shadows it.
+rm -f "$DOCROOT/robots.txt"
+
 # Rebuild caches against the new code
 php artisan config:cache
 php artisan route:cache
