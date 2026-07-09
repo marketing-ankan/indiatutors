@@ -55,11 +55,12 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 
 ---
 
-## Phase 3 — Accounts, roles & KYC ⬜
-- Auth (Sanctum) with roles: parent/student, teacher, admin; email/OTP verification
-- Parent account → multiple student profiles
-- Profile management; KYC uploads: Aadhaar/PAN/photo/certificates
-- "My Account" + role-based dashboard shells
+## Phase 3 — Accounts, roles & KYC ✅ (2026-07-09)
+- ✅ Auth via **Sanctum bearer tokens** (register/login/logout/me), rate-limited; roles parent/student/teacher/admin
+- ✅ Parent → many **students** (owner-scoped CRUD); teacher self-register creates a teacher_profile shell
+- ✅ **KYC uploads** (Aadhaar/PAN/photo/certificate) to **private** storage, mime/size validated, path never exposed
+- ✅ **Dashboard** (`/dashboard`, protected): profile, students management, KYC upload/list; auth-aware header; real Login/Register
+- ⬜ Deferred: email/OTP verification; an admin login UI (admin user created manually via tinker/seeder for now)
 
 ## Phase 4 — Demo → enrollment engine ⬜
 - Requirement/demo capture (subject, grade, mode, location)
