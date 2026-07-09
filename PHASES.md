@@ -37,14 +37,14 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 - ✅ Course detail: age, curriculum (level/topic), pills, subtitle, CTA — *(pricing tiers 1:1-vs-group deferred; source data is mostly single-price)*
 
 **Tutors & local SEO**
-- ⬜ Full tutor profiles (qualification, subjects, city/localities, hourly+trial fee, languages, verified, experience) — migrate 13 from XML
-- ⬜ Tutor directory filters (subject, city, mode, verified)
+- ✅ Full tutor profiles (qualification, subjects, city/localities, hourly+trial fee, languages, verified, experience) — 13 seeded
+- ✅ Tutor directory filters (subject, city, mode) + sort
 - ⬜ City pages (`ito_city`) — "Online/Home Tutors in {City}", template built to scale beyond Kolkata
 
 **Content & pages**
 - ⬜ Landing pages: Group Classes, Free Classes, Video Courses, Events & Workshops, Competitive Exams, Skill Programmes
 - ⬜ Blog: list + post detail (migrate 4 posts)
-- ⬜ Legal: Privacy Policy, Terms of Service, Refund & Cancellation, Refund & Returns
+- ✅ Legal: Privacy Policy, Terms of Service, Refund & Cancellation
 - ⬜ Refer & Earn, Plans & Pricing (driven by real tiers), polish About/Contact
 
 **SEO / technical**

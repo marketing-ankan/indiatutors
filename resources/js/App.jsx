@@ -11,6 +11,7 @@ import FindTutorsPage from './pages/FindTutorsPage.jsx';
 import TutorProfilePage from './pages/TutorProfilePage.jsx';
 import ReferEarnPage from './pages/ReferEarnPage.jsx';
 import BecomeTeacherPage from './pages/BecomeTeacherPage.jsx';
+import LegalPage from './pages/LegalPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
 export default function App() {
@@ -28,6 +29,9 @@ export default function App() {
         <Route path="/tutors/:slug" element={<TutorProfilePage />} />
         <Route path="/refer-earn" element={<ReferEarnPage />} />
         <Route path="/become-a-teacher" element={<BecomeTeacherPage />} />
+        <Route path="/privacy" element={<LegalPage doc="privacy" />} />
+        <Route path="/terms" element={<LegalPage doc="terms" />} />
+        <Route path="/refund" element={<LegalPage doc="refund" />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
