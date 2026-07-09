@@ -21,12 +21,23 @@ export default function CoursesPage() {
   const search   = params.get('search') || '';
   const sort     = params.get('sort') || 'popular';
   const page     = parseInt(params.get('page') || '1', 10);
+  const priceMin = params.get('price_min') || '';
+  const priceMax = params.get('price_max') || '';
 
   const { data: categories = [] } = useQuery({ queryKey:['categories','tree'], queryFn: fetchCategoriesTree });
   const { data, isLoading } = useQuery({
-    queryKey: ['courses', { category, search, sort, page }],
-    queryFn: () => fetchCourses({ category, search, sort, page, per_page:12 }),
+    queryKey: ['courses', { category, search, sort, page, priceMin, priceMax }],
+    queryFn: () => fetchCourses({ category, search, sort, page, price_min:priceMin, price_max:priceMax, per_page:12 }),
   });
+
+  const setPrice = (min, max) => {
+    const next = new URLSearchParams(params);
+    min ? next.set('price_min', min) : next.delete('price_min');
+    max ? next.set('price_max', max) : next.delete('price_max');
+    next.delete('page');
+    setParams(next);
+  };
+  const PRICE_BUCKETS = [['All prices','',''],['Under ₹500','','500'],['₹500 – ₹1,000','500','1000'],['Over ₹1,000','1000','']];
 
   const setParam = (key, val) => {
     const next = new URLSearchParams(params);
@@ -84,13 +95,27 @@ export default function CoursesPage() {
               ))}
             </ul>
           </div>
+          <div>
+            <h3 className="font-semibold text-sm mb-3">Price</h3>
+            <ul className="space-y-0.5 text-sm">
+              {PRICE_BUCKETS.map(([label, min, max]) => {
+                const active = priceMin === min && priceMax === max;
+                return <li key={label}><button onClick={()=>setPrice(min, max)} className={`w-full text-left px-2 py-1.5 rounded ${active?'bg-brand-50 text-brand-700 font-semibold':'text-slate-700 hover:bg-slate-50'}`}>{label}</button></li>;
+              })}
+            </ul>
+          </div>
         </aside>
 
         <div>
           {/* Active filters */}
-          {(category || search) && (
+          {(category || search || priceMin || priceMax) && (
             <div className="flex flex-wrap items-center gap-2 mb-4">
               <span className="text-xs text-slate-400">Filters:</span>
+              {(priceMin || priceMax) && (
+                <button onClick={()=>setPrice('','')} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-200">
+                  {PRICE_BUCKETS.find(([,mn,mx])=>mn===priceMin&&mx===priceMax)?.[0] || `₹${priceMin||'0'}–${priceMax||'∞'}`} <X className="h-3 w-3" />
+                </button>
+              )}
               {search && (
                 <button onClick={()=>setParam('search','')} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-200">
                   “{search}” <X className="h-3 w-3" />

@@ -15,6 +15,10 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    // Google Analytics 4 Measurement ID (e.g. G-XXXXXXXXXX). When set, the
+    // GA4 snippet is injected server-side. Leave blank to disable.
+    'ga_id' => env('GOOGLE_ANALYTICS_ID'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

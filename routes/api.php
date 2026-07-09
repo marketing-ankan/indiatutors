@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\ContactController;
@@ -20,6 +21,9 @@ Route::get('/tutors/{slug}',     [TutorController::class, 'show'])->name('api.tu
 
 Route::get('/cities',            [CityController::class, 'index']);
 Route::get('/cities/{slug}',     [CityController::class, 'show']);
+
+Route::get('/posts',             [BlogController::class, 'index']);
+Route::get('/posts/{slug}',      [BlogController::class, 'show'])->name('api.posts.show');
 
 Route::post('/demo-requests',    [DemoRequestController::class, 'store']);
 Route::post('/contact',          [ContactController::class, 'store']);

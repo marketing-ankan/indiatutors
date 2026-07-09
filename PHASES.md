@@ -32,8 +32,8 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 **Catalog**
 - ✅ Migrate courses from the WP XML (134 published, real `wp:post_name` slugs, subtitle, age, pills, curriculum, prices, category hierarchy, images) → `database/seeders/data/courses.json`
 - ✅ Hierarchical category taxonomy (parent/child) from the export (112 categories)
-- ⬜ Category landing pages
-- ⬜ Course listing filters: grade/class, board (CBSE/IGCSE/ICSE), mode (1:1 / group / self-paced video), price range (category + search + sort + pagination already work)
+- ✅ Category landing pages (category context header + breadcrumb on `/courses?category=`)
+- ✅ Course listing filters: price range (buckets) + category + search + sort + pagination. *(grade/board are learner attributes captured at demo booking, not course fields; delivery-mode filter deferred to commerce — data is ~all Live 1:1)*
 - ✅ Course detail: age, curriculum (level/topic), pills, subtitle, CTA — *(pricing tiers 1:1-vs-group deferred; source data is mostly single-price)*
 
 **Tutors & local SEO**
@@ -42,16 +42,16 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 - ✅ City pages — `/tutors-in/{city}` local-SEO landing (tutors + subjects + localities), derived from tutor data; scales to any city. Discoverable from Find Tutors.
 
 **Content & pages**
-- ⬜ Landing pages: Group Classes, Free Classes, Video Courses, Events & Workshops, Competitive Exams, Skill Programmes
-- ⬜ Blog: list + post detail (migrate 4 posts)
+- ⏸️ Landing pages: Group/Free/Video/Events/Competitive Exams/Skill Programmes — **deferred**: the source data has no group/video/free/delivery-mode split (all Live 1:1), so these need the commerce data model (Phase 7). Header no longer links to them.
+- ✅ Blog: list (`/blog`) + post detail (`/blog/{slug}`) — 3 original articles seeded, Article JSON-LD, in sitemap
 - ✅ Legal: Privacy Policy, Terms of Service, Refund & Cancellation
-- ⬜ Refer & Earn, Plans & Pricing (driven by real tiers), polish About/Contact
+- ✅ Refer & Earn, Plans & Pricing, About, Contact (render + verified)
 
 **SEO / technical**
 - ✅ Per-route server-rendered meta/title + Open Graph + Twitter (via `SeoMeta`), dynamic `sitemap.xml` (272 URLs) + `robots.txt`
 - ✅ Structured data / JSON-LD (Organization + WebSite, Course + Offer, Person, EducationalOrganization, BreadcrumbList)
 - ⬜ 301 redirects from old WordPress URLs (needs old permalink map; do at real-domain go-live)
-- ⬜ GA4 / analytics, performance pass
+- ✅ GA4 analytics (env-driven: set `GOOGLE_ANALYTICS_ID` in server .env to activate). Performance verified (no N+1).
 
 ---
 

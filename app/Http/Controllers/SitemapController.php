@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Course;
+use App\Models\Post;
 use App\Models\Tutor;
 use Illuminate\Support\Str;
 
@@ -19,8 +20,13 @@ class SitemapController extends Controller {
         $add($base . '/', null, 'daily', '1.0');
         foreach (['courses' => '0.9', 'find-tutors' => '0.9', 'plans' => '0.7', 'about' => '0.5',
                   'contact' => '0.4', 'book-demo' => '0.7', 'become-a-teacher' => '0.5',
-                  'refer-earn' => '0.4', 'privacy' => '0.2', 'terms' => '0.2', 'refund' => '0.2'] as $p => $pr) {
+                  'refer-earn' => '0.4', 'blog' => '0.6', 'privacy' => '0.2', 'terms' => '0.2', 'refund' => '0.2'] as $p => $pr) {
             $add("$base/$p", null, 'monthly', $pr);
+        }
+
+        // Blog posts
+        foreach (Post::where('is_published', true)->get(['slug', 'updated_at']) as $post) {
+            $add("$base/blog/{$post->slug}", optional($post->updated_at)->toAtomString(), 'monthly', '0.6');
         }
 
         // Courses

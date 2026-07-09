@@ -27,9 +27,12 @@ class CourseController extends Controller {
 
         if ($request->boolean('featured')) $query->featured();
 
-        // Sort by the *effective* price (sale price when on sale) so the ordering
-        // matches the prices shown to the user.
+        // Effective price = sale price when on sale, else regular price.
         $effective = 'COALESCE(NULLIF(sale_price, 0), regular_price)';
+        if (($min = (int) $request->integer('price_min')) > 0) $query->whereRaw("$effective >= ?", [$min]);
+        if (($max = (int) $request->integer('price_max')) > 0) $query->whereRaw("$effective <= ?", [$max]);
+
+        // Sort by the effective price so the ordering matches the prices shown.
         match($request->string('sort','popular')->toString()) {
             'price_asc'  => $query->orderByRaw("$effective asc"),
             'price_desc' => $query->orderByRaw("$effective desc"),

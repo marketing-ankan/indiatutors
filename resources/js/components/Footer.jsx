@@ -19,7 +19,7 @@ export default function Footer() {
         <div>
           <h4 className="text-white font-semibold mb-4 text-sm">Company</h4>
           <ul className="space-y-2 text-sm">
-            {[['About Us','/about'],['Become a Teacher','/become-a-teacher'],['Contact','/contact']].map(([l,h])=>(
+            {[['About Us','/about'],['Blog','/blog'],['Become a Teacher','/become-a-teacher'],['Contact','/contact']].map(([l,h])=>(
               <li key={l}><Link to={h} className="hover:text-white">{l}</Link></li>
             ))}
           </ul>

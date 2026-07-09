@@ -56,6 +56,7 @@ class SeoMeta {
             'become-a-teacher' => ['title' => 'Become a Teacher — ' . self::SITE, 'description' => 'Teach on Indiatutors Online. Apply to become a verified tutor.'],
             'refer-earn'       => ['title' => 'Refer & Earn — ' . self::SITE, 'description' => 'Refer friends to Indiatutors Online and earn rewards.'],
             'login'            => ['title' => 'Login — ' . self::SITE, 'robots' => 'noindex, follow'],
+            'blog'             => ['title' => 'Blog — ' . self::SITE, 'description' => 'Practical advice on tutoring, study skills and helping your child learn.'],
             'privacy'          => ['title' => 'Privacy Policy — ' . self::SITE],
             'terms'            => ['title' => 'Terms of Service — ' . self::SITE],
             'refund'           => ['title' => 'Refund & Cancellation Policy — ' . self::SITE],
@@ -106,6 +107,21 @@ class SeoMeta {
                     'title' => $t->name . ($t->tagline ? ' — ' . $t->tagline : '') . ' | ' . self::SITE,
                     'description' => $desc, 'image' => $t->image_url ?: null, 'type' => 'profile',
                     'jsonld' => [$person, self::crumbs($base, [['Find Tutors', '/find-tutors'], [$t->name, '/tutors/' . $t->slug]])],
+                ];
+            }
+            if (Str::startsWith($path, 'blog/')) {
+                $p = \App\Models\Post::where('slug', Str::after($path, 'blog/'))->first();
+                if (!$p) return [];
+                $desc = Str::limit(strip_tags($p->excerpt ?: $p->body), 155);
+                $article = ['@context' => 'https://schema.org', '@type' => 'Article', 'headline' => $p->title,
+                    'description' => $desc, 'author' => ['@type' => 'Organization', 'name' => self::SITE],
+                    'publisher' => self::org($base), 'url' => $canonical,
+                    'datePublished' => optional($p->published_at)->toIso8601String()];
+                if ($p->image_url) $article['image'] = $p->image_url;
+                return [
+                    'title' => $p->title . ' — ' . self::SITE, 'description' => $desc,
+                    'image' => $p->image_url ?: null, 'type' => 'article',
+                    'jsonld' => [$article, self::crumbs($base, [['Blog', '/blog'], [$p->title, '/blog/' . $p->slug]])],
                 ];
             }
             if (Str::startsWith($path, 'tutors-in/')) {
