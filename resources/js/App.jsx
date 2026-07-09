@@ -13,6 +13,7 @@ import CityPage from './pages/CityPage.jsx';
 import ReferEarnPage from './pages/ReferEarnPage.jsx';
 import BecomeTeacherPage from './pages/BecomeTeacherPage.jsx';
 import LegalPage from './pages/LegalPage.jsx';
+import LoginPage from './pages/LoginPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
 export default function App() {
@@ -34,6 +35,7 @@ export default function App() {
         <Route path="/privacy" element={<LegalPage doc="privacy" />} />
         <Route path="/terms" element={<LegalPage doc="terms" />} />
         <Route path="/refund" element={<LegalPage doc="refund" />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

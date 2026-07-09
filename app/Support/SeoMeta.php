@@ -55,6 +55,7 @@ class SeoMeta {
             'book-demo'        => ['title' => 'Book a Free Demo Class — ' . self::SITE, 'description' => 'Book a free 30-minute demo class. Meet your tutor. No payment required.'],
             'become-a-teacher' => ['title' => 'Become a Teacher — ' . self::SITE, 'description' => 'Teach on Indiatutors Online. Apply to become a verified tutor.'],
             'refer-earn'       => ['title' => 'Refer & Earn — ' . self::SITE, 'description' => 'Refer friends to Indiatutors Online and earn rewards.'],
+            'login'            => ['title' => 'Login — ' . self::SITE, 'robots' => 'noindex, follow'],
             'privacy'          => ['title' => 'Privacy Policy — ' . self::SITE],
             'terms'            => ['title' => 'Terms of Service — ' . self::SITE],
             'refund'           => ['title' => 'Refund & Cancellation Policy — ' . self::SITE],

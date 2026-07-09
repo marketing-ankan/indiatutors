@@ -15,6 +15,9 @@ class CourseController extends Controller {
             if ($cat) {
                 $ids = array_merge([$cat->id], Category::where('parent_id', $cat->id)->pluck('id')->all());
                 $query->whereHas('categories', fn($q) => $q->whereIn('categories.id', $ids));
+            } else {
+                // Unknown category slug -> no matches (rather than silently returning all).
+                $query->whereRaw('1 = 0');
             }
         }
 
@@ -24,15 +27,19 @@ class CourseController extends Controller {
 
         if ($request->boolean('featured')) $query->featured();
 
+        // Sort by the *effective* price (sale price when on sale) so the ordering
+        // matches the prices shown to the user.
+        $effective = 'COALESCE(NULLIF(sale_price, 0), regular_price)';
         match($request->string('sort','popular')->toString()) {
-            'price_asc'  => $query->orderBy('regular_price'),
-            'price_desc' => $query->orderByDesc('regular_price'),
+            'price_asc'  => $query->orderByRaw("$effective asc"),
+            'price_desc' => $query->orderByRaw("$effective desc"),
             'name'       => $query->orderBy('name'),
             'newest'     => $query->orderByDesc('id'),
             default      => $query->orderByDesc('is_featured')->orderBy('position')->orderBy('name'),
         };
 
-        return CourseResource::collection($query->paginate(min((int)$request->integer('per_page',12),48)));
+        $perPage = max(1, min((int) $request->integer('per_page', 12), 48));
+        return CourseResource::collection($query->paginate($perPage));
     }
 
     public function show(string $slug) {

@@ -6,7 +6,18 @@ import App from './App.jsx';
 import '../css/app.css';
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { staleTime: 60_000, retry: 1, refetchOnWindowFocus: false } },
+  defaultOptions: {
+    queries: {
+      staleTime: 60_000,
+      refetchOnWindowFocus: false,
+      // Don't retry client errors (404 etc.) — only transient/server failures.
+      retry: (failureCount, error) => {
+        const status = error?.response?.status;
+        if (status && status >= 400 && status < 500) return false;
+        return failureCount < 1;
+      },
+    },
+  },
 });
 
 ReactDOM.createRoot(document.getElementById('root')).render(

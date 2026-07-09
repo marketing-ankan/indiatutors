@@ -1,5 +1,5 @@
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Phone, Mail, MapPin, Search, Heart, ShoppingCart, Menu, X } from 'lucide-react';
+import { Phone, Mail, MapPin, Search, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
 const primaryNav = [
@@ -10,16 +10,18 @@ const primaryNav = [
   { to:'/become-a-teacher', label:'Become a Teacher' },
   { to:'/contact', label:'Contact' },
 ];
+// Links to real categories that exist in the catalog (no dead ends).
 const catalogNav = [
   { to:'/', label:'HOME', end:true },
-  { to:'/courses', label:'OUR COURSES' },
-  { to:'/courses?category=video-courses', label:'VIDEO COURSES' },
-  { to:'/courses?category=group-classes', label:'GROUP CLASSES' },
-  { to:'/courses?category=events-workshops', label:'EVENTS & WORKSHOPS' },
-  { to:'/courses?category=free', label:'FREE CLASSES' },
-  { to:'/courses?category=physical', label:'PHYSICAL CLASSES' },
-  { to:'/courses?category=competitive-exams', label:'COMPETITIVE EXAMS' },
-  { to:'/courses?category=skills', label:'SKILL PROGRAMMES' },
+  { to:'/courses', label:'ALL COURSES' },
+  { to:'/courses?category=academics-high-school', label:'ACADEMICS' },
+  { to:'/courses?category=ap-courses', label:'AP COURSES' },
+  { to:'/courses?category=musical-instruments', label:'MUSIC' },
+  { to:'/courses?category=it-technologies', label:'CODING & IT' },
+  { to:'/courses?category=languages', label:'LANGUAGES' },
+  { to:'/courses?category=dance', label:'DANCE' },
+  { to:'/courses?category=standardized-tests', label:'COMPETITIVE EXAMS' },
+  { to:'/find-tutors', label:'FIND TUTORS' },
 ];
 
 export default function Header() {
@@ -61,8 +63,6 @@ export default function Header() {
             ):(
               <button onClick={()=>setShowSearch(true)} className="p-2 text-slate-600 hover:text-brand-600 hidden md:inline-flex"><Search className="h-5 w-5"/></button>
             )}
-            <button className="p-2 text-slate-600 hover:text-brand-600 hidden md:inline-flex"><Heart className="h-5 w-5"/></button>
-            <button className="p-2 text-slate-600 hover:text-brand-600 hidden md:inline-flex"><ShoppingCart className="h-5 w-5"/></button>
             <Link to="/login" className="hidden sm:inline-flex rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Login</Link>
             <Link to="/book-demo" className="rounded-md bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-700 whitespace-nowrap">Book Free Demo</Link>
             <button className="lg:hidden p-2" onClick={()=>setOpen(!open)}>{open?<X className="h-6 w-6"/>:<Menu className="h-6 w-6"/>}</button>
