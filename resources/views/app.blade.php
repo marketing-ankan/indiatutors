@@ -27,6 +27,11 @@
     <meta name="twitter:description" content="{{ $m['description'] ?? '' }}" />
     @if(!empty($m['image']))<meta name="twitter:image" content="{{ $m['image'] }}" />@endif
 
+    {{-- Structured data (schema.org JSON-LD) --}}
+    @foreach(($m['jsonld'] ?? []) as $ld)
+    <script type="application/ld+json">{!! json_encode($ld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+    @endforeach
+
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/main.jsx'])
   </head>

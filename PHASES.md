@@ -49,7 +49,7 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 
 **SEO / technical**
 - ✅ Per-route server-rendered meta/title + Open Graph + Twitter (via `SeoMeta`), dynamic `sitemap.xml` (272 URLs) + `robots.txt`
-- ⬜ Structured data / JSON-LD (Course, LocalBusiness, Breadcrumb)
+- ✅ Structured data / JSON-LD (Organization + WebSite, Course + Offer, Person, EducationalOrganization, BreadcrumbList)
 - ⬜ 301 redirects from old WordPress URLs (needs old permalink map; do at real-domain go-live)
 - ⬜ GA4 / analytics, performance pass
 
