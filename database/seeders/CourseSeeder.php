@@ -19,9 +19,10 @@ class CourseSeeder extends Seeder {
         }
 
         $categoryCache = [];
-        $count = 0;
+        $seededSlugs = [];
         foreach ($courses as $data) {
             $slug = $data['slug'] ?: Str::slug($data['name']);
+            $seededSlugs[] = $slug;
             $course = Course::updateOrCreate(
                 ['slug' => $slug],
                 [
@@ -61,9 +62,17 @@ class CourseSeeder extends Seeder {
                 if ($parentId) $ids[$parentId] = true;
             }
             $course->categories()->sync(array_keys($ids));
-            $count++;
         }
 
-        $this->command->info("Imported/updated $count courses. Categories: ".Category::count());
+        // Prune courses no longer present in the source (e.g. old slugs after a
+        // slug change, or discontinued courses). Non-destructive to user data:
+        // demo_requests.course_id is nullOnDelete, so requests are preserved.
+        $pruned = Course::whereNotIn('slug', $seededSlugs)->count();
+        if ($pruned > 0) Course::whereNotIn('slug', $seededSlugs)->delete();
+
+        // Drop categories that ended up empty (no courses and no children).
+        Category::doesntHave('courses')->doesntHave('children')->delete();
+
+        $this->command->info("Imported/updated ".count($seededSlugs)." courses (pruned $pruned stale). Categories: ".Category::count());
     }
 }

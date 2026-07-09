@@ -28,8 +28,14 @@ fi
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] deploying $BEFORE -> $AFTER"
 
-# Apply any new migrations (safe: only runs pending ones)
+# Apply any new migrations (safe: only runs pending ones — never fresh/refresh)
 php artisan migrate --force
+
+# Sync catalog + tutor reference data. Seeders are idempotent (updateOrCreate
+# by stable slug, prune stale) so this updates in place and never deletes
+# user data (demo requests, contacts, users).
+php artisan db:seed --class=CourseSeeder --force
+php artisan db:seed --class=TutorSeeder --force
 
 # Refresh built front-end assets exposed at the web root
 rm -rf "$DOCROOT/build"
