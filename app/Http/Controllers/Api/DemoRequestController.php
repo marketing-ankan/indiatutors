@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\DemoRequestResource;
 use App\Models\DemoRequest;
 use Illuminate\Http\Request;
 
@@ -22,8 +23,31 @@ class DemoRequestController extends Controller {
             'whatsapp_consent'   => 'nullable|boolean',
             'marketing_consent'  => 'nullable|boolean',
             'course_id'          => 'nullable|integer|exists:courses,id',
+            'student_id'         => 'nullable|integer|exists:students,id',
         ]);
+
+        // If the request carries a valid bearer token, link it to that account.
+        $user = auth('sanctum')->user();
+        if ($user) {
+            $data['user_id'] = $user->id;
+            // Only attach a student the user actually owns.
+            if (!empty($data['student_id']) && !$user->students()->whereKey($data['student_id'])->exists()) {
+                unset($data['student_id']);
+            }
+        } else {
+            unset($data['student_id']); // guests can't attach a student profile
+        }
+
         $demo = DemoRequest::create($data + ['status' => 'new']);
         return response()->json(['message' => 'Demo request received. Our team will contact you within 24 hours.', 'id' => $demo->id], 201);
+    }
+
+    /** A signed-in parent's own demo requests (with status). */
+    public function myIndex(Request $request) {
+        return DemoRequestResource::collection(
+            $request->user()->demoRequests()
+                ->with(['course:id,name,slug', 'student:id,name'])
+                ->latest()->get()
+        );
     }
 }

@@ -62,11 +62,11 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 - ✅ **Dashboard** (`/dashboard`, protected): profile, students management, KYC upload/list; auth-aware header; real Login/Register
 - ⬜ Deferred: email/OTP verification; an admin login UI (admin user created manually via tinker/seeder for now)
 
-## Phase 4 — Demo → enrollment engine ⬜
-- Requirement/demo capture (subject, grade, mode, location)
-- Teacher matching/allocation (subject/grade/pincode) — system + manual
-- Teacher selection → call & confirm → security check → schedule demo (online/offline)
-- Conversion → enrollment record linking student + teacher + course
+## Phase 4 — Demo → enrollment engine 🔨 (v1 done 2026-07-09)
+- ✅ **Requirement capture linked to accounts**: signed-in parents book demos tied to their account + a chosen student (ownership-checked); guests still work
+- ✅ Book-demo prefills contact + student details; **dashboard "My demo requests"** with status
+- ⬜ Teacher matching/allocation (subject/grade/pincode); call & confirm; schedule demo (online/offline)
+- ⬜ Conversion → **enrollment** record (student + teacher + course) — needs the admin/staff UI (Phase 9) to drive status changes
 
 ## Phase 5 — Teacher portal ⬜
 - Onboarding: CV, KYC, service areas by pincode, schedule/availability

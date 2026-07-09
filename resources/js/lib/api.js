@@ -51,6 +51,9 @@ export const createStudent = async (p) => { const { data } = await api.post('/st
 export const updateStudent = async (id, p) => { const { data } = await api.put(`/students/${id}`, p); return data.data; };
 export const deleteStudent = async (id) => { await api.delete(`/students/${id}`); };
 
+// My demo requests (signed-in parent)
+export const fetchMyDemoRequests = async () => { const { data } = await api.get('/my/demo-requests'); return data.data; };
+
 // KYC documents
 export const fetchKyc  = async () => { const { data } = await api.get('/kyc'); return data.data; };
 export const uploadKyc = async (formData) => { const { data } = await api.post('/kyc', formData); return data.data; };

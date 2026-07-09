@@ -44,4 +44,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/kyc',           [KycController::class, 'index']);
     Route::post('/kyc',          [KycController::class, 'store']);
     Route::delete('/kyc/{document}', [KycController::class, 'destroy']);
+
+    Route::get('/my/demo-requests', [DemoRequestController::class, 'myIndex']);
 });

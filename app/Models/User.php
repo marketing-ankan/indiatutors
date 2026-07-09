@@ -39,6 +39,7 @@ class User extends Authenticatable
     public function students() { return $this->hasMany(Student::class); }
     public function teacherProfile() { return $this->hasOne(TeacherProfile::class); }
     public function kycDocuments() { return $this->hasMany(KycDocument::class); }
+    public function demoRequests() { return $this->hasMany(DemoRequest::class); }
 
     // Role helpers
     public function hasRole(string $role): bool { return $this->role === $role; }
