@@ -2,12 +2,13 @@ import { useState, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { LogOut, Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap, Briefcase, Save } from 'lucide-react';
+import { LogOut, Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap, Briefcase, Save, Users, BookOpen, NotebookPen, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import {
   fetchStudents, createStudent, deleteStudent,
   fetchKyc, uploadKyc, deleteKyc, fetchMyDemoRequests, fetchMyEnrollments,
   fetchTeacherProfile, updateTeacherProfile,
+  fetchTeacherStudents, fetchTeacherDemos, fetchClassLogs, addClassLog,
 } from '../lib/api.js';
 
 const inp = "w-full rounded-md ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
@@ -36,9 +37,12 @@ export default function DashboardPage() {
       </div>
 
       {user.role === 'teacher' ? (
-        <div className="grid lg:grid-cols-2 gap-6">
-          <TeacherProfileCard />
-          <KycCard />
+        <div className="space-y-6">
+          <div className="grid lg:grid-cols-2 gap-6">
+            <TeacherProfileCard />
+            <KycCard />
+          </div>
+          <TeacherClassroom />
         </div>
       ) : (
         <>
@@ -118,6 +122,127 @@ function TeacherProfileCard() {
         </div>
       </form>
     </section>
+  );
+}
+
+function TeacherClassroom() {
+  const { data: profile } = useQuery({ queryKey:['teacher-profile'], queryFn: fetchTeacherProfile });
+  const approved = profile?.status === 'approved';
+  const { data: roster = [], isLoading } = useQuery({ queryKey:['teacher-students'], queryFn: fetchTeacherStudents, enabled: approved });
+  const { data: demos = [] } = useQuery({ queryKey:['teacher-demos'], queryFn: fetchTeacherDemos, enabled: approved });
+
+  return (
+    <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
+      <h2 className="text-lg font-bold flex items-center gap-2 mb-1"><Users className="h-5 w-5 text-brand-600"/>My classroom</h2>
+      <p className="text-xs text-slate-500 mb-4">Students assigned to you, their upcoming demos, and the class progress you log.</p>
+
+      {!approved ? (
+        <div className="rounded-lg bg-amber-50 text-amber-800 text-sm p-4">
+          Your classroom unlocks once our team approves your teacher profile. Complete your profile and KYC above to speed things up.
+        </div>
+      ) : (
+        <>
+          {demos.length > 0 && (
+            <div className="mb-5">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Upcoming demos</h3>
+              <ul className="divide-y divide-slate-100">
+                {demos.map(d => (
+                  <li key={d.id} className="flex items-center justify-between py-2.5">
+                    <div>
+                      <div className="font-semibold text-sm text-slate-800">{d.course?.name || d.subject || 'Demo class'}</div>
+                      <div className="text-xs text-slate-500">{[d.student, d.grade, d.mode, d.city].filter(Boolean).join(' · ')}</div>
+                    </div>
+                    <span className="text-xs text-slate-500">{d.scheduled_at ? new Date(d.scheduled_at).toLocaleString() : 'To be scheduled'}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">My students</h3>
+          {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : roster.length ? (
+            <ul className="space-y-2">
+              {roster.map(e => <RosterRow key={e.id} e={e} />)}
+            </ul>
+          ) : <p className="text-sm text-slate-500">No students assigned yet. Once a demo is converted to an enrollment, your students appear here.</p>}
+        </>
+      )}
+    </section>
+  );
+}
+
+function RosterRow({ e }) {
+  const [open, setOpen] = useState(false);
+  const statusColor = { active:'bg-green-50 text-green-700', paused:'bg-amber-50 text-amber-700', completed:'bg-blue-50 text-blue-700', cancelled:'bg-slate-100 text-slate-600' };
+  return (
+    <li className="rounded-lg ring-1 ring-slate-100 overflow-hidden">
+      <button onClick={()=>setOpen(o=>!o)} className="w-full flex items-center justify-between gap-3 px-3 py-2.5 text-left hover:bg-slate-50">
+        <div className="min-w-0">
+          <div className="font-semibold text-sm text-slate-800">{e.student || 'Student'}</div>
+          <div className="text-xs text-slate-500">{[e.course, e.plan, `${e.classes_count||0} class${e.classes_count===1?'':'es'} logged`, e.last_class_on && `last ${e.last_class_on}`].filter(Boolean).join(' · ')}</div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor[e.status]||'bg-slate-100 text-slate-600'}`}>{e.status}</span>
+          {open ? <ChevronUp className="h-4 w-4 text-slate-400"/> : <ChevronDown className="h-4 w-4 text-slate-400"/>}
+        </div>
+      </button>
+      {open && <ClassLogPanel enrollmentId={e.id} />}
+    </li>
+  );
+}
+
+function ClassLogPanel({ enrollmentId }) {
+  const qc = useQueryClient();
+  const { data: logs = [], isLoading } = useQuery({ queryKey:['class-logs', enrollmentId], queryFn:()=>fetchClassLogs(enrollmentId) });
+  const today = new Date().toISOString().slice(0,10);
+  const empty = { topic:'', held_on:today, duration_min:'', homework:'', notes:'', status:'completed' };
+  const [form, setForm] = useState(empty);
+  const [err, setErr] = useState('');
+  const set = k => e => setForm({ ...form, [k]: e.target.value });
+  const add = useMutation({
+    mutationFn: () => addClassLog(enrollmentId, { ...form, duration_min: form.duration_min?Number(form.duration_min):null }),
+    onSuccess: () => { setForm(empty); setErr(''); qc.invalidateQueries({queryKey:['class-logs', enrollmentId]}); qc.invalidateQueries({queryKey:['teacher-students']}); },
+    onError: (e) => setErr(Object.values(e?.response?.data?.errors||{})[0]?.[0] || 'Could not save the class.'),
+  });
+  const statusColor = { completed:'bg-green-50 text-green-700', scheduled:'bg-blue-50 text-blue-700', missed:'bg-red-50 text-red-700' };
+
+  return (
+    <div className="border-t border-slate-100 bg-slate-50 p-3 space-y-3">
+      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400"><BookOpen className="h-3.5 w-3.5"/>Class log</div>
+      {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : logs.length ? (
+        <ul className="space-y-1.5">
+          {logs.map(l => (
+            <li key={l.id} className="rounded-md bg-white ring-1 ring-slate-100 px-3 py-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-semibold text-sm text-slate-800">{l.topic}</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-xs text-slate-500">{l.held_on}{l.duration_min?` · ${l.duration_min}m`:''}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${statusColor[l.status]||'bg-slate-100 text-slate-600'}`}>{l.status}</span>
+                </div>
+              </div>
+              {(l.homework || l.notes) && <div className="text-xs text-slate-500 mt-1">{[l.homework && `HW: ${l.homework}`, l.notes].filter(Boolean).join(' · ')}</div>}
+            </li>
+          ))}
+        </ul>
+      ) : <p className="text-sm text-slate-500">No classes logged yet.</p>}
+
+      {err && <div className="rounded-md bg-red-50 text-red-700 text-xs p-2">{err}</div>}
+      <form onSubmit={ev=>{ev.preventDefault();add.mutate();}} className="space-y-2">
+        <input required value={form.topic} onChange={set('topic')} placeholder="Topic covered (e.g. Quadratic equations)" className={inp}/>
+        <div className="grid grid-cols-3 gap-2">
+          <input type="date" required value={form.held_on} onChange={set('held_on')} className={inp}/>
+          <input type="number" value={form.duration_min} onChange={set('duration_min')} placeholder="Mins" className={inp}/>
+          <select value={form.status} onChange={set('status')} className={inp}>
+            <option value="completed">Completed</option><option value="scheduled">Scheduled</option><option value="missed">Missed</option>
+          </select>
+        </div>
+        <input value={form.homework} onChange={set('homework')} placeholder="Homework assigned (optional)" className={inp}/>
+        <textarea rows={2} value={form.notes} onChange={set('notes')} placeholder="Notes / progress (optional)" className={inp}/>
+        <button disabled={add.isPending} className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">
+          <NotebookPen className="h-4 w-4"/> {add.isPending?'Saving…':'Log this class'}
+        </button>
+      </form>
+    </div>
   );
 }
 

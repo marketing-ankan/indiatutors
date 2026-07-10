@@ -70,12 +70,14 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 - Admin user is env-gated (`ADMIN_EMAIL`/`ADMIN_PASSWORD`) — no default-password admin
 - Deferred to later: call/confirm telephony, pincode-level matching, richer scheduling calendar
 
-## Phase 5 — Teacher portal 🔨 (v1 done 2026-07-10)
-- ✅ **Teacher onboarding & profile**: headline, qualification, subjects, languages, experience, fee, city, teaching mode, **service areas (pincodes)**, **availability (days + slots)**, bio — self-editable on the dashboard (KYC already from Phase 3)
-- ✅ **Admin approval**: Staff Console "Teacher Applications" tab — approve / reject (status pending→approved→rejected)
-- ⬜ Course/subject approval workflow; teacher's students views (demo/enrolled/ongoing)
-- ⬜ Progress tracker (curriculum classwise); curriculum define/divide/edit
-- ⬜ Notes/PPT/homework/lesson plans/question bank; class calendar; feedback
+## Phase 5 — Teacher portal 🔨 (v2 done 2026-07-10)
+- ✅ **Teacher onboarding & profile** (v1): headline, qualification, subjects, languages, experience, fee, city, teaching mode, **service areas (pincodes)**, **availability (days + slots)**, bio — self-editable on the dashboard (KYC already from Phase 3)
+- ✅ **Admin approval** (v1): Staff Console "Teacher Applications" tab — approve / reject (status pending→approved→rejected)
+- ✅ **Approval → directory tutor link** (v2): approving a teacher auto-creates (idempotent) a listed `Tutor` record linked to their account, so demos can be assigned to them and their enrollments flow into the portal — bridges the Phase-4 enrollment engine to the teacher account
+- ✅ **Teacher classroom** (v2): "My students" roster (assigned enrollments — demo/enrolled/ongoing), **upcoming assigned demos** (no parent PII), and a per-enrollment **class log / progress tracker** (topic, date, duration, homework, notes, status) — self-serve on the dashboard, ownership-scoped
+- ⬜ Course/subject approval workflow (teacher proposes courses → admin approves)
+- ⬜ Progress tracker: curriculum classwise (define/divide/edit) — the class log is the v2 foundation
+- ⬜ Notes/PPT/lesson plans/question bank; class calendar; student/parent-visible feedback (parent-facing view is Phase 6)
 
 ## Phase 6 — Student/Parent portal ⬜
 - Access teacher details + curriculum + progress tracker

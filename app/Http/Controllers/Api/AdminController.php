@@ -10,6 +10,7 @@ use App\Models\Enrollment;
 use App\Models\TeacherProfile;
 use App\Models\Tutor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AdminController extends Controller {
     public function demoRequests(Request $request) {
@@ -79,6 +80,42 @@ class AdminController extends Controller {
     public function approveTeacher(Request $request, TeacherProfile $teacherProfile) {
         $data = $request->validate(['status' => 'required|in:pending,approved,rejected']);
         $teacherProfile->update($data);
+
+        // On approval, give the teacher a listed directory tutor (idempotent) so
+        // they can be assigned demos and see their own enrollments in the portal.
+        if ($data['status'] === 'approved') {
+            $this->linkTutor($teacherProfile);
+        }
+
         return new TeacherProfileResource($teacherProfile->fresh()->load('user:id,name,email'));
+    }
+
+    /** Create (once) a directory Tutor for an approved teacher, seeded from their profile. */
+    private function linkTutor(TeacherProfile $profile): void {
+        $user = $profile->user()->first();
+        if (!$user || $user->tutor()->exists()) return;
+
+        $base = Str::slug($user->name) ?: 'tutor';
+        $slug = $base;
+        $i = 2;
+        while (Tutor::where('slug', $slug)->exists()) $slug = $base . '-' . $i++;
+
+        Tutor::create([
+            'user_id'          => $user->id,
+            'name'             => $user->name,
+            'slug'             => $slug,
+            'tagline'          => $profile->headline,
+            'qualification'    => $profile->qualification,
+            'experience_years' => $profile->experience_years,
+            'subjects'         => $profile->subjects,
+            'fee_hourly'       => $profile->fee_hourly ?? 0,
+            'city'             => $profile->city,
+            'localities'       => $profile->service_areas,
+            'languages'        => $profile->languages,
+            'teaching_mode'    => $profile->teaching_mode ?? 'online',
+            'verified'         => true,
+            'is_published'     => true,
+            'bio'              => $profile->bio,
+        ]);
     }
 }

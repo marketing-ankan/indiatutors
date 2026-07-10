@@ -9,4 +9,5 @@ class Enrollment extends Model {
     public function tutor()   { return $this->belongsTo(Tutor::class); }
     public function course()  { return $this->belongsTo(Course::class); }
     public function demoRequest() { return $this->belongsTo(DemoRequest::class); }
+    public function classLogs()   { return $this->hasMany(ClassLog::class)->latest('held_on'); }
 }

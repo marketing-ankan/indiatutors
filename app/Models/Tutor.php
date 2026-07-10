@@ -4,7 +4,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tutor extends Model {
     protected $fillable = [
-        'name','slug','tagline','qualification','experience_years','subjects',
+        'user_id','name','slug','tagline','qualification','experience_years','subjects',
         'fee_hourly','fee_trial','city','state','localities','languages',
         'teaching_mode','verified','is_published','bio','image_url','position',
     ];
@@ -19,6 +19,10 @@ class Tutor extends Model {
     ];
 
     public function scopePublished($q) { return $q->where('is_published', true); }
+
+    public function user()          { return $this->belongsTo(User::class); }
+    public function enrollments()   { return $this->hasMany(Enrollment::class); }
+    public function assignedDemos() { return $this->hasMany(DemoRequest::class, 'assigned_tutor_id'); }
 
     // Turn comma strings into clean arrays for the API
     public function getSubjectsListAttribute(): array {

@@ -51,9 +51,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/my/demo-requests', [DemoRequestController::class, 'myIndex']);
     Route::get('/my/enrollments',   [EnrollmentController::class, 'myIndex']);
 
-    // Teacher portal (own profile)
+    // Teacher portal (own profile + classroom)
     Route::get('/teacher/profile',  [TeacherController::class, 'showMine']);
     Route::put('/teacher/profile',  [TeacherController::class, 'updateMine']);
+    Route::get('/teacher/students', [TeacherController::class, 'students']);
+    Route::get('/teacher/demos',    [TeacherController::class, 'demos']);
+    Route::get('/teacher/enrollments/{enrollment}/logs',  [TeacherController::class, 'classLogs']);
+    Route::post('/teacher/enrollments/{enrollment}/logs', [TeacherController::class, 'storeClassLog']);
 
     // --- Admin (staff): match tutors, schedule, convert demo -> enrollment ---
     Route::middleware(\App\Http\Middleware\EnsureAdmin::class)->prefix('admin')->group(function () {

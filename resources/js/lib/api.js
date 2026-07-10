@@ -55,9 +55,13 @@ export const deleteStudent = async (id) => { await api.delete(`/students/${id}`)
 export const fetchMyDemoRequests = async () => { const { data } = await api.get('/my/demo-requests'); return data.data; };
 export const fetchMyEnrollments  = async () => { const { data } = await api.get('/my/enrollments'); return data.data; };
 
-// Teacher portal (own profile)
+// Teacher portal (own profile + classroom)
 export const fetchTeacherProfile  = async () => { const { data } = await api.get('/teacher/profile'); return data.data; };
 export const updateTeacherProfile = async (payload) => { const { data } = await api.put('/teacher/profile', payload); return data.data; };
+export const fetchTeacherStudents = async () => { const { data } = await api.get('/teacher/students'); return data.data; };
+export const fetchTeacherDemos    = async () => { const { data } = await api.get('/teacher/demos'); return data.data; };
+export const fetchClassLogs = async (enrollmentId) => { const { data } = await api.get(`/teacher/enrollments/${enrollmentId}/logs`); return data.data; };
+export const addClassLog    = async (enrollmentId, payload) => { const { data } = await api.post(`/teacher/enrollments/${enrollmentId}/logs`, payload); return data.data; };
 
 // Admin (staff)
 export const fetchAdminDemoRequests = async (status='') => { const { data } = await api.get('/admin/demo-requests', { params:{ status } }); return data; };

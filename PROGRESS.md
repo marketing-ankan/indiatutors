@@ -10,7 +10,7 @@ Rebuild of the WordPress site (indiatutorsonline.com) as a **Laravel 11 API + Re
 | 2 | Full website parity, SEO, UI match | ✅ Done · Live |
 | 3 | Accounts, auth & KYC | ✅ Done · Live |
 | 4 | Demo → enrollment engine + staff console | ✅ Done · Live |
-| 5 | Teacher portal | 🔨 In progress |
+| 5 | Teacher portal (profile, approval, **classroom + class log**) | 🔨 In progress (v2) |
 
 ---
 
@@ -44,11 +44,13 @@ Rebuild of the WordPress site (indiatutorsonline.com) as a **Laravel 11 API + Re
 - Admin is **env-gated** (`ADMIN_EMAIL`/`ADMIN_PASSWORD`) — no default-password admin
 - **QA:** 11 enrollment-flow tests + admin UI verified
 
-## 🔨 Phase 5 — Teacher portal (v1 done 2026-07-10)
-- ✅ **Teacher onboarding & profile**: headline, qualification, subjects, languages, experience, fee, city, mode, service areas (pincodes), **availability (days + slots)**, bio — self-editable on the dashboard (KYC from Phase 3)
-- ✅ **Admin approval**: Staff Console "Teacher Applications" tab (approve / reject)
-- ⬜ Next: course approval, teacher's students (demo/enrolled/ongoing), progress tracker, curriculum/notes/question-bank, class calendar
-- QA: 8 teacher API tests + teacher dashboard + admin approval verified in browser
+## 🔨 Phase 5 — Teacher portal (v2 done 2026-07-10)
+- ✅ **Teacher onboarding & profile** (v1): headline, qualification, subjects, languages, experience, fee, city, mode, service areas (pincodes), **availability (days + slots)**, bio — self-editable on the dashboard (KYC from Phase 3)
+- ✅ **Admin approval** (v1): Staff Console "Teacher Applications" tab (approve / reject)
+- ✅ **Approval → tutor bridge** (v2): approving a teacher auto-creates a listed directory `Tutor` linked to their account (`tutors.user_id`), so Phase-4 demos/enrollments now reach the teacher's portal
+- ✅ **Teacher classroom** (v2): "My students" roster (assigned enrollments), upcoming assigned demos (parent PII withheld), and a per-enrollment **class log / progress tracker** (topic, date, duration, homework, notes, status) — ownership-scoped, self-serve on the dashboard
+- ⬜ Next: course approval, curriculum define/divide/edit, notes/PPT/question-bank, class calendar, parent-visible feedback (Phase 6)
+- QA: **10 feature tests green** (8 teacher-classroom + 2 example) on isolated sqlite — approval→tutor creation, roster scoping, class-log create + 403 on others' enrollments, PII omission; full teacher login→classroom→log-a-class flow verified in the browser (201 Created, roster count updates)
 
 ---
 
