@@ -110,34 +110,49 @@ export default function ReferEarnPage() {
 
   return (
     <>
-      {/* HERO */}
-      <section className="bg-gradient-to-br from-brand-900 to-brand-700 text-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 grid lg:grid-cols-2 gap-10 items-center">
+      {/* HERO — matches the live layout: eyebrow pill, gold + ghost CTAs, image collage right */}
+      <section className="relative bg-gradient-to-br from-[#0B1220] to-brand-800 text-white pb-24">
+        <div className="container-wide py-16 grid lg:grid-cols-2 gap-10 items-center">
           <div>
+            <span className="inline-block rounded-full bg-white/15 ring-1 ring-white/25 px-3.5 py-1.5 text-xs font-bold mb-4">🎁 Refer & Earn</span>
             <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">Share the gift of learning — earn free classes 🎉</h1>
-            <p className="mt-4 text-slate-200 max-w-xl leading-relaxed">At Indiatutors Online, we believe learning is more rewarding when shared. Refer a friend or relative, and when they join, you earn FREE classes — our way of saying thank you for your trust.</p>
+            <p className="mt-4 text-slate-300 max-w-xl leading-relaxed">At Indiatutors Online, we believe learning is more rewarding when shared. Refer a friend or relative, and when they join, you earn FREE classes — our way of saying thank you for your trust.</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <a href="#refer-form" className="rounded-xl bg-white text-brand-800 px-6 py-3 text-sm font-bold hover:bg-slate-100">🚀 Refer a Friend</a>
-              <Link to="/courses" className="rounded-xl border border-white/50 px-6 py-3 text-sm font-bold hover:bg-white/10">🎓 Learn together</Link>
+              <a href="#refer-form" className="rounded-xl bg-[#D4AF37] text-[#0B1220] px-6 py-3 text-sm font-bold shadow-lg shadow-[#D4AF37]/30 hover:brightness-105">🚀 Refer a Friend</a>
+              <a href="#how-it-works" className="rounded-xl border border-white/60 px-6 py-3 text-sm font-bold hover:bg-white/10">How it works</a>
             </div>
           </div>
-          <div className="rounded-2xl bg-white/10 ring-1 ring-white/20 p-8 backdrop-blur">
-            <div className="text-center mb-5">
-              <div className="text-5xl font-extrabold">2</div>
-              <div className="font-bold">FREE classes</div>
-              <div className="text-sm text-slate-300">for every successful referral</div>
+          <div className="hidden lg:block relative">
+            <div className="grid grid-cols-2 gap-3">
+              <img src="https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-25-768x576.jpg" alt="Live online class" className="col-span-2 h-44 w-full object-cover rounded-2xl shadow-2xl"/>
+              <img src="https://indiatutorsonline.com/wp-content/uploads/2026/05/Graphics-Design-768x576.jpg" alt="Graphics design class" className="h-32 w-full object-cover rounded-2xl shadow-2xl"/>
+              <img src="https://indiatutorsonline.com/wp-content/uploads/2026/05/Hindi-768x576.jpg" alt="Hindi class" className="h-32 w-full object-cover rounded-2xl shadow-2xl"/>
             </div>
-            <ul className="space-y-2.5 text-sm">
-              <li>🧑‍🏫 <strong>2 free 1-on-1 classes</strong> per referral</li>
-              <li>👥 <strong>2 free group classes</strong> per referral</li>
-              <li>♾️ <strong>Unlimited referrals</strong> — the more you refer, the more you earn</li>
-            </ul>
+            <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-[#D4AF37] text-[#0B1220] px-4 py-1.5 text-xs font-extrabold shadow-lg">🎓 Learn together</span>
+          </div>
+        </div>
+
+        {/* REWARD STRIP — white band overlapping the hero bottom, like the live site */}
+        <div className="container-wide">
+          <div className="absolute left-0 right-0 -bottom-16 px-[clamp(16px,3vw,40px)]">
+            <div className="mx-auto rounded-2xl bg-white text-slate-900 shadow-2xl ring-1 ring-slate-100 p-6 grid md:grid-cols-[10rem_1fr] gap-5 items-center">
+              <div className="text-center md:border-r md:border-slate-100 md:pr-5">
+                <div className="text-5xl font-extrabold text-brand-700 leading-none">2</div>
+                <div className="font-bold mt-1">FREE classes</div>
+                <div className="text-xs text-slate-500">for every successful referral</div>
+              </div>
+              <ul className="space-y-2 text-sm">
+                <li>🧑‍🏫 <strong>2 free 1-on-1 classes</strong> per referral</li>
+                <li>👥 <strong>2 free group classes</strong> per referral</li>
+                <li>♾️ <strong>Unlimited referrals</strong> — the more you refer, the more you earn</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="py-14 bg-white">
+      <section id="how-it-works" className="pt-28 pb-14 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-extrabold text-center">How It Works</h2>
           <p className="text-slate-500 text-center mt-1 mb-9">Three simple steps from sharing to earning.</p>
