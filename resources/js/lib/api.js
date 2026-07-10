@@ -63,6 +63,33 @@ export const fetchTeacherDemos    = async () => { const { data } = await api.get
 export const fetchClassLogs = async (enrollmentId) => { const { data } = await api.get(`/teacher/enrollments/${enrollmentId}/logs`); return data.data; };
 export const addClassLog    = async (enrollmentId, payload) => { const { data } = await api.post(`/teacher/enrollments/${enrollmentId}/logs`, payload); return data.data; };
 
+// Curriculum (teacher)
+export const fetchCurriculum = async (eid) => { const { data } = await api.get(`/teacher/enrollments/${eid}/curriculum`); return data.data; };
+export const addCurriculumItem = async (eid, p) => { const { data } = await api.post(`/teacher/enrollments/${eid}/curriculum`, p); return data.data; };
+export const updateCurriculumItem = async (eid, id, p) => { const { data } = await api.patch(`/teacher/enrollments/${eid}/curriculum/${id}`, p); return data.data; };
+export const deleteCurriculumItem = async (eid, id) => { await api.delete(`/teacher/enrollments/${eid}/curriculum/${id}`); };
+
+// Materials (teacher upload; parent/teacher download)
+export const fetchMaterials = async (eid) => { const { data } = await api.get(`/teacher/enrollments/${eid}/materials`); return data.data; };
+export const uploadMaterial = async (eid, formData) => { const { data } = await api.post(`/teacher/enrollments/${eid}/materials`, formData); return data.data; };
+export const deleteMaterial = async (eid, id) => { await api.delete(`/teacher/enrollments/${eid}/materials/${id}`); };
+export const downloadMaterial = async (id, filename) => {
+  const res = await api.get(`/materials/${id}/download`, { responseType: 'blob' });
+  const url = URL.createObjectURL(res.data);
+  const a = Object.assign(document.createElement('a'), { href: url, download: filename || 'material' });
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+};
+
+// Course proposals (teacher + admin)
+export const fetchMyProposals = async () => { const { data } = await api.get('/teacher/proposals'); return data.data; };
+export const submitProposal   = async (p) => { const { data } = await api.post('/teacher/proposals', p); return data.data; };
+export const fetchAdminProposals = async (status='') => { const { data } = await api.get('/admin/proposals', { params:{ status } }); return data; };
+export const decideProposal      = async (id, status) => { const { data } = await api.patch(`/admin/proposals/${id}`, { status }); return data.data; };
+
+// Parent portal: full enrollment detail
+export const fetchMyEnrollmentDetail = async (id) => { const { data } = await api.get(`/my/enrollments/${id}`); return data.data; };
+
 // Admin (staff)
 export const fetchAdminDemoRequests = async (status='') => { const { data } = await api.get('/admin/demo-requests', { params:{ status } }); return data; };
 export const fetchAdminTeachers = async (status='') => { const { data } = await api.get('/admin/teachers', { params:{ status } }); return data; };

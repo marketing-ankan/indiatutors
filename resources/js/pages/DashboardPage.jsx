@@ -2,13 +2,16 @@ import { useState, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { LogOut, Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap, Briefcase, Save, Users, BookOpen, NotebookPen, ChevronDown, ChevronUp } from 'lucide-react';
+import { LogOut, Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap, Briefcase, Save, Users, BookOpen, NotebookPen, ChevronDown, ChevronUp, ListChecks, FolderOpen, Link2, Download, Lightbulb } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import {
   fetchStudents, createStudent, deleteStudent,
   fetchKyc, uploadKyc, deleteKyc, fetchMyDemoRequests, fetchMyEnrollments,
   fetchTeacherProfile, updateTeacherProfile,
   fetchTeacherStudents, fetchTeacherDemos, fetchClassLogs, addClassLog,
+  fetchCurriculum, addCurriculumItem, updateCurriculumItem, deleteCurriculumItem,
+  fetchMaterials, uploadMaterial, deleteMaterial, downloadMaterial,
+  fetchMyProposals, submitProposal, fetchMyEnrollmentDetail,
 } from '../lib/api.js';
 
 const inp = "w-full rounded-md ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
@@ -43,6 +46,7 @@ export default function DashboardPage() {
             <KycCard />
           </div>
           <TeacherClassroom />
+          <TeacherProposalsCard />
         </div>
       ) : (
         <>
@@ -186,8 +190,164 @@ function RosterRow({ e }) {
           {open ? <ChevronUp className="h-4 w-4 text-slate-400"/> : <ChevronDown className="h-4 w-4 text-slate-400"/>}
         </div>
       </button>
-      {open && <ClassLogPanel enrollmentId={e.id} />}
+      {open && <ClassroomTabs enrollmentId={e.id} />}
     </li>
+  );
+}
+
+function ClassroomTabs({ enrollmentId }) {
+  const [tab, setTab] = useState('log');
+  const tabs = [['log','Class log',BookOpen],['curriculum','Curriculum',ListChecks],['materials','Materials',FolderOpen]];
+  return (
+    <div className="border-t border-slate-100 bg-slate-50">
+      <div className="flex gap-1 px-3 pt-2">
+        {tabs.map(([k,label,Icon]) => (
+          <button key={k} onClick={()=>setTab(k)} className={`inline-flex items-center gap-1.5 rounded-t-lg px-3 py-1.5 text-xs font-bold ${tab===k?'bg-white text-brand-700 ring-1 ring-slate-100 ring-b-0':'text-slate-500 hover:text-slate-700'}`}>
+            <Icon className="h-3.5 w-3.5"/>{label}
+          </button>
+        ))}
+      </div>
+      {tab==='log' && <ClassLogPanel enrollmentId={enrollmentId} />}
+      {tab==='curriculum' && <CurriculumPanel enrollmentId={enrollmentId} />}
+      {tab==='materials' && <MaterialsPanel enrollmentId={enrollmentId} />}
+    </div>
+  );
+}
+
+function CurriculumPanel({ enrollmentId }) {
+  const qc = useQueryClient();
+  const { data: items = [], isLoading } = useQuery({ queryKey:['curriculum', enrollmentId], queryFn:()=>fetchCurriculum(enrollmentId) });
+  const [form, setForm] = useState({ topic:'', details:'' });
+  const invalidate = () => qc.invalidateQueries({queryKey:['curriculum', enrollmentId]});
+  const add = useMutation({ mutationFn:()=>addCurriculumItem(enrollmentId, form), onSuccess:()=>{ setForm({topic:'',details:''}); invalidate(); } });
+  const setStatus = useMutation({ mutationFn:({id,status})=>updateCurriculumItem(enrollmentId, id, {status}), onSuccess:invalidate });
+  const remove = useMutation({ mutationFn:(id)=>deleteCurriculumItem(enrollmentId, id), onSuccess:invalidate });
+  const statusColor = { pending:'bg-slate-100 text-slate-600', in_progress:'bg-blue-50 text-blue-700', done:'bg-green-50 text-green-700' };
+  const NEXT = { pending:'in_progress', in_progress:'done', done:'pending' };
+
+  return (
+    <div className="p-3 space-y-3">
+      <p className="text-xs text-slate-500">Define the curriculum classwise — tap a status chip to advance it (pending → in progress → done). Parents see this as the progress tracker.</p>
+      {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : items.length ? (
+        <ol className="space-y-1.5">
+          {items.map((it, i) => (
+            <li key={it.id} className="flex items-center gap-2 rounded-md bg-white ring-1 ring-slate-100 px-3 py-2">
+              <span className="text-xs font-bold text-slate-400 w-5">{i+1}.</span>
+              <div className="min-w-0 flex-1">
+                <div className="font-semibold text-sm text-slate-800">{it.topic}</div>
+                {it.details && <div className="text-xs text-slate-500">{it.details}</div>}
+              </div>
+              <button onClick={()=>setStatus.mutate({id:it.id, status:NEXT[it.status]})} className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${statusColor[it.status]}`} title="Click to advance">
+                {it.status.replace('_',' ')}
+              </button>
+              <button onClick={()=>remove.mutate(it.id)} className="p-1 text-slate-400 hover:text-red-600"><Trash2 className="h-3.5 w-3.5"/></button>
+            </li>
+          ))}
+        </ol>
+      ) : <p className="text-sm text-slate-500">No curriculum yet — add the first topic below.</p>}
+      <form onSubmit={e=>{e.preventDefault();add.mutate();}} className="space-y-2">
+        <input required value={form.topic} onChange={e=>setForm({...form,topic:e.target.value})} placeholder="Topic (e.g. Quadratic equations)" className={inp}/>
+        <input value={form.details} onChange={e=>setForm({...form,details:e.target.value})} placeholder="Details (optional)" className={inp}/>
+        <button disabled={add.isPending} className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">
+          <Plus className="h-4 w-4"/>{add.isPending?'Adding…':'Add topic'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function MaterialsPanel({ enrollmentId }) {
+  const qc = useQueryClient();
+  const fileRef = useRef();
+  const { data: items = [], isLoading } = useQuery({ queryKey:['materials', enrollmentId], queryFn:()=>fetchMaterials(enrollmentId) });
+  const [form, setForm] = useState({ type:'note', title:'', link_url:'' });
+  const [err, setErr] = useState('');
+  const invalidate = () => qc.invalidateQueries({queryKey:['materials', enrollmentId]});
+  const add = useMutation({
+    mutationFn: () => {
+      const fd = new FormData();
+      fd.append('type', form.type); fd.append('title', form.title);
+      if (form.link_url) fd.append('link_url', form.link_url);
+      if (fileRef.current?.files[0]) fd.append('file', fileRef.current.files[0]);
+      return uploadMaterial(enrollmentId, fd);
+    },
+    onSuccess: () => { setForm({type:'note',title:'',link_url:''}); if(fileRef.current) fileRef.current.value=''; setErr(''); invalidate(); },
+    onError: (e) => setErr(e?.response?.data?.message || Object.values(e?.response?.data?.errors||{})[0]?.[0] || 'Upload failed.'),
+  });
+  const remove = useMutation({ mutationFn:(id)=>deleteMaterial(enrollmentId, id), onSuccess:invalidate });
+  const TYPES = [['note','Note'],['ppt','PPT'],['lesson_plan','Lesson plan'],['question_bank','Question bank'],['homework','Homework'],['other','Other']];
+
+  return (
+    <div className="p-3 space-y-3">
+      <p className="text-xs text-slate-500">Share notes, PPTs, lesson plans, question banks or homework — parents can download them from their dashboard.</p>
+      {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : items.length ? (
+        <ul className="space-y-1.5">
+          {items.map(m => (
+            <li key={m.id} className="flex items-center gap-2 rounded-md bg-white ring-1 ring-slate-100 px-3 py-2">
+              <FileText className="h-4 w-4 text-slate-400 shrink-0"/>
+              <div className="min-w-0 flex-1">
+                <div className="font-semibold text-sm text-slate-800">{m.title}</div>
+                <div className="text-xs text-slate-500 capitalize">{m.type.replace('_',' ')}{m.original_name && ` · ${m.original_name}`}</div>
+              </div>
+              {m.has_file && <button onClick={()=>downloadMaterial(m.id, m.original_name)} className="p-1.5 text-slate-400 hover:text-brand-600" title="Download"><Download className="h-4 w-4"/></button>}
+              {m.link_url && <a href={m.link_url} target="_blank" rel="noopener noreferrer" className="p-1.5 text-slate-400 hover:text-brand-600" title="Open link"><Link2 className="h-4 w-4"/></a>}
+              <button onClick={()=>remove.mutate(m.id)} className="p-1 text-slate-400 hover:text-red-600"><Trash2 className="h-3.5 w-3.5"/></button>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="text-sm text-slate-500">Nothing shared yet.</p>}
+      {err && <div className="rounded-md bg-red-50 text-red-700 text-xs p-2">{err}</div>}
+      <form onSubmit={e=>{e.preventDefault();add.mutate();}} className="space-y-2">
+        <div className="grid grid-cols-2 gap-2">
+          <select value={form.type} onChange={e=>setForm({...form,type:e.target.value})} className={inp}>
+            {TYPES.map(([v,l])=><option key={v} value={v}>{l}</option>)}
+          </select>
+          <input required value={form.title} onChange={e=>setForm({...form,title:e.target.value})} placeholder="Title" className={inp}/>
+        </div>
+        <div className="grid grid-cols-2 gap-2 items-center">
+          <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.txt" className="text-sm text-slate-600 file:mr-2 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-semibold"/>
+          <input value={form.link_url} onChange={e=>setForm({...form,link_url:e.target.value})} placeholder="…or paste a link (video, Drive)" className={inp}/>
+        </div>
+        <button disabled={add.isPending} className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">
+          <Upload className="h-4 w-4"/>{add.isPending?'Sharing…':'Share material'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function TeacherProposalsCard() {
+  const qc = useQueryClient();
+  const { data: items = [], isLoading } = useQuery({ queryKey:['my-proposals'], queryFn: fetchMyProposals });
+  const [form, setForm] = useState({ title:'', description:'' });
+  const add = useMutation({
+    mutationFn: () => submitProposal(form),
+    onSuccess: () => { setForm({title:'',description:''}); qc.invalidateQueries({queryKey:['my-proposals']}); },
+  });
+  const badge = { pending:'bg-amber-50 text-amber-700', approved:'bg-green-50 text-green-700', rejected:'bg-red-50 text-red-700' };
+
+  return (
+    <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
+      <h2 className="text-lg font-bold flex items-center gap-2 mb-1"><Lightbulb className="h-5 w-5 text-brand-600"/>Propose a course</h2>
+      <p className="text-xs text-slate-500 mb-4">Want to teach a new subject? Propose it — once our team approves, it's added to your profile.</p>
+      {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : items.length > 0 && (
+        <ul className="space-y-1.5 mb-4">
+          {items.map(p => (
+            <li key={p.id} className="flex items-center justify-between rounded-md ring-1 ring-slate-100 px-3 py-2">
+              <span className="font-semibold text-sm text-slate-800">{p.title}</span>
+              <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${badge[p.status]||'bg-slate-100'}`}>{p.status}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <form onSubmit={e=>{e.preventDefault();add.mutate();}} className="space-y-2">
+        <input required value={form.title} onChange={e=>setForm({...form,title:e.target.value})} placeholder="Subject / course title (e.g. Astronomy)" className={inp}/>
+        <textarea rows={2} value={form.description} onChange={e=>setForm({...form,description:e.target.value})} placeholder="Short description (optional)" className={inp}/>
+        <button disabled={add.isPending} className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">
+          <Plus className="h-4 w-4"/>{add.isPending?'Submitting…':'Submit proposal'}
+        </button>
+      </form>
+    </section>
   );
 }
 
@@ -207,8 +367,7 @@ function ClassLogPanel({ enrollmentId }) {
   const statusColor = { completed:'bg-green-50 text-green-700', scheduled:'bg-blue-50 text-blue-700', missed:'bg-red-50 text-red-700' };
 
   return (
-    <div className="border-t border-slate-100 bg-slate-50 p-3 space-y-3">
-      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400"><BookOpen className="h-3.5 w-3.5"/>Class log</div>
+    <div className="p-3 space-y-3">
       {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : logs.length ? (
         <ul className="space-y-1.5">
           {logs.map(l => (
@@ -248,24 +407,109 @@ function ClassLogPanel({ enrollmentId }) {
 
 function EnrollmentsCard() {
   const { data: items = [], isLoading } = useQuery({ queryKey:['my-enrollments'], queryFn: fetchMyEnrollments });
-  const statusColor = { active:'bg-green-50 text-green-700', paused:'bg-amber-50 text-amber-700', completed:'bg-blue-50 text-blue-700', cancelled:'bg-slate-100 text-slate-600' };
   return (
     <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
-      <h2 className="text-lg font-bold flex items-center gap-2 mb-4"><GraduationCap className="h-5 w-5 text-brand-600"/>My enrollments</h2>
+      <h2 className="text-lg font-bold flex items-center gap-2 mb-1"><GraduationCap className="h-5 w-5 text-brand-600"/>My enrollments</h2>
+      <p className="text-xs text-slate-500 mb-4">Open a class to see the teacher, curriculum progress, class history and shared materials.</p>
       {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : items.length ? (
-        <ul className="divide-y divide-slate-100">
-          {items.map(e => (
-            <li key={e.id} className="flex items-center justify-between py-3">
-              <div>
-                <div className="font-semibold text-sm text-slate-800">{e.course?.name || e.plan || 'Enrollment'}</div>
-                <div className="text-xs text-slate-500">{[e.student, e.tutor?.name && `with ${e.tutor.name}`, e.plan].filter(Boolean).join(' · ')}</div>
-              </div>
-              <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor[e.status]||'bg-slate-100 text-slate-600'}`}>{e.status}</span>
-            </li>
-          ))}
+        <ul className="space-y-2">
+          {items.map(e => <ParentEnrollmentRow key={e.id} e={e} />)}
         </ul>
       ) : <p className="text-sm text-slate-500">No active enrollments yet. Once you complete a demo, your enrolled classes appear here.</p>}
     </section>
+  );
+}
+
+function ParentEnrollmentRow({ e }) {
+  const [open, setOpen] = useState(false);
+  const statusColor = { active:'bg-green-50 text-green-700', paused:'bg-amber-50 text-amber-700', completed:'bg-blue-50 text-blue-700', cancelled:'bg-slate-100 text-slate-600' };
+  return (
+    <li className="rounded-lg ring-1 ring-slate-100 overflow-hidden">
+      <button onClick={()=>setOpen(o=>!o)} className="w-full flex items-center justify-between gap-3 px-3 py-2.5 text-left hover:bg-slate-50">
+        <div className="min-w-0">
+          <div className="font-semibold text-sm text-slate-800">{e.course?.name || e.plan || 'Enrollment'}</div>
+          <div className="text-xs text-slate-500">{[e.student, e.tutor?.name && `with ${e.tutor.name}`, e.plan].filter(Boolean).join(' · ')}</div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor[e.status]||'bg-slate-100 text-slate-600'}`}>{e.status}</span>
+          {open ? <ChevronUp className="h-4 w-4 text-slate-400"/> : <ChevronDown className="h-4 w-4 text-slate-400"/>}
+        </div>
+      </button>
+      {open && <ParentEnrollmentDetail id={e.id} />}
+    </li>
+  );
+}
+
+function ParentEnrollmentDetail({ id }) {
+  const { data: d, isLoading } = useQuery({ queryKey:['my-enrollment', id], queryFn:()=>fetchMyEnrollmentDetail(id) });
+  const curStatus = { pending:'bg-slate-100 text-slate-500', in_progress:'bg-blue-50 text-blue-700', done:'bg-green-50 text-green-700' };
+  const logStatus = { completed:'bg-green-50 text-green-700', scheduled:'bg-blue-50 text-blue-700', missed:'bg-red-50 text-red-700' };
+  if (isLoading) return <div className="border-t border-slate-100 bg-slate-50 p-4 text-sm text-slate-400">Loading…</div>;
+  if (!d) return null;
+  const done = (d.curriculum||[]).filter(c=>c.status==='done').length;
+
+  return (
+    <div className="border-t border-slate-100 bg-slate-50 p-4 space-y-4">
+      {d.teacher && (
+        <div className="flex items-center gap-3 rounded-lg bg-white ring-1 ring-slate-100 p-3">
+          <div className="w-10 h-10 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold overflow-hidden shrink-0">
+            {d.teacher.image_url ? <img src={d.teacher.image_url} alt="" className="w-full h-full object-cover"/> : (d.teacher.name||'?')[0]}
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-sm text-slate-900">{d.teacher.name}</div>
+            <div className="text-xs text-slate-500">{[d.teacher.qualification, d.teacher.experience_years && `${d.teacher.experience_years}y exp`, (d.teacher.subjects||[]).slice(0,3).join(', '), d.teacher.city].filter(Boolean).join(' · ')}</div>
+          </div>
+        </div>
+      )}
+
+      <div>
+        <div className="flex items-center justify-between mb-1.5">
+          <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">Curriculum progress</h4>
+          {d.curriculum?.length > 0 && <span className="text-xs font-semibold text-slate-500">{done}/{d.curriculum.length} done</span>}
+        </div>
+        {d.curriculum?.length ? (
+          <ol className="space-y-1">
+            {d.curriculum.map((c,i) => (
+              <li key={c.id} className="flex items-center gap-2 text-sm">
+                <span className="text-xs font-bold text-slate-400 w-4">{i+1}.</span>
+                <span className="flex-1 text-slate-700">{c.topic}</span>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${curStatus[c.status]}`}>{c.status.replace('_',' ')}</span>
+              </li>
+            ))}
+          </ol>
+        ) : <p className="text-xs text-slate-400">The teacher hasn't published a curriculum yet.</p>}
+      </div>
+
+      <div>
+        <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1.5">Class history</h4>
+        {d.classes?.length ? (
+          <ul className="space-y-1">
+            {d.classes.map(l => (
+              <li key={l.id} className="flex items-center justify-between gap-2 text-sm">
+                <span className="text-slate-700 truncate">{l.topic}</span>
+                <span className="flex items-center gap-2 shrink-0 text-xs text-slate-500">{l.held_on}<span className={`rounded-full px-2 py-0.5 font-semibold ${logStatus[l.status]||'bg-slate-100'}`}>{l.status}</span></span>
+              </li>
+            ))}
+          </ul>
+        ) : <p className="text-xs text-slate-400">No classes logged yet.</p>}
+      </div>
+
+      <div>
+        <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1.5">Materials from the teacher</h4>
+        {d.materials?.length ? (
+          <ul className="space-y-1">
+            {d.materials.map(m => (
+              <li key={m.id} className="flex items-center gap-2 text-sm">
+                <FileText className="h-3.5 w-3.5 text-slate-400 shrink-0"/>
+                <span className="flex-1 text-slate-700 truncate">{m.title} <span className="text-xs text-slate-400 capitalize">({m.type.replace('_',' ')})</span></span>
+                {m.has_file && <button onClick={()=>downloadMaterial(m.id, m.original_name)} className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-700"><Download className="h-3.5 w-3.5"/>Download</button>}
+                {m.link_url && <a href={m.link_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-700"><Link2 className="h-3.5 w-3.5"/>Open</a>}
+              </li>
+            ))}
+          </ul>
+        ) : <p className="text-xs text-slate-400">Nothing shared yet.</p>}
+      </div>
+    </div>
   );
 }
 

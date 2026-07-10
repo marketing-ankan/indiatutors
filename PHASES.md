@@ -70,19 +70,19 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 - Admin user is env-gated (`ADMIN_EMAIL`/`ADMIN_PASSWORD`) — no default-password admin
 - Deferred to later: call/confirm telephony, pincode-level matching, richer scheduling calendar
 
-## Phase 5 — Teacher portal 🔨 (v2 done 2026-07-10)
+## Phase 5 — Teacher portal ✅ (v3 done 2026-07-10)
 - ✅ **Teacher onboarding & profile** (v1): headline, qualification, subjects, languages, experience, fee, city, teaching mode, **service areas (pincodes)**, **availability (days + slots)**, bio — self-editable on the dashboard (KYC already from Phase 3)
 - ✅ **Admin approval** (v1): Staff Console "Teacher Applications" tab — approve / reject (status pending→approved→rejected)
 - ✅ **Approval → directory tutor link** (v2): approving a teacher auto-creates (idempotent) a listed `Tutor` record linked to their account, so demos can be assigned to them and their enrollments flow into the portal — bridges the Phase-4 enrollment engine to the teacher account
 - ✅ **Teacher classroom** (v2): "My students" roster (assigned enrollments — demo/enrolled/ongoing), **upcoming assigned demos** (no parent PII), and a per-enrollment **class log / progress tracker** (topic, date, duration, homework, notes, status) — self-serve on the dashboard, ownership-scoped
-- ⬜ Course/subject approval workflow (teacher proposes courses → admin approves)
-- ⬜ Progress tracker: curriculum classwise (define/divide/edit) — the class log is the v2 foundation
-- ⬜ Notes/PPT/lesson plans/question bank; class calendar; student/parent-visible feedback (parent-facing view is Phase 6)
+- ✅ **Course proposals** (v3): teacher proposes a new subject → Staff Console "Course Proposals" tab → approval appends it to their directory subjects
+- ✅ **Curriculum define/divide/edit** (v3): per-enrollment ordered topics with status (pending → in progress → done) — the classwise progress tracker parents see
+- ✅ **Materials** (v3): notes / PPT / lesson plans / question bank / homework — private file upload (10 MB, KYC-style storage) or external link, per enrollment
+- ⏸️ Deferred: class calendar UI (scheduled class logs cover v1 needs; full scheduling is Phase 8)
 
-## Phase 6 — Student/Parent portal ⬜
-- Access teacher details + curriculum + progress tracker
-- Videos, notes, lesson plans, question bank
-- Class schedules, reschedule requests, portfolio building, exam updates
+## Phase 6 — Student/Parent portal 🔨 (v1 done 2026-07-10)
+- ✅ **Enrollment detail view**: parent expands any enrollment → assigned **teacher details** (photo, qualification, subjects, experience), **curriculum progress** (n/m done), **class history**, and **materials** (download files / open links) — ownership-checked, admin & assigned teacher may also download
+- ⬜ Reschedule requests (Phase 8 scheduling), portfolio building, exam updates
 
 ## Phase 7 — Payments & payouts ⬜
 - **Direct purchase** (video/self-paced): cart → checkout → Razorpay + GST invoice

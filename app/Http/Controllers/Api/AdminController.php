@@ -1,10 +1,12 @@
 <?php
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CourseProposalResource;
 use App\Http\Resources\DemoRequestResource;
 use App\Http\Resources\EnrollmentResource;
 use App\Http\Resources\TeacherProfileResource;
 use App\Http\Resources\TutorResource;
+use App\Models\CourseProposal;
 use App\Models\DemoRequest;
 use App\Models\Enrollment;
 use App\Models\TeacherProfile;
@@ -88,6 +90,32 @@ class AdminController extends Controller {
         }
 
         return new TeacherProfileResource($teacherProfile->fresh()->load('user:id,name,email'));
+    }
+
+    // --- Course proposals (teacher-proposed subjects) ---
+    public function proposals(Request $request) {
+        $q = CourseProposal::query()->with('user:id,name,email')->latest();
+        if ($s = $request->string('status')->toString()) $q->where('status', $s);
+        return CourseProposalResource::collection($q->paginate(20));
+    }
+
+    public function decideProposal(Request $request, CourseProposal $proposal) {
+        $data = $request->validate(['status' => 'required|in:pending,approved,rejected']);
+        $proposal->update($data);
+
+        // On approval, append the subject to the teacher's directory tutor (if linked).
+        if ($data['status'] === 'approved') {
+            $tutor = $proposal->user?->tutor;
+            if ($tutor) {
+                $subjects = array_filter(array_map('trim', explode(',', (string) $tutor->subjects)));
+                if (!in_array($proposal->title, $subjects, true)) {
+                    $subjects[] = $proposal->title;
+                    $tutor->update(['subjects' => implode(', ', $subjects)]);
+                }
+            }
+        }
+
+        return new CourseProposalResource($proposal->fresh()->load('user:id,name,email'));
     }
 
     /** Create (once) a directory Tutor for an approved teacher, seeded from their profile. */

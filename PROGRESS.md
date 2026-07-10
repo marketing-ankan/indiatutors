@@ -10,7 +10,8 @@ Rebuild of the WordPress site (indiatutorsonline.com) as a **Laravel 11 API + Re
 | 2 | Full website parity, SEO, UI match | ✅ Done · Live |
 | 3 | Accounts, auth & KYC | ✅ Done · Live |
 | 4 | Demo → enrollment engine + staff console | ✅ Done · Live |
-| 5 | Teacher portal (profile, approval, **classroom + class log**) | 🔨 In progress (v2) |
+| 5 | Teacher portal (profile, approval, classroom, curriculum, materials, proposals) | ✅ Done |
+| 6 | Student/Parent portal (teacher + curriculum + progress + materials) | 🔨 v1 done |
 
 ---
 
@@ -44,13 +45,22 @@ Rebuild of the WordPress site (indiatutorsonline.com) as a **Laravel 11 API + Re
 - Admin is **env-gated** (`ADMIN_EMAIL`/`ADMIN_PASSWORD`) — no default-password admin
 - **QA:** 11 enrollment-flow tests + admin UI verified
 
-## 🔨 Phase 5 — Teacher portal (v2 done 2026-07-10)
+## 🔨 Phase 6 — Student/Parent portal (v1 done 2026-07-10)
+- ✅ **Parent enrollment detail**: expand any enrollment → assigned teacher (photo, qualification, subjects, experience), **curriculum progress** (n/m done), class history, **materials download** (files stream via authed endpoint; links open directly)
+- ✅ Ownership-checked: only the owning parent (plus assigned teacher/admin) can view or download
+- ⬜ Next: reschedule requests (Phase 8), portfolio, exam updates
+- QA: covered by the 9 curriculum/materials feature tests + full browser flow (teacher creates → admin approves → parent consumes)
+
+## ✅ Phase 5 — Teacher portal (v3 done 2026-07-10)
 - ✅ **Teacher onboarding & profile** (v1): headline, qualification, subjects, languages, experience, fee, city, mode, service areas (pincodes), **availability (days + slots)**, bio — self-editable on the dashboard (KYC from Phase 3)
 - ✅ **Admin approval** (v1): Staff Console "Teacher Applications" tab (approve / reject)
 - ✅ **Approval → tutor bridge** (v2): approving a teacher auto-creates a listed directory `Tutor` linked to their account (`tutors.user_id`), so Phase-4 demos/enrollments now reach the teacher's portal
 - ✅ **Teacher classroom** (v2): "My students" roster (assigned enrollments), upcoming assigned demos (parent PII withheld), and a per-enrollment **class log / progress tracker** (topic, date, duration, homework, notes, status) — ownership-scoped, self-serve on the dashboard
-- ⬜ Next: course approval, curriculum define/divide/edit, notes/PPT/question-bank, class calendar, parent-visible feedback (Phase 6)
-- QA: **10 feature tests green** (8 teacher-classroom + 2 example) on isolated sqlite — approval→tutor creation, roster scoping, class-log create + 403 on others' enrollments, PII omission; full teacher login→classroom→log-a-class flow verified in the browser (201 Created, roster count updates)
+- ✅ **Course proposals** (v3): teacher proposes a subject → Staff Console "Course Proposals" tab → approval appends it to the tutor's directory subjects
+- ✅ **Curriculum define/divide/edit** (v3): ordered topics per enrollment with pending → in-progress → done status (classwise progress tracker)
+- ✅ **Materials** (v3): notes/PPT/lesson-plan/question-bank/homework — private 10 MB file upload (KYC-style storage, path never exposed) or external link; parent downloads via authed streaming endpoint
+- ⏸️ Deferred: class calendar UI (scheduled class logs cover it; full scheduling is Phase 8)
+- QA: **20 feature tests green** (8 classroom + 9 curriculum/materials/proposals + auth 401 + 2 example) on isolated sqlite; teacher→admin→parent flow verified end-to-end in the browser
 
 ---
 

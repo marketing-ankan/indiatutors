@@ -2,11 +2,17 @@
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ClassLogResource;
+use App\Http\Resources\ClassMaterialResource;
+use App\Http\Resources\CourseProposalResource;
+use App\Http\Resources\CurriculumItemResource;
 use App\Http\Resources\TeacherDemoResource;
 use App\Http\Resources\TeacherEnrollmentResource;
 use App\Http\Resources\TeacherProfileResource;
+use App\Models\ClassMaterial;
+use App\Models\CurriculumItem;
 use App\Models\Enrollment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class TeacherController extends Controller {
     public function showMine(Request $request) {
@@ -84,6 +90,103 @@ class TeacherController extends Controller {
             'status'   => $data['status'] ?? 'completed',
         ]);
         return (new ClassLogResource($log))->response()->setStatusCode(201);
+    }
+
+    // --- Curriculum (define / divide / edit, per enrollment) ---
+
+    public function curriculum(Request $request, Enrollment $enrollment) {
+        $this->authorizeEnrollment($request, $enrollment);
+        return CurriculumItemResource::collection($enrollment->curriculumItems()->get());
+    }
+
+    public function storeCurriculumItem(Request $request, Enrollment $enrollment) {
+        $this->authorizeEnrollment($request, $enrollment);
+        $data = $request->validate([
+            'topic'   => 'required|string|max:200',
+            'details' => 'nullable|string|max:2000',
+        ]);
+        $item = $enrollment->curriculumItems()->create([
+            ...$data,
+            'position' => ($enrollment->curriculumItems()->max('position') ?? 0) + 1,
+        ]);
+        return (new CurriculumItemResource($item))->response()->setStatusCode(201);
+    }
+
+    public function updateCurriculumItem(Request $request, Enrollment $enrollment, CurriculumItem $item) {
+        $this->authorizeEnrollment($request, $enrollment);
+        abort_unless($item->enrollment_id === $enrollment->id, 404);
+        $data = $request->validate([
+            'topic'    => 'sometimes|string|max:200',
+            'details'  => 'nullable|string|max:2000',
+            'status'   => 'sometimes|in:pending,in_progress,done',
+            'position' => 'sometimes|integer|min:0|max:10000',
+        ]);
+        $item->update($data);
+        return new CurriculumItemResource($item->fresh());
+    }
+
+    public function destroyCurriculumItem(Request $request, Enrollment $enrollment, CurriculumItem $item) {
+        $this->authorizeEnrollment($request, $enrollment);
+        abort_unless($item->enrollment_id === $enrollment->id, 404);
+        $item->delete();
+        return response()->json(['message' => 'Removed.']);
+    }
+
+    // --- Materials (notes / PPT / lesson plans / question bank) ---
+
+    public function materials(Request $request, Enrollment $enrollment) {
+        $this->authorizeEnrollment($request, $enrollment);
+        return ClassMaterialResource::collection($enrollment->materials()->get());
+    }
+
+    public function storeMaterial(Request $request, Enrollment $enrollment) {
+        $tutor = $this->authorizeEnrollment($request, $enrollment);
+        $data = $request->validate([
+            'type'     => 'required|in:note,ppt,lesson_plan,question_bank,homework,other',
+            'title'    => 'required|string|max:160',
+            'file'     => 'nullable|file|max:10240|mimes:jpg,jpeg,png,pdf,ppt,pptx,doc,docx,xls,xlsx,txt',
+            'link_url' => 'nullable|url|max:500',
+        ]);
+        abort_if(!$request->hasFile('file') && empty($data['link_url']), 422, 'Attach a file or provide a link.');
+
+        $path = $request->hasFile('file')
+            ? $request->file('file')->store("materials/{$enrollment->id}", 'local') // private, like KYC
+            : null;
+
+        $material = $enrollment->materials()->create([
+            'tutor_id'      => $tutor->id,
+            'type'          => $data['type'],
+            'title'         => $data['title'],
+            'original_name' => $request->hasFile('file') ? $request->file('file')->getClientOriginalName() : null,
+            'path'          => $path,
+            'link_url'      => $data['link_url'] ?? null,
+        ]);
+        return (new ClassMaterialResource($material))->response()->setStatusCode(201);
+    }
+
+    public function destroyMaterial(Request $request, Enrollment $enrollment, ClassMaterial $material) {
+        $this->authorizeEnrollment($request, $enrollment);
+        abort_unless($material->enrollment_id === $enrollment->id, 404);
+        if ($material->path) Storage::disk('local')->delete($material->path);
+        $material->delete();
+        return response()->json(['message' => 'Removed.']);
+    }
+
+    // --- Course proposals (teacher proposes; admin approves) ---
+
+    public function proposals(Request $request) {
+        abort_unless($request->user()->isTeacher(), 403, 'Teacher accounts only.');
+        return CourseProposalResource::collection($request->user()->courseProposals()->latest()->get());
+    }
+
+    public function storeProposal(Request $request) {
+        abort_unless($request->user()->isTeacher(), 403, 'Teacher accounts only.');
+        $data = $request->validate([
+            'title'       => 'required|string|max:160',
+            'description' => 'nullable|string|max:2000',
+        ]);
+        $p = $request->user()->courseProposals()->create($data);
+        return (new CourseProposalResource($p))->response()->setStatusCode(201);
     }
 
     /** The directory tutor linked to the signed-in teacher (null until approved). */

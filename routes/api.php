@@ -50,6 +50,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/my/demo-requests', [DemoRequestController::class, 'myIndex']);
     Route::get('/my/enrollments',   [EnrollmentController::class, 'myIndex']);
+    Route::get('/my/enrollments/{enrollment}', [EnrollmentController::class, 'myShow']);
+    Route::get('/materials/{material}/download', [EnrollmentController::class, 'downloadMaterial']);
 
     // Teacher portal (own profile + classroom)
     Route::get('/teacher/profile',  [TeacherController::class, 'showMine']);
@@ -58,6 +60,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/teacher/demos',    [TeacherController::class, 'demos']);
     Route::get('/teacher/enrollments/{enrollment}/logs',  [TeacherController::class, 'classLogs']);
     Route::post('/teacher/enrollments/{enrollment}/logs', [TeacherController::class, 'storeClassLog']);
+    Route::get('/teacher/enrollments/{enrollment}/curriculum',    [TeacherController::class, 'curriculum']);
+    Route::post('/teacher/enrollments/{enrollment}/curriculum',   [TeacherController::class, 'storeCurriculumItem']);
+    Route::patch('/teacher/enrollments/{enrollment}/curriculum/{item}',  [TeacherController::class, 'updateCurriculumItem']);
+    Route::delete('/teacher/enrollments/{enrollment}/curriculum/{item}', [TeacherController::class, 'destroyCurriculumItem']);
+    Route::get('/teacher/enrollments/{enrollment}/materials',    [TeacherController::class, 'materials']);
+    Route::post('/teacher/enrollments/{enrollment}/materials',   [TeacherController::class, 'storeMaterial']);
+    Route::delete('/teacher/enrollments/{enrollment}/materials/{material}', [TeacherController::class, 'destroyMaterial']);
+    Route::get('/teacher/proposals',  [TeacherController::class, 'proposals']);
+    Route::post('/teacher/proposals', [TeacherController::class, 'storeProposal']);
 
     // --- Admin (staff): match tutors, schedule, convert demo -> enrollment ---
     Route::middleware(\App\Http\Middleware\EnsureAdmin::class)->prefix('admin')->group(function () {
@@ -68,5 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/enrollments',                       [AdminController::class, 'enrollments']);
         Route::get('/teachers',                          [AdminController::class, 'teachers']);
         Route::patch('/teachers/{teacherProfile}',       [AdminController::class, 'approveTeacher']);
+        Route::get('/proposals',                         [AdminController::class, 'proposals']);
+        Route::patch('/proposals/{proposal}',            [AdminController::class, 'decideProposal']);
     });
 });
