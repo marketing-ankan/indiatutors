@@ -29,6 +29,8 @@ export default function App() {
         <Route path="/courses/:slug" element={<CourseDetailPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/plans" element={<PlansPage />} />
+        <Route path="/group-classes" element={<PlansPage initialCtype="group" />} />
+        <Route path="/free-classes" element={<PlansPage initialCtype="free" />} />
         <Route path="/book-demo" element={<BookDemoPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/find-tutors" element={<FindTutorsPage />} />
