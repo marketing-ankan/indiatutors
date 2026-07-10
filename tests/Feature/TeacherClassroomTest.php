@@ -121,6 +121,14 @@ class TeacherClassroomTest extends TestCase
         $this->getJson('/api/teacher/students')->assertForbidden();
     }
 
+    /** An unauthenticated API request returns 401 JSON even without an Accept header (not 500). */
+    public function test_unauthenticated_api_request_returns_401_not_500(): void
+    {
+        $this->get('/api/teacher/students') // plain GET, no Accept: application/json
+            ->assertStatus(401)
+            ->assertJson(['message' => 'Unauthenticated.']);
+    }
+
     public function test_assigned_demos_are_returned_without_parent_pii(): void
     {
         $teacher = $this->teacher();
