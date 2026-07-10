@@ -19,8 +19,8 @@ const SUBJECTS = [
 ];
 
 const STATS = [
-  { n:'15+', l:'Years Experience' }, { n:'120+', l:'Live Courses' }, { n:'75+', l:'Expert Tutors' },
-  { n:'8,000+', l:'Students Taught' }, { n:'200+', l:'Workshops Held' }, { n:'4.9 ★', l:'Avg Rating' },
+  { n:'15+', l:'Countries Served' }, { n:'120+', l:'Courses Offered' }, { n:'75+', l:'Expert Tutors' },
+  { n:'8,000+', l:'Students Trained' }, { n:'200+', l:'Free Workshops Run' }, { n:'4.9 ★', l:'Google Rating' },
 ];
 
 const WHY = [
@@ -181,10 +181,13 @@ export default function HomePage() {
               <Link to="/book-demo" className="rounded-lg bg-white text-brand-800 hover:bg-slate-100 px-5 py-2.5 text-sm font-bold">Book a Free Trial</Link>
               <Link to="/courses" className="rounded-lg border border-white/30 hover:bg-white/10 px-5 py-2.5 text-sm font-semibold">Explore All Courses</Link>
             </div>
-            <div className="mt-7 flex items-center gap-3">
+            <p className="mt-5 text-sm text-slate-400">🛡️ No credit card · No commitment · Cancel anytime</p>
+            <div className="mt-4 flex items-center gap-3" aria-label="Rated 4.7 on Google and Trustpilot">
               <div className="flex">{[...Array(5)].map((_,i)=><Star key={i} className="h-4 w-4 text-yellow-400 fill-yellow-400"/>)}</div>
-              <span className="text-sm text-slate-300 font-semibold">4.9 on Google</span>
-              <span className="text-slate-500 text-xs">· 200+ verified reviews</span>
+              <span className="text-sm text-slate-200 font-bold">4.7</span>
+              <span className="text-slate-400 text-xs">on Google</span>
+              <span className="text-slate-600">|</span>
+              <span className="text-sm text-slate-300 font-semibold flex items-center gap-1"><Star className="h-3.5 w-3.5 text-green-400 fill-green-400"/>Trustpilot</span>
             </div>
           </div>
           <HeroSlider />
@@ -195,10 +198,11 @@ export default function HomePage() {
       <section className="py-14 bg-white"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h2 className="text-2xl font-extrabold text-center mb-8 tracking-tight">Choose How You Want to Learn</h2>
         <div className="grid md:grid-cols-3 gap-5">
-          {[{icon:'👤',title:'1-on-1 Live Classes',color:'bg-blue-50 text-blue-700',features:['Fully personalised curriculum','Direct tutor attention','Flexible schedule','Post-class mentoring'],cta:'Book Free Trial',href:'/book-demo'},{icon:'👥',title:'Live Group Classes',color:'bg-purple-50 text-purple-700',features:['Small groups (4–8 students)','Collaborative learning','Affordable group pricing','Certificate on completion'],cta:'Browse Group Classes',href:'/courses'},{icon:'📹',title:'Self-Paced Video Courses',color:'bg-orange-50 text-orange-700',features:['Watch anytime, anywhere','Structured curriculum','Take at your own pace','Lifetime access'],cta:'Browse Video Courses',href:'/courses'}].map(f=>(
+          {[{icon:'👤',title:'1-on-1 Live Classes',color:'bg-blue-50 text-blue-700',desc:'Private sessions with a dedicated tutor. Fully personalised pace, curriculum, and scheduling.',features:['Personalised curriculum','Flexible scheduling','Post-class mentoring'],cta:'Book Free Trial',href:'/book-demo'},{icon:'👥',title:'Live Group Classes',color:'bg-purple-50 text-purple-700',desc:'Interactive small-group sessions. Learn with peers, ask questions live, and build friendships.',features:['Small batches (5–10 students)','Structured curriculum','Affordable group pricing'],cta:'Browse Group Classes',href:'/courses'},{icon:'📹',title:'Self-Paced Video Courses',color:'bg-orange-50 text-orange-700',desc:'Pre-recorded expert lessons you can watch anytime. Learn at your own pace, on your own schedule.',features:['Watch anytime, on any device','Quizzes and assignments','Certificate on completion'],cta:'Browse Video Courses',href:'/courses'}].map(f=>(
             <div key={f.title} className="rounded-2xl border border-slate-100 p-6 hover:shadow-md transition">
               <div className={`inline-flex items-center justify-center w-11 h-11 rounded-xl text-2xl ${f.color} mb-4`}>{f.icon}</div>
-              <h3 className="font-bold text-lg mb-3">{f.title}</h3>
+              <h3 className="font-bold text-lg mb-2">{f.title}</h3>
+              <p className="text-sm text-slate-500 leading-relaxed mb-3">{f.desc}</p>
               <ul className="space-y-2 text-sm text-slate-600">{f.features.map(feat=><li key={feat} className="flex gap-2 items-start"><CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0"/>{feat}</li>)}</ul>
               <Link to={f.href} className="mt-5 block text-center rounded-lg bg-brand-600 text-white py-2.5 text-sm font-bold hover:bg-brand-700">{f.cta}</Link>
             </div>

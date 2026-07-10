@@ -4,7 +4,7 @@ import { CheckCircle2 } from 'lucide-react';
 const PLANS = [
   { name:'🌱 Starter', sub:'Strong Foundations', price:3499, badge:'', features:['One-on-one live interactive sessions','Individually tailored curriculum','Covers academic and non-academic courses','Post-class doubt clearing support','Monthly progress report','Free trial class included'] },
   { name:'⚡ Advanced', sub:'Focused Learning', price:6999, badge:'Most Popular', features:['Small group sessions for collaborative learning','Specialised SAT / PSAT preparation','High school academic support (Algebra, Physics, Chemistry)','AP course support included','Bi-weekly parent progress calls','Certificate on completion','Free trial class included'] },
-  { name:'🏆 Premium', sub:'Holistic Growth', price:11999, badge:'Best Value', features:['Live sessions with top-rated educators','Balanced academic and non-academic programme','Weekly one-on-one mentor sessions','Unlimited doubt clearing via chat','Priority scheduling and tutor selection','Recorded session playback','Certificate + LinkedIn-shareable credential'] },
+  { name:'🏆 Premium', sub:'Holistic Growth', price:11999, badge:'Best Value', features:['Live sessions with top-rated educators','Balanced academic and non-academic programme','Confidence, skills, and goal-oriented learning','Weekly one-on-one mentor sessions','Unlimited doubt clearing via chat','Priority scheduling and tutor selection','Recorded session playback','Certificate + LinkedIn-shareable credential'] },
 ];
 
 export default function PlansPage() {
@@ -13,8 +13,8 @@ export default function PlansPage() {
       <div className="bg-brand-900 text-white py-14 text-center">
         <div className="mx-auto max-w-2xl px-4">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-300 mb-3">No hidden charges · Cancel any time</p>
-          <h1 className="text-4xl font-extrabold tracking-tight">Simple, Honest Pricing</h1>
-          <p className="mt-4 text-slate-300">First class is always free. Pick a plan that fits your child's needs.</p>
+          <h1 className="text-4xl font-extrabold tracking-tight">Plans & Pricing</h1>
+          <p className="mt-4 text-slate-300">Simple, transparent monthly plans. First class is always free.</p>
         </div>
       </div>
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16">

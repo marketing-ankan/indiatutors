@@ -44,8 +44,8 @@ export default function BookDemoPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12">
-      <h1 className="text-3xl font-extrabold tracking-tight">Book a Free Demo</h1>
-      <p className="text-slate-500 mt-2">Fill this in and we'll match you with a verified tutor. The demo is free with no commitment.</p>
+      <h1 className="text-3xl font-extrabold tracking-tight">Book a Free Demo Class</h1>
+      <p className="text-slate-500 mt-2">One-on-one session with world-class tutors. Fill this in and we'll match you with a verified tutor — the demo is free with no commitment.</p>
       {(course || tutor) && (
         <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand-50 text-brand-700 px-3 py-1.5 text-sm font-medium ring-1 ring-brand-100">
           Booking a demo for <b>{course?.name || tutor?.name}</b>
