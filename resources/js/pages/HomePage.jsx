@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Search, CheckCircle2, Star, ChevronLeft, ChevronRight, MapPin, BadgeCheck, Users, Video, BookOpen, PlayCircle, Award } from 'lucide-react';
@@ -37,6 +37,64 @@ const PLANS = [
   { name:'⚡ Advanced', sub:'Focused Learning', price:6999, badge:'Most Popular', features:['Group sessions for collaborative learning','Specialised SAT/PSAT preparation','AP course support','Bi-weekly parent progress calls','Certificate on completion'] },
   { name:'🏆 Premium', sub:'Holistic Growth', price:11999, badge:'Best Value', features:['Sessions with top-rated educators','Weekly one-on-one mentor sessions','Unlimited doubt clearing via chat','Priority scheduling','Recorded session playback'] },
 ];
+
+// Hero image slider — mirrors the live site's Swiper (.ito-ud-swiper-hero):
+// 3 slides, loop, 5s autoplay, pagination dots, horizontal slide transition.
+const HERO_SLIDES = [
+  { src:'https://indiatutorsonline.com/wp-content/themes/indiatutorsonline-theme/hero-carousel-images/CarouselImage1.webp', alt:'AI and ML live classes' },
+  { src:'https://indiatutorsonline.com/wp-content/themes/indiatutorsonline-theme/hero-carousel-images/CarouselImage2.webp', alt:'Python coding classes' },
+  { src:'https://indiatutorsonline.com/wp-content/themes/indiatutorsonline-theme/hero-carousel-images/CarouselImage3.webp', alt:'Robotics classes for kids' },
+];
+
+function HeroSlider() {
+  const n = HERO_SLIDES.length;
+  const [idx, setIdx] = useState(0);
+  const [anim, setAnim] = useState(true);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (paused) return;
+    // Stop at the clone (i === n); the reset effect snaps back to 0. Never overrun into a blank frame.
+    const t = setInterval(() => setIdx(i => (i >= n ? i : i + 1)), 5000);
+    return () => clearInterval(t);
+  }, [paused]);
+
+  // Seamless forward loop: an appended clone of slide 0 lets 2→0 slide forward,
+  // then we snap back to the real slide 0 without a transition.
+  useEffect(() => {
+    if (idx === n) {
+      const t = setTimeout(() => { setAnim(false); setIdx(0); }, 650);
+      return () => clearTimeout(t);
+    }
+    if (!anim) {
+      const r = requestAnimationFrame(() => setAnim(true));
+      return () => cancelAnimationFrame(r);
+    }
+  }, [idx, anim, n]);
+
+  const go = i => { setAnim(true); setIdx(i); };
+  const active = idx % n;
+
+  return (
+    <div
+      className="hidden lg:block relative rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10 h-[520px]"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <div className="flex h-full" style={{ transform:`translateX(-${idx*100}%)`, transition: anim ? 'transform 650ms ease-in-out' : 'none' }}>
+        {[...HERO_SLIDES, HERO_SLIDES[0]].map((s,i) => (
+          <img key={i} src={s.src} alt={s.alt} className="w-full h-full shrink-0 object-cover" loading="eager"/>
+        ))}
+      </div>
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+        {HERO_SLIDES.map((_,i) => (
+          <button key={i} onClick={()=>go(i)} aria-label={`Go to slide ${i+1}`}
+            className={`h-2 rounded-full transition-all ${active===i?'w-6 bg-white':'w-2 bg-white/60 hover:bg-white/90'}`}/>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function useCarousel(total, perView) {
   const [idx, setIdx] = useState(0);
@@ -129,11 +187,7 @@ export default function HomePage() {
               <span className="text-slate-500 text-xs">· 200+ verified reviews</span>
             </div>
           </div>
-          <div className="hidden lg:grid grid-cols-2 gap-3">
-            {['https://indiatutorsonline.com/wp-content/uploads/2026/04/CarouselImage1.webp','https://indiatutorsonline.com/wp-content/uploads/2026/04/CarouselImage2.webp','https://indiatutorsonline.com/wp-content/uploads/2026/04/CarouselImage3-1-scaled.webp','https://indiatutorsonline.com/wp-content/uploads/2026/04/CarouselImage3-3-scaled.webp'].map((src,i)=>(
-              <div key={i} className={`rounded-2xl overflow-hidden shadow-xl ${i===0?'col-span-2 h-48':'h-32'}`}><img src={src} alt="" className="w-full h-full object-cover" loading="eager"/></div>
-            ))}
-          </div>
+          <HeroSlider />
         </div>
       </section>
 
