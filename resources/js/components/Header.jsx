@@ -1,9 +1,10 @@
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Phone, Mail, MapPin, Search, Menu, X, LayoutDashboard, Bell } from 'lucide-react';
+import { Phone, Mail, MapPin, Search, Menu, X, LayoutDashboard, Bell, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../lib/auth.jsx';
 import { fetchNotifications, markNotificationRead, markAllNotificationsRead } from '../lib/api.js';
+import { CATALOG_NAV } from '../data/nav.js';
 
 function NotificationBell() {
   const qc = useQueryClient();
@@ -58,19 +59,57 @@ const primaryNav = [
   { to:'/become-a-teacher', label:'Become a Teacher' },
   { to:'/contact', label:'Contact' },
 ];
-// Links to real categories that exist in the catalog (no dead ends).
-const catalogNav = [
-  { to:'/', label:'HOME', end:true },
-  { to:'/courses', label:'ALL COURSES' },
-  { to:'/courses?category=academics-high-school', label:'ACADEMICS' },
-  { to:'/courses?category=ap-courses', label:'AP COURSES' },
-  { to:'/courses?category=musical-instruments', label:'MUSIC' },
-  { to:'/courses?category=it-technologies', label:'CODING & IT' },
-  { to:'/courses?category=languages', label:'LANGUAGES' },
-  { to:'/courses?category=dance', label:'DANCE' },
-  { to:'/courses?category=standardized-tests', label:'COMPETITIVE EXAMS' },
-  { to:'/find-tutors', label:'FIND TUTORS' },
-];
+
+/** One tab of the live site's category bar: plain link, flat dropdown, or mega menu. */
+function CatalogTab({ item }) {
+  const hasPanel = (item.mega && item.mega.length) || item.items.length > 0;
+  return (
+    <li className="group relative flex-shrink-0">
+      <NavLink to={item.to} end={item.to === '/'}
+        className={({isActive}) => `inline-flex items-center gap-1 text-xs font-bold tracking-wider uppercase whitespace-nowrap py-2.5 ${isActive ? 'text-brand-600' : 'text-slate-700 hover:text-brand-600'}`}>
+        {item.label}{hasPanel && <ChevronDown className="h-3 w-3 opacity-60"/>}
+      </NavLink>
+
+      {item.mega?.length > 0 && (
+        <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition absolute left-1/2 -translate-x-1/2 top-full z-50 pt-1 hidden lg:block">
+          <div className="w-[min(92vw,1080px)] max-h-[70vh] overflow-y-auto rounded-xl bg-white shadow-2xl ring-1 ring-slate-200 p-5">
+            <div className="grid grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-5">
+              {item.mega.map(col => (
+                <div key={col.label} className="min-w-0">
+                  <Link to={col.to} className="block text-[13px] font-extrabold text-slate-900 hover:text-brand-600 mb-1.5 normal-case tracking-normal">{col.label}</Link>
+                  <ul className="space-y-0.5">
+                    {col.items.map(it => (
+                      <li key={it.label + it.to}><Link to={it.to} className="block text-xs text-slate-600 hover:text-brand-600 truncate normal-case tracking-normal py-0.5">{it.label}</Link></li>
+                    ))}
+                  </ul>
+                  <Link to={col.to} className="mt-1 inline-block text-xs font-semibold text-brand-600 hover:text-brand-700 normal-case tracking-normal">View all →</Link>
+                </div>
+              ))}
+            </div>
+            {item.footer?.length > 0 && (
+              <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap gap-5">
+                {item.footer.map(f => <Link key={f.label} to={f.to} className="text-xs font-bold text-brand-700 hover:text-brand-800 normal-case tracking-normal">{f.label}</Link>)}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {!item.mega?.length && item.items.length > 0 && (
+        <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition absolute left-0 top-full z-50 pt-1 hidden lg:block">
+          <div className="w-64 rounded-xl bg-white shadow-2xl ring-1 ring-slate-200 py-2">
+            {item.items.map(it => (
+              <Link key={it.label + it.to} to={it.to} className="block px-4 py-1.5 text-xs text-slate-700 hover:bg-slate-50 hover:text-brand-600 normal-case tracking-normal">{it.label}</Link>
+            ))}
+            {item.footer?.map(f => (
+              <Link key={f.label} to={f.to} className="block px-4 py-2 mt-1 border-t border-slate-100 text-xs font-bold text-brand-700 hover:text-brand-800 normal-case tracking-normal">{f.label}</Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </li>
+  );
+}
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -124,19 +163,15 @@ export default function Header() {
       </div>
       <div className="hidden lg:block border-b border-slate-100">
         <div className="container-wide">
-          <ul className="flex items-center [justify-content:safe_center] gap-4 xl:gap-7 py-2.5 overflow-x-auto">
-            {catalogNav.map(n => (
-              <li key={n.label} className="flex-shrink-0">
-                <NavLink to={n.to} end={n.end} className={({isActive})=>`text-xs font-bold tracking-wider whitespace-nowrap pb-1 ${isActive?'text-brand-600 border-b-2 border-brand-600':'text-slate-700 hover:text-brand-600'}`}>{n.label}</NavLink>
-              </li>
-            ))}
+          <ul className="flex items-center [justify-content:safe_center] gap-4 xl:gap-7">
+            {CATALOG_NAV.map(item => <CatalogTab key={item.label} item={item} />)}
           </ul>
         </div>
       </div>
       {open && (
         <div className="lg:hidden border-t border-slate-100 bg-white">
           <div className="container-wide py-4 space-y-1">
-            {[...primaryNav,...catalogNav.slice(1)].map(n => (
+            {[...primaryNav, ...CATALOG_NAV.slice(1).map(n => ({ to: n.to, label: n.label }))].map(n => (
               <NavLink key={n.to+n.label} to={n.to} onClick={()=>setOpen(false)} className={({isActive})=>`block rounded-md px-3 py-2 text-sm font-medium ${isActive?'bg-brand-50 text-brand-600':'text-slate-800 hover:bg-slate-50'}`}>{n.label}</NavLink>
             ))}
           </div>
