@@ -51,7 +51,7 @@ export default function Header() {
               onError={e=>{ e.currentTarget.style.display='none'; e.currentTarget.nextSibling.style.display='flex'; }}/>
             <span className="text-xl font-extrabold tracking-tight" style={{display:'none'}}>Indiatutors <span className="text-brand-600">Online</span></span>
           </Link>
-          <nav className="hidden lg:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-3 xl:gap-6">
             {primaryNav.map(n => (
               <NavLink key={n.to} to={n.to} className={({isActive})=>`text-sm font-medium whitespace-nowrap ${isActive?'text-brand-600':'text-slate-700 hover:text-brand-600'}`}>{n.label}</NavLink>
             ))}
@@ -76,7 +76,7 @@ export default function Header() {
       </div>
       <div className="hidden lg:block border-b border-slate-100">
         <div className="container-wide">
-          <ul className="flex items-center gap-7 py-2.5 overflow-x-auto">
+          <ul className="flex items-center [justify-content:safe_center] gap-4 xl:gap-7 py-2.5 overflow-x-auto">
             {catalogNav.map(n => (
               <li key={n.label} className="flex-shrink-0">
                 <NavLink to={n.to} end={n.end} className={({isActive})=>`text-xs font-bold tracking-wider whitespace-nowrap pb-1 ${isActive?'text-brand-600 border-b-2 border-brand-600':'text-slate-700 hover:text-brand-600'}`}>{n.label}</NavLink>

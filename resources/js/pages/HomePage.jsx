@@ -296,7 +296,7 @@ export default function HomePage() {
           <div key={p.name} className={`rounded-2xl bg-white p-6 ring-1 relative ${p.badge==='Most Popular'?'ring-brand-500 shadow-xl':'ring-slate-100'}`}>
             {p.badge && <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand-600 text-white px-4 py-1 text-xs font-bold whitespace-nowrap">{p.badge}</div>}
             <h3 className="font-extrabold text-lg">{p.name}</h3><p className="text-sm text-slate-500">{p.sub}</p>
-            <div className="my-4 flex items-baseline gap-1"><span className="text-4xl font-extrabold text-slate-900">₹{p.price.toLocaleString('en-IN')}</span><span className="text-slate-500 text-sm">/month</span></div>
+            <div className="my-4 flex flex-wrap items-baseline gap-1"><span className="text-3xl lg:text-4xl font-extrabold text-slate-900">₹{p.price.toLocaleString('en-IN')}</span><span className="text-slate-500 text-sm">/month</span></div>
             <ul className="space-y-2 mb-6">{p.features.map(f=><li key={f} className="flex gap-2 items-start text-sm text-slate-600"><CheckCircle2 className="h-4 w-4 text-green-500 shrink-0 mt-0.5"/>{f}</li>)}</ul>
             <Link to="/book-demo" className={`block text-center rounded-lg py-2.5 text-sm font-bold ${p.badge==='Most Popular'?'bg-brand-600 text-white hover:bg-brand-700':'bg-slate-100 text-slate-800 hover:bg-slate-200'}`}>Get Started</Link>
           </div>

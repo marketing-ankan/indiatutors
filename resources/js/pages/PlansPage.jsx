@@ -24,8 +24,8 @@ export default function PlansPage() {
               {p.badge && <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand-600 text-white px-4 py-1 text-xs font-bold whitespace-nowrap">{p.badge}</div>}
               <h3 className="font-extrabold text-xl">{p.name}</h3>
               <p className="text-slate-500 text-sm">{p.sub}</p>
-              <div className="my-5 flex items-baseline gap-1">
-                <span className="text-5xl font-extrabold text-slate-900">₹{p.price.toLocaleString('en-IN')}</span>
+              <div className="my-5 flex flex-wrap items-baseline gap-1">
+                <span className="text-4xl lg:text-5xl font-extrabold text-slate-900">₹{p.price.toLocaleString('en-IN')}</span>
                 <span className="text-slate-500">/month</span>
               </div>
               <ul className="space-y-2.5 mb-7">
