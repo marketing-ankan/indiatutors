@@ -12,6 +12,7 @@ import {
   fetchCurriculum, addCurriculumItem, updateCurriculumItem, deleteCurriculumItem,
   fetchMaterials, uploadMaterial, deleteMaterial, downloadMaterial,
   fetchMyProposals, submitProposal, fetchMyEnrollmentDetail,
+  requestReschedule, fetchTeacherReschedules, decideReschedule,
 } from '../lib/api.js';
 
 const inp = "w-full rounded-md ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
@@ -46,7 +47,10 @@ export default function DashboardPage() {
             <KycCard />
           </div>
           <TeacherClassroom />
-          <TeacherProposalsCard />
+          <div className="grid lg:grid-cols-2 gap-6">
+            <TeacherReschedulesCard />
+            <TeacherProposalsCard />
+          </div>
         </div>
       ) : (
         <>
@@ -494,6 +498,8 @@ function ParentEnrollmentDetail({ id }) {
         ) : <p className="text-xs text-slate-400">No classes logged yet.</p>}
       </div>
 
+      <RescheduleBlock id={id} reschedules={d.reschedules || []} />
+
       <div>
         <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1.5">Materials from the teacher</h4>
         {d.materials?.length ? (
@@ -540,6 +546,89 @@ function RequestsCard() {
       ) : (
         <p className="text-sm text-slate-500">No demo requests yet. <Link to="/book-demo" className="text-brand-600 font-semibold">Book your first free demo →</Link></p>
       )}
+    </section>
+  );
+}
+
+function RescheduleBlock({ id, reschedules }) {
+  const qc = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ preferred_date:'', reason:'' });
+  const send = useMutation({
+    mutationFn: () => requestReschedule(id, { preferred_date: form.preferred_date || null, reason: form.reason || null }),
+    onSuccess: () => { setForm({preferred_date:'',reason:''}); setShowForm(false); qc.invalidateQueries({queryKey:['my-enrollment', id]}); },
+  });
+  const badge = { pending:'bg-amber-50 text-amber-700', accepted:'bg-green-50 text-green-700', declined:'bg-red-50 text-red-700' };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">Reschedule requests</h4>
+        <button onClick={()=>setShowForm(s=>!s)} className="text-xs font-semibold text-brand-600 hover:text-brand-700">{showForm?'Cancel':'+ Request reschedule'}</button>
+      </div>
+      {reschedules.length > 0 && (
+        <ul className="space-y-1 mb-2">
+          {reschedules.map(r => (
+            <li key={r.id} className="flex items-center justify-between gap-2 text-sm">
+              <span className="text-slate-700 truncate">{[r.preferred_date && `Prefer ${r.preferred_date}`, r.reason].filter(Boolean).join(' — ') || `Requested ${r.created_at}`}</span>
+              <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize shrink-0 ${badge[r.status]||'bg-slate-100'}`}>{r.status}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {showForm && (
+        <form onSubmit={e=>{e.preventDefault();send.mutate();}} className="space-y-2 rounded-lg bg-white ring-1 ring-slate-100 p-3">
+          <div className="grid grid-cols-2 gap-2">
+            <input type="date" value={form.preferred_date} onChange={e=>setForm({...form,preferred_date:e.target.value})} className={inp}/>
+            <input value={form.reason} onChange={e=>setForm({...form,reason:e.target.value})} placeholder="Reason (optional)" className={inp}/>
+          </div>
+          {send.isError && <p className="text-xs text-red-600">Could not send — check the date (today or later).</p>}
+          <button disabled={send.isPending} className="rounded-lg bg-brand-600 text-white px-4 py-2 text-xs font-bold hover:bg-brand-700 disabled:opacity-60">
+            {send.isPending?'Sending…':'Send to teacher'}
+          </button>
+        </form>
+      )}
+      {!showForm && reschedules.length === 0 && <p className="text-xs text-slate-400">Need to move a class? Send your teacher a reschedule request.</p>}
+    </div>
+  );
+}
+
+function TeacherReschedulesCard() {
+  const qc = useQueryClient();
+  const { data: items = [], isLoading } = useQuery({ queryKey:['teacher-reschedules'], queryFn: fetchTeacherReschedules });
+  const act = useMutation({ mutationFn:({id,s})=>decideReschedule(id, s), onSuccess:()=>qc.invalidateQueries({queryKey:['teacher-reschedules']}) });
+  const badge = { pending:'bg-amber-50 text-amber-700', accepted:'bg-green-50 text-green-700', declined:'bg-red-50 text-red-700' };
+  const pending = items.filter(r=>r.status==='pending');
+  const past = items.filter(r=>r.status!=='pending').slice(0,5);
+
+  return (
+    <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
+      <h2 className="text-lg font-bold flex items-center gap-2 mb-1"><CalendarClock className="h-5 w-5 text-brand-600"/>Reschedule requests</h2>
+      <p className="text-xs text-slate-500 mb-4">Parents' requests to move a class — accept or decline, and they're notified instantly.</p>
+      {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : pending.length || past.length ? (
+        <ul className="space-y-2">
+          {pending.map(r => (
+            <li key={r.id} className="rounded-lg ring-1 ring-slate-100 px-3 py-2.5">
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="font-semibold text-sm text-slate-800">{r.student || 'Student'}{r.course && <span className="text-slate-400 font-normal"> · {r.course}</span>}</div>
+                  <div className="text-xs text-slate-500">{[r.preferred_date && `Prefers ${r.preferred_date}`, r.reason].filter(Boolean).join(' — ') || `Requested ${r.created_at}`}</div>
+                </div>
+                <div className="flex gap-1.5 shrink-0">
+                  <button disabled={act.isPending} onClick={()=>act.mutate({id:r.id,s:'accepted'})} className="rounded-md bg-green-600 text-white px-2.5 py-1.5 text-xs font-bold hover:bg-green-700 disabled:opacity-60">Accept</button>
+                  <button disabled={act.isPending} onClick={()=>act.mutate({id:r.id,s:'declined'})} className="rounded-md ring-1 ring-slate-200 px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-60">Decline</button>
+                </div>
+              </div>
+            </li>
+          ))}
+          {past.map(r => (
+            <li key={r.id} className="flex items-center justify-between gap-2 px-3 py-1.5 text-sm opacity-70">
+              <span className="text-slate-600 truncate">{r.student}{r.preferred_date && ` · ${r.preferred_date}`}</span>
+              <span className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${badge[r.status]}`}>{r.status}</span>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="text-sm text-slate-500">No reschedule requests.</p>}
     </section>
   );
 }

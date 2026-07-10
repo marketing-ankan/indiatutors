@@ -8,9 +8,11 @@ use App\Http\Resources\CurriculumItemResource;
 use App\Http\Resources\TeacherDemoResource;
 use App\Http\Resources\TeacherEnrollmentResource;
 use App\Http\Resources\TeacherProfileResource;
+use App\Models\AppNotification;
 use App\Models\ClassMaterial;
 use App\Models\CurriculumItem;
 use App\Models\Enrollment;
+use App\Models\RescheduleRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -161,6 +163,14 @@ class TeacherController extends Controller {
             'path'          => $path,
             'link_url'      => $data['link_url'] ?? null,
         ]);
+
+        AppNotification::send(
+            $enrollment->student?->user_id,
+            'material_shared',
+            'New material from your teacher',
+            "\"{$material->title}\" was shared for " . ($enrollment->student?->name ?? 'your student') . '.',
+        );
+
         return (new ClassMaterialResource($material))->response()->setStatusCode(201);
     }
 
@@ -170,6 +180,45 @@ class TeacherController extends Controller {
         if ($material->path) Storage::disk('local')->delete($material->path);
         $material->delete();
         return response()->json(['message' => 'Removed.']);
+    }
+
+    // --- Reschedule requests from parents (Phase 8) ---
+
+    public function reschedules(Request $request) {
+        $tutor = $this->tutorFor($request);
+        if (!$tutor) return response()->json(['data' => []]);
+
+        $items = RescheduleRequest::whereIn('enrollment_id', $tutor->enrollments()->pluck('id'))
+            ->with(['enrollment.student:id,name', 'enrollment.course:id,name'])
+            ->latest()->limit(50)->get();
+
+        return response()->json(['data' => $items->map(fn ($r) => [
+            'id'             => $r->id,
+            'student'        => $r->enrollment?->student?->name,
+            'course'         => $r->enrollment?->course?->name,
+            'preferred_date' => optional($r->preferred_date)->toDateString(),
+            'reason'         => $r->reason,
+            'status'         => $r->status,
+            'created_at'     => optional($r->created_at)->toDateString(),
+        ])]);
+    }
+
+    public function decideReschedule(Request $request, RescheduleRequest $reschedule) {
+        $tutor = $this->tutorFor($request);
+        abort_unless($tutor && $reschedule->enrollment?->tutor_id === $tutor->id, 403, 'Not your class.');
+        $data = $request->validate(['status' => 'required|in:accepted,declined']);
+        $reschedule->update($data);
+
+        // Tell the parent.
+        AppNotification::send(
+            $reschedule->requested_by,
+            'reschedule_decided',
+            'Reschedule ' . $data['status'],
+            trim(($reschedule->enrollment?->student?->name ?? 'Your') . "'s reschedule request was {$data['status']}"
+                . ($reschedule->preferred_date ? ' (' . $reschedule->preferred_date->toDateString() . ')' : '')),
+        );
+
+        return response()->json(['data' => ['id' => $reschedule->id, 'status' => $reschedule->status]]);
     }
 
     // --- Course proposals (teacher proposes; admin approves) ---

@@ -84,22 +84,21 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 - ✅ **Enrollment detail view**: parent expands any enrollment → assigned **teacher details** (photo, qualification, subjects, experience), **curriculum progress** (n/m done), **class history**, and **materials** (download files / open links) — ownership-checked, admin & assigned teacher may also download
 - ⬜ Reschedule requests (Phase 8 scheduling), portfolio building, exam updates
 
-## Phase 7 — Payments & payouts ⬜
+## Phase 7 — Payments & payouts ⬜ (blocked: needs Razorpay keys + GST details)
 - **Direct purchase** (video/self-paced): cart → checkout → Razorpay + GST invoice
 - **Demo-first** (live): fees + GST at enrollment, per-class billing
 - Teacher payouts: net of TDS, fixed margin, retention/conversion bonuses
 - Refunds & receipts
 
-## Phase 8 — Scheduling, messaging & location ⬜
-- In-app notifications + WhatsApp/email/phone linkages
-- Class scheduling/rescheduling, reminders
-- Home-tuition location tracking / teacher check-in
-- Issue/emergency reporting (student unavailable, teacher can't visit)
+## Phase 8 — Scheduling, messaging & location 🔨 (v1 done 2026-07-10)
+- ✅ **In-app notifications**: header bell + unread badge; raised on teacher approval, proposal decision, demo scheduled, enrollment confirmed, material shared, reschedule requested/decided; mark read / mark all read
+- ✅ **Reschedule requests**: parent requests (date + reason) from the enrollment detail → teacher notified → accepts/declines from the dashboard → parent notified
+- ⬜ WhatsApp/email linkages (needs provider credentials), reminders
+- ⬜ Home-tuition location tracking / teacher check-in; issue/emergency reporting
 
-## Phase 9 — Admin dashboard & analytics ⬜
-- Teachers & students/parents by location / state / subject / grade
-- Revenue analytics (month / location / state / subject / grade)
-- Teacher-payment analytics; approvals, moderation, security
+## Phase 9 — Admin dashboard & analytics 🔨 (v1 done 2026-07-10)
+- ✅ **Staff Console "Analytics" tab**: headline tiles (parents, teachers ± status, students, listed tutors, demos ± status, active enrollments, classes logged, pending proposals/reschedules), 6-month trends (demos / enrollments / signups), breakdowns by city & subject
+- ⬜ Revenue & teacher-payment analytics (after Phase 7); state/grade dimensions when captured
 
 ## Phase 10 — PWA, hardening & go-live ⬜
 - PWA (installable, offline shell, push notifications)

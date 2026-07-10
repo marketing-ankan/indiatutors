@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ShieldAlert, ChevronDown, ChevronUp, UserCheck, GraduationCap, Check, X } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
-import { fetchAdminDemoRequests, fetchDemoTutors, assignDemo, convertDemo, fetchAdminTeachers, approveTeacher, fetchAdminProposals, decideProposal } from '../lib/api.js';
+import { fetchAdminDemoRequests, fetchDemoTutors, assignDemo, convertDemo, fetchAdminTeachers, approveTeacher, fetchAdminProposals, decideProposal, fetchAdminAnalytics } from '../lib/api.js';
 
 const STATUSES = ['', 'new', 'scheduled', 'converted', 'closed'];
 const badge = { new:'bg-amber-50 text-amber-700', scheduled:'bg-blue-50 text-blue-700', converted:'bg-green-50 text-green-700', closed:'bg-slate-100 text-slate-600' };
@@ -30,8 +30,8 @@ export default function AdminPage() {
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
       <h1 className="text-3xl font-extrabold tracking-tight">Staff Console</h1>
 
-      <div className="mt-5 flex gap-2 border-b border-slate-100">
-        {[['demos','Demo Requests'],['teachers','Teacher Applications'],['proposals','Course Proposals']].map(([k,label]) => (
+      <div className="mt-5 flex flex-wrap gap-2 border-b border-slate-100">
+        {[['demos','Demo Requests'],['teachers','Teacher Applications'],['proposals','Course Proposals'],['analytics','Analytics']].map(([k,label]) => (
           <button key={k} onClick={()=>setTab(k)} className={`px-4 py-2 text-sm font-semibold border-b-2 -mb-px ${tab===k?'border-brand-600 text-brand-700':'border-transparent text-slate-500 hover:text-slate-700'}`}>{label}</button>
         ))}
       </div>
@@ -51,9 +51,89 @@ export default function AdminPage() {
         </>
       ) : tab === 'teachers' ? (
         <TeachersPanel />
-      ) : (
+      ) : tab === 'proposals' ? (
         <ProposalsPanel />
+      ) : (
+        <AnalyticsPanel />
       )}
+    </div>
+  );
+}
+
+/** Single-series bars: brand hue carries magnitude; identity lives in the row label. */
+function BarList({ title, items }) {
+  const max = Math.max(1, ...items.map(i => i.count));
+  return (
+    <div className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-5">
+      <h3 className="text-sm font-bold text-slate-800 mb-3">{title}</h3>
+      {items.length ? (
+        <ul className="space-y-2">
+          {items.map(i => (
+            <li key={i.label} className="grid grid-cols-[7rem_1fr_2rem] items-center gap-2" title={`${i.label}: ${i.count}`}>
+              <span className="text-xs text-slate-600 truncate">{i.label}</span>
+              <span className="h-3 rounded-r bg-brand-600" style={{ width: `${Math.max(2,(i.count/max)*100)}%` }}/>
+              <span className="text-xs font-semibold text-slate-700 text-right tabular-nums">{i.count}</span>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="text-xs text-slate-400">No data yet.</p>}
+    </div>
+  );
+}
+
+/** Monthly trend: one series, thin columns, direct value labels on hover via title. */
+function TrendBars({ title, points }) {
+  const max = Math.max(1, ...points.map(p => p.count));
+  return (
+    <div className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-5">
+      <h3 className="text-sm font-bold text-slate-800 mb-3">{title}</h3>
+      <div className="flex items-end gap-2 h-24">
+        {points.map(p => (
+          <div key={p.month} className="flex-1 flex flex-col items-center gap-1" title={`${p.month}: ${p.count}`}>
+            <span className="text-[10px] font-semibold text-slate-600 tabular-nums">{p.count}</span>
+            <div className="w-full rounded-t bg-brand-600" style={{ height: `${Math.max(3,(p.count/max)*72)}px` }}/>
+            <span className="text-[10px] text-slate-400">{p.month.slice(5)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsPanel() {
+  const { data: d, isLoading } = useQuery({ queryKey:['admin-analytics'], queryFn: fetchAdminAnalytics });
+  if (isLoading) return <p className="text-slate-500 py-10 text-center">Loading analytics…</p>;
+  if (!d) return null;
+  const t = d.totals;
+  const TILES = [
+    ['Parents', t.parents], ['Teachers', t.teachers, `${t.teachers_approved} approved · ${t.teachers_pending} pending`],
+    ['Students', t.students], ['Listed tutors', t.tutors_listed],
+    ['Demo requests', t.demos_total, `${t.demos_new} new · ${t.demos_converted} converted`],
+    ['Active enrollments', t.enrollments_active], ['Classes logged', t.classes_logged],
+    ['Awaiting action', t.proposals_pending + t.reschedules_pending, `${t.proposals_pending} proposals · ${t.reschedules_pending} reschedules`],
+  ];
+
+  return (
+    <div className="mt-5 space-y-5">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {TILES.map(([label, n, sub]) => (
+          <div key={label} className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-4">
+            <div className="text-2xl font-extrabold text-slate-900 tabular-nums">{n}</div>
+            <div className="text-xs font-semibold text-slate-500 mt-0.5">{label}</div>
+            {sub && <div className="text-[11px] text-slate-400 mt-0.5">{sub}</div>}
+          </div>
+        ))}
+      </div>
+      <div className="grid md:grid-cols-3 gap-4">
+        <TrendBars title="Demo requests / month" points={d.trend.demos}/>
+        <TrendBars title="Enrollments / month" points={d.trend.enrollments}/>
+        <TrendBars title="Signups / month" points={d.trend.signups}/>
+      </div>
+      <div className="grid md:grid-cols-3 gap-4">
+        <BarList title="Demos by city" items={d.demos_by_city}/>
+        <BarList title="Demos by subject" items={d.demos_by_subject}/>
+        <BarList title="Listed tutors by city" items={d.tutors_by_city}/>
+      </div>
     </div>
   );
 }

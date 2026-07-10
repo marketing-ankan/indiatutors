@@ -6,9 +6,14 @@ use App\Http\Resources\DemoRequestResource;
 use App\Http\Resources\EnrollmentResource;
 use App\Http\Resources\TeacherProfileResource;
 use App\Http\Resources\TutorResource;
+use App\Models\AppNotification;
+use App\Models\ClassLog;
 use App\Models\CourseProposal;
 use App\Models\DemoRequest;
 use App\Models\Enrollment;
+use App\Models\RescheduleRequest;
+use App\Models\Student;
+use App\Models\User;
 use App\Models\TeacherProfile;
 use App\Models\Tutor;
 use Illuminate\Http\Request;
@@ -40,6 +45,17 @@ class AdminController extends Controller {
             'scheduled_at'      => 'nullable|date',
         ]);
         $demoRequest->update($data);
+
+        if (($data['status'] ?? null) === 'scheduled') {
+            AppNotification::send(
+                $demoRequest->user_id,
+                'demo_scheduled',
+                'Your demo class is scheduled',
+                trim(($demoRequest->subject ?: 'Demo class')
+                    . ($demoRequest->scheduled_at ? ' on ' . $demoRequest->scheduled_at->toDayDateTimeString() : '')),
+            );
+        }
+
         return new DemoRequestResource($demoRequest->fresh()->load(['assignedTutor:id,name,slug', 'student:id,name']));
     }
 
@@ -60,6 +76,14 @@ class AdminController extends Controller {
             'status'          => 'active',
         ]);
         $demoRequest->update(['status' => 'converted']);
+
+        AppNotification::send(
+            $demoRequest->user_id,
+            'enrolled',
+            'Enrollment confirmed 🎉',
+            trim(($demoRequest->student?->name ?? 'Your student') . ' is now enrolled'
+                . ($enrollment->course_id && $demoRequest->course ? " in {$demoRequest->course->name}" : '') . '.'),
+        );
 
         return (new EnrollmentResource(
             $enrollment->load(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug'])
@@ -89,6 +113,15 @@ class AdminController extends Controller {
             $this->linkTutor($teacherProfile);
         }
 
+        AppNotification::send(
+            $teacherProfile->user_id,
+            'teacher_' . $data['status'],
+            'Your teacher application was ' . $data['status'],
+            $data['status'] === 'approved'
+                ? 'You are now listed in the tutor directory — students can be matched to you.'
+                : null,
+        );
+
         return new TeacherProfileResource($teacherProfile->fresh()->load('user:id,name,email'));
     }
 
@@ -115,7 +148,57 @@ class AdminController extends Controller {
             }
         }
 
+        AppNotification::send(
+            $proposal->user_id,
+            'proposal_decided',
+            "Course proposal \"{$proposal->title}\" was {$data['status']}",
+            $data['status'] === 'approved' ? 'It has been added to your teaching subjects.' : null,
+        );
+
         return new CourseProposalResource($proposal->fresh()->load('user:id,name,email'));
+    }
+
+    // --- Analytics (Phase 9): headline totals + breakdowns for the staff console ---
+    public function analytics() {
+        $months = collect(range(5, 0))->map(fn ($i) => now()->subMonths($i)->format('Y-m'));
+        $since  = now()->subMonths(6)->startOfMonth();
+
+        // Portable month bucketing (MySQL prod / sqlite tests): bucket in PHP.
+        $byMonth = function ($query) use ($months, $since) {
+            $counts = $query->where('created_at', '>=', $since)->pluck('created_at')
+                ->groupBy(fn ($d) => $d->format('Y-m'))->map->count();
+            return $months->map(fn ($m) => ['month' => $m, 'count' => $counts[$m] ?? 0])->values();
+        };
+        $topCounts = fn ($query, $col, $limit = 8) =>
+            $query->whereNotNull($col)->where($col, '!=', '')
+                ->selectRaw("$col as label, COUNT(*) as count")
+                ->groupBy($col)->orderByDesc('count')->limit($limit)->get();
+
+        return response()->json(['data' => [
+            'totals' => [
+                'parents'            => User::where('role', 'parent')->count(),
+                'teachers'           => User::where('role', 'teacher')->count(),
+                'teachers_pending'   => TeacherProfile::where('status', 'pending')->count(),
+                'teachers_approved'  => TeacherProfile::where('status', 'approved')->count(),
+                'students'           => Student::count(),
+                'tutors_listed'      => Tutor::where('is_published', true)->count(),
+                'demos_total'        => DemoRequest::count(),
+                'demos_new'          => DemoRequest::where('status', 'new')->count(),
+                'demos_converted'    => DemoRequest::where('status', 'converted')->count(),
+                'enrollments_active' => Enrollment::where('status', 'active')->count(),
+                'classes_logged'     => ClassLog::count(),
+                'proposals_pending'  => CourseProposal::where('status', 'pending')->count(),
+                'reschedules_pending'=> RescheduleRequest::where('status', 'pending')->count(),
+            ],
+            'demos_by_city'    => $topCounts(DemoRequest::query(), 'city'),
+            'demos_by_subject' => $topCounts(DemoRequest::query(), 'subject'),
+            'tutors_by_city'   => $topCounts(Tutor::where('is_published', true), 'city'),
+            'trend' => [
+                'demos'       => $byMonth(DemoRequest::query()),
+                'enrollments' => $byMonth(Enrollment::query()),
+                'signups'     => $byMonth(User::query()),
+            ],
+        ]]);
     }
 
     /** Create (once) a directory Tutor for an approved teacher, seeded from their profile. */

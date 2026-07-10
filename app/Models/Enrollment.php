@@ -12,4 +12,5 @@ class Enrollment extends Model {
     public function classLogs()   { return $this->hasMany(ClassLog::class)->latest('held_on'); }
     public function curriculumItems() { return $this->hasMany(CurriculumItem::class)->orderBy('position'); }
     public function materials()      { return $this->hasMany(ClassMaterial::class)->latest(); }
+    public function reschedules()    { return $this->hasMany(RescheduleRequest::class)->latest(); }
 }

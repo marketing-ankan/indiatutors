@@ -12,6 +12,8 @@ Rebuild of the WordPress site (indiatutorsonline.com) as a **Laravel 11 API + Re
 | 4 | Demo → enrollment engine + staff console | ✅ Done · Live |
 | 5 | Teacher portal (profile, approval, classroom, curriculum, materials, proposals) | ✅ Done |
 | 6 | Student/Parent portal (teacher + curriculum + progress + materials) | 🔨 v1 done |
+| 8 | Notifications + reschedule requests (in-app) | 🔨 v1 done |
+| 9 | Admin analytics (tiles, trends, breakdowns) | 🔨 v1 done |
 
 ---
 
@@ -44,6 +46,13 @@ Rebuild of the WordPress site (indiatutorsonline.com) as a **Laravel 11 API + Re
 - Parent dashboard: **My demo requests** + **My enrollments**
 - Admin is **env-gated** (`ADMIN_EMAIL`/`ADMIN_PASSWORD`) — no default-password admin
 - **QA:** 11 enrollment-flow tests + admin UI verified
+
+## 🔨 Phases 8 & 9 — Notifications, reschedules & admin analytics (v1 done 2026-07-10)
+- ✅ **In-app notifications** (Phase 8): header bell + unread badge; raised on approval, proposal decision, demo scheduled, enrollment, material shared, reschedule events; mark read / mark all
+- ✅ **Reschedule requests** (Phase 8): parent requests from the enrollment detail → teacher accepts/declines → both sides notified
+- ✅ **Admin analytics** (Phase 9): Staff Console "Analytics" tab — headline tiles, 6-month demo/enrollment/signup trends, city & subject breakdowns
+- ⬜ Blocked/deferred: WhatsApp/email (needs provider creds), location tracking, revenue analytics (after Phase 7)
+- QA: **28 feature tests green** (8 new); reschedule→notify→accept→notify loop + analytics tab verified in the browser; admin/dashboard overflow-free at 375/768
 
 ## 🔨 Phase 6 — Student/Parent portal (v1 done 2026-07-10)
 - ✅ **Parent enrollment detail**: expand any enrollment → assigned teacher (photo, qualification, subjects, experience), **curriculum progress** (n/m done), class history, **materials download** (files stream via authed endpoint; links open directly)

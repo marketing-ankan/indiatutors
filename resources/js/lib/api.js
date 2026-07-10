@@ -89,6 +89,19 @@ export const decideProposal      = async (id, status) => { const { data } = awai
 
 // Parent portal: full enrollment detail
 export const fetchMyEnrollmentDetail = async (id) => { const { data } = await api.get(`/my/enrollments/${id}`); return data.data; };
+export const requestReschedule = async (id, p) => { const { data } = await api.post(`/my/enrollments/${id}/reschedules`, p); return data.data; };
+
+// In-app notifications (Phase 8)
+export const fetchNotifications = async () => { const { data } = await api.get('/notifications'); return data; };
+export const markNotificationRead = async (id) => { await api.patch(`/notifications/${id}/read`); };
+export const markAllNotificationsRead = async () => { await api.patch('/notifications/read-all'); };
+
+// Teacher reschedules (Phase 8)
+export const fetchTeacherReschedules = async () => { const { data } = await api.get('/teacher/reschedules'); return data.data; };
+export const decideReschedule = async (id, status) => { const { data } = await api.patch(`/teacher/reschedules/${id}`, { status }); return data.data; };
+
+// Admin analytics (Phase 9)
+export const fetchAdminAnalytics = async () => { const { data } = await api.get('/admin/analytics'); return data.data; };
 
 // Admin (staff)
 export const fetchAdminDemoRequests = async (status='') => { const { data } = await api.get('/admin/demo-requests', { params:{ status } }); return data; };

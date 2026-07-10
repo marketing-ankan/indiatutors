@@ -5,6 +5,7 @@ use App\Http\Resources\ClassLogResource;
 use App\Http\Resources\ClassMaterialResource;
 use App\Http\Resources\CurriculumItemResource;
 use App\Http\Resources\EnrollmentResource;
+use App\Models\AppNotification;
 use App\Models\ClassMaterial;
 use App\Models\Enrollment;
 use Illuminate\Http\Request;
@@ -44,7 +45,36 @@ class EnrollmentController extends Controller {
             'curriculum' => CurriculumItemResource::collection($enrollment->curriculumItems()->get()),
             'classes'    => ClassLogResource::collection($enrollment->classLogs()->get()),
             'materials'  => ClassMaterialResource::collection($enrollment->materials()->get()),
+            'reschedules'=> $enrollment->reschedules()->get()->map(fn ($r) => [
+                'id'             => $r->id,
+                'preferred_date' => optional($r->preferred_date)->toDateString(),
+                'reason'         => $r->reason,
+                'status'         => $r->status,
+                'created_at'     => optional($r->created_at)->toDateString(),
+            ]),
         ]]);
+    }
+
+    /** Parent asks the teacher to reschedule an upcoming class (Phase 8). */
+    public function requestReschedule(Request $request, Enrollment $enrollment) {
+        $this->authorizeParent($request, $enrollment);
+        $data = $request->validate([
+            'preferred_date' => 'nullable|date|after_or_equal:today',
+            'reason'         => 'nullable|string|max:500',
+        ]);
+        $r = $enrollment->reschedules()->create($data + ['requested_by' => $request->user()->id, 'status' => 'pending']);
+
+        // Tell the assigned teacher.
+        AppNotification::send(
+            $enrollment->tutor?->user_id,
+            'reschedule_requested',
+            'Reschedule requested',
+            trim(($enrollment->student?->name ?? 'A student') . "'s parent asked to reschedule"
+                . ($r->preferred_date ? ' to ' . $r->preferred_date->toDateString() : '')
+                . ($r->reason ? " — {$r->reason}" : '')),
+        );
+
+        return response()->json(['data' => ['id' => $r->id, 'status' => $r->status]], 201);
     }
 
     /** Download a shared material — allowed for the owning parent or the assigned teacher. */
