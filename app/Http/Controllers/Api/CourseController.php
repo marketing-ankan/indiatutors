@@ -13,7 +13,9 @@ class CourseController extends Controller {
         if ($slug = $request->string('category')->toString()) {
             $cat = Category::where('slug', $slug)->first();
             if ($cat) {
-                $ids = array_merge([$cat->id], Category::where('parent_id', $cat->id)->pluck('id')->all());
+                // Include the category and ALL descendants (any depth), so a parent
+                // category surfaces every course in its subtree — matching WooCommerce.
+                $ids = $this->descendantIds($cat->id);
                 $query->whereHas('categories', fn($q) => $q->whereIn('categories.id', $ids));
             } else {
                 // Unknown category slug -> no matches (rather than silently returning all).
@@ -43,6 +45,20 @@ class CourseController extends Controller {
 
         $perPage = max(1, min((int) $request->integer('per_page', 12), 48));
         return CourseResource::collection($query->paginate($perPage));
+    }
+
+    /** Category id + all descendant ids (breadth-first, cycle-safe). */
+    private function descendantIds(int $rootId): array {
+        $all = [$rootId];
+        $frontier = [$rootId];
+        while ($frontier) {
+            $children = Category::whereIn('parent_id', $frontier)
+                ->whereNotIn('id', $all)->pluck('id')->all();
+            if (!$children) break;
+            $all = array_merge($all, $children);
+            $frontier = $children;
+        }
+        return $all;
     }
 
     public function show(string $slug) {
