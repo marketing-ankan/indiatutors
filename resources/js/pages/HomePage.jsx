@@ -168,7 +168,7 @@ export default function HomePage() {
       {/* HERO */}
       <section className="relative bg-brand-950 text-white overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-brand-900 via-brand-800 to-brand-950 opacity-90"/>
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-24 grid lg:grid-cols-2 gap-10 items-center">
+        <div className="relative container-wide py-16 lg:py-24 grid lg:grid-cols-2 gap-10 items-center">
           <div>
             <div className="inline-flex gap-2 rounded-full bg-white/10 ring-1 ring-white/20 px-4 py-1.5 text-xs font-semibold tracking-wider mb-5">LIVE CLASSES · VIDEO COURSES · 1-ON-1 TUTORING</div>
             <h1 className="text-4xl sm:text-5xl lg:text-[3.4rem] font-extrabold leading-[1.1] tracking-tight">All The Expert Tutors You Need, In One Place</h1>
@@ -195,7 +195,7 @@ export default function HomePage() {
       </section>
 
       {/* CHOOSE HOW TO LEARN */}
-      <section className="py-14 bg-white"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="py-14 bg-white"><div className="container-wide">
         <h2 className="text-2xl font-extrabold text-center mb-8 tracking-tight">Choose How You Want to Learn</h2>
         <div className="grid md:grid-cols-3 gap-5">
           {[{icon:'👤',title:'1-on-1 Live Classes',color:'bg-blue-50 text-blue-700',desc:'Private sessions with a dedicated tutor. Fully personalised pace, curriculum, and scheduling.',features:['Personalised curriculum','Flexible scheduling','Post-class mentoring'],cta:'Book Free Trial',href:'/book-demo'},{icon:'👥',title:'Live Group Classes',color:'bg-purple-50 text-purple-700',desc:'Interactive small-group sessions. Learn with peers, ask questions live, and build friendships.',features:['Small batches (5–10 students)','Structured curriculum','Affordable group pricing'],cta:'Browse Group Classes',href:'/courses'},{icon:'📹',title:'Self-Paced Video Courses',color:'bg-orange-50 text-orange-700',desc:'Pre-recorded expert lessons you can watch anytime. Learn at your own pace, on your own schedule.',features:['Watch anytime, on any device','Quizzes and assignments','Certificate on completion'],cta:'Browse Video Courses',href:'/courses'}].map(f=>(
@@ -212,20 +212,20 @@ export default function HomePage() {
 
       {/* STATS */}
       <div className="bg-brand-900 text-white py-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid grid-cols-3 md:grid-cols-6 gap-4 text-center">
+        <div className="container-wide grid grid-cols-3 md:grid-cols-6 gap-4 text-center">
           {STATS.map(s=><div key={s.l}><div className="text-2xl font-extrabold text-brand-200">{s.n}</div><div className="text-xs text-slate-400 mt-0.5">{s.l}</div></div>)}
         </div>
       </div>
 
       {/* ALL COURSES */}
-      <section className="py-14 bg-slate-50"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="py-14 bg-slate-50"><div className="container-wide">
         <div className="flex items-end justify-between mb-6"><h2 className="text-2xl font-extrabold tracking-tight">All The Courses You Need In One Place</h2><Link to="/courses" className="text-sm font-semibold text-brand-600 hover:text-brand-700">View all courses →</Link></div>
         <div className="flex gap-2 flex-wrap mb-6">{categories.slice(0,10).map(c=><Link key={c.id} to={`/courses?category=${c.slug}`} className="rounded-full bg-white border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-brand-400 hover:text-brand-700 transition">{c.name}</Link>)}</div>
         <CarouselWrap car={courseCar} itemW={208}>{courses.map(c=><MiniCourseCard key={c.id} course={c}/>)}</CarouselWrap>
       </div></section>
 
       {/* ABOUT + HOW IT WORKS */}
-      <section className="py-14 bg-white"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10">
+      <section className="py-14 bg-white"><div className="container-wide grid lg:grid-cols-2 gap-10">
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-brand-600 mb-2">About Indiatutors Online</p>
           <h2 className="text-2xl font-extrabold mb-4">India's most trusted live tutoring platform</h2>
@@ -249,7 +249,7 @@ export default function HomePage() {
       </div></section>
 
       {/* MOST POPULAR SUBJECTS */}
-      <section className="py-14 bg-slate-50"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="py-14 bg-slate-50"><div className="container-wide">
         <div className="flex items-end justify-between mb-7"><h2 className="text-2xl font-extrabold tracking-tight">Most Popular Subjects</h2><Link to="/courses" className="text-sm font-semibold text-brand-600 hover:text-brand-700">View All Subjects →</Link></div>
         <CarouselWrap car={subCar} itemW={160}>{SUBJECTS.map(s=>(
           <Link key={s.label} to={`/courses?search=${encodeURIComponent(s.label)}`} className="group flex-shrink-0 w-36 rounded-xl overflow-hidden shadow-sm ring-1 ring-slate-100 hover:shadow-md transition">
@@ -263,13 +263,13 @@ export default function HomePage() {
       </div></section>
 
       {/* MEET OUR TEACHERS */}
-      <section className="py-14 bg-white"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="py-14 bg-white"><div className="container-wide">
         <div className="flex items-end justify-between mb-7"><div><p className="text-xs font-bold uppercase tracking-widest text-brand-600 mb-1">Verified Educators</p><h2 className="text-2xl font-extrabold tracking-tight">Meet Our Teachers</h2></div><Link to="/find-tutors" className="text-sm font-semibold text-brand-600 hover:text-brand-700">All teachers →</Link></div>
         <CarouselWrap car={tutorCar} itemW={220}>{tutors.map(t=><HomeTutorCard key={t.slug} t={t}/>)}</CarouselWrap>
       </div></section>
 
       {/* TESTIMONIALS */}
-      <section className="py-14 bg-slate-50"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="py-14 bg-slate-50"><div className="container-wide">
         <div className="flex items-end justify-between mb-7"><div><p className="text-xs font-bold uppercase tracking-widest text-brand-600 mb-1">Real Students · Real Parents</p><h2 className="text-2xl font-extrabold tracking-tight">What Students & Parents Say</h2></div></div>
         <div className="grid md:grid-cols-3 gap-5">{[{rating:5,text:"The no commitment policy was what convinced us to try Indiatutors Online. Best decision — our daughter's Math improved two grades in 3 months.",name:'Priya Sharma',role:'Parent, Class 9 student'},{rating:5,text:"We've tried many online platforms but none matched the live interaction and personal curriculum here. Rahul Sir explains Python brilliantly.",name:'Arjun Mehta',role:'Class 11 student'},{rating:5,text:"Our son has been taking Chess and Python classes for 6 months. The progress tracker after every class is what sets this platform apart.",name:'Lakshmi Krishnamurthy',role:'Parent, Class 7 student'}].map(t=>(
           <div key={t.name} className="rounded-2xl bg-white p-6 ring-1 ring-slate-100 shadow-sm">
@@ -284,13 +284,13 @@ export default function HomePage() {
       </div></section>
 
       {/* WHY FAMILIES CHOOSE US */}
-      <section className="py-14 bg-white"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="py-14 bg-white"><div className="container-wide">
         <div className="flex items-end justify-between mb-7"><div><p className="text-xs font-bold uppercase tracking-widest text-brand-600 mb-1">Why 8,000+ families trust us</p><h2 className="text-2xl font-extrabold tracking-tight">Why Families Choose Us</h2></div></div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">{WHY.map(f=><div key={f.t} className="rounded-xl p-5 ring-1 ring-slate-100 hover:shadow-sm transition"><f.icon className="h-7 w-7 text-brand-600 mb-3"/><h3 className="font-bold text-slate-900 mb-1">{f.t}</h3><p className="text-sm text-slate-500 leading-relaxed">{f.d}</p></div>)}</div>
       </div></section>
 
       {/* PRICING */}
-      <section className="py-14 bg-slate-50"><div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="py-14 bg-slate-50"><div className="container-wide">
         <div className="text-center mb-10"><p className="text-xs font-bold uppercase tracking-widest text-brand-600 mb-2">No hidden charges · Cancel any time</p><h2 className="text-3xl font-extrabold tracking-tight">Simple, Honest Pricing</h2><p className="text-slate-500 mt-2">First class is always free.</p></div>
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">{PLANS.map(p=>(
           <div key={p.name} className={`rounded-2xl bg-white p-6 ring-1 relative ${p.badge==='Most Popular'?'ring-brand-500 shadow-xl':'ring-slate-100'}`}>

@@ -3,7 +3,7 @@ import { Phone, Mail, MapPin } from 'lucide-react';
 export default function Footer() {
   return (
     <footer className="bg-slate-900 text-slate-300 mt-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14 grid grid-cols-1 md:grid-cols-4 gap-10">
+      <div className="container-wide py-14 grid grid-cols-1 md:grid-cols-4 gap-10">
         <div>
           <div className="text-xl font-extrabold text-white">Indiatutors <span className="text-brand-400">Online</span></div>
           <p className="mt-3 text-sm leading-relaxed text-slate-400">Live 1-on-1 classes, group sessions, and self-paced video courses across Academics, Coding, Music, Dance, Languages & more.</p>
@@ -34,7 +34,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-slate-800">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <div className="container-wide py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
           <span>© {new Date().getFullYear()} Indiatutors Online. All rights reserved.</span>
           <div className="flex gap-4">
             <Link to="/privacy" className="hover:text-slate-300">Privacy</Link>

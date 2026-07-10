@@ -10,4 +10,7 @@
 @layer components {
   .btn-primary { @apply inline-flex items-center justify-center rounded-md bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 transition; }
   .btn-secondary { @apply inline-flex items-center justify-center rounded-md bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50 transition; }
+  /* Full-width container used by the live site's header/homepage/footer:
+     no max-width cap, fluid side padding 16→40px. */
+  .container-wide { width: 100%; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); }
 }

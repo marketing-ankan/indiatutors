@@ -36,7 +36,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-40 bg-white shadow-sm">
       <div className="bg-slate-900 text-slate-300 text-xs">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between py-2">
+        <div className="container-wide flex items-center justify-between py-2">
           <div className="flex flex-wrap items-center gap-4">
             <a href="tel:+919330811581" className="inline-flex items-center gap-1.5 hover:text-white"><Phone className="h-3.5 w-3.5"/>+91 93308 11581</a>
             <a href="mailto:connect@indiatutorsonline.com" className="hidden sm:inline-flex items-center gap-1.5 hover:text-white"><Mail className="h-3.5 w-3.5"/>connect@indiatutorsonline.com</a>
@@ -45,7 +45,7 @@ export default function Header() {
         </div>
       </div>
       <div className="border-b border-slate-100">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between py-3">
+        <div className="container-wide flex items-center justify-between py-3">
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
             <img src="https://indiatutorsonline.com/wp-content/uploads/2026/04/IndTutorBlackLogo.png" alt="Indiatutors Online" className="h-9 w-auto"
               onError={e=>{ e.currentTarget.style.display='none'; e.currentTarget.nextSibling.style.display='flex'; }}/>
@@ -75,7 +75,7 @@ export default function Header() {
         </div>
       </div>
       <div className="hidden lg:block border-b border-slate-100">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="container-wide">
           <ul className="flex items-center gap-7 py-2.5 overflow-x-auto">
             {catalogNav.map(n => (
               <li key={n.label} className="flex-shrink-0">
@@ -87,7 +87,7 @@ export default function Header() {
       </div>
       {open && (
         <div className="lg:hidden border-t border-slate-100 bg-white">
-          <div className="mx-auto max-w-7xl px-4 py-4 space-y-1">
+          <div className="container-wide py-4 space-y-1">
             {[...primaryNav,...catalogNav.slice(1)].map(n => (
               <NavLink key={n.to+n.label} to={n.to} onClick={()=>setOpen(false)} className={({isActive})=>`block rounded-md px-3 py-2 text-sm font-medium ${isActive?'bg-brand-50 text-brand-600':'text-slate-800 hover:bg-slate-50'}`}>{n.label}</NavLink>
             ))}
