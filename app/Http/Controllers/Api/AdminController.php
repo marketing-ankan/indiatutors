@@ -3,9 +3,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\DemoRequestResource;
 use App\Http\Resources\EnrollmentResource;
+use App\Http\Resources\TeacherProfileResource;
 use App\Http\Resources\TutorResource;
 use App\Models\DemoRequest;
 use App\Models\Enrollment;
+use App\Models\TeacherProfile;
 use App\Models\Tutor;
 use Illuminate\Http\Request;
 
@@ -65,5 +67,18 @@ class AdminController extends Controller {
         return EnrollmentResource::collection(
             Enrollment::with(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug'])->latest()->paginate(20)
         );
+    }
+
+    // --- Teacher applications ---
+    public function teachers(Request $request) {
+        $q = TeacherProfile::query()->with('user:id,name,email')->latest();
+        if ($s = $request->string('status')->toString()) $q->where('status', $s);
+        return TeacherProfileResource::collection($q->paginate(20));
+    }
+
+    public function approveTeacher(Request $request, TeacherProfile $teacherProfile) {
+        $data = $request->validate(['status' => 'required|in:pending,approved,rejected']);
+        $teacherProfile->update($data);
+        return new TeacherProfileResource($teacherProfile->fresh()->load('user:id,name,email'));
     }
 }

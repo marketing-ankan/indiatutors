@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ShieldAlert, ChevronDown, ChevronUp, UserCheck, GraduationCap } from 'lucide-react';
+import { ShieldAlert, ChevronDown, ChevronUp, UserCheck, GraduationCap, Check, X } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
-import { fetchAdminDemoRequests, fetchDemoTutors, assignDemo, convertDemo } from '../lib/api.js';
+import { fetchAdminDemoRequests, fetchDemoTutors, assignDemo, convertDemo, fetchAdminTeachers, approveTeacher } from '../lib/api.js';
 
 const STATUSES = ['', 'new', 'scheduled', 'converted', 'closed'];
 const badge = { new:'bg-amber-50 text-amber-700', scheduled:'bg-blue-50 text-blue-700', converted:'bg-green-50 text-green-700', closed:'bg-slate-100 text-slate-600' };
 
 export default function AdminPage() {
   const { user, isAuthed, isLoading } = useAuth();
+  const [tab, setTab] = useState('demos');
   const [status, setStatus] = useState('');
-  const { data } = useQuery({ queryKey:['admin-demos', status], queryFn:()=>fetchAdminDemoRequests(status), enabled: isAuthed && user?.role==='admin' });
+  const isAdmin = isAuthed && user?.role === 'admin';
+  const { data } = useQuery({ queryKey:['admin-demos', status], queryFn:()=>fetchAdminDemoRequests(status), enabled: isAdmin && tab==='demos' });
 
   if (isLoading) return <div className="mx-auto max-w-5xl px-4 py-20 text-slate-500">Loading…</div>;
   if (!isAuthed) return <Navigate to="/login" replace />;
@@ -26,21 +28,70 @@ export default function AdminPage() {
   const reqs = data?.data ?? [];
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
-      <h1 className="text-3xl font-extrabold tracking-tight">Staff Console — Demo Requests</h1>
-      <p className="text-slate-500 mt-1">Match a tutor, schedule, and convert demos into enrollments.</p>
+      <h1 className="text-3xl font-extrabold tracking-tight">Staff Console</h1>
 
-      <div className="mt-6 flex flex-wrap gap-2">
-        {STATUSES.map(s => (
-          <button key={s||'all'} onClick={()=>setStatus(s)} className={`rounded-full px-3 py-1.5 text-sm font-semibold ${status===s?'bg-brand-600 text-white':'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
-            {s ? s[0].toUpperCase()+s.slice(1) : 'All'}
-          </button>
+      <div className="mt-5 flex gap-2 border-b border-slate-100">
+        {[['demos','Demo Requests'],['teachers','Teacher Applications']].map(([k,label]) => (
+          <button key={k} onClick={()=>setTab(k)} className={`px-4 py-2 text-sm font-semibold border-b-2 -mb-px ${tab===k?'border-brand-600 text-brand-700':'border-transparent text-slate-500 hover:text-slate-700'}`}>{label}</button>
         ))}
       </div>
 
-      <div className="mt-6 space-y-3">
-        {reqs.length ? reqs.map(r => <DemoRow key={r.id} r={r} />) : <p className="text-slate-500 py-10 text-center">No demo requests.</p>}
-      </div>
+      {tab === 'demos' ? (
+        <>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {STATUSES.map(s => (
+              <button key={s||'all'} onClick={()=>setStatus(s)} className={`rounded-full px-3 py-1.5 text-sm font-semibold ${status===s?'bg-brand-600 text-white':'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
+                {s ? s[0].toUpperCase()+s.slice(1) : 'All'}
+              </button>
+            ))}
+          </div>
+          <div className="mt-5 space-y-3">
+            {reqs.length ? reqs.map(r => <DemoRow key={r.id} r={r} />) : <p className="text-slate-500 py-10 text-center">No demo requests.</p>}
+          </div>
+        </>
+      ) : (
+        <TeachersPanel />
+      )}
     </div>
+  );
+}
+
+function TeachersPanel() {
+  const qc = useQueryClient();
+  const [status, setStatus] = useState('pending');
+  const { data } = useQuery({ queryKey:['admin-teachers', status], queryFn:()=>fetchAdminTeachers(status) });
+  const act = useMutation({ mutationFn:({id,s})=>approveTeacher(id, s), onSuccess:()=>qc.invalidateQueries({queryKey:['admin-teachers']}) });
+  const teachers = data?.data ?? [];
+  const badge = { pending:'bg-amber-50 text-amber-700', approved:'bg-green-50 text-green-700', rejected:'bg-red-50 text-red-700' };
+
+  return (
+    <>
+      <div className="mt-5 flex flex-wrap gap-2">
+        {['pending','approved','rejected',''].map(s => (
+          <button key={s||'all'} onClick={()=>setStatus(s)} className={`rounded-full px-3 py-1.5 text-sm font-semibold ${status===s?'bg-brand-600 text-white':'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>{s?s[0].toUpperCase()+s.slice(1):'All'}</button>
+        ))}
+      </div>
+      <div className="mt-5 space-y-3">
+        {teachers.length ? teachers.map(t => (
+          <div key={t.id} className="rounded-xl ring-1 ring-slate-100 bg-white p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="font-semibold text-sm text-slate-800">{t.teacher?.name || 'Teacher'} <span className="text-slate-400 font-normal">· {t.teacher?.email}</span></div>
+                <div className="text-sm text-slate-700 mt-0.5">{t.headline || <span className="text-slate-400">No headline yet</span>}</div>
+                <div className="text-xs text-slate-500 mt-1">{[t.qualification, t.subjects && `Subjects: ${t.subjects}`, t.experience_years && `${t.experience_years}y exp`, t.fee_hourly && `₹${t.fee_hourly}/hr`, t.city, t.teaching_mode].filter(Boolean).join(' · ')}</div>
+                {t.service_areas && <div className="text-xs text-slate-500 mt-0.5">Areas: {t.service_areas}</div>}
+                {t.availability?.slots && <div className="text-xs text-slate-500 mt-0.5">Available: {(t.availability.days||[]).join(', ')} · {t.availability.slots}</div>}
+              </div>
+              <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${badge[t.status]||'bg-slate-100'}`}>{t.status}</span>
+            </div>
+            <div className="mt-3 flex gap-2">
+              <button disabled={act.isPending} onClick={()=>act.mutate({id:t.id,s:'approved'})} className="inline-flex items-center gap-1 rounded-lg bg-green-600 text-white px-3 py-1.5 text-sm font-semibold hover:bg-green-700 disabled:opacity-60"><Check className="h-4 w-4"/>Approve</button>
+              <button disabled={act.isPending} onClick={()=>act.mutate({id:t.id,s:'rejected'})} className="inline-flex items-center gap-1 rounded-lg ring-1 ring-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"><X className="h-4 w-4"/>Reject</button>
+            </div>
+          </div>
+        )) : <p className="text-slate-500 py-10 text-center">No teacher applications.</p>}
+      </div>
+    </>
   );
 }
 

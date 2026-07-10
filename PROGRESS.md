@@ -44,8 +44,11 @@ Rebuild of the WordPress site (indiatutorsonline.com) as a **Laravel 11 API + Re
 - Admin is **env-gated** (`ADMIN_EMAIL`/`ADMIN_PASSWORD`) — no default-password admin
 - **QA:** 11 enrollment-flow tests + admin UI verified
 
-## 🔨 Phase 5 — Teacher portal (in progress)
-Onboarding (profile, KYC, service areas, availability), admin approval, then course approval, student management, progress tracker, curriculum/notes/question-bank, class calendar.
+## 🔨 Phase 5 — Teacher portal (v1 done 2026-07-10)
+- ✅ **Teacher onboarding & profile**: headline, qualification, subjects, languages, experience, fee, city, mode, service areas (pincodes), **availability (days + slots)**, bio — self-editable on the dashboard (KYC from Phase 3)
+- ✅ **Admin approval**: Staff Console "Teacher Applications" tab (approve / reject)
+- ⬜ Next: course approval, teacher's students (demo/enrolled/ongoing), progress tracker, curriculum/notes/question-bank, class calendar
+- QA: 8 teacher API tests + teacher dashboard + admin approval verified in browser
 
 ---
 

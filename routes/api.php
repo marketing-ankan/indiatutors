@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\DemoRequestController;
 use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\Api\TeacherController;
 use App\Http\Controllers\Api\TutorController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +51,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/my/demo-requests', [DemoRequestController::class, 'myIndex']);
     Route::get('/my/enrollments',   [EnrollmentController::class, 'myIndex']);
 
+    // Teacher portal (own profile)
+    Route::get('/teacher/profile',  [TeacherController::class, 'showMine']);
+    Route::put('/teacher/profile',  [TeacherController::class, 'updateMine']);
+
     // --- Admin (staff): match tutors, schedule, convert demo -> enrollment ---
     Route::middleware(\App\Http\Middleware\EnsureAdmin::class)->prefix('admin')->group(function () {
         Route::get('/demo-requests',                     [AdminController::class, 'demoRequests']);
@@ -57,5 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/demo-requests/{demoRequest}',     [AdminController::class, 'assignDemo']);
         Route::post('/demo-requests/{demoRequest}/convert',[AdminController::class, 'convert']);
         Route::get('/enrollments',                       [AdminController::class, 'enrollments']);
+        Route::get('/teachers',                          [AdminController::class, 'teachers']);
+        Route::patch('/teachers/{teacherProfile}',       [AdminController::class, 'approveTeacher']);
     });
 });

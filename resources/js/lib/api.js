@@ -55,8 +55,14 @@ export const deleteStudent = async (id) => { await api.delete(`/students/${id}`)
 export const fetchMyDemoRequests = async () => { const { data } = await api.get('/my/demo-requests'); return data.data; };
 export const fetchMyEnrollments  = async () => { const { data } = await api.get('/my/enrollments'); return data.data; };
 
+// Teacher portal (own profile)
+export const fetchTeacherProfile  = async () => { const { data } = await api.get('/teacher/profile'); return data.data; };
+export const updateTeacherProfile = async (payload) => { const { data } = await api.put('/teacher/profile', payload); return data.data; };
+
 // Admin (staff)
 export const fetchAdminDemoRequests = async (status='') => { const { data } = await api.get('/admin/demo-requests', { params:{ status } }); return data; };
+export const fetchAdminTeachers = async (status='') => { const { data } = await api.get('/admin/teachers', { params:{ status } }); return data; };
+export const approveTeacher     = async (id, status) => { const { data } = await api.patch(`/admin/teachers/${id}`, { status }); return data.data; };
 export const fetchDemoTutors  = async (id) => { const { data } = await api.get(`/admin/demo-requests/${id}/tutors`); return data.data; };
 export const assignDemo       = async (id, payload) => { const { data } = await api.patch(`/admin/demo-requests/${id}`, payload); return data.data; };
 export const convertDemo      = async (id, payload) => { const { data } = await api.post(`/admin/demo-requests/${id}/convert`, payload); return data.data; };

@@ -70,12 +70,12 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 - Admin user is env-gated (`ADMIN_EMAIL`/`ADMIN_PASSWORD`) — no default-password admin
 - Deferred to later: call/confirm telephony, pincode-level matching, richer scheduling calendar
 
-## Phase 5 — Teacher portal ⬜
-- Onboarding: CV, KYC, service areas by pincode, schedule/availability
-- Course/subject approval workflow
-- Students views: demo / enrolled / ongoing (grade, subject, location)
-- Progress tracker (curriculum classwise, update after each class); curriculum define/divide/edit
-- Notes/PPT/homework/lesson plans/question bank (scan/upload); class calendar; feedback
+## Phase 5 — Teacher portal 🔨 (v1 done 2026-07-10)
+- ✅ **Teacher onboarding & profile**: headline, qualification, subjects, languages, experience, fee, city, teaching mode, **service areas (pincodes)**, **availability (days + slots)**, bio — self-editable on the dashboard (KYC already from Phase 3)
+- ✅ **Admin approval**: Staff Console "Teacher Applications" tab — approve / reject (status pending→approved→rejected)
+- ⬜ Course/subject approval workflow; teacher's students views (demo/enrolled/ongoing)
+- ⬜ Progress tracker (curriculum classwise); curriculum define/divide/edit
+- ⬜ Notes/PPT/homework/lesson plans/question bank; class calendar; feedback
 
 ## Phase 6 — Student/Parent portal ⬜
 - Access teacher details + curriculum + progress tracker

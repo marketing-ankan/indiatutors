@@ -2,11 +2,12 @@ import { useState, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { LogOut, Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap } from 'lucide-react';
+import { LogOut, Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap, Briefcase, Save } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import {
   fetchStudents, createStudent, deleteStudent,
   fetchKyc, uploadKyc, deleteKyc, fetchMyDemoRequests, fetchMyEnrollments,
+  fetchTeacherProfile, updateTeacherProfile,
 } from '../lib/api.js';
 
 const inp = "w-full rounded-md ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
@@ -34,16 +35,89 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        <RequestsCard />
-        <EnrollmentsCard />
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-6 mt-6">
-        {user.role !== 'teacher' && <StudentsCard />}
-        <KycCard />
-      </div>
+      {user.role === 'teacher' ? (
+        <div className="grid lg:grid-cols-2 gap-6">
+          <TeacherProfileCard />
+          <KycCard />
+        </div>
+      ) : (
+        <>
+          <div className="grid lg:grid-cols-2 gap-6">
+            <RequestsCard />
+            <EnrollmentsCard />
+          </div>
+          <div className="grid lg:grid-cols-2 gap-6 mt-6">
+            <StudentsCard />
+            <KycCard />
+          </div>
+        </>
+      )}
     </div>
+  );
+}
+
+function TeacherProfileCard() {
+  const qc = useQueryClient();
+  const { data: p, isLoading } = useQuery({ queryKey:['teacher-profile'], queryFn: fetchTeacherProfile });
+  const [form, setForm] = useState(null);
+  const [saved, setSaved] = useState(false);
+  const value = form ?? (p ? {
+    headline:p.headline||'', qualification:p.qualification||'', subjects:p.subjects||'', languages:p.languages||'',
+    experience_years:p.experience_years||'', fee_hourly:p.fee_hourly||'', city:p.city||'', teaching_mode:p.teaching_mode||'online',
+    service_areas:p.service_areas||'', bio:p.bio||'', slots:p.availability?.slots||'', days:p.availability?.days||[],
+  } : null);
+  const set = k => e => { setSaved(false); setForm({ ...value, [k]: e.target.value }); };
+  const toggleDay = d => { setSaved(false); const days = value.days.includes(d) ? value.days.filter(x=>x!==d) : [...value.days, d]; setForm({ ...value, days }); };
+  const save = useMutation({
+    mutationFn: () => updateTeacherProfile({ ...value, experience_years: value.experience_years?Number(value.experience_years):null, fee_hourly: value.fee_hourly?Number(value.fee_hourly):null, availability:{ days:value.days, slots:value.slots } }),
+    onSuccess: () => { setSaved(true); qc.invalidateQueries({queryKey:['teacher-profile']}); },
+  });
+  const statusBadge = { pending:'bg-amber-50 text-amber-700', approved:'bg-green-50 text-green-700', rejected:'bg-red-50 text-red-700' };
+  const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  if (isLoading || !value) return <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6 text-sm text-slate-400">Loading profile…</section>;
+
+  return (
+    <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
+      <div className="flex items-center justify-between mb-1">
+        <h2 className="text-lg font-bold flex items-center gap-2"><Briefcase className="h-5 w-5 text-brand-600"/>Teacher profile</h2>
+        <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusBadge[p.status]||'bg-slate-100'}`}>{p.status}</span>
+      </div>
+      <p className="text-xs text-slate-500 mb-4">Complete your profile so our team can review and approve you.</p>
+      <form onSubmit={e=>{e.preventDefault();save.mutate();}} className="space-y-3">
+        <input value={value.headline} onChange={set('headline')} placeholder="Headline (e.g. Physics & Math mentor)" className={inp}/>
+        <div className="grid grid-cols-2 gap-2">
+          <input value={value.qualification} onChange={set('qualification')} placeholder="Qualification" className={inp}/>
+          <input value={value.subjects} onChange={set('subjects')} placeholder="Subjects (comma-sep)" className={inp}/>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <input type="number" value={value.experience_years} onChange={set('experience_years')} placeholder="Years exp." className={inp}/>
+          <input type="number" value={value.fee_hourly} onChange={set('fee_hourly')} placeholder="₹/hour" className={inp}/>
+          <input value={value.languages} onChange={set('languages')} placeholder="Languages" className={inp}/>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <select value={value.teaching_mode} onChange={set('teaching_mode')} className={inp}>
+            <option value="online">Online</option><option value="home">Home tuition</option><option value="both">Online & Home</option>
+          </select>
+          <input value={value.city} onChange={set('city')} placeholder="City" className={inp}/>
+        </div>
+        <input value={value.service_areas} onChange={set('service_areas')} placeholder="Service areas / pincodes (e.g. 700001, Salt Lake)" className={inp}/>
+        <div>
+          <label className="block text-xs font-semibold text-slate-600 mb-1">Availability</label>
+          <div className="flex flex-wrap gap-1.5 mb-2">
+            {DAYS.map(d => <button type="button" key={d} onClick={()=>toggleDay(d)} className={`rounded-full px-2.5 py-1 text-xs font-semibold ${value.days.includes(d)?'bg-brand-600 text-white':'bg-slate-100 text-slate-600'}`}>{d}</button>)}
+          </div>
+          <input value={value.slots} onChange={set('slots')} placeholder="Time slots (e.g. 5-8pm weekdays)" className={inp}/>
+        </div>
+        <textarea rows={3} value={value.bio} onChange={set('bio')} placeholder="Short bio" className={inp}/>
+        <div className="flex items-center gap-3">
+          <button disabled={save.isPending} className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">
+            <Save className="h-4 w-4"/> {save.isPending?'Saving…':'Save profile'}
+          </button>
+          {saved && <span className="text-sm text-green-600 font-semibold">Saved ✓</span>}
+        </div>
+      </form>
+    </section>
   );
 }
 
