@@ -58,10 +58,19 @@ class CourseSeeder extends Seeder {
                     if ($part === '') continue;
                     $path2 = $path2 ? "$path2 > $part" : $part;
                     if (!isset($categoryCache[$path2])) {
+                        // Match the live WordPress slugs exactly: sanitize_title turns
+                        // "/" into "-" (Math SAT/PSAT -> math-sat-psat), and child
+                        // slugs carry no parent suffix. Fall back to a -{parentId}
+                        // suffix only on a genuine collision.
+                        $desired = Str::slug(str_replace('/', '-', $part));
                         $cat = Category::firstOrCreate(
                             ['name' => $part, 'parent_id' => $parentId],
-                            ['slug' => Str::slug($part).($parentId ? '-'.$parentId : '')]
+                            ['slug' => $desired]
                         );
+                        if ($cat->slug !== $desired) {
+                            $taken = Category::where('slug', $desired)->where('id', '!=', $cat->id)->exists();
+                            $cat->update(['slug' => $taken ? $desired.'-'.($parentId ?? 0) : $desired]);
+                        }
                         $categoryCache[$path2] = $cat->id;
                     }
                     $parentId = $categoryCache[$path2];
