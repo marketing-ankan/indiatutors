@@ -7,6 +7,15 @@ import { useAuth } from '../lib/auth.jsx';
 const empty = { name:'',email:'',phone_country_code:'+91',phone:'',subject:'',grade:'',board:'',mode:'online',city:'',country:'India',timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,message:'',whatsapp_consent:true,marketing_consent:false,course_id:null,student_id:null };
 const inp = "w-full rounded-md ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
 
+// The live page's five booking flows — same form engine, different framing.
+const BOOKING_TYPES = [
+  { key:'demo',     pill:'Free Demo',       heading:'Book a Free Demo Class',       sub:'One-on-one session with world-class tutors.',            mode:'online', cta:'Request Free Demo' },
+  { key:'group',    pill:'Group Classes',   heading:'Book a Free Group-Class Demo', sub:'Learn together in small, interactive batches.',          mode:'online', cta:'Request Group-Class Demo' },
+  { key:'workshop', pill:'Workshops',       heading:'Book a Free Workshop',         sub:'Hands-on workshops, bootcamps & masterclasses.',         mode:'online', cta:'Reserve Workshop Seat' },
+  { key:'free',     pill:'Free Classes',    heading:'Book a Free Class',            sub:'Try a complimentary class — zero cost, no card.',        mode:'online', cta:'Request Free Class' },
+  { key:'physical', pill:'Physical Tutor',  heading:'Find a Physical Home Tutor',   sub:'Get a verified in-person tutor in your locality.',       mode:'home',   cta:'Find My Home Tutor' },
+];
+
 export default function BookDemoPage() {
   const [params] = useSearchParams();
   const courseSlug = params.get('course');
@@ -15,6 +24,12 @@ export default function BookDemoPage() {
   // ?subject= prefill (exam dropdown, plan cards, course accordion CTAs)
   const [form, setForm] = useState({ ...empty, subject: params.get('subject') || '' });
   const [ok, setOk] = useState(false);
+  // ?type= deep-links a specific flow (e.g. /book-demo?type=group)
+  const [typeKey, setTypeKey] = useState(
+    BOOKING_TYPES.some(t => t.key === params.get('type')) ? params.get('type') : 'demo'
+  );
+  const bookingType = BOOKING_TYPES.find(t => t.key === typeKey);
+  const switchType = (t) => { setTypeKey(t.key); setForm(f => ({ ...f, mode: t.mode })); };
 
   // If arriving from a course or tutor page, resolve it to prefill nicely + link it.
   const { data: course } = useQuery({ queryKey:['course', courseSlug], queryFn:()=>fetchCourse(courseSlug), enabled: !!courseSlug });
@@ -31,7 +46,14 @@ export default function BookDemoPage() {
       grade: s?.grade || f.grade, board: s?.board || f.board, subject: s?.subjects || f.subject }));
   };
 
-  const mutation = useMutation({ mutationFn: submitDemoRequest, onSuccess: ()=>{ setOk(true); setForm(empty); } });
+  // Record which flow was requested so the staff console sees it.
+  const mutation = useMutation({
+    mutationFn: () => submitDemoRequest({
+      ...form,
+      message: typeKey === 'demo' ? form.message : `[${bookingType.heading}] ${form.message}`.trim(),
+    }),
+    onSuccess: ()=>{ setOk(true); setForm(empty); },
+  });
   const set = k => e => setForm({...form, [k]: e.target.type==='checkbox'?e.target.checked:e.target.value});
 
   if (ok) return (
@@ -45,14 +67,23 @@ export default function BookDemoPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12">
-      <h1 className="text-3xl font-extrabold tracking-tight">Book a Free Demo Class</h1>
-      <p className="text-slate-500 mt-2">One-on-one session with world-class tutors. Fill this in and we'll match you with a verified tutor — the demo is free with no commitment.</p>
+      {/* Booking-flow pills, like the live page */}
+      <div className="flex flex-wrap gap-1.5 mb-6">
+        {BOOKING_TYPES.map(t => (
+          <button key={t.key} type="button" onClick={()=>switchType(t)}
+            className={`rounded-full px-3.5 py-1.5 text-xs font-bold ${typeKey===t.key?'bg-brand-600 text-white':'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+            {t.pill}
+          </button>
+        ))}
+      </div>
+      <h1 className="text-3xl font-extrabold tracking-tight">{bookingType.heading}</h1>
+      <p className="text-slate-500 mt-2">{bookingType.sub} Fill this in and we'll match you with a verified tutor — it's free with no commitment.</p>
       {(course || tutor) && (
         <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand-50 text-brand-700 px-3 py-1.5 text-sm font-medium ring-1 ring-brand-100">
           Booking a demo for <b>{course?.name || tutor?.name}</b>
         </div>
       )}
-      <form onSubmit={e=>{e.preventDefault();mutation.mutate(form);}} className="mt-8 space-y-4 bg-white p-6 rounded-xl ring-1 ring-slate-100">
+      <form onSubmit={e=>{e.preventDefault();mutation.mutate();}} className="mt-8 space-y-4 bg-white p-6 rounded-xl ring-1 ring-slate-100">
         {isAuthed && students.length > 0 && (
           <div className="rounded-lg bg-brand-50 ring-1 ring-brand-100 p-3">
             <label className="block text-xs font-semibold text-brand-800 mb-1">Which student is this demo for?</label>
@@ -94,7 +125,7 @@ export default function BookDemoPage() {
         </div>
         {mutation.isError && <div className="rounded-md bg-red-50 text-red-700 text-sm p-3">{mutation.error?.response?.data?.message||'Something went wrong. Please try again.'}</div>}
         <button disabled={mutation.isPending} className="w-full rounded-lg bg-brand-600 text-white py-3 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">
-          {mutation.isPending?'Submitting…':'Request Free Demo'}
+          {mutation.isPending?'Submitting…':bookingType.cta}
         </button>
       </form>
     </div>
