@@ -159,9 +159,21 @@ export default function HomePage() {
   const courses = allCourses?.data ?? [];
   const { data: tutors = [] } = useQuery({ queryKey:['tutors','home'], queryFn:()=>fetchTutors() });
 
-  const courseCar = useCarousel(courses.length, 5);
-  const tutorCar  = useCarousel(tutors.length, 4);
-  const subCar    = useCarousel(SUBJECTS.length, 6);
+  const trending = [...courses].reverse();
+  const videoCourses = courses.slice(0, 14);
+  const courseCar   = useCarousel(courses.length, 5);
+  const trendingCar = useCarousel(trending.length, 5);
+  const videoCar    = useCarousel(videoCourses.length, 5);
+  const tutorCar    = useCarousel(tutors.length, 4);
+  const subCar      = useCarousel(SUBJECTS.length, 6);
+  const GROUP_CATS = [
+    { label:'♟️ Mind Sports', slug:'mind-sports' }, { label:'💻 IT Technologies', slug:'it-technologies' },
+    { label:'🌐 Languages', slug:'languages' }, { label:'💃 Dance', slug:'dance' }, { label:'🎨 Creative Skills', slug:'creative-skills' },
+  ];
+  const DEMO_VIDEOS = [
+    { title:'About Indiatutors Online — Our Story', img:'https://indiatutorsonline.com/wp-content/uploads/2026/04/AboutUsImage1.webp' },
+    { title:'Creative Skills — Sample Class for Kids', img:'https://indiatutorsonline.com/wp-content/uploads/2026/05/Arts-And-Painting-1.jpg' },
+  ];
 
   return (
     <>
@@ -224,6 +236,36 @@ export default function HomePage() {
         <CarouselWrap car={courseCar} itemW={208}>{courses.map(c=><MiniCourseCard key={c.id} course={c}/>)}</CarouselWrap>
       </div></section>
 
+      {/* TRENDING COURSES */}
+      <section className="py-14 bg-white"><div className="container-wide">
+        <div className="flex items-end justify-between mb-6"><h2 className="text-2xl font-extrabold tracking-tight">Trending Courses</h2><Link to="/courses" className="text-sm font-semibold text-brand-600 hover:text-brand-700">See all →</Link></div>
+        <CarouselWrap car={trendingCar} itemW={208}>{trending.map(c=><MiniCourseCard key={c.id} course={c}/>)}</CarouselWrap>
+      </div></section>
+
+      {/* POPULAR VIDEO COURSES */}
+      <section className="py-14 bg-slate-50"><div className="container-wide">
+        <div className="flex items-end justify-between mb-6"><h2 className="text-2xl font-extrabold tracking-tight">Popular Video Courses</h2><Link to="/video-courses" className="text-sm font-semibold text-brand-600 hover:text-brand-700">See all →</Link></div>
+        <CarouselWrap car={videoCar} itemW={208}>{videoCourses.map(c=>(
+          <Link key={c.id} to="/video-courses" className="group flex-shrink-0 w-48 rounded-xl bg-white shadow-sm ring-1 ring-slate-100 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
+            <div className="relative h-28 bg-slate-100 overflow-hidden">
+              <img src={c.image_url} alt={c.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" onError={e=>{e.currentTarget.style.visibility='hidden'}}/>
+              <span className="absolute inset-0 flex items-center justify-center"><PlayCircle className="h-10 w-10 text-white drop-shadow-lg"/></span>
+            </div>
+            <div className="p-3"><p className="text-xs font-semibold line-clamp-2 text-slate-800 leading-snug min-h-[2rem]">{c.name}</p><p className="mt-1 text-sm font-bold text-brand-700">Self-paced</p></div>
+          </Link>
+        ))}</CarouselWrap>
+      </div></section>
+
+      {/* GROUP CLASSES */}
+      <section className="py-14 bg-white"><div className="container-wide">
+        <div className="flex items-end justify-between mb-4"><div><p className="text-xs font-bold uppercase tracking-widest text-brand-600 mb-1">Learn together, pay less</p><h2 className="text-2xl font-extrabold tracking-tight">Group Classes</h2></div><Link to="/group-classes" className="text-sm font-semibold text-brand-600 hover:text-brand-700">View all →</Link></div>
+        <p className="text-slate-600 text-sm max-w-2xl mb-5">Interactive small-group sessions (5–10 students) with structured curriculum and affordable group pricing.</p>
+        <div className="flex flex-wrap gap-2">
+          {GROUP_CATS.map(g=><Link key={g.slug} to={`/courses?category=${g.slug}`} className="rounded-full bg-slate-50 ring-1 ring-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:border-brand-400 hover:text-brand-700">{g.label}</Link>)}
+          <Link to="/group-classes" className="rounded-full bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700">Browse Group Classes →</Link>
+        </div>
+      </div></section>
+
       {/* ABOUT + HOW IT WORKS */}
       <section className="py-14 bg-white"><div className="container-wide grid lg:grid-cols-2 gap-10">
         <div>
@@ -268,6 +310,22 @@ export default function HomePage() {
         <CarouselWrap car={tutorCar} itemW={220}>{tutors.map(t=><HomeTutorCard key={t.slug} t={t}/>)}</CarouselWrap>
       </div></section>
 
+      {/* WATCH FREE DEMO CLASSES */}
+      <section className="py-14 bg-slate-50"><div className="container-wide">
+        <div className="flex items-end justify-between mb-7"><div><p className="text-xs font-bold uppercase tracking-widest text-brand-600 mb-1">See a class in action</p><h2 className="text-2xl font-extrabold tracking-tight">Watch Free Demo Classes</h2></div><Link to="/free-classes" className="text-sm font-semibold text-brand-600 hover:text-brand-700">See Free Workshops →</Link></div>
+        <div className="grid sm:grid-cols-2 gap-5">
+          {DEMO_VIDEOS.map(v=>(
+            <Link key={v.title} to="/book-demo" className="group relative rounded-2xl overflow-hidden ring-1 ring-slate-100 shadow-sm">
+              <div className="h-56 bg-slate-200 overflow-hidden">
+                <img src={v.img} alt={v.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy"/>
+              </div>
+              <span className="absolute inset-0 bg-black/25 flex items-center justify-center"><PlayCircle className="h-16 w-16 text-white drop-shadow-lg"/></span>
+              <span className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white font-bold">{v.title}</span>
+            </Link>
+          ))}
+        </div>
+      </div></section>
+
       {/* TESTIMONIALS */}
       <section className="py-14 bg-slate-50"><div className="container-wide">
         <div className="flex items-end justify-between mb-7"><div><p className="text-xs font-bold uppercase tracking-widest text-brand-600 mb-1">Real Students · Real Parents</p><h2 className="text-2xl font-extrabold tracking-tight">What Students & Parents Say</h2></div></div>
@@ -306,11 +364,23 @@ export default function HomePage() {
       {/* CTA */}
       <section className="bg-brand-900 text-white py-14">
         <div className="mx-auto max-w-3xl px-4 text-center">
-          <h2 className="text-3xl font-extrabold">Ready to start learning?</h2>
+          <h2 className="text-3xl font-extrabold">Start with a Free Trial Class Today</h2>
           <p className="mt-3 text-slate-300">Book a free 30-minute demo class — no payment, no commitment.</p>
           <div className="mt-7 flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/book-demo" className="rounded-lg bg-white text-brand-800 hover:bg-slate-100 px-8 py-3 text-sm font-bold">Book Free Trial Now</Link>
             <Link to="/courses" className="rounded-lg border border-white/30 hover:bg-white/10 px-8 py-3 text-sm font-semibold">Browse All Courses</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* MARKETPLACE BAND */}
+      <section className="bg-gradient-to-br from-[#0B1220] to-brand-800 text-white py-16">
+        <div className="container-wide text-center">
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">India's Most Trusted Online Tutor Marketplace</h2>
+          <p className="mt-3 text-slate-300 max-w-2xl mx-auto">Connect with expert tutors for academics, music, coding, languages &amp; more. First demo class is always free — no credit card needed.</p>
+          <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
+            <Link to="/book-demo" className="rounded-xl bg-[#D4AF37] text-[#0B1220] px-7 py-3 text-sm font-bold shadow-lg shadow-[#D4AF37]/30 hover:brightness-105">📅 Book a Free Demo</Link>
+            <Link to="/find-tutors" className="rounded-xl border border-white/60 px-7 py-3 text-sm font-bold hover:bg-white/10">👩‍🏫 Find a Tutor</Link>
           </div>
         </div>
       </section>
