@@ -23,8 +23,21 @@ class CourseController extends Controller {
             }
         }
 
-        if ($q = $request->string('search')->toString()) {
-            $query->where(fn($s) => $s->where('name','like',"%$q%")->orWhere('short_description','like',"%$q%"));
+        if ($q = trim($request->string('search')->toString())) {
+            // Tokenised search: split on spaces / & / - / slash, drop stopwords, and
+            // require each remaining token to appear in the name or short description.
+            // So a nav link like "Art and Painting" still matches "Arts & Painting".
+            $stop = ['and','the','for','with','of','to','in','on','a','an','online','class','classes'];
+            $tokens = array_values(array_filter(
+                preg_split('/[\s&\-\/,]+/', mb_strtolower($q)),
+                fn($t) => mb_strlen($t) >= 2 && !in_array($t, $stop, true)
+            ));
+            if (empty($tokens)) $tokens = [mb_strtolower($q)];
+            $query->where(function($s) use ($tokens) {
+                foreach ($tokens as $t) {
+                    $s->where(fn($w) => $w->where('name','like',"%{$t}%")->orWhere('short_description','like',"%{$t}%"));
+                }
+            });
         }
 
         if ($request->boolean('featured')) $query->featured();

@@ -40,6 +40,24 @@ class CourseCategoryFilterTest extends TestCase
             ->assertJsonPath('meta.total', 1);
     }
 
+    public function test_tokenised_search_matches_across_word_variants(): void
+    {
+        $cat = Category::create(['name' => 'Creative', 'slug' => 'creative']);
+        $this->course('Arts & Painting', $cat);
+        $this->course('Digital SAT/PSAT Math', $cat);
+        $this->course('Piano', $cat);
+
+        // Nav link "Art and Painting" must still find "Arts & Painting".
+        $this->getJson('/api/courses?search=' . urlencode('Art and Painting'))
+            ->assertOk()->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.name', 'Arts & Painting');
+
+        // Multi-token still narrows correctly.
+        $this->getJson('/api/courses?search=' . urlencode('SAT Math'))
+            ->assertOk()->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.name', 'Digital SAT/PSAT Math');
+    }
+
     public function test_unknown_category_returns_no_courses(): void
     {
         $cat = Category::create(['name' => 'Music', 'slug' => 'music']);
