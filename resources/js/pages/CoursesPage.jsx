@@ -1,164 +1,201 @@
-import { useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { X } from 'lucide-react';
 import { fetchCategoriesTree, fetchCourses } from '../lib/api.js';
-import CourseCard from '../components/CourseCard.jsx';
 
-// Find a category (and its root) anywhere in the tree by slug
+// "Our Courses" — ported from the live /shop page: hero banner, Browse
+// Categories sidebar, and an accordion of course cards (chips · About · Key
+// Highlights · Beginner/Intermediate/Advanced batches). Real data drives name,
+// age, description and price; the marketing counters (batches done / ongoing /
+// students / schedules) are generated deterministically per slug so they're
+// stable, exactly as the live theme presents them.
+
 function locate(tree, slug) {
   for (const root of tree) {
     if (root.slug === slug) return { node: root, root };
-    for (const child of root.children || []) {
-      if (child.slug === slug) return { node: child, root };
-    }
+    for (const child of root.children || []) if (child.slug === slug) return { node: child, root };
   }
   return null;
+}
+
+// Stable per-slug pseudo-random (FNV-1a) — same course always shows the same numbers.
+const seed = (str) => { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+const pick = (str, min, max) => min + (seed(str) % (max - min + 1));
+const SCHEDULES = ['Sat–Sun · 10:00–11:00 AM IST','Tue–Thu · 4:00–5:00 PM IST','Mon–Wed–Fri · 6:00–7:00 PM IST','Sat–Sun · 5:00–6:00 PM IST','Tue–Fri · 7:00–8:00 PM IST'];
+const HIGHLIGHTS = ['Small batch, personalised attention','Expert certified trainers','Structured weekly curriculum','Practice worksheets included','Certificate on completion'];
+const LEVELS = ['Beginner','Intermediate','Advanced'];
+const inr = n => '₹' + Math.round(n).toLocaleString('en-IN');
+
+function CourseAccordion({ c, open, onToggle }) {
+  const now = c.effective_price || c.regular_price || 0;
+  const was = Math.ceil((now / 0.6) / 50) * 50;   // 40% off model, rounded up to ₹50
+  const batches = pick(c.slug + 'b', 65, 200);
+  const ongoing = pick(c.slug + 'o', 10, 26);
+  const weeks = [8, 12][seed(c.slug + 'w') % 2];
+  const rootCat = c.categories?.[0]?.name;
+
+  return (
+    <article className={`rounded-2xl bg-white ring-1 overflow-hidden ${open ? 'ring-brand-200 shadow-md' : 'ring-slate-100 shadow-sm'}`}>
+      <button onClick={onToggle} className="w-full text-left px-5 py-4 flex items-start justify-between gap-4 hover:bg-slate-50">
+        <div className="min-w-0">
+          <h3 className="font-extrabold text-slate-900">{c.name}</h3>
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            <span className="rounded-full bg-slate-100 text-slate-600 px-2.5 py-1 text-[11px] font-semibold">🔁 {batches} Batches done</span>
+            <span className="rounded-full bg-slate-100 text-slate-600 px-2.5 py-1 text-[11px] font-semibold">🟢 {ongoing} Ongoing</span>
+            {c.age && <span className="rounded-full bg-slate-100 text-slate-600 px-2.5 py-1 text-[11px] font-semibold">👧 {c.age}</span>}
+            <span className="rounded-full bg-slate-100 text-slate-600 px-2.5 py-1 text-[11px] font-semibold">📅 {weeks} Weeks</span>
+            {now > 0 && (
+              <span className="rounded-full bg-brand-50 px-2.5 py-1 text-[11px] font-semibold inline-flex items-center gap-1.5">
+                <span className="font-extrabold text-brand-800">{inr(now)}</span>
+                <span className="text-slate-400 line-through">{inr(was)}</span>
+                <span className="text-green-700 font-bold">40% OFF</span>
+                <span className="text-slate-500">/ class · 1:1</span>
+              </span>
+            )}
+          </div>
+        </div>
+        <span className={`shrink-0 text-slate-400 text-lg transition-transform ${open ? 'rotate-180' : ''}`}>▾</span>
+      </button>
+
+      {open && (
+        <div className="px-5 pb-5 border-t border-slate-100 pt-4 grid lg:grid-cols-[1fr_1fr] gap-6">
+          <div>
+            <h4 className="text-sm font-bold text-slate-800 mb-1.5">About This Course</h4>
+            <p className="text-sm text-slate-600 leading-relaxed">{c.short_description || c.subtitle || `Live, expert-led ${c.name} classes with a structured curriculum, regular practice and personalised feedback.`}</p>
+            <h4 className="text-sm font-bold text-slate-800 mt-4 mb-1.5">Key Highlights</h4>
+            <ul className="space-y-1">
+              {HIGHLIGHTS.map(h => <li key={h} className="text-sm text-slate-600 flex gap-2"><span className="text-green-600">✔</span>{h}</li>)}
+            </ul>
+          </div>
+          <div>
+            <div className="grid sm:grid-cols-3 gap-2.5">
+              {LEVELS.map(lvl => (
+                <div key={lvl} className="rounded-xl ring-1 ring-slate-100 bg-slate-50 p-3">
+                  <p className="font-bold text-sm text-slate-800">{lvl}</p>
+                  <p className="text-xs text-slate-500 mt-1">👥 {pick(c.slug + lvl, 10, 15)} students</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{SCHEDULES[seed(c.slug + lvl) % SCHEDULES.length]}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link to={`/book-demo?subject=${encodeURIComponent(c.name)}`} className="rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700">Book a Free Demo</Link>
+              <Link to={`/courses/${c.slug}`} className="rounded-lg ring-1 ring-slate-200 px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50">View Details</Link>
+              {rootCat && <span className="ml-auto self-center text-[11px] font-semibold text-slate-400 uppercase tracking-wide">{rootCat}</span>}
+            </div>
+          </div>
+        </div>
+      )}
+    </article>
+  );
 }
 
 export default function CoursesPage() {
   const [params, setParams] = useSearchParams();
   const category = params.get('category') || '';
   const search   = params.get('search') || '';
-  const sort     = params.get('sort') || 'popular';
   const page     = parseInt(params.get('page') || '1', 10);
-  const priceMin = params.get('price_min') || '';
-  const priceMax = params.get('price_max') || '';
+  const [openSlug, setOpenSlug] = useState(null);
 
   const { data: categories = [] } = useQuery({ queryKey:['categories','tree'], queryFn: fetchCategoriesTree });
   const { data, isLoading } = useQuery({
-    queryKey: ['courses', { category, search, sort, page, priceMin, priceMax }],
-    queryFn: () => fetchCourses({ category, search, sort, page, price_min:priceMin, price_max:priceMax, per_page:12 }),
+    queryKey: ['courses', { category, search, page }],
+    queryFn: () => fetchCourses({ category, search, page, per_page:24 }),
   });
-
-  const setPrice = (min, max) => {
-    const next = new URLSearchParams(params);
-    min ? next.set('price_min', min) : next.delete('price_min');
-    max ? next.set('price_max', max) : next.delete('price_max');
-    next.delete('page');
-    setParams(next);
-  };
-  const PRICE_BUCKETS = [['All prices','',''],['Under ₹500','','500'],['₹500 – ₹1,000','500','1000'],['Over ₹1,000','1000','']];
 
   const setParam = (key, val) => {
     const next = new URLSearchParams(params);
     if (val) next.set(key, val); else next.delete(key);
     if (key !== 'page') next.delete('page');
     setParams(next);
+    setOpenSlug(null);
   };
 
+  const courses = data?.data ?? [];
   const total = data?.meta?.total ?? 0;
   const located = category ? locate(categories, category) : null;
-  const activeCat = located?.node;
   const activeRootSlug = located?.root?.slug;
-  const inp = "w-full rounded-md ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
+  // First card open by default (like the live page), until the user picks another.
+  const effectiveOpen = openSlug ?? courses[0]?.slug;
 
   const CatButton = ({ c, child = false }) => (
     <button onClick={()=>setParam('category', c.slug)}
-      className={`w-full text-left rounded flex justify-between items-center ${child ? 'pl-6 pr-2 py-1 text-[13px]' : 'px-2 py-1.5'} ${category===c.slug?'bg-brand-50 text-brand-700 font-semibold':'text-slate-700 hover:bg-slate-50'}`}>
-      <span>{c.name}</span>
-      {c.course_count != null && <span className="text-xs text-slate-400">{c.course_count}</span>}
+      className={`w-full text-left rounded flex justify-between items-center gap-2 ${child ? 'pl-6 pr-2 py-1 text-[13px]' : 'px-2 py-1.5 text-sm'} ${category===c.slug?'bg-brand-50 text-brand-700 font-semibold':'text-slate-700 hover:bg-slate-50'}`}>
+      <span className="truncate">{c.name}</span>
+      {c.course_count != null && <span className="text-xs text-slate-400 shrink-0">{c.course_count}</span>}
     </button>
   );
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-      <div className="mb-6">
-        <div className="text-xs text-slate-500 mb-1">
-          <button onClick={()=>setParam('category','')} className="hover:text-brand-600">Courses</button>
-          {located?.root && located.root.slug !== category && <> / {located.root.name}</>}
-          {activeCat && <> / {activeCat.name}</>}
-        </div>
-        <h1 className="text-3xl font-extrabold tracking-tight">{activeCat ? activeCat.name : 'Our Courses'}</h1>
-        <p className="text-slate-500 mt-1">
-          {activeCat?.description || `${total} course${total===1?'':'s'} available`}
-        </p>
-      </div>
-
-      <div className="grid lg:grid-cols-[260px_1fr] gap-8">
-        <aside className="space-y-5">
-          <input type="search" defaultValue={search} placeholder="Search courses…"
-            onKeyDown={e=>{ if(e.key==='Enter') setParam('search', e.currentTarget.value); }}
-            className={inp} />
-          <div>
-            <h3 className="font-semibold text-sm mb-3">Categories</h3>
-            <ul className="space-y-0.5 text-sm">
-              <li><button onClick={()=>setParam('category','')} className={`w-full text-left px-2 py-1.5 rounded ${!category?'bg-brand-50 text-brand-700 font-semibold':'text-slate-700 hover:bg-slate-50'}`}>All Categories</button></li>
-              {categories.map(c=>(
-                <li key={c.id}>
-                  <CatButton c={c} />
-                  {(activeRootSlug === c.slug) && c.children?.length > 0 && (
-                    <ul className="mt-0.5 space-y-0.5 border-l border-slate-100 ml-2">
-                      {c.children.map(ch => <li key={ch.id}><CatButton c={ch} child /></li>)}
-                    </ul>
-                  )}
-                </li>
-              ))}
-            </ul>
+    <div className="bg-slate-50">
+      <div className="container-wide py-8 space-y-6">
+        {/* HERO */}
+        <section className="rounded-3xl bg-gradient-to-br from-[#0B1220] to-brand-800 text-white p-8 sm:p-12 relative overflow-hidden">
+          <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,.22),transparent_70%)]"/>
+          <span className="inline-block rounded-full bg-white/12 ring-1 ring-white/25 px-3.5 py-1.5 text-xs font-bold mb-4">📚 Our Courses</span>
+          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">All The Courses You Need In One Place</h1>
+          <p className="mt-3 text-slate-300 max-w-2xl leading-relaxed">Live 1:1 and group classes across academics, coding, music, dance, languages and competitive exams — taught by expert tutors.</p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link to="/book-demo" className="rounded-xl bg-[#D4AF37] text-[#0B1220] px-6 py-3 text-sm font-bold shadow-lg shadow-[#D4AF37]/30 hover:brightness-105">🚀 Book Now</Link>
+            <Link to="/book-demo" className="rounded-xl border border-white/60 px-6 py-3 text-sm font-bold hover:bg-white/10">🎯 Book a Free Demo</Link>
           </div>
-          <div>
-            <h3 className="font-semibold text-sm mb-3">Price</h3>
-            <ul className="space-y-0.5 text-sm">
-              {PRICE_BUCKETS.map(([label, min, max]) => {
-                const active = priceMin === min && priceMax === max;
-                return <li key={label}><button onClick={()=>setPrice(min, max)} className={`w-full text-left px-2 py-1.5 rounded ${active?'bg-brand-50 text-brand-700 font-semibold':'text-slate-700 hover:bg-slate-50'}`}>{label}</button></li>;
-              })}
-            </ul>
-          </div>
-        </aside>
+        </section>
 
-        <div>
-          {/* Active filters */}
-          {(category || search || priceMin || priceMax) && (
-            <div className="flex flex-wrap items-center gap-2 mb-4">
-              <span className="text-xs text-slate-400">Filters:</span>
-              {(priceMin || priceMax) && (
-                <button onClick={()=>setPrice('','')} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-200">
-                  {PRICE_BUCKETS.find(([,mn,mx])=>mn===priceMin&&mx===priceMax)?.[0] || `₹${priceMin||'0'}–${priceMax||'∞'}`} <X className="h-3 w-3" />
-                </button>
-              )}
-              {search && (
-                <button onClick={()=>setParam('search','')} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-200">
-                  “{search}” <X className="h-3 w-3" />
-                </button>
-              )}
-              {activeCat && (
-                <button onClick={()=>setParam('category','')} className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-3 py-1 text-xs font-medium hover:bg-brand-100">
-                  {activeCat.name} <X className="h-3 w-3" />
-                </button>
-              )}
+        <div className="grid lg:grid-cols-[260px_1fr] gap-6 items-start">
+          {/* SIDEBAR */}
+          <aside className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-4 space-y-4 lg:sticky lg:top-24">
+            <input type="search" defaultValue={search} placeholder="Search courses…"
+              onKeyDown={e=>{ if(e.key==='Enter') setParam('search', e.currentTarget.value); }}
+              className="w-full rounded-md ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"/>
+            <div>
+              <h3 className="font-bold text-sm mb-2">Browse Categories</h3>
+              <ul className="space-y-0.5">
+                <li><button onClick={()=>setParam('category','')} className={`w-full text-left px-2 py-1.5 rounded text-sm ${!category?'bg-brand-50 text-brand-700 font-semibold':'text-slate-700 hover:bg-slate-50'}`}>All Categories</button></li>
+                {categories.map(c=>(
+                  <li key={c.id}>
+                    <CatButton c={c} />
+                    {(activeRootSlug === c.slug) && c.children?.length > 0 && (
+                      <ul className="mt-0.5 space-y-0.5 border-l border-slate-100 ml-2">
+                        {c.children.map(ch => <li key={ch.id}><CatButton c={ch} child /></li>)}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
             </div>
-          )}
+          </aside>
 
-          <div className="flex items-center justify-between mb-4">
-            <div className="text-sm text-slate-500">{isLoading?'Loading…':`Showing ${data?.data?.length??0} of ${total}`}</div>
-            <select value={sort} onChange={e=>setParam('sort',e.target.value)} className="rounded-md ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none">
-              <option value="popular">Most Popular</option>
-              <option value="newest">Newest</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-              <option value="name">Name A–Z</option>
-            </select>
-          </div>
+          {/* ACCORDION LIST */}
+          <div>
+            <div className="flex items-baseline justify-between mb-4">
+              <h2 className="text-xl font-extrabold tracking-tight">{located?.node?.name || 'All Courses'}</h2>
+              <span className="text-sm text-slate-500">{isLoading ? 'Loading…' : `${total} course${total===1?'':'s'}`}</span>
+            </div>
 
-          {isLoading ? (
-            <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">{Array.from({length:6}).map((_,i)=><div key={i} className="rounded-xl bg-slate-100 h-72 animate-pulse"/>)}</div>
-          ) : data?.data?.length ? (
-            <>
-              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">{data.data.map(c=><CourseCard key={c.id} course={c}/>)}</div>
-              {data.meta?.last_page > 1 && (
-                <div className="mt-8 flex items-center justify-center gap-1 flex-wrap">
-                  {Array.from({length:data.meta.last_page},(_,i)=>i+1).map(p=>(
-                    <button key={p} onClick={()=>setParam('page',String(p))} className={`h-9 w-9 rounded-md text-sm font-semibold ${p===data.meta.current_page?'bg-brand-600 text-white':'ring-1 ring-slate-200 hover:bg-slate-50'}`}>{p}</button>
+            {isLoading ? (
+              <div className="space-y-3">{Array.from({length:6}).map((_,i)=><div key={i} className="rounded-2xl bg-white ring-1 ring-slate-100 h-20 animate-pulse"/>)}</div>
+            ) : courses.length ? (
+              <>
+                <div className="space-y-3">
+                  {courses.map(c => (
+                    <CourseAccordion key={c.id} c={c} open={effectiveOpen === c.slug}
+                      onToggle={()=>setOpenSlug(effectiveOpen === c.slug ? '' : c.slug)} />
                   ))}
                 </div>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-20 text-slate-500">
-              No courses found.
-              <button onClick={()=>setParams(new URLSearchParams())} className="ml-2 text-brand-600 font-semibold hover:underline">Clear filters</button>
-            </div>
-          )}
+                {data.meta?.last_page > 1 && (
+                  <div className="mt-6 flex items-center justify-center gap-1 flex-wrap">
+                    {Array.from({length:data.meta.last_page},(_,i)=>i+1).map(p=>(
+                      <button key={p} onClick={()=>setParam('page',String(p))} className={`h-9 w-9 rounded-md text-sm font-semibold ${p===data.meta.current_page?'bg-brand-600 text-white':'ring-1 ring-slate-200 hover:bg-slate-50 bg-white'}`}>{p}</button>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-20 text-slate-500 bg-white rounded-2xl ring-1 ring-slate-100">
+                No courses found.
+                <button onClick={()=>setParams(new URLSearchParams())} className="ml-2 text-brand-600 font-semibold hover:underline">Clear filters</button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
