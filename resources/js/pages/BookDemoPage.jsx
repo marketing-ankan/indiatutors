@@ -12,7 +12,8 @@ export default function BookDemoPage() {
   const courseSlug = params.get('course');
   const tutorSlug = params.get('tutor');
   const { user, isAuthed } = useAuth();
-  const [form, setForm] = useState(empty);
+  // ?subject= prefill (exam dropdown, plan cards, course accordion CTAs)
+  const [form, setForm] = useState({ ...empty, subject: params.get('subject') || '' });
   const [ok, setOk] = useState(false);
 
   // If arriving from a course or tutor page, resolve it to prefill nicely + link it.

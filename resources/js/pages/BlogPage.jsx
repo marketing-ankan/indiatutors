@@ -7,12 +7,16 @@ export default function BlogPage() {
   const posts = data?.data ?? [];
 
   return (
-    <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-8">
-        <p className="text-xs font-bold uppercase tracking-widest text-brand-600 mb-1">Learning Hub</p>
-        <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight">The IndiaTutors Blog</h1>
-        <p className="text-slate-500 mt-2">Practical advice on tutoring, study skills and helping your child learn.</p>
+    <>
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#0B1220] to-brand-800 text-white">
+      <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-[radial-gradient(circle,rgba(212,175,55,.22),transparent_70%)]"/>
+      <div className="container-wide py-14">
+        <span className="inline-block rounded-full bg-white/12 ring-1 ring-white/25 px-3.5 py-1.5 text-xs font-bold mb-4">📝 Learning Hub</span>
+        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">The IndiaTutors Blog</h1>
+        <p className="mt-3 text-slate-300 max-w-xl">Practical advice on tutoring, study skills and helping your child learn.</p>
       </div>
+    </section>
+    <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-12">
 
       {isLoading ? (
         <div className="grid sm:grid-cols-2 gap-6">{Array.from({length:4}).map((_,i)=><div key={i} className="rounded-2xl bg-slate-100 h-72 animate-pulse"/>)}</div>
@@ -34,5 +38,6 @@ export default function BlogPage() {
         <p className="text-slate-500 py-20 text-center">No posts yet — check back soon.</p>
       )}
     </div>
+    </>
   );
 }

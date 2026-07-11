@@ -1,38 +1,117 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin } from 'lucide-react';
-export default function Footer() {
+import { Phone, Mail, MapPin, Facebook, Instagram, Youtube, Linkedin, Twitter, MessageCircle } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import { submitContact } from '../lib/api.js';
+
+// Footer ported from the live site: brand block (tagline, socials, contact,
+// newsletter) + Quick Links · Our Courses · Learn & Discover · Support.
+// Live links that 404 there (FAQ/Help/Sitemap pages) are mapped to working
+// equivalents here (contact page, dynamic /sitemap.xml).
+
+const QUICK_LINKS = [
+  ['🏠 Home', '/'], ['ℹ️ About Us', '/about'], ['👩‍🏫 Become a Teacher', '/become-a-teacher'],
+  ['💳 Plans & Pricing', '/plans'], ['🎁 Refer & Earn', '/refer-earn'], ['📝 Blog', '/blog'],
+  ['📞 Contact Us', '/contact'], ['📅 Book Free Demo', '/book-demo'],
+];
+const OUR_COURSES = [
+  ['📗 CBSE Tuition', '/courses?category=academics'], ['📘 ICSE / IGCSE / IB', '/courses?category=academics'],
+  ['📐 Mathematics', '/courses?search=Mathematics'], ['⚛️ Physics', '/courses?search=Physics'],
+  ['🐍 Python & AI', '/courses?search=Python'], ['💬 Spoken English', '/courses?search=Spoken English'],
+  ['🎵 Music Classes', '/courses?category=musical-instruments'], ['🌐 Foreign Languages', '/courses?category=languages'],
+  ['🔍 Browse All →', '/courses'],
+];
+const LEARN_DISCOVER = [
+  ['👩‍🏫 Find Tutors', '/find-tutors'], ['🖥️ Online Tutors', '/find-tutors?mode=online'],
+  ['🏠 Home Tutors', '/find-tutors?mode=home'], ['📡 Live Classes', '/courses'],
+  ['👥 Group Classes', '/group-classes'], ['🎁 Free Classes', '/free-classes'],
+  ['🌟 Events & Workshops', '/events-workshops'], ['🏆 Competitive Exams', '/competitive-exams'],
+  ['💼 Skill Programmes', '/skill-programmes'],
+];
+const SUPPORT = [
+  ['🎓 Student Login', '/login'], ['👩‍🏫 Teacher Login', '/login'],
+  ['❓ FAQ', '/contact'], ['🆘 Help Centre', '/contact'],
+  ['🔒 Privacy Policy', '/privacy'], ['📜 Terms of Service', '/terms'], ['💰 Refund Policy', '/refund'],
+];
+const SOCIALS = [
+  [MessageCircle, 'https://wa.me/919330811581', 'WhatsApp'],
+  [Facebook, 'https://www.facebook.com/indiatutorsonline', 'Facebook'],
+  [Instagram, 'https://www.instagram.com/indiatutorsonline', 'Instagram'],
+  [Youtube, 'https://www.youtube.com/@indiatutorsonline', 'YouTube'],
+  [Linkedin, 'https://www.linkedin.com/company/indiatutorsonline', 'LinkedIn'],
+  [Twitter, 'https://twitter.com/indiatutorsonline', 'X (Twitter)'],
+];
+
+function FooterCol({ title, links }) {
   return (
-    <footer className="bg-slate-900 text-slate-300 mt-20">
-      <div className="container-wide py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+    <div>
+      <h4 className="text-white font-bold mb-4 text-xs uppercase tracking-widest">{title}</h4>
+      <ul className="space-y-2 text-sm">
+        {links.map(([label, href]) => (
+          <li key={label}><Link to={href} className="hover:text-white">{label}</Link></li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default function Footer() {
+  const [email, setEmail] = useState('');
+  const subscribe = useMutation({
+    mutationFn: () => submitContact({
+      name: 'Newsletter subscriber', email,
+      subject: 'Newsletter signup', message: 'Please send me free study tips & offers.',
+    }),
+    onSuccess: () => setEmail(''),
+  });
+
+  return (
+    <footer className="bg-slate-900 text-slate-300">
+      <div className="container-wide py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] gap-10">
+        {/* BRAND + CONTACT + NEWSLETTER */}
         <div>
-          <div className="text-xl font-extrabold text-white">Indiatutors <span className="text-brand-400">Online</span></div>
-          <p className="mt-3 text-sm leading-relaxed text-slate-400">Live 1-on-1 classes, group sessions, and self-paced video courses across Academics, Coding, Music, Dance, Languages & more.</p>
-        </div>
-        <div>
-          <h4 className="text-white font-semibold mb-4 text-sm">Explore</h4>
-          <ul className="space-y-2 text-sm">
-            {[['Courses','/courses'],['Find Tutors','/find-tutors'],['Plans & Pricing','/plans'],['Book Demo','/book-demo'],['Refer & Earn','/refer-earn']].map(([l,h])=>(
-              <li key={l}><Link to={h} className="hover:text-white">{l}</Link></li>
+          <div className="text-xl font-extrabold text-white">IndiaTutors<span className="text-brand-400">Online</span></div>
+          <p className="mt-3 text-sm leading-relaxed text-slate-400">India's premium online tutor marketplace — connecting students with verified experts across academics, music, coding, languages, and the arts. Based in New Town, Kolkata & serving pan-India.</p>
+          <div className="mt-4 flex gap-2">
+            {SOCIALS.map(([Icon, href, label]) => (
+              <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+                 className="w-8 h-8 rounded-md bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700">
+                <Icon className="h-4 w-4"/>
+              </a>
             ))}
+          </div>
+          <ul className="mt-4 space-y-2 text-sm text-slate-400">
+            <li className="flex gap-2 items-center"><Phone className="h-4 w-4 shrink-0"/><a href="tel:+919330811581" className="hover:text-white">+91 93308 11581</a></li>
+            <li className="flex gap-2 items-center"><Mail className="h-4 w-4 shrink-0"/><a href="mailto:connect@indiatutorsonline.com" className="hover:text-white break-all">connect@indiatutorsonline.com</a></li>
+            <li className="flex gap-2 items-start"><MapPin className="h-4 w-4 mt-0.5 shrink-0"/>New Town, Kolkata — 700161</li>
           </ul>
+          <div className="mt-5">
+            <p className="text-xs font-bold text-white mb-2">✉️ Get free study tips & offers</p>
+            {subscribe.isSuccess ? (
+              <p className="text-sm text-green-400 font-semibold">✅ Subscribed — see you in your inbox!</p>
+            ) : (
+              <form onSubmit={e=>{e.preventDefault(); if(email) subscribe.mutate();}} className="flex">
+                <input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="Your email address"
+                  className="min-w-0 flex-1 rounded-l-md bg-slate-800 ring-1 ring-slate-700 px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-brand-500"/>
+                <button disabled={subscribe.isPending} className="rounded-r-md bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-500 disabled:opacity-60">
+                  {subscribe.isPending ? '…' : 'Subscribe'}
+                </button>
+              </form>
+            )}
+          </div>
         </div>
+
+        <FooterCol title="Quick Links" links={QUICK_LINKS}/>
+        <FooterCol title="Our Courses" links={OUR_COURSES}/>
+        <FooterCol title="Learn & Discover" links={LEARN_DISCOVER}/>
         <div>
-          <h4 className="text-white font-semibold mb-4 text-sm">Company</h4>
-          <ul className="space-y-2 text-sm">
-            {[['About Us','/about'],['Blog','/blog'],['Become a Teacher','/become-a-teacher'],['Contact','/contact']].map(([l,h])=>(
-              <li key={l}><Link to={h} className="hover:text-white">{l}</Link></li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h4 className="text-white font-semibold mb-4 text-sm">Get in touch</h4>
-          <ul className="space-y-2 text-sm text-slate-400">
-            <li className="flex gap-2 items-start"><Phone className="h-4 w-4 mt-0.5 shrink-0"/>+91 93308 11581</li>
-            <li className="flex gap-2 items-start"><Mail className="h-4 w-4 mt-0.5 shrink-0"/><span className="break-all">connect@indiatutorsonline.com</span></li>
-            <li className="flex gap-2 items-start"><MapPin className="h-4 w-4 mt-0.5 shrink-0"/>New Town, Kolkata, India</li>
+          <FooterCol title="Support" links={SUPPORT}/>
+          <ul className="mt-2 space-y-2 text-sm">
+            <li><a href="/sitemap.xml" className="hover:text-white">🗺️ Sitemap</a></li>
           </ul>
         </div>
       </div>
+
       <div className="border-t border-slate-800">
         <div className="container-wide py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
           <span>© {new Date().getFullYear()} Indiatutors Online. All rights reserved.</span>

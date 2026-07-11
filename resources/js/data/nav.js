@@ -753,11 +753,11 @@ export const CATALOG_NAV = [
    },
    {
     "label": "🇪🇸 Spanish Language",
-    "to": "/courses?search=Spanish%20Language"
+    "to": "/courses?search=Spanish"
    },
    {
     "label": "🇫🇷 French Language",
-    "to": "/courses?search=French%20Language"
+    "to": "/courses?search=French"
    },
    {
     "label": "♟️ Chess",
@@ -814,11 +814,11 @@ export const CATALOG_NAV = [
    },
    {
     "label": "🇪🇸 Spanish Language",
-    "to": "/courses?search=Spanish%20Language"
+    "to": "/courses?search=Spanish"
    },
    {
     "label": "🇫🇷 French Language",
-    "to": "/courses?search=French%20Language"
+    "to": "/courses?search=French"
    },
    {
     "label": "♟️ Chess",
@@ -854,31 +854,31 @@ export const CATALOG_NAV = [
   "items": [
    {
     "label": "⚡ JEE Main & Advanced",
-    "to": "/courses?search=jee"
+    "to": "/book-demo?subject=JEE Main %26 Advanced"
    },
    {
     "label": "🧬 NEET",
-    "to": "/courses?search=neet"
+    "to": "/book-demo?subject=NEET"
    },
    {
     "label": "📝 CUET",
-    "to": "/courses?search=cuet"
+    "to": "/book-demo?subject=CUET"
    },
    {
     "label": "🏆 Olympiads",
-    "to": "/courses?search=olympiad"
+    "to": "/book-demo?subject=Olympiads"
    },
    {
     "label": "🌎 SAT / ACT",
-    "to": "/courses?search=sat"
+    "to": "/courses?category=standardized-tests"
    },
    {
     "label": "🌐 IELTS / TOEFL",
-    "to": "/courses?search=ielts"
+    "to": "/book-demo?subject=IELTS / TOEFL"
    },
    {
     "label": "🎓 AP Courses",
-    "to": "/courses?search=ap"
+    "to": "/courses?category=ap-courses"
    }
   ],
   "footer": [
