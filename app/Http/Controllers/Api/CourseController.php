@@ -56,7 +56,10 @@ class CourseController extends Controller {
             default      => $query->orderByDesc('is_featured')->orderBy('position')->orderBy('name'),
         };
 
-        $perPage = max(1, min((int) $request->integer('per_page', 12), 48));
+        // Cap high enough that a client can pull the whole catalog in one page
+        // (e.g. the product page's "Other Courses" related-products filter, which
+        // matches WooCommerce "shares any category"). Default stays small.
+        $perPage = max(1, min((int) $request->integer('per_page', 12), 200));
         return CourseResource::collection($query->paginate($perPage));
     }
 
