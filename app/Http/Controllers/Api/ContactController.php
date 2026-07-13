@@ -8,7 +8,9 @@ class ContactController extends Controller {
     public function store(Request $request) {
         $data = $request->validate([
             'name'    => 'required|string|max:120',
-            'email'   => 'required|email|max:180',
+            // Nullable: the tutor-enquiry form (live parity) collects phone as the
+            // required channel and treats email as optional.
+            'email'   => 'nullable|email|max:180',
             'phone'   => 'nullable|string|max:20',
             'subject' => 'nullable|string|max:200',
             'message' => 'required|string|max:5000',

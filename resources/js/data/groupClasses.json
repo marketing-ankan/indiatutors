@@ -1,0 +1,752 @@
+{
+ "categories": [
+  {
+   "key": "all",
+   "label": "All Categories"
+  },
+  {
+   "key": "it-technologies",
+   "label": "💻 IT Technologies"
+  },
+  {
+   "key": "mind-sports",
+   "label": "♟️ Mind Sports"
+  },
+  {
+   "key": "creative-skills",
+   "label": "🎨 Creative Skills"
+  },
+  {
+   "key": "dance",
+   "label": "💃 Dance"
+  },
+  {
+   "key": "languages",
+   "label": "🌐 Languages"
+  }
+ ],
+ "cards": [
+  {
+   "cat": "it-technologies",
+   "title": "Scratch",
+   "slug": "scratch",
+   "chips": [
+    "🔁 119 Batches done",
+    "🟢 16 Ongoing",
+    "👧 6–14 years",
+    "📅 12 Weeks"
+   ],
+   "now": "₹300",
+   "was": "₹500",
+   "about": "Live, expert-led Scratch group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 13 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 10 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 9 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    }
+   ]
+  },
+  {
+   "cat": "it-technologies",
+   "title": "Roblox & Minecraft",
+   "slug": "roblox-minecraft",
+   "chips": [
+    "🔁 95 Batches done",
+    "🟢 13 Ongoing",
+    "👧 6–14 years",
+    "📅 8 Weeks"
+   ],
+   "now": "₹300",
+   "was": "₹500",
+   "about": "Live, expert-led Roblox & Minecraft group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 13 students",
+     "schedule": "Mon-Fri · 5:00–6:00 PM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 14 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 14 students",
+     "schedule": "Mon-Wed · 6:30–7:30 PM IST"
+    }
+   ]
+  },
+  {
+   "cat": "it-technologies",
+   "title": "Python",
+   "slug": "python",
+   "chips": [
+    "🔁 77 Batches done",
+    "🟢 23 Ongoing",
+    "👧 6–14 years",
+    "📅 8 Weeks"
+   ],
+   "now": "₹300",
+   "was": "₹500",
+   "about": "Live, expert-led Python group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 11 students",
+     "schedule": "Mon-Fri · 5:00–6:00 PM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 9 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 8 students",
+     "schedule": "Mon-Wed · 6:30–7:30 PM IST"
+    }
+   ]
+  },
+  {
+   "cat": "it-technologies",
+   "title": "Robotics",
+   "slug": "robotics",
+   "chips": [
+    "🔁 169 Batches done",
+    "🟢 24 Ongoing",
+    "👧 6–14 years",
+    "📅 8 Weeks"
+   ],
+   "now": "₹300",
+   "was": "₹500",
+   "about": "Live, expert-led Robotics group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 12 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 10 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 12 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    }
+   ]
+  },
+  {
+   "cat": "it-technologies",
+   "title": "AI & ML",
+   "slug": "ai-ml",
+   "chips": [
+    "🔁 106 Batches done",
+    "🟢 9 Ongoing",
+    "👧 6–14 years",
+    "📅 12 Weeks"
+   ],
+   "now": "₹600",
+   "was": "₹1,000",
+   "about": "Live, expert-led AI & ML group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 13 students",
+     "schedule": "Mon-Wed · 6:30–7:30 PM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 10 students",
+     "schedule": "Mon-Wed · 6:30–7:30 PM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 9 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    }
+   ]
+  },
+  {
+   "cat": "mind-sports",
+   "title": "Rubik's Cube",
+   "slug": "rubiks-cube",
+   "chips": [
+    "🔁 200 Batches done",
+    "🟢 12 Ongoing",
+    "👧 6–14 years",
+    "📅 12 Weeks"
+   ],
+   "now": "₹300",
+   "was": "₹500",
+   "about": "Live, expert-led Rubik's Cube group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 14 students",
+     "schedule": "Mon-Wed · 6:30–7:30 PM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 11 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 13 students",
+     "schedule": "Mon-Fri · 5:00–6:00 PM IST"
+    }
+   ]
+  },
+  {
+   "cat": "mind-sports",
+   "title": "Chess",
+   "slug": "chess",
+   "chips": [
+    "🔁 84 Batches done",
+    "🟢 24 Ongoing",
+    "👧 6–14 years",
+    "📅 8 Weeks"
+   ],
+   "now": "₹300",
+   "was": "₹500",
+   "about": "Live, expert-led Chess group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 12 students",
+     "schedule": "Mon-Wed · 6:30–7:30 PM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 10 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 9 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    }
+   ]
+  },
+  {
+   "cat": "creative-skills",
+   "title": "Arts & Painting",
+   "slug": "arts-painting",
+   "chips": [
+    "🔁 169 Batches done",
+    "🟢 9 Ongoing",
+    "👧 6–14 years",
+    "📅 12 Weeks"
+   ],
+   "now": "₹200",
+   "was": "₹350",
+   "about": "Live, expert-led Arts & Painting group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 12 students",
+     "schedule": "Mon-Wed · 6:30–7:30 PM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 10 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 9 students",
+     "schedule": "Mon-Fri · 5:00–6:00 PM IST"
+    }
+   ]
+  },
+  {
+   "cat": "creative-skills",
+   "title": "Art and Craft",
+   "slug": "art-and-craft",
+   "chips": [
+    "🔁 70 Batches done",
+    "🟢 22 Ongoing",
+    "👧 6–14 years",
+    "📅 8 Weeks"
+   ],
+   "now": "₹200",
+   "was": "₹350",
+   "about": "Live, expert-led Art and Craft group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 11 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 13 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 10 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    }
+   ]
+  },
+  {
+   "cat": "creative-skills",
+   "title": "Creative Writing",
+   "slug": "creative-writing",
+   "chips": [
+    "🔁 165 Batches done",
+    "🟢 18 Ongoing",
+    "👧 6–14 years",
+    "📅 8 Weeks"
+   ],
+   "now": "₹300",
+   "was": "₹500",
+   "about": "Live, expert-led Creative Writing group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 14 students",
+     "schedule": "Mon-Wed · 6:30–7:30 PM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 14 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 11 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    }
+   ]
+  },
+  {
+   "cat": "creative-skills",
+   "title": "Public Speaking",
+   "slug": "public-speaking",
+   "chips": [
+    "🔁 101 Batches done",
+    "🟢 26 Ongoing",
+    "👧 6–14 years",
+    "📅 12 Weeks"
+   ],
+   "now": "₹150",
+   "was": "₹250",
+   "about": "Live, expert-led Public Speaking group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 12 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 10 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 9 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    }
+   ]
+  },
+  {
+   "cat": "creative-skills",
+   "title": "Spelling Competition",
+   "slug": "spelling-competition",
+   "chips": [
+    "🔁 103 Batches done",
+    "🟢 19 Ongoing",
+    "👧 6–14 years",
+    "📅 12 Weeks"
+   ],
+   "now": "₹300",
+   "was": "₹500",
+   "about": "Live, expert-led Spelling Competition group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 8 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 8 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 11 students",
+     "schedule": "Mon-Fri · 5:00–6:00 PM IST"
+    }
+   ]
+  },
+  {
+   "cat": "dance",
+   "title": "Bollywood Dance",
+   "slug": "bollywood-dance",
+   "chips": [
+    "🔁 197 Batches done",
+    "🟢 17 Ongoing",
+    "👧 6–14 years",
+    "📅 12 Weeks"
+   ],
+   "now": "₹300",
+   "was": "₹500",
+   "about": "Live, expert-led Bollywood Dance group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 13 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 10 students",
+     "schedule": "Mon-Fri · 5:00–6:00 PM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 9 students",
+     "schedule": "Mon-Fri · 5:00–6:00 PM IST"
+    }
+   ]
+  },
+  {
+   "cat": "dance",
+   "title": "Hip Hop Dance",
+   "slug": "hip-hop-dance",
+   "chips": [
+    "🔁 185 Batches done",
+    "🟢 14 Ongoing",
+    "👧 6–14 years",
+    "📅 8 Weeks"
+   ],
+   "now": "₹300",
+   "was": "₹500",
+   "about": "Live, expert-led Hip Hop Dance group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 11 students",
+     "schedule": "Mon-Fri · 5:00–6:00 PM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 13 students",
+     "schedule": "Mon-Fri · 5:00–6:00 PM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 10 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    }
+   ]
+  },
+  {
+   "cat": "languages",
+   "title": "Spanish",
+   "slug": "spanish",
+   "chips": [
+    "🔁 182 Batches done",
+    "🟢 16 Ongoing",
+    "👧 6–14 years",
+    "📅 12 Weeks"
+   ],
+   "now": "₹300",
+   "was": "₹500",
+   "about": "Live, expert-led Spanish group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 10 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 9 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 12 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    }
+   ]
+  },
+  {
+   "cat": "languages",
+   "title": "French",
+   "slug": "french",
+   "chips": [
+    "🔁 68 Batches done",
+    "🟢 19 Ongoing",
+    "👧 6–14 years",
+    "📅 12 Weeks"
+   ],
+   "now": "₹300",
+   "was": "₹500",
+   "about": "Live, expert-led French group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 11 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 13 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 14 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    }
+   ]
+  },
+  {
+   "cat": "languages",
+   "title": "Hindi",
+   "slug": "hindi",
+   "chips": [
+    "🔁 127 Batches done",
+    "🟢 25 Ongoing",
+    "👧 6–14 years",
+    "📅 12 Weeks"
+   ],
+   "now": "₹300",
+   "was": "₹500",
+   "about": "Live, expert-led Hindi group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 8 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 8 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 8 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    }
+   ]
+  },
+  {
+   "cat": "languages",
+   "title": "Tamil",
+   "slug": "tamil",
+   "chips": [
+    "🔁 155 Batches done",
+    "🟢 17 Ongoing",
+    "👧 6–14 years",
+    "📅 8 Weeks"
+   ],
+   "now": "₹300",
+   "was": "₹500",
+   "about": "Live, expert-led Tamil group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 12 students",
+     "schedule": "Mon-Fri · 5:00–6:00 PM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 13 students",
+     "schedule": "Mon-Fri · 5:00–6:00 PM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 10 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    }
+   ]
+  },
+  {
+   "cat": "languages",
+   "title": "Telugu",
+   "slug": "telugu",
+   "chips": [
+    "🔁 74 Batches done",
+    "🟢 25 Ongoing",
+    "👧 6–14 years",
+    "📅 12 Weeks"
+   ],
+   "now": "₹300",
+   "was": "₹500",
+   "about": "Live, expert-led Telugu group sessions with a structured weekly curriculum, small batches and regular practice — designed to build strong fundamentals while kids learn alongside peers.",
+   "hi": [
+    "Small batch, personalised attention",
+    "Expert certified trainers",
+    "Structured weekly curriculum",
+    "Practice worksheets included",
+    "Certificate on completion"
+   ],
+   "levels": [
+    {
+     "name": "Beginner",
+     "students": "👥 10 students",
+     "schedule": "Mon-Fri · 5:00–6:00 PM IST"
+    },
+    {
+     "name": "Intermediate",
+     "students": "👥 9 students",
+     "schedule": "Tue-Thu · 4:00–5:00 PM IST"
+    },
+    {
+     "name": "Advanced",
+     "students": "👥 8 students",
+     "schedule": "Sat-Sun · 10:00–11:00 AM IST"
+    }
+   ]
+  }
+ ]
+}

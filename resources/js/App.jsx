@@ -5,6 +5,7 @@ import CoursesPage from './pages/CoursesPage.jsx';
 import CourseDetailPage from './pages/CourseDetailPage.jsx';
 import AboutPage from './pages/AboutPage.jsx';
 import PlansPage from './pages/PlansPage.jsx';
+import GroupClassesPage from './pages/GroupClassesPage.jsx';
 import FreeClassesPage from './pages/FreeClassesPage.jsx';
 import LandingPage from './pages/LandingPage.jsx';
 import BookDemoPage from './pages/BookDemoPage.jsx';
@@ -31,7 +32,7 @@ export default function App() {
         <Route path="/courses/:slug" element={<CourseDetailPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/plans" element={<PlansPage />} />
-        <Route path="/group-classes" element={<PlansPage initialCtype="group" />} />
+        <Route path="/group-classes" element={<GroupClassesPage />} />
         <Route path="/free-classes" element={<FreeClassesPage />} />
         <Route path="/video-courses" element={<LandingPage page="video-courses" />} />
         <Route path="/events-workshops" element={<LandingPage page="events-workshops" />} />

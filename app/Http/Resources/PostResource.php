@@ -13,7 +13,9 @@ class PostResource extends JsonResource {
             'image_url'    => $this->image_url,
             'author'       => $this->author,
             'published_at' => optional($this->published_at)->toDateString(),
-            'body'         => $this->when($request->routeIs('api.posts.show'), $this->body),
+            // Always included: the live blog index renders full post content
+            // (WP posts page), so the list endpoint needs the body too.
+            'body'         => $this->body,
         ];
     }
 }
