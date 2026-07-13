@@ -11,7 +11,11 @@ export default {
           800: '#1e3a8a', 900: '#16276b', 950: '#0b1220',
         },
       },
-      fontFamily: { sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'] },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        // Live site headings/card titles are Poppins (see indiatutorsonline.com theme)
+        heading: ['Poppins', 'Montserrat', 'system-ui', 'sans-serif'],
+      },
     },
   },
   plugins: [],

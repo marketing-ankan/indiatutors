@@ -89,6 +89,82 @@ function CourseAccordion({ c, open, onToggle }) {
   );
 }
 
+// Category archive — mirrors the live /product-category/* template:
+// dark hero with breadcrumb + title, child-category pills, image-card grid
+// ("From ₹now ₹was 40% OFF · View course →"). No sidebar, exactly like live.
+function CategoryArchive({ located, categories, courses, isLoading }) {
+  const node = located?.node;
+  const root = located?.root;
+  const isChild = node && root && node.slug !== root.slug;
+  // Pills: the parent's children (siblings when viewing a child), active highlighted.
+  const pills = (root?.children?.length ? root.children : categories.find(c=>c.slug===node?.slug)?.children) || [];
+  const gross = (now) => Math.ceil((now / 0.6) / 50) * 50;
+
+  return (
+    <>
+      {/* HERO with breadcrumb, like ito-br-hero */}
+      <section className="bg-gradient-to-br from-[#0B1220] via-brand-900 to-brand-800 text-white">
+        <div className="container-wide py-14 text-center">
+          <nav className="text-sm text-slate-300 flex items-center justify-center gap-2 flex-wrap">
+            <Link to="/" className="hover:text-white">Home</Link><span>›</span>
+            <Link to="/courses" className="hover:text-white">Courses</Link><span>›</span>
+            {isChild && <><Link to={`/courses?category=${root.slug}`} className="hover:text-white">{root.name}</Link><span>›</span></>}
+            <strong className="text-white">{node?.name}</strong>
+          </nav>
+          <h1 className="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight">{node?.name}</h1>
+          <span className="mt-4 inline-block h-1 w-14 rounded bg-[#D4AF37]"/>
+        </div>
+      </section>
+
+      <div className="container-wide py-8">
+        {/* CHILD-CATEGORY PILLS (ito-br-subs) */}
+        {pills.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            {pills.map(p => (
+              <Link key={p.id} to={`/courses?category=${p.slug}`}
+                className={`rounded-full px-4 py-1.5 text-sm font-semibold ring-1 ${p.slug===node?.slug ? 'bg-brand-600 text-white ring-brand-600' : 'bg-white text-brand-700 ring-slate-200 hover:ring-brand-400'}`}>
+                {p.name}
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* CARD GRID (ito-br-grid) */}
+        {isLoading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">{Array.from({length:8}).map((_,i)=><div key={i} className="rounded-xl bg-slate-100 h-64 animate-pulse"/>)}</div>
+        ) : courses.length ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {courses.map(c => {
+              const now = c.effective_price || c.regular_price || 0;
+              return (
+                <Link key={c.id} to={`/courses/${c.slug}`} className="group rounded-xl bg-white ring-1 ring-slate-200 shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
+                  {c.image_url
+                    ? <span className="block h-36 bg-cover bg-center" style={{ backgroundImage:`url('${c.image_url}')` }}/>
+                    : <span className="flex h-36 items-center justify-center text-5xl font-extrabold text-white bg-gradient-to-br from-brand-700 to-brand-900">{c.name[0]}</span>}
+                  <span className="block p-4">
+                    <span className="block font-extrabold text-slate-900 leading-snug">{c.name}</span>
+                    {now > 0 && (
+                      <span className="mt-2 flex items-center flex-wrap gap-1.5 text-sm">
+                        <span className="text-slate-500">From</span>
+                        <span className="font-extrabold text-brand-700">{inr(now)}</span>
+                        <span className="text-xs text-slate-400 line-through">{inr(gross(now))}</span>
+                        <span className="rounded bg-green-100 text-green-700 px-1.5 py-0.5 text-[11px] font-bold">40% OFF</span>
+                      </span>
+                    )}
+                    <span className="mt-2 block text-sm font-bold text-brand-600 group-hover:text-brand-700">View course →</span>
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-center py-16 text-slate-500">No courses in this category yet.</p>
+        )}
+      </div>
+    </>
+  );
+}
+
 export default function CoursesPage() {
   const [params, setParams] = useSearchParams();
   const category = params.get('category') || '';
@@ -116,6 +192,16 @@ export default function CoursesPage() {
   const activeRootSlug = located?.root?.slug;
   // First card open by default (like the live page), until the user picks another.
   const effectiveOpen = openSlug ?? courses[0]?.slug;
+
+  // Category views use the live /product-category/* archive template;
+  // the plain /courses view keeps the /shop accordion.
+  if (category) {
+    return (
+      <div className="bg-slate-50 min-h-[60vh]">
+        <CategoryArchive located={located} categories={categories} courses={courses} isLoading={isLoading} />
+      </div>
+    );
+  }
 
   const CatButton = ({ c, child = false }) => (
     <button onClick={()=>setParam('category', c.slug)}

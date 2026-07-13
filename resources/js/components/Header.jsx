@@ -62,16 +62,20 @@ const primaryNav = [
 
 /** One tab of the live site's category bar: plain link, flat dropdown, or mega menu. */
 function CatalogTab({ item }) {
-  const hasPanel = (item.mega && item.mega.length) || item.items.length > 0;
+  const hasMega = !!(item.mega && item.mega.length);
+  const hasPanel = hasMega || item.items.length > 0;
   return (
-    <li className="group relative flex-shrink-0">
+    // Mega tabs are NOT position-relative: their panel anchors to the full-width
+    // category-bar container (which is `relative`) so a wide 1080px panel stays
+    // centred in the viewport instead of overflowing off the left edge.
+    <li className={`group flex-shrink-0 ${hasMega ? '' : 'relative'}`}>
       <NavLink to={item.to} end={item.to === '/'}
         className={({isActive}) => `inline-flex items-center gap-1 text-xs font-bold tracking-wider uppercase whitespace-nowrap py-2.5 ${isActive ? 'text-brand-600' : 'text-slate-700 hover:text-brand-600'}`}>
         {item.label}{hasPanel && <ChevronDown className="h-3 w-3 opacity-60"/>}
       </NavLink>
 
-      {item.mega?.length > 0 && (
-        <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition absolute left-1/2 -translate-x-1/2 top-full z-50 pt-1 hidden lg:block">
+      {hasMega && (
+        <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition absolute left-0 right-0 top-full z-50 pt-1 hidden xl:flex justify-center">
           <div className="w-[min(92vw,1080px)] max-h-[70vh] overflow-y-auto rounded-xl bg-white shadow-2xl ring-1 ring-slate-200 p-5">
             <div className="grid grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-5">
               {item.mega.map(col => (
@@ -96,7 +100,7 @@ function CatalogTab({ item }) {
       )}
 
       {!item.mega?.length && item.items.length > 0 && (
-        <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition absolute left-0 top-full z-50 pt-1 hidden lg:block">
+        <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition absolute left-0 top-full z-50 pt-1 hidden xl:block">
           <div className="w-64 rounded-xl bg-white shadow-2xl ring-1 ring-slate-200 py-2">
             {item.items.map(it => (
               <Link key={it.label + it.to} to={it.to} className="block px-4 py-1.5 text-xs text-slate-700 hover:bg-slate-50 hover:text-brand-600 normal-case tracking-normal">{it.label}</Link>
@@ -120,7 +124,7 @@ export default function Header() {
   const onSearch = e => { e.preventDefault(); if(sq.trim()) { nav(`/courses?search=${encodeURIComponent(sq.trim())}`); setShowSearch(false); setSq(''); }};
 
   return (
-    <header className="sticky top-0 z-40 bg-white shadow-sm">
+    <header className="sticky top-0 z-40 bg-white shadow-sm [overflow-x:clip]">
       <div className="bg-slate-900 text-slate-300 text-xs">
         <div className="container-wide flex items-center justify-between py-2">
           <div className="flex flex-wrap items-center gap-4">
@@ -157,19 +161,21 @@ export default function Header() {
               ? <Link to="/dashboard" className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"><LayoutDashboard className="h-4 w-4"/>Dashboard</Link>
               : <Link to="/login" className="hidden sm:inline-flex rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Login</Link>}
             <Link to="/book-demo" className="rounded-md bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-700 whitespace-nowrap">Book Free Demo</Link>
-            <button className="lg:hidden p-2" onClick={()=>setOpen(!open)}>{open?<X className="h-6 w-6"/>:<Menu className="h-6 w-6"/>}</button>
+            <button className="xl:hidden p-2" onClick={()=>setOpen(!open)}>{open?<X className="h-6 w-6"/>:<Menu className="h-6 w-6"/>}</button>
           </div>
         </div>
       </div>
-      <div className="hidden lg:block border-b border-slate-100">
-        <div className="container-wide">
-          <ul className="flex items-center [justify-content:safe_center] gap-4 xl:gap-7">
+      {/* Category bar only from xl — below that it doesn't fit and the live
+          site collapses to the burger menu instead. */}
+      <div className="hidden xl:block border-b border-slate-100">
+        <div className="container-wide relative">
+          <ul className="flex items-center [justify-content:safe_center] gap-3 2xl:gap-6">
             {CATALOG_NAV.map(item => <CatalogTab key={item.label} item={item} />)}
           </ul>
         </div>
       </div>
       {open && (
-        <div className="lg:hidden border-t border-slate-100 bg-white">
+        <div className="xl:hidden border-t border-slate-100 bg-white">
           <div className="container-wide py-4 space-y-1">
             {[...primaryNav, ...CATALOG_NAV.slice(1).map(n => ({ to: n.to, label: n.label }))].map(n => (
               <NavLink key={n.to+n.label} to={n.to} onClick={()=>setOpen(false)} className={({isActive})=>`block rounded-md px-3 py-2 text-sm font-medium ${isActive?'bg-brand-50 text-brand-600':'text-slate-800 hover:bg-slate-50'}`}>{n.label}</NavLink>

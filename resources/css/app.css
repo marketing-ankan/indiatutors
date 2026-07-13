@@ -14,3 +14,10 @@
      no max-width cap, fluid side padding 16→40px. */
   .container-wide { width: 100%; margin-inline: auto; padding-inline: clamp(16px, 3vw, 40px); }
 }
+
+@layer utilities {
+  /* Horizontal card rails: scrollable but with the scrollbar hidden (like the
+     live site's arrow-driven carousels). */
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+}
