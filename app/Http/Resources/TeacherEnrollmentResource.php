@@ -11,6 +11,7 @@ class TeacherEnrollmentResource extends JsonResource {
             'status'        => $this->status,
             'plan'          => $this->plan,
             'student'       => $this->whenLoaded('student', fn () => $this->student?->name),
+            'student_id'    => $this->student_id,
             'course'        => $this->whenLoaded('course', fn () => $this->course?->name),
             'classes_count' => $this->when(isset($this->class_logs_count), fn () => (int) $this->class_logs_count),
             'last_class_on' => $this->whenLoaded('classLogs', fn () => optional($this->classLogs->first()?->held_on)->toDateString()),

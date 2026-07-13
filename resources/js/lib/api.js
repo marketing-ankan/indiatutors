@@ -103,6 +103,31 @@ export const decideReschedule = async (id, status) => { const { data } = await a
 // Admin analytics (Phase 9)
 export const fetchAdminAnalytics = async () => { const { data } = await api.get('/admin/analytics'); return data.data; };
 
+// Teacher calendar (Phase 5)
+export const fetchTeacherCalendar = async (month) => { const { data } = await api.get('/teacher/calendar', { params: month ? { month } : {} }); return data.data; };
+
+// Student portfolio (Phase 6)
+export const fetchPortfolio = async (studentId) => { const { data } = await api.get(`/students/${studentId}/portfolio`); return data.data; };
+export const addPortfolioItem = async (studentId, formData) => { const { data } = await api.post(`/students/${studentId}/portfolio`, formData); return data.data; };
+export const deletePortfolioItem = async (id) => { await api.delete(`/portfolio/${id}`); };
+export const downloadPortfolioItem = async (id, filename) => {
+  const res = await api.get(`/portfolio/${id}/download`, { responseType: 'blob' });
+  const url = URL.createObjectURL(res.data);
+  const a = Object.assign(document.createElement('a'), { href: url, download: filename || 'portfolio-item' });
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+};
+
+// Parent: upcoming scheduled classes (Phase 6)
+export const fetchUpcomingClasses = async () => { const { data } = await api.get('/my/upcoming-classes'); return data.data; };
+
+// Exam updates (Phase 6)
+export const fetchExamUpdates = async () => { const { data } = await api.get('/exam-updates'); return data.data; };
+export const fetchAdminExamUpdates = async () => { const { data } = await api.get('/admin/exam-updates'); return data.data; };
+export const createExamUpdate = async (p) => { const { data } = await api.post('/admin/exam-updates', p); return data.data; };
+export const updateExamUpdate = async (id, p) => { const { data } = await api.patch(`/admin/exam-updates/${id}`, p); return data.data; };
+export const deleteExamUpdate = async (id) => { await api.delete(`/admin/exam-updates/${id}`); };
+
 // Admin (staff)
 export const fetchAdminDemoRequests = async (status='') => { const { data } = await api.get('/admin/demo-requests', { params:{ status } }); return data; };
 export const fetchAdminTeachers = async (status='') => { const { data } = await api.get('/admin/teachers', { params:{ status } }); return data; };

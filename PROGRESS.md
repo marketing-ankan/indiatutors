@@ -10,8 +10,8 @@ Rebuild of the WordPress site (indiatutorsonline.com) as a **Laravel 11 API + Re
 | 2 | Full website parity, SEO, UI match | ✅ Done · Live |
 | 3 | Accounts, auth & KYC | ✅ Done · Live |
 | 4 | Demo → enrollment engine + staff console | ✅ Done · Live |
-| 5 | Teacher portal (profile, approval, classroom, curriculum, materials, proposals) | ✅ Done |
-| 6 | Student/Parent portal (teacher + curriculum + progress + materials) | 🔨 v1 done |
+| 5 | Teacher portal (profile, approval, classroom, curriculum, materials, proposals, **calendar**) | ✅ Complete |
+| 6 | Student/Parent portal (teacher, curriculum, progress, materials, **schedules, portfolio, exam updates**) | ✅ Complete |
 | 8 | Notifications + reschedule requests (in-app) | 🔨 v1 done |
 | 9 | Admin analytics (tiles, trends, breakdowns) | 🔨 v1 done |
 
@@ -46,6 +46,13 @@ Rebuild of the WordPress site (indiatutorsonline.com) as a **Laravel 11 API + Re
 - Parent dashboard: **My demo requests** + **My enrollments**
 - Admin is **env-gated** (`ADMIN_EMAIL`/`ADMIN_PASSWORD`) — no default-password admin
 - **QA:** 11 enrollment-flow tests + admin UI verified
+
+## ✅ Phases 5 & 6 — completed (2026-07-13)
+- ✅ **Teacher class calendar**: month grid (Mon-first) with colour-coded dots (done/scheduled/missed/demo), month navigation, upcoming side-list; logging a class refreshes it live
+- ✅ **Parent "Upcoming classes"**: scheduled classes across all enrollments with teacher/course
+- ✅ **Student portfolio**: achievements/certificates/milestones/artwork per student — parent adds from the student row, teacher from a new classroom "Portfolio" tab; private file uploads (5 MB) or links; teacher-added entries raise a parent bell notification; parent can delete
+- ✅ **Exam updates**: Staff Console tab (publish/draft/delete) → parent dashboard feed card (card hidden until something is published)
+- QA: **41 feature tests green** (8 new: portfolio authorization both roles + stranger 403 + delete rights, exam updates admin-only + draft invisibility, calendar month/ownership scoping, upcoming-classes scoping); every flow driven end-to-end in the browser (teacher schedule→calendar, teacher portfolio→parent notification→parent add, admin publish→parent feed); overflow-free at 375
 
 ## 🔨 Phases 8 & 9 — Notifications, reschedules & admin analytics (v1 done 2026-07-10)
 - ✅ **In-app notifications** (Phase 8): header bell + unread badge; raised on approval, proposal decision, demo scheduled, enrollment, material shared, reschedule events; mark read / mark all

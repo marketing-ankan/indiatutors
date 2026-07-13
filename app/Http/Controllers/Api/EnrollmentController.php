@@ -55,6 +55,25 @@ class EnrollmentController extends Controller {
         ]]);
     }
 
+    /** Upcoming scheduled classes across all the parent's enrollments (Phase 6). */
+    public function upcomingClasses(Request $request) {
+        $enrollmentIds = $request->user()->enrollments()->pluck('enrollments.id');
+        $classes = \App\Models\ClassLog::whereIn('enrollment_id', $enrollmentIds)
+            ->where('status', 'scheduled')
+            ->whereDate('held_on', '>=', now()->toDateString())
+            ->with(['enrollment.student:id,name', 'enrollment.course:id,name', 'tutor:id,name'])
+            ->orderBy('held_on')->limit(10)->get();
+
+        return response()->json(['data' => $classes->map(fn ($l) => [
+            'id'      => $l->id,
+            'date'    => $l->held_on->toDateString(),
+            'topic'   => $l->topic,
+            'student' => $l->enrollment?->student?->name,
+            'course'  => $l->enrollment?->course?->name,
+            'teacher' => $l->tutor?->name,
+        ])]);
+    }
+
     /** Parent asks the teacher to reschedule an upcoming class (Phase 8). */
     public function requestReschedule(Request $request, Enrollment $enrollment) {
         $this->authorizeParent($request, $enrollment);

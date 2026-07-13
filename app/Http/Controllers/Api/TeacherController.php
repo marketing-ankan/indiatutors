@@ -9,6 +9,7 @@ use App\Http\Resources\TeacherDemoResource;
 use App\Http\Resources\TeacherEnrollmentResource;
 use App\Http\Resources\TeacherProfileResource;
 use App\Models\AppNotification;
+use App\Models\ClassLog;
 use App\Models\ClassMaterial;
 use App\Models\CurriculumItem;
 use App\Models\Enrollment;
@@ -180,6 +181,51 @@ class TeacherController extends Controller {
         if ($material->path) Storage::disk('local')->delete($material->path);
         $material->delete();
         return response()->json(['message' => 'Removed.']);
+    }
+
+    // --- Class calendar (Phase 5): month view of classes + assigned demos ---
+
+    public function calendar(Request $request) {
+        $tutor = $this->tutorFor($request);
+        if (!$tutor) return response()->json(['data' => ['classes' => [], 'demos' => []]]);
+
+        $month = $request->string('month')->toString();
+        $start = preg_match('/^\d{4}-\d{2}$/', $month)
+            ? \Carbon\Carbon::createFromFormat('Y-m-d', $month.'-01')->startOfMonth()
+            : now()->startOfMonth();
+        $end = $start->copy()->endOfMonth();
+
+        $classes = ClassLog::whereIn('enrollment_id', $tutor->enrollments()->pluck('id'))
+            ->whereBetween('held_on', [$start, $end])
+            ->with(['enrollment.student:id,name', 'enrollment.course:id,name'])
+            ->orderBy('held_on')->get()
+            ->map(fn ($l) => [
+                'id'      => $l->id,
+                'date'    => $l->held_on->toDateString(),
+                'topic'   => $l->topic,
+                'status'  => $l->status,
+                'student' => $l->enrollment?->student?->name,
+                'course'  => $l->enrollment?->course?->name,
+            ]);
+
+        $demos = $tutor->assignedDemos()
+            ->whereNotNull('scheduled_at')
+            ->whereBetween('scheduled_at', [$start, $end])
+            ->with('student:id,name')
+            ->orderBy('scheduled_at')->get()
+            ->map(fn ($d) => [
+                'id'      => $d->id,
+                'date'    => $d->scheduled_at->toDateString(),
+                'time'    => $d->scheduled_at->format('H:i'),
+                'subject' => $d->subject,
+                'student' => $d->student?->name,
+            ]);
+
+        return response()->json(['data' => [
+            'month'   => $start->format('Y-m'),
+            'classes' => $classes,
+            'demos'   => $demos,
+        ]]);
     }
 
     // --- Reschedule requests from parents (Phase 8) ---

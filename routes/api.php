@@ -8,8 +8,10 @@ use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\DemoRequestController;
+use App\Http\Controllers\Api\ExamUpdateController;
 use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PortfolioController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\TeacherController;
 use App\Http\Controllers\Api\TutorController;
@@ -51,9 +53,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/my/demo-requests', [DemoRequestController::class, 'myIndex']);
     Route::get('/my/enrollments',   [EnrollmentController::class, 'myIndex']);
+    Route::get('/my/upcoming-classes', [EnrollmentController::class, 'upcomingClasses']);
     Route::get('/my/enrollments/{enrollment}', [EnrollmentController::class, 'myShow']);
     Route::post('/my/enrollments/{enrollment}/reschedules', [EnrollmentController::class, 'requestReschedule']);
     Route::get('/materials/{material}/download', [EnrollmentController::class, 'downloadMaterial']);
+
+    // Student portfolio (Phase 6)
+    Route::get('/students/{student}/portfolio',  [PortfolioController::class, 'index']);
+    Route::post('/students/{student}/portfolio', [PortfolioController::class, 'store']);
+    Route::delete('/portfolio/{item}',           [PortfolioController::class, 'destroy']);
+    Route::get('/portfolio/{item}/download',     [PortfolioController::class, 'download']);
+
+    // Exam updates feed (Phase 6)
+    Route::get('/exam-updates',                  [ExamUpdateController::class, 'index']);
 
     // In-app notifications (Phase 8)
     Route::get('/notifications',                 [NotificationController::class, 'index']);
@@ -78,6 +90,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/teacher/proposals', [TeacherController::class, 'storeProposal']);
     Route::get('/teacher/reschedules',              [TeacherController::class, 'reschedules']);
     Route::patch('/teacher/reschedules/{reschedule}', [TeacherController::class, 'decideReschedule']);
+    Route::get('/teacher/calendar',                 [TeacherController::class, 'calendar']);
 
     // --- Admin (staff): match tutors, schedule, convert demo -> enrollment ---
     Route::middleware(\App\Http\Middleware\EnsureAdmin::class)->prefix('admin')->group(function () {
@@ -91,5 +104,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/proposals',                         [AdminController::class, 'proposals']);
         Route::patch('/proposals/{proposal}',            [AdminController::class, 'decideProposal']);
         Route::get('/analytics',                         [AdminController::class, 'analytics']);
+        Route::get('/exam-updates',                      [ExamUpdateController::class, 'adminIndex']);
+        Route::post('/exam-updates',                     [ExamUpdateController::class, 'store']);
+        Route::patch('/exam-updates/{examUpdate}',       [ExamUpdateController::class, 'update']);
+        Route::delete('/exam-updates/{examUpdate}',      [ExamUpdateController::class, 'destroy']);
     });
 });

@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { LogOut, Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap, Briefcase, Save, Users, BookOpen, NotebookPen, ChevronDown, ChevronUp, ListChecks, FolderOpen, Link2, Download, Lightbulb } from 'lucide-react';
+import { LogOut, Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap, Briefcase, Save, Users, BookOpen, NotebookPen, ChevronDown, ChevronUp, ListChecks, FolderOpen, Link2, Download, Lightbulb, Calendar, Award, Megaphone, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import {
   fetchStudents, createStudent, deleteStudent,
@@ -13,6 +13,8 @@ import {
   fetchMaterials, uploadMaterial, deleteMaterial, downloadMaterial,
   fetchMyProposals, submitProposal, fetchMyEnrollmentDetail,
   requestReschedule, fetchTeacherReschedules, decideReschedule,
+  fetchTeacherCalendar, fetchPortfolio, addPortfolioItem, deletePortfolioItem, downloadPortfolioItem,
+  fetchExamUpdates, fetchUpcomingClasses,
 } from '../lib/api.js';
 
 const inp = "w-full rounded-md ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
@@ -47,6 +49,7 @@ export default function DashboardPage() {
             <KycCard />
           </div>
           <TeacherClassroom />
+          <TeacherCalendarCard />
           <div className="grid lg:grid-cols-2 gap-6">
             <TeacherReschedulesCard />
             <TeacherProposalsCard />
@@ -57,6 +60,10 @@ export default function DashboardPage() {
           <div className="grid lg:grid-cols-2 gap-6">
             <RequestsCard />
             <EnrollmentsCard />
+          </div>
+          <div className="grid lg:grid-cols-2 gap-6 mt-6">
+            <UpcomingClassesCard />
+            <ExamUpdatesCard />
           </div>
           <div className="grid lg:grid-cols-2 gap-6 mt-6">
             <StudentsCard />
@@ -194,17 +201,17 @@ function RosterRow({ e }) {
           {open ? <ChevronUp className="h-4 w-4 text-slate-400"/> : <ChevronDown className="h-4 w-4 text-slate-400"/>}
         </div>
       </button>
-      {open && <ClassroomTabs enrollmentId={e.id} />}
+      {open && <ClassroomTabs enrollmentId={e.id} studentId={e.student_id} />}
     </li>
   );
 }
 
-function ClassroomTabs({ enrollmentId }) {
+function ClassroomTabs({ enrollmentId, studentId }) {
   const [tab, setTab] = useState('log');
-  const tabs = [['log','Class log',BookOpen],['curriculum','Curriculum',ListChecks],['materials','Materials',FolderOpen]];
+  const tabs = [['log','Class log',BookOpen],['curriculum','Curriculum',ListChecks],['materials','Materials',FolderOpen],['portfolio','Portfolio',Award]];
   return (
     <div className="border-t border-slate-100 bg-slate-50">
-      <div className="flex gap-1 px-3 pt-2">
+      <div className="flex flex-wrap gap-1 px-3 pt-2">
         {tabs.map(([k,label,Icon]) => (
           <button key={k} onClick={()=>setTab(k)} className={`inline-flex items-center gap-1.5 rounded-t-lg px-3 py-1.5 text-xs font-bold ${tab===k?'bg-white text-brand-700 ring-1 ring-slate-100 ring-b-0':'text-slate-500 hover:text-slate-700'}`}>
             <Icon className="h-3.5 w-3.5"/>{label}
@@ -214,7 +221,154 @@ function ClassroomTabs({ enrollmentId }) {
       {tab==='log' && <ClassLogPanel enrollmentId={enrollmentId} />}
       {tab==='curriculum' && <CurriculumPanel enrollmentId={enrollmentId} />}
       {tab==='materials' && <MaterialsPanel enrollmentId={enrollmentId} />}
+      {tab==='portfolio' && (studentId ? <PortfolioPanel studentId={studentId} /> : <p className="p-3 text-sm text-slate-400">No student linked.</p>)}
     </div>
+  );
+}
+
+// Shared by the teacher's classroom tab and the parent's student rows.
+function PortfolioPanel({ studentId }) {
+  const qc = useQueryClient();
+  const fileRef = useRef();
+  const { data: items = [], isLoading } = useQuery({ queryKey:['portfolio', studentId], queryFn:()=>fetchPortfolio(studentId) });
+  const [form, setForm] = useState({ type:'achievement', title:'', description:'', awarded_on:'', link_url:'' });
+  const [err, setErr] = useState('');
+  const invalidate = () => qc.invalidateQueries({queryKey:['portfolio', studentId]});
+  const add = useMutation({
+    mutationFn: () => {
+      const fd = new FormData();
+      Object.entries(form).forEach(([k,v]) => { if (v) fd.append(k, v); });
+      if (fileRef.current?.files[0]) fd.append('file', fileRef.current.files[0]);
+      return addPortfolioItem(studentId, fd);
+    },
+    onSuccess: () => { setForm({type:'achievement',title:'',description:'',awarded_on:'',link_url:''}); if(fileRef.current) fileRef.current.value=''; setErr(''); invalidate(); },
+    onError: (e) => setErr(e?.response?.data?.message || Object.values(e?.response?.data?.errors||{})[0]?.[0] || 'Could not save.'),
+  });
+  const remove = useMutation({ mutationFn: deletePortfolioItem, onSuccess: invalidate });
+  const TYPE_ICON = { achievement:'🏆', certificate:'📜', milestone:'🎯', artwork:'🎨', other:'⭐' };
+
+  return (
+    <div className="p-3 space-y-3">
+      <p className="text-xs text-slate-500">Build the student's portfolio — achievements, certificates, milestones and artwork. Visible to the parent and the assigned teacher.</p>
+      {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : items.length ? (
+        <ul className="space-y-1.5">
+          {items.map(i => (
+            <li key={i.id} className="flex items-center gap-2 rounded-md bg-white ring-1 ring-slate-100 px-3 py-2">
+              <span className="shrink-0">{TYPE_ICON[i.type] || '⭐'}</span>
+              <div className="min-w-0 flex-1">
+                <div className="font-semibold text-sm text-slate-800">{i.title}</div>
+                <div className="text-xs text-slate-500">{[i.type, i.awarded_on, i.added_by && `by ${i.added_by.name}`].filter(Boolean).join(' · ')}</div>
+                {i.description && <div className="text-xs text-slate-500 mt-0.5">{i.description}</div>}
+              </div>
+              {i.has_file && <button onClick={()=>downloadPortfolioItem(i.id)} className="p-1.5 text-slate-400 hover:text-brand-600" title="Download"><Download className="h-4 w-4"/></button>}
+              {i.link_url && <a href={i.link_url} target="_blank" rel="noopener noreferrer" className="p-1.5 text-slate-400 hover:text-brand-600" title="Open link"><Link2 className="h-4 w-4"/></a>}
+              <button onClick={()=>remove.mutate(i.id)} className="p-1 text-slate-400 hover:text-red-600"><Trash2 className="h-3.5 w-3.5"/></button>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="text-sm text-slate-500">Nothing in the portfolio yet — add the first entry below.</p>}
+      {err && <div className="rounded-md bg-red-50 text-red-700 text-xs p-2">{err}</div>}
+      <form onSubmit={e=>{e.preventDefault();add.mutate();}} className="space-y-2">
+        <div className="grid grid-cols-2 gap-2">
+          <select value={form.type} onChange={e=>setForm({...form,type:e.target.value})} className={inp}>
+            {['achievement','certificate','milestone','artwork','other'].map(t=><option key={t} value={t} className="capitalize">{t}</option>)}
+          </select>
+          <input required value={form.title} onChange={e=>setForm({...form,title:e.target.value})} placeholder="Title (e.g. Piano Grade 1)" className={inp}/>
+        </div>
+        <input value={form.description} onChange={e=>setForm({...form,description:e.target.value})} placeholder="Description (optional)" className={inp}/>
+        <div className="grid grid-cols-2 gap-2 items-center">
+          <input type="date" value={form.awarded_on} onChange={e=>setForm({...form,awarded_on:e.target.value})} className={inp}/>
+          <input ref={fileRef} type="file" accept=".jpg,.jpeg,.png,.pdf" className="text-sm text-slate-600 file:mr-2 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-semibold"/>
+        </div>
+        <input value={form.link_url} onChange={e=>setForm({...form,link_url:e.target.value})} placeholder="…or paste a link (optional)" className={inp}/>
+        <button disabled={add.isPending} className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">
+          <Plus className="h-4 w-4"/>{add.isPending?'Adding…':'Add to portfolio'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function TeacherCalendarCard() {
+  const [month, setMonth] = useState(() => new Date().toISOString().slice(0,7)); // YYYY-MM
+  const { data: d, isLoading } = useQuery({ queryKey:['teacher-calendar', month], queryFn:()=>fetchTeacherCalendar(month) });
+  const shift = (delta) => {
+    const [y,m] = month.split('-').map(Number);
+    const next = new Date(y, m - 1 + delta, 1);
+    setMonth(`${next.getFullYear()}-${String(next.getMonth()+1).padStart(2,'0')}`);
+  };
+  const [y,m] = month.split('-').map(Number);
+  const first = new Date(y, m-1, 1);
+  const daysInMonth = new Date(y, m, 0).getDate();
+  const leading = (first.getDay() + 6) % 7; // Monday-first grid
+  const byDate = {};
+  (d?.classes||[]).forEach(c => { (byDate[c.date] = byDate[c.date] || []).push({ ...c, kind:'class' }); });
+  (d?.demos||[]).forEach(x => { (byDate[x.date] = byDate[x.date] || []).push({ ...x, kind:'demo' }); });
+  const dot = { completed:'bg-green-500', scheduled:'bg-blue-500', missed:'bg-red-500', demo:'bg-amber-500' };
+  const monthLabel = first.toLocaleDateString('en-IN', { month:'long', year:'numeric' });
+  const today = new Date().toISOString().slice(0,10);
+  const upcoming = Object.entries(byDate).flatMap(([date, evs]) => evs.map(e => ({...e, date})))
+    .filter(e => e.date >= today && (e.kind==='demo' || e.status==='scheduled'))
+    .sort((a,b) => a.date.localeCompare(b.date)).slice(0,6);
+
+  return (
+    <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
+      <div className="flex items-center justify-between mb-1">
+        <h2 className="text-lg font-bold flex items-center gap-2"><Calendar className="h-5 w-5 text-brand-600"/>Class calendar</h2>
+        <div className="flex items-center gap-1">
+          <button onClick={()=>shift(-1)} className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500" aria-label="Previous month"><ChevronLeft className="h-4 w-4"/></button>
+          <span className="text-sm font-bold text-slate-700 min-w-[9rem] text-center">{monthLabel}</span>
+          <button onClick={()=>shift(1)} className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500" aria-label="Next month"><ChevronRight className="h-4 w-4"/></button>
+        </div>
+      </div>
+      <p className="text-xs text-slate-500 mb-4">Your logged and scheduled classes plus assigned demos.
+        <span className="ml-2 inline-flex items-center gap-2 text-[11px]">
+          <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500"/>done</span>
+          <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500"/>scheduled</span>
+          <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500"/>missed</span>
+          <span className="inline-flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500"/>demo</span>
+        </span>
+      </p>
+      {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : (
+        <div className="grid lg:grid-cols-[1fr_16rem] gap-5">
+          <div>
+            <div className="grid grid-cols-7 text-center text-[11px] font-bold text-slate-400 mb-1">
+              {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(w=><div key={w}>{w}</div>)}
+            </div>
+            <div className="grid grid-cols-7 gap-1">
+              {Array.from({length: leading}).map((_,i)=><div key={'x'+i}/>)}
+              {Array.from({length: daysInMonth},(_,i)=>{
+                const date = `${month}-${String(i+1).padStart(2,'0')}`;
+                const evs = byDate[date] || [];
+                return (
+                  <div key={date} title={evs.map(e=>e.kind==='demo'?`Demo: ${e.subject||''} ${e.time||''}`:`${e.topic} (${e.status})`).join('\n')}
+                    className={`min-h-[3rem] rounded-lg p-1 text-xs ring-1 ${date===today?'ring-brand-400 bg-brand-50':'ring-slate-100'} ${evs.length?'bg-white':'bg-slate-50/50'}`}>
+                    <div className="text-[11px] font-semibold text-slate-500">{i+1}</div>
+                    <div className="flex flex-wrap gap-0.5 mt-0.5">
+                      {evs.slice(0,4).map((e,j)=><span key={j} className={`w-2 h-2 rounded-full ${dot[e.kind==='demo'?'demo':e.status]||'bg-slate-300'}`}/>)}
+                      {evs.length>4 && <span className="text-[9px] text-slate-400">+{evs.length-4}</span>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Upcoming</h3>
+            {upcoming.length ? (
+              <ul className="space-y-1.5">
+                {upcoming.map((e,i)=>(
+                  <li key={i} className="rounded-lg ring-1 ring-slate-100 px-2.5 py-1.5">
+                    <div className="text-xs font-semibold text-slate-800 truncate">{e.kind==='demo' ? `Demo · ${e.subject||'class'}` : e.topic}</div>
+                    <div className="text-[11px] text-slate-500">{e.date}{e.time?` · ${e.time}`:''}{e.student?` · ${e.student}`:''}</div>
+                  </li>
+                ))}
+              </ul>
+            ) : <p className="text-xs text-slate-400">Nothing scheduled this month.</p>}
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -365,7 +519,7 @@ function ClassLogPanel({ enrollmentId }) {
   const set = k => e => setForm({ ...form, [k]: e.target.value });
   const add = useMutation({
     mutationFn: () => addClassLog(enrollmentId, { ...form, duration_min: form.duration_min?Number(form.duration_min):null }),
-    onSuccess: () => { setForm(empty); setErr(''); qc.invalidateQueries({queryKey:['class-logs', enrollmentId]}); qc.invalidateQueries({queryKey:['teacher-students']}); },
+    onSuccess: () => { setForm(empty); setErr(''); qc.invalidateQueries({queryKey:['class-logs', enrollmentId]}); qc.invalidateQueries({queryKey:['teacher-students']}); qc.invalidateQueries({queryKey:['teacher-calendar']}); },
     onError: (e) => setErr(Object.values(e?.response?.data?.errors||{})[0]?.[0] || 'Could not save the class.'),
   });
   const statusColor = { completed:'bg-green-50 text-green-700', scheduled:'bg-blue-50 text-blue-700', missed:'bg-red-50 text-red-700' };
@@ -652,15 +806,7 @@ function StudentsCard() {
 
       {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : students.length ? (
         <ul className="space-y-2 mb-5">
-          {students.map(s => (
-            <li key={s.id} className="flex items-center justify-between rounded-lg ring-1 ring-slate-100 px-3 py-2">
-              <div>
-                <div className="font-semibold text-sm text-slate-800">{s.name}</div>
-                <div className="text-xs text-slate-500">{[s.grade, s.board, s.subjects].filter(Boolean).join(' · ') || 'No details yet'}</div>
-              </div>
-              <button onClick={()=>remove.mutate(s.id)} className="p-1.5 text-slate-400 hover:text-red-600" title="Remove"><Trash2 className="h-4 w-4"/></button>
-            </li>
-          ))}
+          {students.map(s => <ParentStudentRow key={s.id} s={s} onRemove={()=>remove.mutate(s.id)} />)}
         </ul>
       ) : <p className="text-sm text-slate-500 mb-5">No students yet. Add your child below.</p>}
 
@@ -676,6 +822,74 @@ function StudentsCard() {
           <Plus className="h-4 w-4"/> {create.isPending?'Adding…':'Add student'}
         </button>
       </form>
+    </section>
+  );
+}
+
+function ParentStudentRow({ s, onRemove }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <li className="rounded-lg ring-1 ring-slate-100 overflow-hidden">
+      <div className="flex items-center justify-between px-3 py-2">
+        <button onClick={()=>setOpen(o=>!o)} className="flex-1 min-w-0 text-left">
+          <div className="font-semibold text-sm text-slate-800 flex items-center gap-1.5">
+            {s.name}
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-600"><Award className="h-3 w-3"/>{open?'Hide portfolio':'Portfolio'}</span>
+          </div>
+          <div className="text-xs text-slate-500">{[s.grade, s.board, s.subjects].filter(Boolean).join(' · ') || 'No details yet'}</div>
+        </button>
+        <div className="flex items-center gap-1 shrink-0">
+          <button onClick={()=>setOpen(o=>!o)} className="p-1.5 text-slate-400 hover:text-brand-600" title="Portfolio">{open ? <ChevronUp className="h-4 w-4"/> : <ChevronDown className="h-4 w-4"/>}</button>
+          <button onClick={onRemove} className="p-1.5 text-slate-400 hover:text-red-600" title="Remove"><Trash2 className="h-4 w-4"/></button>
+        </div>
+      </div>
+      {open && <div className="border-t border-slate-100 bg-slate-50"><PortfolioPanel studentId={s.id} /></div>}
+    </li>
+  );
+}
+
+function UpcomingClassesCard() {
+  const { data: items = [], isLoading } = useQuery({ queryKey:['upcoming-classes'], queryFn: fetchUpcomingClasses });
+  return (
+    <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
+      <h2 className="text-lg font-bold flex items-center gap-2 mb-4"><Calendar className="h-5 w-5 text-brand-600"/>Upcoming classes</h2>
+      {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : items.length ? (
+        <ul className="divide-y divide-slate-100">
+          {items.map(c => (
+            <li key={c.id} className="flex items-center justify-between gap-2 py-2.5">
+              <div className="min-w-0">
+                <div className="font-semibold text-sm text-slate-800 truncate">{c.topic}</div>
+                <div className="text-xs text-slate-500">{[c.student, c.course, c.teacher && `with ${c.teacher}`].filter(Boolean).join(' · ')}</div>
+              </div>
+              <span className="shrink-0 rounded-full bg-blue-50 text-blue-700 px-2.5 py-0.5 text-xs font-semibold">{c.date}</span>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="text-sm text-slate-500">No classes scheduled yet — your teacher schedules them in the class log.</p>}
+    </section>
+  );
+}
+
+function ExamUpdatesCard() {
+  const { data: items = [], isLoading } = useQuery({ queryKey:['exam-updates'], queryFn: fetchExamUpdates });
+  if (!isLoading && !items.length) return null; // hide the card until staff publish something
+  return (
+    <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
+      <h2 className="text-lg font-bold flex items-center gap-2 mb-4"><Megaphone className="h-5 w-5 text-brand-600"/>Exam updates</h2>
+      {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : (
+        <ul className="space-y-3">
+          {items.map(u => (
+            <li key={u.id} className="rounded-lg ring-1 ring-slate-100 p-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="font-semibold text-sm text-slate-800">{u.title}</div>
+                {u.exam_date && <span className="shrink-0 rounded-full bg-amber-50 text-amber-700 px-2.5 py-0.5 text-xs font-semibold">{u.exam_date}</span>}
+              </div>
+              {u.body && <p className="text-xs text-slate-500 mt-1 leading-relaxed">{u.body}</p>}
+              {u.link_url && <a href={u.link_url} target="_blank" rel="noopener noreferrer" className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-700"><Link2 className="h-3.5 w-3.5"/>Learn more</a>}
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

@@ -8,4 +8,5 @@ class Student extends Model {
 
     public function user() { return $this->belongsTo(User::class); }
     public function enrollments() { return $this->hasMany(Enrollment::class); }
+    public function portfolioItems() { return $this->hasMany(PortfolioItem::class)->latest('awarded_on')->latest('id'); }
 }
