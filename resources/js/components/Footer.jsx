@@ -112,9 +112,28 @@ export default function Footer() {
         </div>
       </div>
 
+      {/* Trust strip + payment badges, like the live footer */}
+      <div className="border-t border-slate-800">
+        <div className="container-wide py-4 flex flex-col lg:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+          <div className="flex flex-wrap justify-center gap-x-5 gap-y-1.5">
+            <span>🛡️ Verified Tutors</span>
+            <span>⭐ 4.8/5 Avg Rating</span>
+            <span>👨‍👩‍👧 10,000+ Happy Students</span>
+            <span>🔒 SSL Secured</span>
+            <span>🎓 500+ Expert Tutors</span>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-1.5">
+            <span className="mr-1">We accept:</span>
+            {['UPI','Razorpay','VISA','MC','Net Banking'].map(p => (
+              <span key={p} className="rounded border border-slate-700 bg-slate-800 px-2 py-0.5 text-[10px] font-bold text-slate-300">{p}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="border-t border-slate-800">
         <div className="container-wide py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          <span>© {new Date().getFullYear()} Indiatutors Online. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} Indiatutors Online. All rights reserved. Made with ❤️ in India.</span>
           <div className="flex gap-4">
             <Link to="/privacy" className="hover:text-slate-300">Privacy</Link>
             <Link to="/terms" className="hover:text-slate-300">Terms</Link>
