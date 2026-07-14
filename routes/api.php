@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\DemoRequestController;
 use App\Http\Controllers\Api\ExamUpdateController;
 use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PortfolioController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\TeacherController;
@@ -36,6 +37,7 @@ Route::get('/posts/{slug}',      [BlogController::class, 'show'])->name('api.pos
 
 Route::post('/demo-requests',    [DemoRequestController::class, 'store']);
 Route::post('/contact',          [ContactController::class, 'store']);
+Route::post('/orders',           [OrderController::class, 'store'])->middleware('throttle:10,1');
 
 // --- Auth (bearer-token, Sanctum) ---
 Route::post('/auth/register',    [AuthController::class, 'register'])->middleware('throttle:10,1');

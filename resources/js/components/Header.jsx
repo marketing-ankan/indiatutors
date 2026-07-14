@@ -1,10 +1,22 @@
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { Phone, Mail, MapPin, Search, Menu, X, LayoutDashboard, Bell, ChevronDown } from 'lucide-react';
+import { Phone, Mail, MapPin, Search, Menu, X, LayoutDashboard, Bell, ChevronDown, Heart, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../lib/auth.jsx';
 import { fetchNotifications, markNotificationRead, markAllNotificationsRead } from '../lib/api.js';
+import { useCart, useWishlist } from '../lib/cart.js';
 import { CATALOG_NAV } from '../data/nav.js';
+
+/** Live-header parity: ♡ wishlist and 🛒 cart icons with a count bubble that
+ *  appears only when non-empty (the live count spans are `hidden` at 0). */
+function HeaderIcon({ to, label, count, Icon }) {
+  return (
+    <Link to={to} aria-label={label} className="relative hidden p-2 text-slate-600 hover:text-brand-600 sm:inline-flex">
+      <Icon className="h-5 w-5" />
+      {count > 0 && <span className="absolute right-0 top-0.5 min-w-[16px] rounded-full bg-brand-600 px-0.5 text-center text-[10px] font-bold leading-4 text-white">{count > 9 ? '9+' : count}</span>}
+    </Link>
+  );
+}
 
 function NotificationBell() {
   const qc = useQueryClient();
@@ -121,6 +133,8 @@ export default function Header() {
   const [showSearch, setShowSearch] = useState(false);
   const nav = useNavigate();
   const { isAuthed, user } = useAuth();
+  const cartItems = useCart();
+  const wishItems = useWishlist();
   const onSearch = e => { e.preventDefault(); if(sq.trim()) { nav(`/courses?search=${encodeURIComponent(sq.trim())}`); setShowSearch(false); setSq(''); }};
 
   return (
@@ -155,6 +169,8 @@ export default function Header() {
             ):(
               <button onClick={()=>setShowSearch(true)} className="p-2 text-slate-600 hover:text-brand-600 hidden md:inline-flex"><Search className="h-5 w-5"/></button>
             )}
+            <HeaderIcon to="/wishlist" label={`Wishlist (${wishItems.length})`} count={wishItems.length} Icon={Heart} />
+            <HeaderIcon to="/cart" label={`Cart (${cartItems.length})`} count={cartItems.length} Icon={ShoppingCart} />
             {isAuthed && <NotificationBell />}
             {user?.role === 'admin' && <Link to="/admin" className="hidden sm:inline-flex rounded-md bg-slate-900 text-white px-3 py-2 text-sm font-semibold hover:bg-slate-800">Staff</Link>}
             {isAuthed

@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   CheckCircle2, Video, Users, Calendar, Clock, Baby, Star, Heart, Download,
   Phone, Mail, Play, Plus, ShoppingCart, ChevronRight,
 } from 'lucide-react';
 import { fetchCourse, fetchCourses, inr } from '../lib/api.js';
+import { cart, wishlist, useWishlist, cartItemOf } from '../lib/cart.js';
 import {
   buildPriceMatrix, CARD_FEATURES, FAQS, WORKSHOPS, PARENTS, TEACHERS,
   ACHIEVEMENTS, BLOG_POSTS,
@@ -36,7 +37,8 @@ function BuyCard({ course }) {
   const [plan, setPlan] = useState(plans[0]);
   const [level, setLevel] = useState(0);
   const cell = matrix[plan]?.[levels[level]] || { net: 0, gross: 0 };
-  const [wished, setWished] = useState(false);
+  const nav = useNavigate();
+  const wished = useWishlist().some(w => w.slug === course.slug);
 
   return (
     <aside className="rounded-2xl bg-white shadow-lg ring-1 ring-slate-100 overflow-hidden lg:sticky lg:top-24">
@@ -84,11 +86,13 @@ function BuyCard({ course }) {
           ))}
         </ul>
 
-        {/* Actions */}
-        <Link to={`/book-demo?course=${course.slug}`} className="flex items-center justify-center gap-2 rounded-[10px] bg-brand-600 text-white py-3 text-sm font-bold hover:bg-brand-700">
+        {/* Actions — Add to Cart adds the catalog product (base price, qty 1,
+            like the live Woo store) and opens the cart. */}
+        <button type="button" onClick={() => { cart.add(cartItemOf(course)); nav('/cart'); }}
+          className="w-full flex items-center justify-center gap-2 rounded-[10px] bg-brand-600 text-white py-3 text-sm font-bold hover:bg-brand-700">
           <ShoppingCart className="h-4 w-4" /> Add to Cart
-        </Link>
-        <button type="button" onClick={() => setWished(w => !w)} aria-pressed={wished}
+        </button>
+        <button type="button" onClick={() => wishlist.toggle(cartItemOf(course))} aria-pressed={wished}
           className="w-full flex items-center justify-center gap-2 rounded-[10px] bg-white border border-[#E7E7EF] text-slate-600 py-2.5 text-sm font-bold hover:border-brand-300">
           <Heart className={`h-4 w-4 ${wished ? 'fill-red-500 text-red-500' : ''}`} /> {wished ? 'Saved to Wishlist' : 'Save to Wishlist'}
         </button>

@@ -143,3 +143,4 @@ export const uploadKyc = async (formData) => { const { data } = await api.post('
 export const deleteKyc = async (id) => { await api.delete(`/kyc/${id}`); };
 export const submitDemoRequest   = async (p) => { const { data } = await api.post('/demo-requests', p); return data; };
 export const submitContact       = async (p) => { const { data } = await api.post('/contact', p); return data; };
+export const placeOrder          = async (p) => { const { data } = await api.post('/orders', p); return data; };

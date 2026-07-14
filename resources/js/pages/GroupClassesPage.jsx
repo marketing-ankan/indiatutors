@@ -107,7 +107,7 @@ export default function GroupClassesPage() {
       </section>
 
       {/* LAYOUT: sidebar + cards */}
-      <div className="grid items-start gap-6 min-[901px]:grid-cols-[250px_1fr]">
+      <div className="grid grid-cols-1 items-start gap-6 min-[901px]:grid-cols-[250px_minmax(0,1fr)]">
         <aside className="min-[901px]:sticky min-[901px]:top-[90px]">
           <h2 className="font-heading mb-3 text-[1.05rem] font-extrabold text-[#0B1220]">Browse Categories</h2>
           <ul className="mb-[18px] flex flex-row flex-wrap gap-1 min-[901px]:flex-col">

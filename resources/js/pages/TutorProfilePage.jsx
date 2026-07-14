@@ -157,7 +157,7 @@ export default function TutorProfilePage() {
       </div>
 
       {/* BODY */}
-      <div className="container-wide grid items-start gap-x-10 pb-24 pt-[52px] lg:grid-cols-[1fr_320px]">
+      <div className="container-wide grid grid-cols-1 items-start gap-x-10 pb-24 pt-[52px] lg:grid-cols-[minmax(0,1fr)_320px]">
         <main className="min-w-0">
           {tutor.bio && (
             <Section title="About">

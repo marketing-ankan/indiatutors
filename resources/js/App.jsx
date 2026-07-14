@@ -18,6 +18,9 @@ import BlogPostPage from './pages/BlogPostPage.jsx';
 import ReferEarnPage from './pages/ReferEarnPage.jsx';
 import BecomeTeacherPage from './pages/BecomeTeacherPage.jsx';
 import LegalPage from './pages/LegalPage.jsx';
+import CartPage from './pages/CartPage.jsx';
+import CheckoutPage from './pages/CheckoutPage.jsx';
+import WishlistPage from './pages/WishlistPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
@@ -51,6 +54,9 @@ export default function App() {
         <Route path="/privacy" element={<LegalPage doc="privacy" />} />
         <Route path="/terms" element={<LegalPage doc="terms" />} />
         <Route path="/refund" element={<LegalPage doc="refund" />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/admin" element={<AdminPage />} />
