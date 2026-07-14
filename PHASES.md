@@ -87,11 +87,13 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 - ✅ **Portfolio building**: per-student achievements/certificates/milestones/artwork — parent and assigned teacher can add (files stored privately, links supported); teacher-added entries notify the parent
 - ✅ **Exam updates**: Staff Console "Exam Updates" tab (publish/draft/delete) → feed card on the parent dashboard
 
-## Phase 7 — Payments & payouts ⬜ (blocked: needs Razorpay keys + GST details)
-- **Direct purchase** (video/self-paced): cart → checkout → Razorpay + GST invoice
-- **Demo-first** (live): fees + GST at enrollment, per-class billing
-- Teacher payouts: net of TDS, fixed margin, retention/conversion bonuses
-- Refunds & receipts
+## Phase 7 — Payments & payouts 🔨 (v1 done 2026-07-14; live capture blocked on Razorpay keys + GST details)
+- ✅ **Cart → checkout → order**: WooCommerce-parity /cart, /checkout, /wishlist; guest orders re-priced server-side, recorded as `pending` with items (POST /api/orders)
+- ✅ **Razorpay integration (config-driven)**: set `RAZORPAY_KEY_ID`/`RAZORPAY_KEY_SECRET` and checkout creates a gateway order + opens the Razorpay modal; `POST /api/orders/verify` checks the HMAC signature and marks the order `paid`. Without keys the pending-payment stub flow runs unchanged.
+- ✅ **Staff Console “Orders” tab**: list/filter orders, mark paid / cancel / reopen (manual settlement until keys land)
+- ⬜ Live payment capture (needs Razorpay keys), GST invoice, webhooks for out-of-band capture
+- ⬜ **Demo-first** (live): fees + GST at enrollment, per-class billing
+- ⬜ Teacher payouts: net of TDS, fixed margin, retention/conversion bonuses; refunds & receipts
 
 ## Phase 8 — Scheduling, messaging & location 🔨 (v1 done 2026-07-10)
 - ✅ **In-app notifications**: header bell + unread badge; raised on teacher approval, proposal decision, demo scheduled, enrollment confirmed, material shared, reschedule requested/decided; mark read / mark all read

@@ -1,15 +1,26 @@
 import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { placeOrder } from '../lib/api.js';
+import { placeOrder, verifyPayment } from '../lib/api.js';
 import { cart, useCart, inrFmt } from '../lib/cart.js';
 
 // Checkout — mirrors the live WooCommerce Blocks checkout: Contact
 // information + Billing address + Payment options on the left, an Order
 // summary rail on the right, and the classic Woo "Order received"
 // confirmation. An empty cart redirects back to /cart, like live.
-// Payment is a Razorpay stub until Phase 7 keys arrive: the order is
-// recorded as pending and the confirmation says payment follows.
+// Payment: when the server returns a `razorpay` payload (keys configured)
+// the Razorpay modal opens and a verified payment marks the order paid;
+// without keys the order stays a pending-payment stub.
+
+// Load checkout.js once, lazily — only when a gateway order actually arrives.
+let rzpScript = null;
+const loadRazorpay = () => rzpScript ??= new Promise((resolve, reject) => {
+  const s = document.createElement('script');
+  s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+  s.onload = () => resolve();
+  s.onerror = () => { rzpScript = null; reject(new Error('Razorpay script failed to load')); };
+  document.head.appendChild(s);
+});
 
 const Field = ({ label, span, children }) => (
   <label className={`block ${span ? 'sm:col-span-2' : ''}`}>
@@ -19,7 +30,7 @@ const Field = ({ label, span, children }) => (
 );
 const inputCls = 'w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500';
 
-function OrderReceived({ order }) {
+function OrderReceived({ order, paymentNote }) {
   return (
     <div className="container-wide max-w-3xl py-12">
       <h1 className="font-heading text-3xl font-extrabold tracking-tight text-[#1A1A1A]">Order received</h1>
@@ -45,7 +56,11 @@ function OrderReceived({ order }) {
           <span className="font-heading font-extrabold">{inrFmt(order.total)}</span>
         </div>
       </div>
-      <p className="mt-5 text-sm text-slate-500">Your order is recorded as <strong>pending payment</strong> — our team will share a secure Razorpay payment link on the email/phone above to complete it.</p>
+      <p className="mt-5 text-sm text-slate-500">
+        {order.status === 'paid'
+          ? <>✅ Payment received — your order is <strong>confirmed</strong>. Our team will reach out on the email/phone above to schedule your classes.</>
+          : paymentNote || <>Your order is recorded as <strong>pending payment</strong> — our team will share a secure Razorpay payment link on the email/phone above to complete it.</>}
+      </p>
       <Link to="/courses" className="mt-6 inline-block rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-brand-700">Continue shopping</Link>
     </div>
   );
@@ -59,13 +74,47 @@ export default function CheckoutPage() {
   });
   const set = k => e => setF(s => ({ ...s, [k]: e.target.value }));
   const total = items.reduce((s, i) => s + Number(i.price || 0), 0);
+  // Final confirmation: { order, paymentNote } once the flow settles (either
+  // no gateway configured, payment verified, or the modal was dismissed).
+  const [done, setDone] = useState(null);
+
+  const verify = useMutation({
+    mutationFn: verifyPayment,
+    onSuccess: d => setDone({ order: d.order }),
+  });
+
+  const openRazorpayModal = async (rz, order) => {
+    try {
+      await loadRazorpay();
+      new window.Razorpay({
+        key: rz.key, order_id: rz.order_id, amount: rz.amount, currency: rz.currency,
+        name: rz.name, prefill: rz.prefill,
+        handler: resp => verify.mutate(resp, {
+          onError: () => setDone({ order, paymentNote: '⚠️ We received your payment reference but could not verify it automatically — our team will confirm it and email you shortly.' }),
+        }),
+        modal: { ondismiss: () => setDone(d => d ?? { order }) },
+      }).open();
+    } catch {
+      setDone({ order }); // script blocked/offline — fall back to the pending stub
+    }
+  };
 
   const submit = useMutation({
     mutationFn: () => placeOrder({ ...f, items: items.map(i => ({ slug: i.slug })) }),
-    onSuccess: () => cart.clear(),
+    onSuccess: data => {
+      cart.clear();
+      if (data.razorpay) openRazorpayModal(data.razorpay, data.order);
+      else setDone({ order: data.order });
+    },
   });
 
-  if (submit.isSuccess) return <OrderReceived order={submit.data.order} />;
+  if (done) return <OrderReceived order={done.order} paymentNote={done.paymentNote} />;
+  if (submit.isSuccess) return (
+    <div className="container-wide py-24 text-center text-slate-600">
+      <p className="font-heading text-xl font-bold">Order recorded — complete the payment in the Razorpay window…</p>
+      <p className="mt-2 text-sm text-slate-400">If the window doesn't appear, disable your popup blocker and refresh.</p>
+    </div>
+  );
   // Live parity: an empty checkout redirects to the cart — but only when no
   // order attempt is underway (clearing the cart on success re-renders with
   // zero items a beat before the success state commits).

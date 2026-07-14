@@ -38,6 +38,7 @@ Route::get('/posts/{slug}',      [BlogController::class, 'show'])->name('api.pos
 Route::post('/demo-requests',    [DemoRequestController::class, 'store']);
 Route::post('/contact',          [ContactController::class, 'store']);
 Route::post('/orders',           [OrderController::class, 'store'])->middleware('throttle:10,1');
+Route::post('/orders/verify',    [OrderController::class, 'verify'])->middleware('throttle:20,1');
 
 // --- Auth (bearer-token, Sanctum) ---
 Route::post('/auth/register',    [AuthController::class, 'register'])->middleware('throttle:10,1');
@@ -101,6 +102,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/demo-requests/{demoRequest}',     [AdminController::class, 'assignDemo']);
         Route::post('/demo-requests/{demoRequest}/convert',[AdminController::class, 'convert']);
         Route::get('/enrollments',                       [AdminController::class, 'enrollments']);
+        Route::get('/orders',                            [AdminController::class, 'orders']);
+        Route::patch('/orders/{order}',                  [AdminController::class, 'updateOrder']);
         Route::get('/teachers',                          [AdminController::class, 'teachers']);
         Route::patch('/teachers/{teacherProfile}',       [AdminController::class, 'approveTeacher']);
         Route::get('/proposals',                         [AdminController::class, 'proposals']);

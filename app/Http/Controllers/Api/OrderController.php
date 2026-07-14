@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Order;
+use App\Support\Razorpay;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -10,7 +11,9 @@ class OrderController extends Controller {
     /**
      * Guest checkout (WooCommerce parity). Items are re-priced from the
      * catalog server-side — the client only sends slugs — and the order is
-     * recorded as pending until the Razorpay integration lands (Phase 7).
+     * recorded as pending. When Razorpay keys are configured a gateway order
+     * is created too and the response carries the modal payload; the client
+     * then confirms via verify() below.
      */
     public function store(Request $request) {
         $data = $request->validate([
@@ -65,18 +68,64 @@ class OrderController extends Controller {
             return $order;
         });
 
+        // Gateway order (only when keys are configured; never blocks checkout).
+        $razorpay = null;
+        if (Razorpay::enabled()) {
+            $rp = Razorpay::createOrder((int) round($order->total * 100), 'order_'.$order->id);
+            if ($rp && !empty($rp['id'])) {
+                $order->update(['razorpay_order_id' => $rp['id']]);
+                $razorpay = [
+                    'key'      => Razorpay::key(),
+                    'order_id' => $rp['id'],
+                    'amount'   => $rp['amount'],
+                    'currency' => $rp['currency'] ?? 'INR',
+                    'name'     => 'Indiatutors Online',
+                    'prefill'  => [
+                        'name'    => trim($order->first_name.' '.($order->last_name ?? '')),
+                        'email'   => $order->email,
+                        'contact' => $order->phone,
+                    ],
+                ];
+            }
+        }
+
         return response()->json([
-            'message' => 'Order received.',
-            'order'   => [
-                'number'         => $order->id,
-                'date'           => $order->created_at->toDateString(),
-                'email'          => $order->email,
-                'total'          => $order->total,
-                'currency'       => $order->currency,
-                'payment_method' => $order->payment_method,
-                'status'         => $order->status,
-                'items'          => $order->items->map(fn ($i) => ['name' => $i->name, 'price' => $i->price, 'qty' => $i->qty]),
-            ],
+            'message'  => 'Order received.',
+            'order'    => self::orderPayload($order),
+            'razorpay' => $razorpay,
         ], 201);
+    }
+
+    /** Confirm a Razorpay checkout callback and mark the order paid. */
+    public function verify(Request $request) {
+        $data = $request->validate([
+            'razorpay_order_id'   => 'required|string|max:60',
+            'razorpay_payment_id' => 'required|string|max:60',
+            'razorpay_signature'  => 'required|string|max:200',
+        ]);
+
+        $order = Order::where('razorpay_order_id', $data['razorpay_order_id'])->first();
+        if (!$order) return response()->json(['message' => 'Order not found.'], 404);
+
+        if (!Razorpay::enabled() || !Razorpay::verifySignature($data['razorpay_order_id'], $data['razorpay_payment_id'], $data['razorpay_signature'])) {
+            return response()->json(['message' => 'Payment signature could not be verified.'], 422);
+        }
+
+        $order->update(['status' => 'paid', 'razorpay_payment_id' => $data['razorpay_payment_id']]);
+
+        return response()->json(['message' => 'Payment verified.', 'order' => self::orderPayload($order->fresh('items'))]);
+    }
+
+    private static function orderPayload(Order $order): array {
+        return [
+            'number'         => $order->id,
+            'date'           => $order->created_at->toDateString(),
+            'email'          => $order->email,
+            'total'          => $order->total,
+            'currency'       => $order->currency,
+            'payment_method' => $order->payment_method,
+            'status'         => $order->status,
+            'items'          => $order->items->map(fn ($i) => ['name' => $i->name, 'price' => $i->price, 'qty' => $i->qty]),
+        ];
     }
 }

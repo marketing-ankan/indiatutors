@@ -144,3 +144,6 @@ export const deleteKyc = async (id) => { await api.delete(`/kyc/${id}`); };
 export const submitDemoRequest   = async (p) => { const { data } = await api.post('/demo-requests', p); return data; };
 export const submitContact       = async (p) => { const { data } = await api.post('/contact', p); return data; };
 export const placeOrder          = async (p) => { const { data } = await api.post('/orders', p); return data; };
+export const verifyPayment       = async (p) => { const { data } = await api.post('/orders/verify', p); return data; };
+export const fetchAdminOrders    = async (status='') => { const { data } = await api.get('/admin/orders', { params: status ? { status } : {} }); return data; };
+export const updateAdminOrder    = async ({ id, status }) => { const { data } = await api.patch(`/admin/orders/${id}`, { status }); return data; };

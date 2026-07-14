@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    // Checkout payments. Leave the keys empty to keep the pending-payment
+    // stub flow; setting both activates the Razorpay modal at checkout.
+    'razorpay' => [
+        'key'    => env('RAZORPAY_KEY_ID'),
+        'secret' => env('RAZORPAY_KEY_SECRET'),
+    ],
+
 ];

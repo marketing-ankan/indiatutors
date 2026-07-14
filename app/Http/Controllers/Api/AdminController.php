@@ -11,6 +11,7 @@ use App\Models\ClassLog;
 use App\Models\CourseProposal;
 use App\Models\DemoRequest;
 use App\Models\Enrollment;
+use App\Models\Order;
 use App\Models\RescheduleRequest;
 use App\Models\Student;
 use App\Models\User;
@@ -26,6 +27,20 @@ class AdminController extends Controller {
             ->latest();
         if ($s = $request->string('status')->toString()) $q->where('status', $s);
         return DemoRequestResource::collection($q->paginate(20));
+    }
+
+    /** Cart orders (guest checkout), newest first, optional status filter. */
+    public function orders(Request $request) {
+        $q = Order::query()->with('items:id,order_id,name,price,qty')->latest();
+        if ($s = $request->string('status')->toString()) $q->where('status', $s);
+        return response()->json($q->paginate(20));
+    }
+
+    /** Manual settlement until the Razorpay flow is fully live. */
+    public function updateOrder(Request $request, Order $order) {
+        $data = $request->validate(['status' => 'required|in:pending,paid,cancelled']);
+        $order->update($data);
+        return response()->json($order->fresh('items'));
     }
 
     /** Tutors that match a demo's subject + city (fallback to any if none). */
