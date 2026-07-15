@@ -43,9 +43,11 @@ function LiveTutorCard({ t }) {
   );
 }
 
-export default function FindTutorsPage() {
+export default function FindTutorsPage({ subjectOverride = '' }) {
   const [params, setParams] = useSearchParams();
-  const subject = params.get('subject') || '';
+  // subjectOverride backs the live /subject/{slug} archive URLs; an explicit
+  // ?subject= param (user changed the filter) always wins over it.
+  const subject = params.get('subject') || subjectOverride;
   const mode    = params.get('mode') || '';
   const [board, setBoard]   = useState('');
   const [grade, setGrade]   = useState('');
