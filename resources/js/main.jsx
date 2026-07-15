@@ -21,6 +21,14 @@ const queryClient = new QueryClient({
   },
 });
 
+// PWA: offline shell + installability. Production only so dev never
+// serves stale assets from the worker cache.
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>

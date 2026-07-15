@@ -48,7 +48,7 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 **SEO / technical**
 - ✅ Per-route server-rendered meta/title + Open Graph + Twitter (via `SeoMeta`), dynamic `sitemap.xml` (272 URLs) + `robots.txt`
 - ✅ Structured data / JSON-LD (Organization + WebSite, Course + Offer, Person, EducationalOrganization, BreadcrumbList)
-- ⬜ 301 redirects from old WordPress URLs (needs old permalink map; do at real-domain go-live)
+- ✅ 301 redirects from old WordPress URLs (server-side map for every WP-only URL, 2026-07-15 — see Phase 10)
 - ✅ GA4 analytics (env-driven: set `GOOGLE_ANALYTICS_ID` in server .env to activate). Performance verified (no N+1).
 
 ---
@@ -103,10 +103,12 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 - ✅ **Staff Console "Analytics" tab**: headline tiles (parents, teachers ± status, students, listed tutors, demos ± status, active enrollments, classes logged, pending proposals/reschedules), 6-month trends (demos / enrollments / signups), breakdowns by city & subject
 - ⬜ Revenue & teacher-payment analytics (after Phase 7); state/grade dimensions when captured
 
-## Phase 10 — PWA, hardening & go-live ⬜
-- PWA (installable, offline shell, push notifications)
-- Security/compliance pass, rate limiting, data protection
-- Migrate to real domain (update `APP_URL`, `SANCTUM_STATEFUL_DOMAINS`), performance, monitoring
+## Phase 10 — PWA, hardening & go-live 🔨 (UI + redirects ready 2026-07-15)
+- ✅ **PWA**: manifest (192/512 + maskable icons from the site logo), service worker (offline shell, cache-first hashed assets, network-first pages, API never cached), registered in production builds — installable from the browser
+- ✅ **301 redirect map**: every WP-only URL redirects server-side (shop→courses, product/*→courses/*, product-category/*→category archive, legal renames, my-account→login, hello-world, tutors/kolkata, WP defaults) — live now, ready for cutover
+- ⬜ Cutover checklist: buy domain → update `APP_URL` + `SANCTUM_STATEFUL_DOMAINS` → **copy the WP `wp-content/uploads` folder to the new server** (course/tutor images currently hotlink indiatutorsonline.com/wp-content/uploads/… and will break when WP is retired) → re-verify → submit sitemap to Search Console
+- ⬜ Push notifications (needs a push provider / VAPID setup)
+- ⬜ Final security/compliance pass, monitoring
 - *(Native React Native app — separate later track if needed)*
 
 ---
