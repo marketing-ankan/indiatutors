@@ -53,3 +53,12 @@ php artisan route:cache
 php artisan view:clear
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] deploy complete"
+
+# --- PWA files served from the web root ---------------------------------
+# NOTE: this script git-pulls itself mid-run, so edits must be APPENDED
+# (keep all earlier bytes identical) or bash may misread the running file.
+cp -f "$LARAVEL_DIR/public/sw.js" "$DOCROOT/sw.js"
+cp -f "$LARAVEL_DIR/public/manifest.webmanifest" "$DOCROOT/manifest.webmanifest"
+rm -rf "$DOCROOT/icons"
+cp -r "$LARAVEL_DIR/public/icons" "$DOCROOT/icons"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] pwa assets synced"
