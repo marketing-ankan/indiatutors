@@ -56,6 +56,10 @@ export default function App() {
         <Route path="/privacy" element={<LegalPage doc="privacy" />} />
         <Route path="/terms" element={<LegalPage doc="terms" />} />
         <Route path="/refund" element={<LegalPage doc="refund" />} />
+        {/* WordPress/WooCommerce alias URLs (live-parity; 301 targets at go-live) */}
+        <Route path="/my-account" element={<LoginPage />} />
+        <Route path="/refund_returns" element={<LegalPage doc="refund" />} />
+        <Route path="/plans-and-pricing" element={<PlansPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/wishlist" element={<WishlistPage />} />

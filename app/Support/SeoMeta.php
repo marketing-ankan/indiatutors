@@ -59,7 +59,8 @@ class SeoMeta {
             'login'             => ['title' => 'Login — ' . self::SITE, 'robots' => 'noindex, follow'],
             'dashboard'         => ['title' => 'Dashboard — ' . self::SITE, 'robots' => 'noindex, nofollow'],
             'admin'             => ['title' => 'Staff Console — ' . self::SITE, 'robots' => 'noindex, nofollow'],
-            'blog'              => ['title' => self::SITE . ' — Live Online Tutoring & Verified Home Tutors Across India', 'description' => 'Practical advice on tutoring, study skills and helping your child learn.'],
+            // Live-parity quirk: WP titles the posts index with the site name twice.
+            'blog'              => ['title' => self::SITE . ' — ' . self::SITE . ' — Live Online Tutoring & Verified Home Tutors Across India', 'description' => 'Practical advice on tutoring, study skills and helping your child learn.'],
             'privacy'           => ['title' => 'Privacy Policy — ' . self::SITE],
             'terms'             => ['title' => 'Terms of Service — ' . self::SITE],
             'refund'            => ['title' => 'Refund & Cancellation Policy — ' . self::SITE],
@@ -70,8 +71,15 @@ class SeoMeta {
             'competitive-exams' => ['title' => 'Competitive Exams — ' . self::SITE, 'description' => 'Focused, strategy-led coaching for standardised tests.'],
             'skill-programmes'  => ['title' => 'Skill Programmes — ' . self::SITE, 'description' => 'Career- and future-focused skill tracks for older learners.'],
             'cart'              => ['title' => 'Cart — ' . self::SITE, 'robots' => 'noindex, follow'],
-            'checkout'          => ['title' => 'Checkout — ' . self::SITE, 'robots' => 'noindex, follow'],
+            // Live-parity: an empty /checkout redirects to the cart, so the URL
+            // serves "Cart" (the SPA does the same redirect client-side).
+            'checkout'          => ['title' => 'Cart — ' . self::SITE, 'robots' => 'noindex, follow'],
             'wishlist'          => ['title' => 'Wishlist — ' . self::SITE, 'robots' => 'noindex, follow'],
+            // WordPress/WooCommerce alias URLs served for live-parity; they'll
+            // also be 301 targets in the go-live redirect map.
+            'my-account'        => ['title' => 'My account — ' . self::SITE, 'robots' => 'noindex, follow'],
+            'refund_returns'    => ['title' => 'Refund and Returns Policy — ' . self::SITE],
+            'plans-and-pricing' => ['title' => 'Plans & Pricing — ' . self::SITE, 'description' => 'Simple, honest pricing for live tutoring. First class is always free.'],
         ];
 
         // Category-filtered course archive (/courses?category=slug) — the live
