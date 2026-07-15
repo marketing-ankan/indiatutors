@@ -25,9 +25,7 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 
 ---
 
-## Phase 2 — Full website parity 🔜 (retire WordPress)
-
-**Kickoff decision needed:** SEO rendering strategy. The current SPA is client-rendered; a content/commerce site replacing WordPress needs server-rendered meta/content. Choose: SSR (Inertia+SSR) · prerendering · or per-route server-injected meta tags + sitemap. Decide before building Phase 2 pages.
+## Phase 2 — Full website parity ✅ (2026-07-14; only the 301 map remains, deferred to real-domain go-live)
 
 **Catalog**
 - ✅ Migrate courses from the WP XML (134 published, real `wp:post_name` slugs, subtitle, age, pills, curriculum, prices, category hierarchy, images) → `database/seeders/data/courses.json`
@@ -42,7 +40,7 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 - ✅ City pages — `/tutors-in/{city}` local-SEO landing (tutors + subjects + localities), derived from tutor data; scales to any city. Discoverable from Find Tutors.
 
 **Content & pages**
-- ⏸️ Landing pages: Group/Free/Video/Events/Competitive Exams/Skill Programmes — **deferred**: the source data has no group/video/free/delivery-mode split (all Live 1:1), so these need the commerce data model (Phase 7). Header no longer links to them.
+- ✅ Landing pages: Group Classes (full live accordion template), Free Classes, Video Courses, Events & Workshops, Competitive Exams, Skill Programmes — all rebuilt 1:1 from the live templates (2026-07-13/14)
 - ✅ Blog: list (`/blog`) + post detail (`/blog/{slug}`) — 3 original articles seeded, Article JSON-LD, in sitemap
 - ✅ Legal: Privacy Policy, Terms of Service, Refund & Cancellation
 - ✅ Refer & Earn, Plans & Pricing, About, Contact (render + verified)
