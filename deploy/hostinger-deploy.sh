@@ -62,3 +62,10 @@ cp -f "$LARAVEL_DIR/public/manifest.webmanifest" "$DOCROOT/manifest.webmanifest"
 rm -rf "$DOCROOT/icons"
 cp -r "$LARAVEL_DIR/public/icons" "$DOCROOT/icons"
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] pwa assets synced"
+
+# --- route-cache resilience -------------------------------------------
+# A stale route cache 404s new endpoints (SPA catch-all swallows them).
+# Rebuild the cache; if that ever fails, clear it — uncached routes work.
+php artisan route:clear || true
+php artisan route:cache || php artisan route:clear || true
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] route cache refreshed"
