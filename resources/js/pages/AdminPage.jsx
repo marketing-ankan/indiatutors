@@ -73,7 +73,7 @@ export default function AdminPage() {
 }
 
 const VC_BLANK = { title:'', subtitle:'', description:'', price:0, level:'Beginner', category:'', is_published:true };
-const LESSON_BLANK = { title:'', provider:'youtube', video_id:'', duration_seconds:0, is_preview:false };
+const LESSON_BLANK = { title:'', provider:'bunny', video_id:'', duration_seconds:0, is_preview:false };
 
 function LessonsManager({ course }) {
   const qc = useQueryClient();
@@ -102,8 +102,8 @@ function LessonsManager({ course }) {
       </div>
       <form onSubmit={e=>{e.preventDefault(); add.mutate(nl);}} className="mt-2 flex flex-wrap items-center gap-2">
         <input required value={nl.title} onChange={e=>setNl(s=>({...s,title:e.target.value}))} placeholder="Lesson title" className={inp+' flex-1 min-w-[140px]'} />
-        <select value={nl.provider} onChange={e=>setNl(s=>({...s,provider:e.target.value}))} className={inp}><option value="youtube">youtube</option><option value="bunny">bunny</option></select>
-        <input required value={nl.video_id} onChange={e=>setNl(s=>({...s,video_id:e.target.value}))} placeholder="video id / GUID" className={inp+' w-32'} />
+        <select value={nl.provider} onChange={e=>setNl(s=>({...s,provider:e.target.value}))} className={inp}><option value="bunny">Bunny (secure)</option><option value="youtube">YouTube (public only)</option></select>
+        <input required value={nl.video_id} onChange={e=>setNl(s=>({...s,video_id:e.target.value}))} placeholder={nl.provider==='bunny'?'Bunny GUID':'YouTube id'} className={inp+' w-32'} />
         <input type="number" min="0" value={nl.duration_seconds} onChange={e=>setNl(s=>({...s,duration_seconds:Number(e.target.value)}))} placeholder="sec" className={inp+' w-16'} />
         <label className="flex items-center gap-1 text-xs text-slate-600"><input type="checkbox" checked={nl.is_preview} onChange={e=>setNl(s=>({...s,is_preview:e.target.checked}))} className="accent-brand-600" />preview</label>
         <button type="submit" disabled={add.isPending} className="rounded-lg bg-brand-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-brand-700 disabled:opacity-60">+ Add</button>
