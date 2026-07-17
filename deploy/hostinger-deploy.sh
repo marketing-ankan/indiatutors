@@ -49,7 +49,7 @@ rm -f "$DOCROOT/robots.txt"
 
 # Rebuild caches against the new code
 php artisan config:cache
-php artisan route:cache
+php artisan route:clear
 php artisan view:clear
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] deploy complete"
