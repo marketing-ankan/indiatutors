@@ -3,7 +3,8 @@ import { Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ShieldAlert, ChevronDown, ChevronUp, UserCheck, GraduationCap, Check, X } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
-import { fetchAdminDemoRequests, fetchDemoTutors, assignDemo, convertDemo, fetchAdminTeachers, approveTeacher, fetchAdminProposals, decideProposal, fetchAdminAnalytics, fetchAdminExamUpdates, createExamUpdate, updateExamUpdate, deleteExamUpdate, fetchAdminOrders, updateAdminOrder, fetchAdminEvents, createAdminEvent, updateAdminEvent, deleteAdminEvent } from '../lib/api.js';
+import { fetchAdminDemoRequests, fetchDemoTutors, assignDemo, convertDemo, fetchAdminTeachers, approveTeacher, fetchAdminProposals, decideProposal, fetchAdminAnalytics, fetchAdminExamUpdates, createExamUpdate, updateExamUpdate, deleteExamUpdate, fetchAdminOrders, updateAdminOrder, fetchAdminEvents, createAdminEvent, updateAdminEvent, deleteAdminEvent, fetchAdminStoreProducts, createAdminStoreProduct, updateAdminStoreProduct, deleteAdminStoreProduct } from '../lib/api.js';
+import { STORE_CATEGORIES } from '../data/store.js';
 
 const STATUSES = ['', 'new', 'scheduled', 'converted', 'closed'];
 const badge = { new:'bg-amber-50 text-amber-700', scheduled:'bg-blue-50 text-blue-700', converted:'bg-green-50 text-green-700', closed:'bg-slate-100 text-slate-600' };
@@ -31,7 +32,7 @@ export default function AdminPage() {
       <h1 className="text-3xl font-extrabold tracking-tight">Staff Console</h1>
 
       <div className="mt-5 flex flex-wrap gap-2 border-b border-slate-100">
-        {[['demos','Demo Requests'],['orders','Orders'],['events','Events'],['teachers','Teacher Applications'],['proposals','Course Proposals'],['exams','Exam Updates'],['analytics','Analytics']].map(([k,label]) => (
+        {[['demos','Demo Requests'],['orders','Orders'],['events','Events'],['store','Store'],['teachers','Teacher Applications'],['proposals','Course Proposals'],['exams','Exam Updates'],['analytics','Analytics']].map(([k,label]) => (
           <button key={k} onClick={()=>setTab(k)} className={`px-4 py-2 text-sm font-semibold border-b-2 -mb-px ${tab===k?'border-brand-600 text-brand-700':'border-transparent text-slate-500 hover:text-slate-700'}`}>{label}</button>
         ))}
       </div>
@@ -53,6 +54,8 @@ export default function AdminPage() {
         <OrdersPanel />
       ) : tab === 'events' ? (
         <EventsPanel />
+      ) : tab === 'store' ? (
+        <StorePanel />
       ) : tab === 'teachers' ? (
         <TeachersPanel />
       ) : tab === 'proposals' ? (
@@ -61,6 +64,69 @@ export default function AdminPage() {
         <ExamUpdatesPanel />
       ) : (
         <AnalyticsPanel />
+      )}
+    </div>
+  );
+}
+
+const STORE_BLANK = { name:'', category:STORE_CATEGORIES[0]?.key||'', price:0, blurb:'', image_url:'', position:0, is_published:true };
+
+function StorePanel() {
+  const qc = useQueryClient();
+  const { data: products = [], isLoading } = useQuery({ queryKey:['admin-store'], queryFn: fetchAdminStoreProducts });
+  const invalidate = () => { qc.invalidateQueries({ queryKey:['admin-store'] }); qc.invalidateQueries({ queryKey:['store-products'] }); };
+  const [editing, setEditing] = useState(null);
+  const save = useMutation({ mutationFn: p => p.id ? updateAdminStoreProduct(p) : createAdminStoreProduct(p), onSuccess: () => { invalidate(); setEditing(null); } });
+  const remove = useMutation({ mutationFn: deleteAdminStoreProduct, onSuccess: invalidate });
+
+  const inp = 'w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500';
+  const set = k => e => setEditing(s => ({ ...s, [k]: k==='price'||k==='position' ? Number(e.target.value) : e.target.value }));
+  const catName = k => STORE_CATEGORIES.find(c=>c.key===k)?.name || k;
+
+  return (
+    <div className="mt-5">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm text-slate-500">Instruments & robotics-kits catalog shown on /instruments (enquiry-based).</p>
+        <button onClick={()=>setEditing({ ...STORE_BLANK })} className="rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700">+ New Product</button>
+      </div>
+
+      {editing && (
+        <form onSubmit={e=>{e.preventDefault(); save.mutate(editing);}} className="mb-6 rounded-2xl ring-1 ring-brand-100 bg-brand-50/40 p-5 grid gap-3 sm:grid-cols-2">
+          <F label="Name *"><input required value={editing.name} onChange={set('name')} className={inp}/></F>
+          <F label="Category *">
+            <select value={editing.category} onChange={set('category')} className={inp}>
+              {STORE_CATEGORIES.map(c=><option key={c.key} value={c.key}>{c.name}</option>)}
+            </select>
+          </F>
+          <F label="Price (₹, indicative)"><input type="number" min="0" value={editing.price} onChange={set('price')} className={inp}/></F>
+          <F label="Image URL (optional)"><input value={editing.image_url||''} onChange={set('image_url')} className={inp} placeholder="https://…"/></F>
+          <div className="sm:col-span-2"><F label="Blurb"><textarea rows={2} value={editing.blurb||''} onChange={set('blurb')} className={inp}/></F></div>
+          <div className="flex items-end gap-2">
+            <button type="submit" disabled={save.isPending} className="rounded-lg bg-brand-600 text-white px-5 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">{editing.id?'Save':'Create'}</button>
+            <button type="button" onClick={()=>setEditing(null)} className="rounded-lg ring-1 ring-slate-200 px-4 py-2 text-sm font-semibold text-slate-600">Cancel</button>
+          </div>
+          {save.isError && <p className="sm:col-span-2 text-xs text-red-600">Could not save — check the fields.</p>}
+        </form>
+      )}
+
+      {isLoading ? <p className="text-slate-500 py-10 text-center">Loading products…</p>
+      : !products.length ? <p className="text-slate-500 py-10 text-center">No products yet.</p>
+      : (
+        <div className="space-y-2">
+          {products.map(p => (
+            <div key={p.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl ring-1 ring-slate-100 bg-white px-4 py-3">
+              <span className="font-bold text-sm">{p.name}</span>
+              <span className="rounded-full bg-slate-100 text-slate-600 px-2 py-0.5 text-xs">{catName(p.category)}</span>
+              <span className="text-sm font-extrabold text-brand-600">₹{Number(p.price).toLocaleString('en-IN')}</span>
+              {!p.is_published && <span className="rounded-full bg-amber-50 text-amber-700 px-2 py-0.5 text-xs font-bold">hidden</span>}
+              <div className="ml-auto flex gap-2">
+                <a href={`/instruments/${p.slug}`} target="_blank" rel="noreferrer" className="text-xs font-semibold text-brand-600 hover:underline">View ↗</a>
+                <button onClick={()=>setEditing({ ...p })} className="text-xs font-bold text-slate-600 hover:text-brand-700">Edit</button>
+                <button onClick={()=>{ if(confirm(`Delete "${p.name}"?`)) remove.mutate(p.id); }} className="text-xs font-bold text-slate-600 hover:text-red-600">Delete</button>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

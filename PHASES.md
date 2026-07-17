@@ -118,6 +118,7 @@ User triage of the gap report: instruments store, SAT/Vedic calculators and CA/D
 - ✅ **/faqs** — site-wide FAQ page (the 18 real FAQs, accordion + demo CTA); footer FAQ link now points here
 - ✅ **/download-curriculum** — lead-gen gated curriculum download (course picker → lead into contact_messages → full curriculum unlocks on-page with Print/Save-as-PDF); product-page “Download Full Curriculum” links here prefilled
 - ✅ **Events system** — events table (initial 3 events seeded in the migration), public /events/{slug} detail pages (countdown, details grid, Google-Calendar link, registration → contact_messages), “Scheduled Events” section on /events-workshops, Staff Console “Events” tab (create/edit/publish/complete/delete), Event JSON-LD
+- ✅ **Instruments & Robotics-Kits store** (catalog + enquiry, 2026-07-15): /instruments (48 products × 7 categories), /instruments/{slug} detail with Enquire-to-order lead + WhatsApp, /buying-guide hub + 9 guides, Staff Console “Store” tab. No online payment/shipping (user-approved depth). Instruments-store checkout/SAT+Vedic calculators/extra policies remain NOT required per user.
 - ⬜ Later (user list): India-city geo pages; deeper round-2 audit (portals detailing, lead capture, teacher profiles, referral bonus system, YouTube linkages, product-page upgrades, video-courses front, physical-classes module)
 
 ---

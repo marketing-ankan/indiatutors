@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\DemoRequestController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\ExamUpdateController;
+use App\Http\Controllers\Api\StoreProductController;
 use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
@@ -38,6 +39,9 @@ Route::get('/posts/{slug}',      [BlogController::class, 'show'])->name('api.pos
 
 Route::get('/events',            [EventController::class, 'index']);
 Route::get('/events/{slug}',     [EventController::class, 'show'])->name('api.events.show');
+
+Route::get('/store-products',        [StoreProductController::class, 'index']);
+Route::get('/store-products/{slug}', [StoreProductController::class, 'show'])->name('api.store.show');
 
 Route::post('/demo-requests',    [DemoRequestController::class, 'store']);
 Route::post('/contact',          [ContactController::class, 'store']);
@@ -112,6 +116,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/events',                           [EventController::class, 'store']);
         Route::patch('/events/{event}',                  [EventController::class, 'update']);
         Route::delete('/events/{event}',                 [EventController::class, 'destroy']);
+        Route::get('/store-products',                    [StoreProductController::class, 'adminIndex']);
+        Route::post('/store-products',                   [StoreProductController::class, 'store']);
+        Route::patch('/store-products/{storeProduct}',   [StoreProductController::class, 'update']);
+        Route::delete('/store-products/{storeProduct}',  [StoreProductController::class, 'destroy']);
         Route::get('/teachers',                          [AdminController::class, 'teachers']);
         Route::patch('/teachers/{teacherProfile}',       [AdminController::class, 'approveTeacher']);
         Route::get('/proposals',                         [AdminController::class, 'proposals']);

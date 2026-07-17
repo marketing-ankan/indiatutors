@@ -77,6 +77,8 @@ class SeoMeta {
             'wishlist'          => ['title' => 'Wishlist — ' . self::SITE, 'robots' => 'noindex, follow'],
             // WordPress/WooCommerce alias URLs served for live-parity; they'll
             // also be 301 targets in the go-live redirect map.
+            'instruments'       => ['title' => 'Musical Instruments & Robotics Kits Store — ' . self::SITE, 'description' => 'Order age-appropriate instruments and coding/robotics kits matched to your child\'s classes. Pan-India delivery — enquire for price.'],
+            'buying-guide'      => ['title' => 'Instrument & Kit Buying Guides — ' . self::SITE, 'description' => 'Free, plain-English guides to choosing the right instrument or robotics kit for your child.'],
             'faqs'              => ['title' => 'FAQs — ' . self::SITE, 'description' => 'Frequently asked questions about classes, payments, scheduling, certificates and progress tracking.'],
             'download-curriculum' => ['title' => 'Download Curriculum — ' . self::SITE, 'description' => 'Get the complete level-by-level curriculum for any of our courses — free.'],
             'my-account'        => ['title' => 'My account — ' . self::SITE, 'robots' => 'noindex, follow'],
@@ -142,6 +144,16 @@ class SeoMeta {
                     'title' => $t->name . ' — ' . self::SITE, // live-parity: "{Name} – Indiatutors Online"
                     'description' => $desc, 'image' => $t->image_url ?: null, 'type' => 'profile',
                     'jsonld' => [$person, self::crumbs($base, [['Find Tutors', '/find-tutors'], [$t->name, '/tutor/' . $t->slug]])],
+                ];
+            }
+            if (Str::startsWith($path, 'instruments/')) {
+                $sp = \App\Models\StoreProduct::published()->where('slug', Str::after($path, 'instruments/'))->first();
+                if (!$sp) return [];
+                $desc = Str::limit(strip_tags($sp->blurb ?: ''), 155);
+                return [
+                    'title'       => $sp->name . ' — ' . self::SITE,
+                    'description' => $desc,
+                    'jsonld'      => [self::crumbs($base, [['Store', '/instruments'], [$sp->name, '/instruments/' . $sp->slug]])],
                 ];
             }
             if (Str::startsWith($path, 'events/')) {
