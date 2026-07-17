@@ -22,6 +22,8 @@ import InstrumentsPage from './pages/InstrumentsPage.jsx';
 import InstrumentProductPage from './pages/InstrumentProductPage.jsx';
 import BuyingGuidePage from './pages/BuyingGuidePage.jsx';
 import BoardPage from './pages/BoardPage.jsx';
+import VideoCoursesPage from './pages/VideoCoursesPage.jsx';
+import VideoCourseDetailPage from './pages/VideoCourseDetailPage.jsx';
 import BlogPostPage from './pages/BlogPostPage.jsx';
 import ReferEarnPage from './pages/ReferEarnPage.jsx';
 import BecomeTeacherPage from './pages/BecomeTeacherPage.jsx';
@@ -45,7 +47,8 @@ export default function App() {
         <Route path="/plans" element={<PlansPage />} />
         <Route path="/group-classes" element={<GroupClassesPage />} />
         <Route path="/free-classes" element={<FreeClassesPage />} />
-        <Route path="/video-courses" element={<LandingPage page="video-courses" />} />
+        <Route path="/video-courses" element={<VideoCoursesPage />} />
+        <Route path="/video-courses/:slug" element={<VideoCourseDetailPage />} />
         <Route path="/events-workshops" element={<LandingPage page="events-workshops" />} />
         <Route path="/events/:slug" element={<EventPage />} />
         <Route path="/faqs" element={<FaqsPage />} />

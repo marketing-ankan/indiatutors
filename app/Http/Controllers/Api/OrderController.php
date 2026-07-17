@@ -3,6 +3,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Order;
+use App\Models\VideoCourse;
+use App\Models\VideoEntitlement;
 use App\Support\Razorpay;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -30,16 +32,26 @@ class OrderController extends Controller {
             'order_notes'  => 'nullable|string|max:2000',
             'items'        => 'required|array|min:1|max:50',
             'items.*.slug' => 'required|string|max:190',
+            'items.*.kind' => 'nullable|in:course,video',
         ]);
 
-        $slugs   = collect($data['items'])->pluck('slug')->unique()->values();
-        $courses = Course::whereIn('slug', $slugs)->published()->get();
-        if ($courses->isEmpty()) {
+        // Split cart items by kind and re-price each from its own table.
+        $bySlug  = collect($data['items'])->keyBy('slug');
+        $videoSlugs  = $bySlug->filter(fn ($i) => ($i['kind'] ?? 'course') === 'video')->keys();
+        $courseSlugs = $bySlug->filter(fn ($i) => ($i['kind'] ?? 'course') !== 'video')->keys();
+
+        $courses = Course::whereIn('slug', $courseSlugs)->published()->get();
+        $videos  = VideoCourse::whereIn('slug', $videoSlugs)->published()->get();
+        if ($courses->isEmpty() && $videos->isEmpty()) {
             return response()->json(['message' => 'None of the cart items are available.'], 422);
         }
 
-        $order = DB::transaction(function () use ($data, $courses) {
+        // Public route: capture the buyer from a bearer token if one is present,
+        // so video-course entitlements can attach to their account on payment.
+        $userId = $request->user('sanctum')?->id;
+        $order = DB::transaction(function () use ($data, $courses, $videos, $userId) {
             $order = Order::create([
+                'user_id'     => $userId,
                 'first_name'  => $data['first_name'],
                 'last_name'   => $data['last_name'] ?? null,
                 'email'       => $data['email'],
@@ -56,15 +68,17 @@ class OrderController extends Controller {
             $total = 0;
             foreach ($courses as $c) {
                 $price = (float) $c->effective_price;
-                $order->items()->create([
-                    'course_id' => $c->id,
-                    'name'      => $c->name,
-                    'price'     => $price,
-                    'qty'       => 1, // catalog products are sold individually (live parity)
-                ]);
+                $order->items()->create(['course_id' => $c->id, 'name' => $c->name, 'price' => $price, 'qty' => 1]);
+                $total += $price;
+            }
+            foreach ($videos as $v) {
+                $price = (float) $v->price;
+                $order->items()->create(['video_course_id' => $v->id, 'name' => $v->title.' (video course)', 'price' => $price, 'qty' => 1]);
                 $total += $price;
             }
             $order->update(['total' => $total]);
+            // Free video courses (price 0) unlock immediately for a logged-in buyer.
+            if ($order->total == 0) { $order->update(['status' => 'paid']); self::grantEntitlements($order); }
             return $order;
         });
 
@@ -112,8 +126,24 @@ class OrderController extends Controller {
         }
 
         $order->update(['status' => 'paid', 'razorpay_payment_id' => $data['razorpay_payment_id']]);
+        self::grantEntitlements($order);
 
         return response()->json(['message' => 'Payment verified.', 'order' => self::orderPayload($order->fresh('items'))]);
+    }
+
+    /**
+     * Grant video-course access for every video item on a paid order. Idempotent
+     * (unique user+course), so it's safe to call on any →paid transition. Needs
+     * the order to belong to a user; guest video orders can't be entitled.
+     */
+    public static function grantEntitlements(Order $order): void {
+        if ($order->status !== 'paid' || !$order->user_id) return;
+        foreach ($order->items()->whereNotNull('video_course_id')->get() as $item) {
+            VideoEntitlement::firstOrCreate(
+                ['user_id' => $order->user_id, 'video_course_id' => $item->video_course_id],
+                ['order_id' => $order->id, 'granted_at' => now()],
+            );
+        }
     }
 
     private static function orderPayload(Order $order): array {

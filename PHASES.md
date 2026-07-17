@@ -85,6 +85,13 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 - ✅ **Portfolio building**: per-student achievements/certificates/milestones/artwork — parent and assigned teacher can add (files stored privately, links supported); teacher-added entries notify the parent
 - ✅ **Exam updates**: Staff Console "Exam Updates" tab (publish/draft/delete) → feed card on the parent dashboard
 
+## Video courses as gated playlists (point #4, 2026-07-16)
+- ✅ **Self-paced video courses** at /video-courses + /video-courses/{slug}: playlist with a gated player. Free-preview lessons play for everyone; paid lessons are locked until purchase.
+- ✅ **Purchase → entitlement**: buying a video course (requires login) creates an order tied to user_id; on paid (Razorpay or admin mark-paid) a video_entitlement is granted → all lessons unlock. Reuses the cart/checkout/Razorpay flow (cart items carry kind=course|video).
+- ✅ **Bunny.net Stream adapter** (config-driven, AppSupportBunnyStream): signs short-lived embed URLs — token=SHA256(key+videoId+expires) — when BUNNY_STREAM_* are set; without keys only preview/YouTube lessons play. Lessons store provider (bunny|youtube) + video_id.
+- ✅ **Staff Console “Video Courses” tab**: course CRUD + per-course lessons manager (add/reorder-by-position/preview-toggle/delete). **/my/video-courses** endpoint for the buyer’s library.
+- ⬜ Left: create the Bunny account + set BUNNY_STREAM_LIBRARY_ID/TOKEN_KEY (then paid playback goes live); upload real lesson videos; optional dashboard “My Courses” UI.
+
 ## Phase 7 — Payments & payouts 🔨 (v1 done 2026-07-14; live capture blocked on Razorpay keys + GST details)
 - ✅ **Cart → checkout → order**: WooCommerce-parity /cart, /checkout, /wishlist; guest orders re-priced server-side, recorded as `pending` with items (POST /api/orders)
 - ✅ **Razorpay integration (config-driven)**: set `RAZORPAY_KEY_ID`/`RAZORPAY_KEY_SECRET` and checkout creates a gateway order + opens the Razorpay modal; `POST /api/orders/verify` checks the HMAC signature and marks the order `paid`. Without keys the pending-payment stub flow runs unchanged.

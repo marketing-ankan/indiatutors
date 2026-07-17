@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\DemoRequestController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\ExamUpdateController;
 use App\Http\Controllers\Api\StoreProductController;
+use App\Http\Controllers\Api\VideoCourseController;
 use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
@@ -43,6 +44,12 @@ Route::get('/events/{slug}',     [EventController::class, 'show'])->name('api.ev
 Route::get('/store-products',        [StoreProductController::class, 'index']);
 Route::get('/store-products/{slug}', [StoreProductController::class, 'show'])->name('api.store.show');
 
+// Video courses — public list/detail (ownership resolved from a bearer token if
+// present); lesson playback is gated in the controller.
+Route::get('/video-courses',         [VideoCourseController::class, 'index']);
+Route::get('/video-courses/{slug}',  [VideoCourseController::class, 'show'])->name('api.video.show');
+Route::post('/video-courses/{videoCourse}/lessons/{lesson}/playback', [VideoCourseController::class, 'playback'])->middleware('throttle:60,1');
+
 Route::post('/demo-requests',    [DemoRequestController::class, 'store']);
 Route::post('/contact',          [ContactController::class, 'store']);
 Route::post('/orders',           [OrderController::class, 'store'])->middleware('throttle:10,1');
@@ -55,6 +62,7 @@ Route::post('/auth/login',       [AuthController::class, 'login'])->middleware('
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me',       [AuthController::class, 'me']);
     Route::post('/auth/logout',  [AuthController::class, 'logout']);
+    Route::get('/my/video-courses', [VideoCourseController::class, 'myCourses']);
 
     Route::apiResource('students', StudentController::class)->except(['show']);
 
@@ -120,6 +128,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/store-products',                   [StoreProductController::class, 'store']);
         Route::patch('/store-products/{storeProduct}',   [StoreProductController::class, 'update']);
         Route::delete('/store-products/{storeProduct}',  [StoreProductController::class, 'destroy']);
+        Route::get('/video-courses',                     [VideoCourseController::class, 'adminIndex']);
+        Route::post('/video-courses',                    [VideoCourseController::class, 'store']);
+        Route::patch('/video-courses/{videoCourse}',     [VideoCourseController::class, 'update']);
+        Route::delete('/video-courses/{videoCourse}',    [VideoCourseController::class, 'destroy']);
+        Route::get('/video-courses/{videoCourse}/lessons',                 [VideoCourseController::class, 'lessons']);
+        Route::post('/video-courses/{videoCourse}/lessons',                [VideoCourseController::class, 'storeLesson']);
+        Route::patch('/video-courses/{videoCourse}/lessons/{lesson}',      [VideoCourseController::class, 'updateLesson']);
+        Route::delete('/video-courses/{videoCourse}/lessons/{lesson}',     [VideoCourseController::class, 'destroyLesson']);
         Route::get('/teachers',                          [AdminController::class, 'teachers']);
         Route::patch('/teachers/{teacherProfile}',       [AdminController::class, 'approveTeacher']);
         Route::get('/proposals',                         [AdminController::class, 'proposals']);

@@ -159,3 +159,15 @@ export const fetchAdminStoreProducts= async () => { const { data } = await api.g
 export const createAdminStoreProduct= async (p) => { const { data } = await api.post('/admin/store-products', p); return data; };
 export const updateAdminStoreProduct= async ({ id, ...p }) => { const { data } = await api.patch(`/admin/store-products/${id}`, p); return data; };
 export const deleteAdminStoreProduct= async (id) => { const { data } = await api.delete(`/admin/store-products/${id}`); return data; };
+export const fetchVideoCourses      = async () => { const { data } = await api.get('/video-courses'); return data.data; };
+export const fetchVideoCourse       = async (slug) => { const { data } = await api.get(`/video-courses/${slug}`); return data; };
+export const fetchLessonPlayback    = async ({ courseId, lessonId }) => { const { data } = await api.post(`/video-courses/${courseId}/lessons/${lessonId}/playback`); return data; };
+export const fetchMyVideoCourses    = async () => { const { data } = await api.get('/my/video-courses'); return data.data; };
+export const fetchAdminVideoCourses = async () => { const { data } = await api.get('/admin/video-courses'); return data.data; };
+export const createAdminVideoCourse = async (p) => { const { data } = await api.post('/admin/video-courses', p); return data; };
+export const updateAdminVideoCourse = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/video-courses/${id}`, p); return data; };
+export const deleteAdminVideoCourse = async (id) => { const { data } = await api.delete(`/admin/video-courses/${id}`); return data; };
+export const fetchAdminLessons      = async (courseId) => { const { data } = await api.get(`/admin/video-courses/${courseId}/lessons`); return data.data; };
+export const createAdminLesson      = async ({ courseId, ...p }) => { const { data } = await api.post(`/admin/video-courses/${courseId}/lessons`, p); return data; };
+export const updateAdminLesson      = async ({ courseId, id, ...p }) => { const { data } = await api.patch(`/admin/video-courses/${courseId}/lessons/${id}`, p); return data; };
+export const deleteAdminLesson      = async ({ courseId, id }) => { const { data } = await api.delete(`/admin/video-courses/${courseId}/lessons/${id}`); return data; };

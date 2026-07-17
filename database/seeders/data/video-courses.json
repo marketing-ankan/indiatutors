@@ -1,0 +1,54 @@
+{
+  "courses": [
+    {
+      "slug": "python-for-kids-self-paced",
+      "title": "Python for Kids — Self-Paced",
+      "subtitle": "Code your first games and projects, at your own pace.",
+      "description": "A complete beginner-friendly Python track for ages 10+. Learn variables, loops, functions and build real mini-projects — watch anytime, rewatch as often as you like, and practise between lessons.",
+      "price": 1499,
+      "level": "Beginner",
+      "category": "IT Technologies",
+      "position": 0,
+      "lessons": [
+        { "title": "Welcome & what you'll build", "provider": "youtube", "video_id": "rfscVS0vtbw", "duration_seconds": 240, "is_preview": true },
+        { "title": "Installing Python & your first program", "provider": "youtube", "video_id": "kqtD5dpn9C8", "duration_seconds": 900, "is_preview": true },
+        { "title": "Variables & data types", "provider": "youtube", "video_id": "rfscVS0vtbw", "duration_seconds": 1080, "is_preview": false },
+        { "title": "Loops: repeat things automatically", "provider": "youtube", "video_id": "rfscVS0vtbw", "duration_seconds": 1200, "is_preview": false },
+        { "title": "Functions & building a number game", "provider": "youtube", "video_id": "rfscVS0vtbw", "duration_seconds": 1500, "is_preview": false }
+      ]
+    },
+    {
+      "slug": "arts-painting-fundamentals-video",
+      "title": "Arts & Painting Fundamentals (Video)",
+      "subtitle": "Sketching, colour theory and your first paintings.",
+      "description": "Self-paced painting fundamentals for young artists — pencil control, shading, colour mixing and three guided paintings you can complete at home.",
+      "price": 999,
+      "level": "Beginner",
+      "category": "Creative Skills",
+      "position": 1,
+      "lessons": [
+        { "title": "Course intro & materials", "provider": "youtube", "video_id": "ewMksAbgdBI", "duration_seconds": 300, "is_preview": true },
+        { "title": "Pencil control & basic shapes", "provider": "youtube", "video_id": "ewMksAbgdBI", "duration_seconds": 900, "is_preview": false },
+        { "title": "Shading & light", "provider": "youtube", "video_id": "ewMksAbgdBI", "duration_seconds": 1100, "is_preview": false },
+        { "title": "Colour theory & mixing", "provider": "youtube", "video_id": "ewMksAbgdBI", "duration_seconds": 1300, "is_preview": false }
+      ]
+    },
+    {
+      "slug": "digital-sat-math-video",
+      "title": "Digital SAT Math — Self-Paced",
+      "subtitle": "Concept videos + strategy for the Digital SAT Math section.",
+      "description": "Every Digital SAT Math topic broken into short, focused videos with worked examples and timing strategy — study on your schedule and revisit the tricky bits before test day.",
+      "price": 2499,
+      "level": "Advanced",
+      "category": "Study Abroad",
+      "position": 2,
+      "lessons": [
+        { "title": "How the Digital SAT Math works", "provider": "youtube", "video_id": "aircAruvnKk", "duration_seconds": 420, "is_preview": true },
+        { "title": "Heart of Algebra", "provider": "youtube", "video_id": "aircAruvnKk", "duration_seconds": 1500, "is_preview": false },
+        { "title": "Problem Solving & Data Analysis", "provider": "youtube", "video_id": "aircAruvnKk", "duration_seconds": 1600, "is_preview": false },
+        { "title": "Passport to Advanced Math", "provider": "youtube", "video_id": "aircAruvnKk", "duration_seconds": 1700, "is_preview": false },
+        { "title": "Full-section timing strategy", "provider": "youtube", "video_id": "aircAruvnKk", "duration_seconds": 1200, "is_preview": false }
+      ]
+    }
+  ]
+}

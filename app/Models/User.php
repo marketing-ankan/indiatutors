@@ -37,6 +37,7 @@ class User extends Authenticatable
 
     // Relationships
     public function students() { return $this->hasMany(Student::class); }
+    public function videoEntitlements() { return $this->hasMany(VideoEntitlement::class); }
     public function teacherProfile() { return $this->hasOne(TeacherProfile::class); }
     public function tutor() { return $this->hasOne(Tutor::class); }
     public function courseProposals() { return $this->hasMany(CourseProposal::class); }

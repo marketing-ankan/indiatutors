@@ -42,4 +42,13 @@ return [
         'secret' => env('RAZORPAY_KEY_SECRET'),
     ],
 
+    // Bunny.net Stream — paid video-course playback. Set the library id +
+    // token security key to sign gated playback URLs; without them, only
+    // preview (YouTube) lessons play. embed_host defaults to Bunny's iframe CDN.
+    'bunny' => [
+        'library_id' => env('BUNNY_STREAM_LIBRARY_ID'),
+        'token_key'  => env('BUNNY_STREAM_TOKEN_KEY'),
+        'embed_host' => env('BUNNY_STREAM_EMBED_HOST', 'iframe.mediadelivery.net'),
+    ],
+
 ];

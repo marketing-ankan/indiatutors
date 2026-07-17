@@ -146,6 +146,17 @@ class SeoMeta {
                     'jsonld' => [$person, self::crumbs($base, [['Find Tutors', '/find-tutors'], [$t->name, '/tutor/' . $t->slug]])],
                 ];
             }
+            if (Str::startsWith($path, 'video-courses/')) {
+                $vc = \App\Models\VideoCourse::published()->where('slug', Str::after($path, 'video-courses/'))->first();
+                if (!$vc) return [];
+                $desc = Str::limit(strip_tags($vc->subtitle ?: $vc->description ?: ''), 155);
+                return [
+                    'title'       => $vc->title . ' — Self-Paced Video Course | ' . self::SITE,
+                    'description' => $desc,
+                    'type'        => 'product',
+                    'jsonld'      => [self::crumbs($base, [['Video Courses', '/video-courses'], [$vc->title, $path]])],
+                ];
+            }
             if (Str::startsWith($path, 'board/')) {
                 static $boards = [
                     'cbse' => ['CBSE', 'Central Board of Secondary Education'],

@@ -100,7 +100,7 @@ export default function CheckoutPage() {
   };
 
   const submit = useMutation({
-    mutationFn: () => placeOrder({ ...f, items: items.map(i => ({ slug: i.slug })) }),
+    mutationFn: () => placeOrder({ ...f, items: items.map(i => ({ slug: i.slug, kind: i.kind || 'course' })) }),
     onSuccess: data => {
       cart.clear();
       if (data.razorpay) openRazorpayModal(data.razorpay, data.order);

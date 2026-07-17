@@ -5,6 +5,7 @@ import { ShieldAlert, ChevronDown, ChevronUp, UserCheck, GraduationCap, Check, X
 import { useAuth } from '../lib/auth.jsx';
 import { fetchAdminDemoRequests, fetchDemoTutors, assignDemo, convertDemo, fetchAdminTeachers, approveTeacher, fetchAdminProposals, decideProposal, fetchAdminAnalytics, fetchAdminExamUpdates, createExamUpdate, updateExamUpdate, deleteExamUpdate, fetchAdminOrders, updateAdminOrder, fetchAdminEvents, createAdminEvent, updateAdminEvent, deleteAdminEvent, fetchAdminStoreProducts, createAdminStoreProduct, updateAdminStoreProduct, deleteAdminStoreProduct } from '../lib/api.js';
 import { STORE_CATEGORIES } from '../data/store.js';
+import { fetchAdminVideoCourses, createAdminVideoCourse, updateAdminVideoCourse, deleteAdminVideoCourse, fetchAdminLessons, createAdminLesson, updateAdminLesson, deleteAdminLesson } from '../lib/api.js';
 
 const STATUSES = ['', 'new', 'scheduled', 'converted', 'closed'];
 const badge = { new:'bg-amber-50 text-amber-700', scheduled:'bg-blue-50 text-blue-700', converted:'bg-green-50 text-green-700', closed:'bg-slate-100 text-slate-600' };
@@ -32,7 +33,7 @@ export default function AdminPage() {
       <h1 className="text-3xl font-extrabold tracking-tight">Staff Console</h1>
 
       <div className="mt-5 flex flex-wrap gap-2 border-b border-slate-100">
-        {[['demos','Demo Requests'],['orders','Orders'],['events','Events'],['store','Store'],['teachers','Teacher Applications'],['proposals','Course Proposals'],['exams','Exam Updates'],['analytics','Analytics']].map(([k,label]) => (
+        {[['demos','Demo Requests'],['orders','Orders'],['events','Events'],['store','Store'],['videos','Video Courses'],['teachers','Teacher Applications'],['proposals','Course Proposals'],['exams','Exam Updates'],['analytics','Analytics']].map(([k,label]) => (
           <button key={k} onClick={()=>setTab(k)} className={`px-4 py-2 text-sm font-semibold border-b-2 -mb-px ${tab===k?'border-brand-600 text-brand-700':'border-transparent text-slate-500 hover:text-slate-700'}`}>{label}</button>
         ))}
       </div>
@@ -56,6 +57,8 @@ export default function AdminPage() {
         <EventsPanel />
       ) : tab === 'store' ? (
         <StorePanel />
+      ) : tab === 'videos' ? (
+        <VideoCoursesPanel />
       ) : tab === 'teachers' ? (
         <TeachersPanel />
       ) : tab === 'proposals' ? (
@@ -64,6 +67,106 @@ export default function AdminPage() {
         <ExamUpdatesPanel />
       ) : (
         <AnalyticsPanel />
+      )}
+    </div>
+  );
+}
+
+const VC_BLANK = { title:'', subtitle:'', description:'', price:0, level:'Beginner', category:'', is_published:true };
+const LESSON_BLANK = { title:'', provider:'youtube', video_id:'', duration_seconds:0, is_preview:false };
+
+function LessonsManager({ course }) {
+  const qc = useQueryClient();
+  const { data: lessons = [] } = useQuery({ queryKey:['admin-lessons', course.id], queryFn:()=>fetchAdminLessons(course.id) });
+  const invalidate = () => { qc.invalidateQueries({ queryKey:['admin-lessons', course.id] }); qc.invalidateQueries({ queryKey:['admin-videos'] }); };
+  const [nl, setNl] = useState({ ...LESSON_BLANK });
+  const add = useMutation({ mutationFn: p => createAdminLesson({ courseId: course.id, ...p }), onSuccess: () => { invalidate(); setNl({ ...LESSON_BLANK }); } });
+  const patch = useMutation({ mutationFn: ({ id, ...p }) => updateAdminLesson({ courseId: course.id, id, ...p }), onSuccess: invalidate });
+  const del = useMutation({ mutationFn: id => deleteAdminLesson({ courseId: course.id, id }), onSuccess: invalidate });
+  const inp = 'rounded-lg ring-1 ring-slate-200 px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500';
+
+  return (
+    <div className="mt-3 rounded-xl bg-slate-50 p-4">
+      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">Playlist ({lessons.length} lessons)</p>
+      <div className="space-y-1.5">
+        {lessons.map(l => (
+          <div key={l.id} className="flex flex-wrap items-center gap-2 rounded-lg bg-white px-3 py-2 ring-1 ring-slate-100">
+            <span className="text-xs font-semibold text-slate-700">{l.position + 1}. {l.title}</span>
+            <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-500">{l.provider}:{l.video_id}</span>
+            {l.is_preview ? <span className="rounded bg-green-50 px-1.5 py-0.5 text-[10px] font-bold text-green-700">FREE</span>
+              : <button onClick={()=>patch.mutate({ id:l.id, is_preview:true })} className="text-[10px] font-semibold text-brand-600">make preview</button>}
+            {l.is_preview && <button onClick={()=>patch.mutate({ id:l.id, is_preview:false })} className="text-[10px] font-semibold text-slate-500">make paid</button>}
+            <button onClick={()=>{ if(confirm('Delete lesson?')) del.mutate(l.id); }} className="ml-auto text-[10px] font-bold text-slate-500 hover:text-red-600">Delete</button>
+          </div>
+        ))}
+      </div>
+      <form onSubmit={e=>{e.preventDefault(); add.mutate(nl);}} className="mt-2 flex flex-wrap items-center gap-2">
+        <input required value={nl.title} onChange={e=>setNl(s=>({...s,title:e.target.value}))} placeholder="Lesson title" className={inp+' flex-1 min-w-[140px]'} />
+        <select value={nl.provider} onChange={e=>setNl(s=>({...s,provider:e.target.value}))} className={inp}><option value="youtube">youtube</option><option value="bunny">bunny</option></select>
+        <input required value={nl.video_id} onChange={e=>setNl(s=>({...s,video_id:e.target.value}))} placeholder="video id / GUID" className={inp+' w-32'} />
+        <input type="number" min="0" value={nl.duration_seconds} onChange={e=>setNl(s=>({...s,duration_seconds:Number(e.target.value)}))} placeholder="sec" className={inp+' w-16'} />
+        <label className="flex items-center gap-1 text-xs text-slate-600"><input type="checkbox" checked={nl.is_preview} onChange={e=>setNl(s=>({...s,is_preview:e.target.checked}))} className="accent-brand-600" />preview</label>
+        <button type="submit" disabled={add.isPending} className="rounded-lg bg-brand-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-brand-700 disabled:opacity-60">+ Add</button>
+      </form>
+    </div>
+  );
+}
+
+function VideoCoursesPanel() {
+  const qc = useQueryClient();
+  const { data: courses = [], isLoading } = useQuery({ queryKey:['admin-videos'], queryFn: fetchAdminVideoCourses });
+  const invalidate = () => { qc.invalidateQueries({ queryKey:['admin-videos'] }); qc.invalidateQueries({ queryKey:['video-courses'] }); };
+  const [editing, setEditing] = useState(null);
+  const [openId, setOpenId] = useState(null);
+  const save = useMutation({ mutationFn: p => p.id ? updateAdminVideoCourse(p) : createAdminVideoCourse(p), onSuccess: () => { invalidate(); setEditing(null); } });
+  const del = useMutation({ mutationFn: deleteAdminVideoCourse, onSuccess: invalidate });
+  const inp = 'w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500';
+  const set = k => e => setEditing(s => ({ ...s, [k]: k==='price' ? Number(e.target.value) : e.target.value }));
+
+  return (
+    <div className="mt-5">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm text-slate-500">Self-paced video courses on /video-courses. Add lessons (YouTube for previews, Bunny GUIDs for paid) and mark which are free previews.</p>
+        <button onClick={()=>setEditing({ ...VC_BLANK })} className="rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700">+ New Video Course</button>
+      </div>
+
+      {editing && (
+        <form onSubmit={e=>{e.preventDefault(); save.mutate(editing);}} className="mb-6 rounded-2xl ring-1 ring-brand-100 bg-brand-50/40 p-5 grid gap-3 sm:grid-cols-2">
+          <F label="Title *"><input required value={editing.title} onChange={set('title')} className={inp}/></F>
+          <F label="Price (₹)"><input type="number" min="0" value={editing.price} onChange={set('price')} className={inp}/></F>
+          <F label="Level"><input value={editing.level||''} onChange={set('level')} className={inp} placeholder="Beginner"/></F>
+          <F label="Category"><input value={editing.category||''} onChange={set('category')} className={inp}/></F>
+          <div className="sm:col-span-2"><F label="Subtitle"><input value={editing.subtitle||''} onChange={set('subtitle')} className={inp}/></F></div>
+          <div className="sm:col-span-2"><F label="Description"><textarea rows={2} value={editing.description||''} onChange={set('description')} className={inp}/></F></div>
+          <div className="flex items-end gap-2">
+            <button type="submit" disabled={save.isPending} className="rounded-lg bg-brand-600 text-white px-5 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">{editing.id?'Save':'Create'}</button>
+            <button type="button" onClick={()=>setEditing(null)} className="rounded-lg ring-1 ring-slate-200 px-4 py-2 text-sm font-semibold text-slate-600">Cancel</button>
+          </div>
+        </form>
+      )}
+
+      {isLoading ? <p className="text-slate-500 py-10 text-center">Loading…</p>
+      : !courses.length ? <p className="text-slate-500 py-10 text-center">No video courses yet.</p>
+      : (
+        <div className="space-y-3">
+          {courses.map(c => (
+            <div key={c.id} className="rounded-2xl ring-1 ring-slate-100 bg-white p-4">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="font-bold text-sm">{c.title}</span>
+                <span className="text-sm font-extrabold text-brand-600">₹{Number(c.price).toLocaleString('en-IN')}</span>
+                <span className="rounded-full bg-slate-100 text-slate-600 px-2 py-0.5 text-xs">{c.lessons_count} lessons</span>
+                {!c.is_published && <span className="rounded-full bg-amber-50 text-amber-700 px-2 py-0.5 text-xs font-bold">hidden</span>}
+                <div className="ml-auto flex gap-2">
+                  <a href={`/video-courses/${c.slug}`} target="_blank" rel="noreferrer" className="text-xs font-semibold text-brand-600 hover:underline">View ↗</a>
+                  <button onClick={()=>setOpenId(openId===c.id?null:c.id)} className="text-xs font-bold text-slate-600 hover:text-brand-700">{openId===c.id?'Hide lessons':'Lessons'}</button>
+                  <button onClick={()=>setEditing({ ...c })} className="text-xs font-bold text-slate-600 hover:text-brand-700">Edit</button>
+                  <button onClick={()=>{ if(confirm(`Delete "${c.title}" and its lessons?`)) del.mutate(c.id); }} className="text-xs font-bold text-slate-600 hover:text-red-600">Delete</button>
+                </div>
+              </div>
+              {openId===c.id && <LessonsManager course={c} />}
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

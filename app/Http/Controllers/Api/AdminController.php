@@ -40,6 +40,8 @@ class AdminController extends Controller {
     public function updateOrder(Request $request, Order $order) {
         $data = $request->validate(['status' => 'required|in:pending,paid,cancelled']);
         $order->update($data);
+        // Marking an order paid grants any video-course entitlements it carries.
+        if ($data['status'] === 'paid') \App\Http\Controllers\Api\OrderController::grantEntitlements($order->fresh());
         return response()->json($order->fresh('items'));
     }
 

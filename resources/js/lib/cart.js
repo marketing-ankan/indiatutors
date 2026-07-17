@@ -43,6 +43,16 @@ export const cartItemOf = c => ({
   name: c.name,
   price: Number(c.effective_price ?? c.price ?? 0),
   image_url: c.image_url || null,
+  kind: 'course',
+});
+
+// A self-paced video course as a cart line (kind drives server-side re-pricing).
+export const videoCartItem = v => ({
+  slug: v.slug,
+  name: v.title,
+  price: Number(v.price ?? 0),
+  image_url: v.thumbnail || null,
+  kind: 'video',
 });
 
 export const inrFmt = n => '₹' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });

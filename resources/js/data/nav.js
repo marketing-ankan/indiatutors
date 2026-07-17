@@ -522,20 +522,13 @@ export const CATALOG_NAV = [
   "to": "/video-courses",
   "mega": null,
   "items": [
-   {
-    "label": "🎨 Art and Painting",
-    "to": "/courses?search=Art%20and%20Painting"
-   },
-   {
-    "label": "✂️ Art and Craft",
-    "to": "/courses?search=Art%20and%20Craft"
-   },
-   {
-    "label": "🧮 Digital SAT Math",
-    "to": "/courses?search=SAT%20Math"
-   }
+   { "label": "🐍 Python for Kids", "to": "/video-courses/python-for-kids-self-paced" },
+   { "label": "🎨 Arts & Painting Fundamentals", "to": "/video-courses/arts-painting-fundamentals-video" },
+   { "label": "🧮 Digital SAT Math", "to": "/video-courses/digital-sat-math-video" }
   ],
-  "footer": []
+  "footer": [
+   { "label": "🎬 All video courses →", "to": "/video-courses" }
+  ]
  },
  {
   "label": "Group Classes",
