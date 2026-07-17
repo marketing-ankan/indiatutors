@@ -37,7 +37,9 @@ const SOCIALS = [
   [MessageCircle, 'https://wa.me/919330811581', 'WhatsApp'],
   [Facebook, 'https://www.facebook.com/indiatutorsonline', 'Facebook'],
   [Instagram, 'https://www.instagram.com/indiatutorsonline', 'Instagram'],
-  [Youtube, 'https://www.youtube.com/@indiatutorsonline', 'YouTube'],
+  // Real channel (the @indiatutorsonline handle on the live site 404s;
+  // user-approved correction — the business's channel is WinQuest's).
+  [Youtube, 'https://www.youtube.com/channel/UC9wzhXEl8sdHenhC_ZuYpgw', 'YouTube'],
   [Linkedin, 'https://www.linkedin.com/company/indiatutorsonline', 'LinkedIn'],
   [Twitter, 'https://twitter.com/indiatutorsonline', 'X (Twitter)'],
 ];
