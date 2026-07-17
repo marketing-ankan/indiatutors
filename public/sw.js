@@ -7,7 +7,7 @@
  *  - icons/manifest/favicon: cache-first
  * Bump VERSION to invalidate old caches on deploy.
  */
-const VERSION = 'v2';
+const VERSION = 'v3';
 const SHELL_CACHE = `ito-shell-${VERSION}`;
 const ASSET_CACHE = `ito-assets-${VERSION}`;
 const SHELL_URLS = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
