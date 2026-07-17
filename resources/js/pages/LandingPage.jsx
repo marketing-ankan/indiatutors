@@ -1,8 +1,39 @@
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { fetchEvents } from '../lib/api.js';
 
 // The four category-bar landing pages, ported from the live site's shared
 // template: hero (eyebrow · title · tagline · demo/pricing CTAs), card grid
 // (priced course cards or "Upcoming · Register Interest" cards), CTA band.
+// The events page additionally lists real dated events (Staff Console-managed)
+// above the interest grid, each linking to its /events/{slug} detail page.
+
+const fmtDate = d => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+function DatedEvents() {
+  const { data: events = [] } = useQuery({ queryKey: ['events'], queryFn: fetchEvents });
+  const upcoming = events.filter(e => e.status === 'upcoming');
+  if (!upcoming.length) return null;
+  return (
+    <section>
+      <h2 className="text-2xl font-extrabold tracking-tight mb-5">Scheduled Events</h2>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {upcoming.map(ev => (
+          <Link key={ev.slug} to={`/events/${ev.slug}`}
+            className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-5 flex flex-col gap-2 transition hover:-translate-y-0.5 hover:shadow-lg">
+            <div className="flex items-center justify-between">
+              <span className="text-3xl">{ev.icon}</span>
+              <span className="rounded-full bg-green-50 text-green-700 px-2.5 py-0.5 text-[11px] font-bold">Free · Live</span>
+            </div>
+            <h3 className="font-bold text-slate-900">{ev.title}</h3>
+            {ev.starts_at && <p className="text-sm text-slate-500">📅 {fmtDate(ev.starts_at)}{ev.ends_at ? ` – ${fmtDate(ev.ends_at)}` : ''} · {ev.mode}</p>}
+            <span className="mt-auto pt-1 text-sm font-bold text-brand-600">View & register →</span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 const LANDINGS = {
   'video-courses': {
@@ -85,6 +116,9 @@ export default function LandingPage({ page }) {
             <Link to="/plans" className="rounded-xl border border-white/60 px-6 py-3 text-sm font-bold hover:bg-white/10">See Plans & Pricing</Link>
           </div>
         </section>
+
+        {/* REAL DATED EVENTS (events page only) */}
+        {page === 'events-workshops' && <DatedEvents />}
 
         {/* CARD GRID */}
         <section>

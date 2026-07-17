@@ -77,6 +77,8 @@ class SeoMeta {
             'wishlist'          => ['title' => 'Wishlist — ' . self::SITE, 'robots' => 'noindex, follow'],
             // WordPress/WooCommerce alias URLs served for live-parity; they'll
             // also be 301 targets in the go-live redirect map.
+            'faqs'              => ['title' => 'FAQs — ' . self::SITE, 'description' => 'Frequently asked questions about classes, payments, scheduling, certificates and progress tracking.'],
+            'download-curriculum' => ['title' => 'Download Curriculum — ' . self::SITE, 'description' => 'Get the complete level-by-level curriculum for any of our courses — free.'],
             'my-account'        => ['title' => 'My account — ' . self::SITE, 'robots' => 'noindex, follow'],
             'refund_returns'    => ['title' => 'Refund and Returns Policy — ' . self::SITE],
             'plans-and-pricing' => ['title' => 'Plans & Pricing — ' . self::SITE, 'description' => 'Simple, honest pricing for live tutoring. First class is always free.'],
@@ -140,6 +142,21 @@ class SeoMeta {
                     'title' => $t->name . ' — ' . self::SITE, // live-parity: "{Name} – Indiatutors Online"
                     'description' => $desc, 'image' => $t->image_url ?: null, 'type' => 'profile',
                     'jsonld' => [$person, self::crumbs($base, [['Find Tutors', '/find-tutors'], [$t->name, '/tutor/' . $t->slug]])],
+                ];
+            }
+            if (Str::startsWith($path, 'events/')) {
+                $ev = \App\Models\Event::published()->where('slug', Str::after($path, 'events/'))->first();
+                if (!$ev) return [];
+                $desc = Str::limit(strip_tags($ev->description ?: ''), 155);
+                $jsonld = ['@context' => 'https://schema.org', '@type' => 'Event', 'name' => $ev->title,
+                    'description' => $desc, 'eventAttendanceMode' => 'https://schema.org/OnlineEventAttendanceMode',
+                    'organizer' => self::org($base), 'url' => $canonical];
+                if ($ev->starts_at) $jsonld['startDate'] = $ev->starts_at->toIso8601String();
+                if ($ev->ends_at)   $jsonld['endDate'] = $ev->ends_at->toIso8601String();
+                return [
+                    'title'       => $ev->title . ' — ' . self::SITE,
+                    'description' => $desc,
+                    'jsonld'      => [$jsonld, self::crumbs($base, [['Events & Workshops', '/events-workshops'], [$ev->title, '/events/' . $ev->slug]])],
                 ];
             }
             if (Str::startsWith($path, 'subject/')) {

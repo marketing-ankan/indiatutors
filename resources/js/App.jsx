@@ -15,6 +15,9 @@ import SubjectPage from './pages/SubjectPage.jsx';
 import TutorProfilePage from './pages/TutorProfilePage.jsx';
 import CityPage from './pages/CityPage.jsx';
 import BlogPage from './pages/BlogPage.jsx';
+import FaqsPage from './pages/FaqsPage.jsx';
+import DownloadCurriculumPage from './pages/DownloadCurriculumPage.jsx';
+import EventPage from './pages/EventPage.jsx';
 import BlogPostPage from './pages/BlogPostPage.jsx';
 import ReferEarnPage from './pages/ReferEarnPage.jsx';
 import BecomeTeacherPage from './pages/BecomeTeacherPage.jsx';
@@ -40,6 +43,9 @@ export default function App() {
         <Route path="/free-classes" element={<FreeClassesPage />} />
         <Route path="/video-courses" element={<LandingPage page="video-courses" />} />
         <Route path="/events-workshops" element={<LandingPage page="events-workshops" />} />
+        <Route path="/events/:slug" element={<EventPage />} />
+        <Route path="/faqs" element={<FaqsPage />} />
+        <Route path="/download-curriculum" element={<DownloadCurriculumPage />} />
         <Route path="/competitive-exams" element={<LandingPage page="competitive-exams" />} />
         <Route path="/skill-programmes" element={<LandingPage page="skill-programmes" />} />
         <Route path="/tutor/:slug" element={<TutorProfilePage />} />

@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ShieldAlert, ChevronDown, ChevronUp, UserCheck, GraduationCap, Check, X } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
-import { fetchAdminDemoRequests, fetchDemoTutors, assignDemo, convertDemo, fetchAdminTeachers, approveTeacher, fetchAdminProposals, decideProposal, fetchAdminAnalytics, fetchAdminExamUpdates, createExamUpdate, updateExamUpdate, deleteExamUpdate, fetchAdminOrders, updateAdminOrder } from '../lib/api.js';
+import { fetchAdminDemoRequests, fetchDemoTutors, assignDemo, convertDemo, fetchAdminTeachers, approveTeacher, fetchAdminProposals, decideProposal, fetchAdminAnalytics, fetchAdminExamUpdates, createExamUpdate, updateExamUpdate, deleteExamUpdate, fetchAdminOrders, updateAdminOrder, fetchAdminEvents, createAdminEvent, updateAdminEvent, deleteAdminEvent } from '../lib/api.js';
 
 const STATUSES = ['', 'new', 'scheduled', 'converted', 'closed'];
 const badge = { new:'bg-amber-50 text-amber-700', scheduled:'bg-blue-50 text-blue-700', converted:'bg-green-50 text-green-700', closed:'bg-slate-100 text-slate-600' };
@@ -31,7 +31,7 @@ export default function AdminPage() {
       <h1 className="text-3xl font-extrabold tracking-tight">Staff Console</h1>
 
       <div className="mt-5 flex flex-wrap gap-2 border-b border-slate-100">
-        {[['demos','Demo Requests'],['orders','Orders'],['teachers','Teacher Applications'],['proposals','Course Proposals'],['exams','Exam Updates'],['analytics','Analytics']].map(([k,label]) => (
+        {[['demos','Demo Requests'],['orders','Orders'],['events','Events'],['teachers','Teacher Applications'],['proposals','Course Proposals'],['exams','Exam Updates'],['analytics','Analytics']].map(([k,label]) => (
           <button key={k} onClick={()=>setTab(k)} className={`px-4 py-2 text-sm font-semibold border-b-2 -mb-px ${tab===k?'border-brand-600 text-brand-700':'border-transparent text-slate-500 hover:text-slate-700'}`}>{label}</button>
         ))}
       </div>
@@ -51,6 +51,8 @@ export default function AdminPage() {
         </>
       ) : tab === 'orders' ? (
         <OrdersPanel />
+      ) : tab === 'events' ? (
+        <EventsPanel />
       ) : tab === 'teachers' ? (
         <TeachersPanel />
       ) : tab === 'proposals' ? (
@@ -60,6 +62,88 @@ export default function AdminPage() {
       ) : (
         <AnalyticsPanel />
       )}
+    </div>
+  );
+}
+
+const eventBadge = { upcoming:'bg-green-50 text-green-700', completed:'bg-slate-100 text-slate-600', draft:'bg-amber-50 text-amber-700' };
+const EVENT_BLANK = { title:'', icon:'🎓', category:'', description:'', starts_at:'', ends_at:'', mode:'Online', batch_size:'', session_duration:'', schedule_note:'', time_note:'', status:'upcoming' };
+// Hoisted so inputs keep identity (and focus) across EventsPanel re-renders.
+const F = ({ label, children }) => <label className="block"><span className="block text-xs font-semibold text-slate-600 mb-1">{label}</span>{children}</label>;
+
+function EventsPanel() {
+  const qc = useQueryClient();
+  const { data: events = [], isLoading } = useQuery({ queryKey:['admin-events'], queryFn: fetchAdminEvents });
+  const invalidate = () => { qc.invalidateQueries({ queryKey:['admin-events'] }); qc.invalidateQueries({ queryKey:['events'] }); };
+  const [editing, setEditing] = useState(null); // null | {…event} (id null = new)
+  const save = useMutation({
+    mutationFn: p => p.id ? updateAdminEvent(p) : createAdminEvent(p),
+    onSuccess: () => { invalidate(); setEditing(null); },
+  });
+  const patch = useMutation({ mutationFn: updateAdminEvent, onSuccess: invalidate });
+  const remove = useMutation({ mutationFn: deleteAdminEvent, onSuccess: invalidate });
+
+  const inp = 'w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500';
+  const toLocal = v => v ? String(v).replace(' ', 'T').slice(0, 16) : '';
+  const set = k => e => setEditing(s => ({ ...s, [k]: e.target.value }));
+
+  return (
+    <div className="mt-5">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm text-slate-500">Dated events shown on /events-workshops with public detail + registration pages.</p>
+        <button onClick={()=>setEditing({ ...EVENT_BLANK })} className="rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700">+ New Event</button>
+      </div>
+
+      {editing && (
+        <form onSubmit={e=>{e.preventDefault(); save.mutate(editing);}} className="mb-6 rounded-2xl ring-1 ring-brand-100 bg-brand-50/40 p-5 grid gap-3 sm:grid-cols-2">
+          <F label="Title *"><input required value={editing.title} onChange={set('title')} className={inp}/></F>
+          <div className="grid grid-cols-[80px_1fr] gap-3">
+            <F label="Icon"><input value={editing.icon||''} onChange={set('icon')} className={inp}/></F>
+            <F label="Category"><input value={editing.category||''} onChange={set('category')} className={inp} placeholder="e.g. Mind Sports"/></F>
+          </div>
+          <F label="Starts"><input type="datetime-local" value={toLocal(editing.starts_at)} onChange={set('starts_at')} className={inp}/></F>
+          <F label="Ends"><input type="datetime-local" value={toLocal(editing.ends_at)} onChange={set('ends_at')} className={inp}/></F>
+          <F label="Batch size"><input value={editing.batch_size||''} onChange={set('batch_size')} className={inp} placeholder="10–15 students"/></F>
+          <F label="Session duration"><input value={editing.session_duration||''} onChange={set('session_duration')} className={inp} placeholder="1 hour per session"/></F>
+          <F label="Schedule note"><input value={editing.schedule_note||''} onChange={set('schedule_note')} className={inp}/></F>
+          <F label="Time note"><input value={editing.time_note||''} onChange={set('time_note')} className={inp} placeholder="8:00 am – 5:00 pm (Asia/Kolkata)"/></F>
+          <div className="sm:col-span-2"><F label="Description"><textarea rows={3} value={editing.description||''} onChange={set('description')} className={inp}/></F></div>
+          <F label="Status">
+            <select value={editing.status||'upcoming'} onChange={set('status')} className={inp}>
+              {['upcoming','completed','draft'].map(s=><option key={s}>{s}</option>)}
+            </select>
+          </F>
+          <div className="flex items-end gap-2">
+            <button type="submit" disabled={save.isPending} className="rounded-lg bg-brand-600 text-white px-5 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">{editing.id?'Save changes':'Create event'}</button>
+            <button type="button" onClick={()=>setEditing(null)} className="rounded-lg ring-1 ring-slate-200 px-4 py-2 text-sm font-semibold text-slate-600">Cancel</button>
+          </div>
+          {save.isError && <p className="sm:col-span-2 text-xs text-red-600">Could not save — check the fields (end must be after start).</p>}
+        </form>
+      )}
+
+      <div className="space-y-3">
+        {isLoading ? <p className="text-slate-500 py-10 text-center">Loading events…</p>
+        : !events.length ? <p className="text-slate-500 py-10 text-center">No events yet — create the first one.</p>
+        : events.map(ev => (
+          <div key={ev.id} className="rounded-2xl ring-1 ring-slate-100 bg-white p-5">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span className="text-xl">{ev.icon}</span>
+              <span className="font-bold">{ev.title}</span>
+              <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${eventBadge[ev.status]||''}`}>{ev.status}</span>
+              {ev.starts_at && <span className="text-sm text-slate-500">{new Date(ev.starts_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}{ev.ends_at?` – ${new Date(ev.ends_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}`:''}</span>}
+              <a href={`/events/${ev.slug}`} target="_blank" rel="noreferrer" className="ml-auto text-xs font-semibold text-brand-600 hover:underline">View page ↗</a>
+            </div>
+            {ev.description && <p className="mt-1.5 text-sm text-slate-600 line-clamp-2">{ev.description}</p>}
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button onClick={()=>setEditing({ ...ev })} className="rounded-lg ring-1 ring-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:ring-brand-300">Edit</button>
+              {ev.status !== 'completed' && <button onClick={()=>patch.mutate({ id:ev.id, status:'completed' })} className="rounded-lg ring-1 ring-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-green-700">Mark completed</button>}
+              {ev.status !== 'upcoming' && <button onClick={()=>patch.mutate({ id:ev.id, status:'upcoming' })} className="rounded-lg ring-1 ring-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-green-700">Mark upcoming</button>}
+              {ev.status !== 'draft' && <button onClick={()=>patch.mutate({ id:ev.id, status:'draft' })} className="rounded-lg ring-1 ring-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-amber-700">Unpublish</button>}
+              <button onClick={()=>{ if(confirm(`Delete "${ev.title}"?`)) remove.mutate(ev.id); }} className="rounded-lg ring-1 ring-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-red-600 hover:ring-red-200">Delete</button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

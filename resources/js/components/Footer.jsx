@@ -30,7 +30,7 @@ const LEARN_DISCOVER = [
 ];
 const SUPPORT = [
   ['🎓 Student Login', '/login'], ['👩‍🏫 Teacher Login', '/login'],
-  ['❓ FAQ', '/contact'], ['🆘 Help Centre', '/contact'],
+  ['❓ FAQ', '/faqs'], ['🆘 Help Centre', '/contact'],
   ['🔒 Privacy Policy', '/privacy'], ['📜 Terms of Service', '/terms'], ['💰 Refund Policy', '/refund'],
 ];
 const SOCIALS = [

@@ -147,3 +147,9 @@ export const placeOrder          = async (p) => { const { data } = await api.pos
 export const verifyPayment       = async (p) => { const { data } = await api.post('/orders/verify', p); return data; };
 export const fetchAdminOrders    = async (status='') => { const { data } = await api.get('/admin/orders', { params: status ? { status } : {} }); return data; };
 export const updateAdminOrder    = async ({ id, status }) => { const { data } = await api.patch(`/admin/orders/${id}`, { status }); return data; };
+export const fetchEvents        = async () => { const { data } = await api.get('/events'); return data.data; };
+export const fetchEvent         = async (slug) => { const { data } = await api.get(`/events/${slug}`); return data; };
+export const fetchAdminEvents   = async () => { const { data } = await api.get('/admin/events'); return data.data; };
+export const createAdminEvent   = async (p) => { const { data } = await api.post('/admin/events', p); return data; };
+export const updateAdminEvent   = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/events/${id}`, p); return data; };
+export const deleteAdminEvent   = async (id) => { const { data } = await api.delete(`/admin/events/${id}`); return data; };

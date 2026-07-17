@@ -97,9 +97,9 @@ function BuyCard({ course }) {
           <Heart className={`h-4 w-4 ${wished ? 'fill-red-500 text-red-500' : ''}`} /> {wished ? 'Saved to Wishlist' : 'Save to Wishlist'}
         </button>
         <Link to="/book-demo" className="block text-center rounded-[10px] bg-[#F3F6FC] text-brand-800 py-2.5 text-sm font-bold hover:bg-brand-100">Book a Free Demo</Link>
-        <a href="#course-tabs" className="flex items-center justify-center gap-2 rounded-[10px] text-[#0B1220] py-2 text-sm font-bold hover:text-brand-700">
+        <Link to={`/download-curriculum?course=${course.slug}`} className="flex items-center justify-center gap-2 rounded-[10px] text-[#0B1220] py-2 text-sm font-bold hover:text-brand-700">
           <Download className="h-4 w-4" /> Download Full Curriculum (PDF)
-        </a>
+        </Link>
 
         {/* Contact */}
         <div className="pt-3 border-t border-slate-100">

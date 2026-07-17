@@ -113,6 +113,15 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 
 ---
 
+## WinQuest feature adoption (sister site winquestonline.com; audited 2026-07-15)
+User triage of the gap report: instruments store, SAT/Vedic calculators and CA/DEIB policies = NOT required; geo pages = later, India-city-specific; approved trio built 2026-07-15:
+- ✅ **/faqs** — site-wide FAQ page (the 18 real FAQs, accordion + demo CTA); footer FAQ link now points here
+- ✅ **/download-curriculum** — lead-gen gated curriculum download (course picker → lead into contact_messages → full curriculum unlocks on-page with Print/Save-as-PDF); product-page “Download Full Curriculum” links here prefilled
+- ✅ **Events system** — events table (initial 3 events seeded in the migration), public /events/{slug} detail pages (countdown, details grid, Google-Calendar link, registration → contact_messages), “Scheduled Events” section on /events-workshops, Staff Console “Events” tab (create/edit/publish/complete/delete), Event JSON-LD
+- ⬜ Later (user list): India-city geo pages; deeper round-2 audit (portals detailing, lead capture, teacher profiles, referral bonus system, YouTube linkages, product-page upgrades, video-courses front, physical-classes module)
+
+---
+
 ## Reference — source data model (from WP export)
 - **Courses** (`product`, WooCommerce simple): meta `_ito_subtitle`, `_ito_age`, `_ito_pills`, `_ito_tier_labels`/`_ito_tier_o2o`/`_ito_tier_group`, `_ito_curriculum`, `_regular_price`/`_sale_price`
 - **Tutors** (`ito_tutor`): full_name, tagline, qualification, teaching_mode, city/state/localities, fee_hourly, fee_trial, verified, languages, experience_years

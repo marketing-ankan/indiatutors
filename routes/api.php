@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\DemoRequestController;
+use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\ExamUpdateController;
 use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\NotificationController;
@@ -34,6 +35,9 @@ Route::get('/cities/{slug}',     [CityController::class, 'show']);
 
 Route::get('/posts',             [BlogController::class, 'index']);
 Route::get('/posts/{slug}',      [BlogController::class, 'show'])->name('api.posts.show');
+
+Route::get('/events',            [EventController::class, 'index']);
+Route::get('/events/{slug}',     [EventController::class, 'show'])->name('api.events.show');
 
 Route::post('/demo-requests',    [DemoRequestController::class, 'store']);
 Route::post('/contact',          [ContactController::class, 'store']);
@@ -104,6 +108,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/enrollments',                       [AdminController::class, 'enrollments']);
         Route::get('/orders',                            [AdminController::class, 'orders']);
         Route::patch('/orders/{order}',                  [AdminController::class, 'updateOrder']);
+        Route::get('/events',                            [EventController::class, 'adminIndex']);
+        Route::post('/events',                           [EventController::class, 'store']);
+        Route::patch('/events/{event}',                  [EventController::class, 'update']);
+        Route::delete('/events/{event}',                 [EventController::class, 'destroy']);
         Route::get('/teachers',                          [AdminController::class, 'teachers']);
         Route::patch('/teachers/{teacherProfile}',       [AdminController::class, 'approveTeacher']);
         Route::get('/proposals',                         [AdminController::class, 'proposals']);
