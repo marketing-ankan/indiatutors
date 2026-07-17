@@ -81,7 +81,9 @@ class CourseSeeder extends Seeder {
         }
 
         // Drop categories that ended up empty (no courses and no children).
-        Category::doesntHave('courses')->doesntHave('children')->delete();
+        // Loop so a parent whose children were all just pruned (e.g. the removed
+        // "AP Courses" branch) also clears in the same run — bottom-up to stable.
+        do { $gone = Category::doesntHave('courses')->doesntHave('children')->delete(); } while ($gone > 0);
 
         $this->command->info("Imported/updated ".count($sourceSlugs)." courses (pruned $pruned stale). Categories: ".Category::count());
     }

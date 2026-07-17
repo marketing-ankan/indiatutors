@@ -3,6 +3,7 @@ use App\Http\Controllers\SitemapController;
 use App\Support\SeoMeta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 Route::get('/robots.txt', [SitemapController::class, 'robots']);
@@ -30,7 +31,13 @@ foreach ([
 ] as $from => $to) {
     Route::redirect('/'.$from, $to, 301);
 }
-Route::get('/product/{slug}', fn (string $slug) => redirect('/courses/'.$slug, 301));
+// AP courses were removed (India-localisation): old AP course URLs 301 to
+// /courses. The constraint means only /courses/ap-* hits this — every other
+// /courses/{slug} still falls through to the SPA catch-all below.
+Route::get('/courses/{slug}', fn () => redirect('/courses', 301))->where('slug', 'ap-.+');
+Route::get('/product/{slug}', fn (string $slug) => Str::startsWith($slug, 'ap-')
+    ? redirect('/courses', 301)
+    : redirect('/courses/'.$slug, 301));
 // WP category URLs nest parents (/product-category/dance/kathak/); the last
 // segment is the category slug our archive filters on.
 Route::get('/product-category/{path}', function (string $path) {

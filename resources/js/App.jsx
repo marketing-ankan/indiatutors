@@ -21,6 +21,7 @@ import EventPage from './pages/EventPage.jsx';
 import InstrumentsPage from './pages/InstrumentsPage.jsx';
 import InstrumentProductPage from './pages/InstrumentProductPage.jsx';
 import BuyingGuidePage from './pages/BuyingGuidePage.jsx';
+import BoardPage from './pages/BoardPage.jsx';
 import BlogPostPage from './pages/BlogPostPage.jsx';
 import ReferEarnPage from './pages/ReferEarnPage.jsx';
 import BecomeTeacherPage from './pages/BecomeTeacherPage.jsx';
@@ -53,6 +54,7 @@ export default function App() {
         <Route path="/instruments/:slug" element={<InstrumentProductPage />} />
         <Route path="/buying-guide" element={<BuyingGuidePage />} />
         <Route path="/buying-guide/:slug" element={<BuyingGuidePage />} />
+        <Route path="/board/:slug" element={<BoardPage />} />
         <Route path="/competitive-exams" element={<LandingPage page="competitive-exams" />} />
         <Route path="/skill-programmes" element={<LandingPage page="skill-programmes" />} />
         <Route path="/tutor/:slug" element={<TutorProfilePage />} />

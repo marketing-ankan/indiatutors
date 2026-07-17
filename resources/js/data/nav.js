@@ -13,6 +13,17 @@ export const CATALOG_NAV = [
   "to": "/courses",
   "mega": [
    {
+    "label": "🎓 By Board",
+    "to": "/courses?category=academics-high-school",
+    "items": [
+     { "label": "🏫 CBSE", "to": "/board/cbse" },
+     { "label": "📚 ICSE / ISC", "to": "/board/icse" },
+     { "label": "🌍 IGCSE / Cambridge", "to": "/board/igcse" },
+     { "label": "📍 State Boards", "to": "/board/state-boards" },
+     { "label": "📖 NCERT", "to": "/board/ncert" }
+    ]
+   },
+   {
     "label": "📘 Academics — Elementary & Middle School",
     "to": "/courses?category=academics-elementary-middle-school",
     "items": [
@@ -169,111 +180,18 @@ export const CATALOG_NAV = [
     ]
    },
    {
-    "label": "🎓 AP Courses",
-    "to": "/courses?category=ap-courses",
+    "label": "🏆 Competitive Exams",
+    "to": "/competitive-exams",
     "items": [
-     {
-      "label": "🧬 AP Biology",
-      "to": "/courses/ap-biology"
-     },
-     {
-      "label": "📐 AP Calculus AB",
-      "to": "/courses/ap-calculus-ab"
-     },
-     {
-      "label": "📐 AP Calculus BC",
-      "to": "/courses/ap-calculus-bc"
-     },
-     {
-      "label": "🧪 AP Chemistry",
-      "to": "/courses/ap-chemistry"
-     },
-     {
-      "label": "🔬 AP Computer Science",
-      "to": "/courses/ap-computer-science"
-     },
-     {
-      "label": "🔬 AP Computer Science Principles",
-      "to": "/courses/ap-computer-science-principles"
-     },
-     {
-      "label": "📖 AP English Language",
-      "to": "/courses/ap-english-language"
-     },
-     {
-      "label": "📜 AP European History",
-      "to": "/courses/ap-european-history"
-     },
-     {
-      "label": "🇫🇷 AP French",
-      "to": "/courses/ap-french"
-     },
-     {
-      "label": "📊 AP Macro Economics",
-      "to": "/courses/ap-macro-economics"
-     },
-     {
-      "label": "📊 AP Micro Economics",
-      "to": "/courses/ap-micro-economics"
-     },
-     {
-      "label": "🎼 AP Music Theory",
-      "to": "/courses/ap-music-theory"
-     },
-     {
-      "label": "⚛️ AP Physics 1/2",
-      "to": "/courses/ap-physics-1-2"
-     },
-     {
-      "label": "⚛️ AP Physics C",
-      "to": "/courses/ap-physics-c"
-     },
-     {
-      "label": "⚛️ AP Physics C Mechanics",
-      "to": "/courses/ap-physics-c-mechanics"
-     },
-     {
-      "label": "⚛️ AP Physics Prep",
-      "to": "/courses/ap-physics-prep"
-     },
-     {
-      "label": "📐 AP Pre-Calculus",
-      "to": "/courses/ap-pre-calculus"
-     },
-     {
-      "label": "🇪🇸 AP Spanish",
-      "to": "/courses/ap-spanish"
-     }
-    ]
-   },
-   {
-    "label": "📝 Standardized Tests",
-    "to": "/courses?category=standardized-tests",
-    "items": [
-     {
-      "label": "📝 ACT",
-      "to": "/courses/act"
-     },
-     {
-      "label": "📝 Digital SAT/PSAT Math",
-      "to": "/courses/digital-sat-psat-math"
-     },
-     {
-      "label": "📖 English SAT/PSAT",
-      "to": "/courses/english-sat-psat"
-     },
-     {
-      "label": "📝 Math SAT/PSAT",
-      "to": "/courses/math-sat-psat"
-     },
-     {
-      "label": "📝 NMSQT",
-      "to": "/courses/nmsqt"
-     },
-     {
-      "label": "📝 SAT/PSAT Math Mastery",
-      "to": "/courses/sat-psat-math-mastery"
-     }
+     { "label": "⚡ JEE Main", "to": "/book-demo?subject=JEE Main" },
+     { "label": "⚡ JEE Advanced", "to": "/book-demo?subject=JEE Advanced" },
+     { "label": "🧬 NEET", "to": "/book-demo?subject=NEET" },
+     { "label": "📝 CUET", "to": "/book-demo?subject=CUET" },
+     { "label": "🏅 Olympiads", "to": "/book-demo?subject=Olympiads" },
+     { "label": "📊 NTSE", "to": "/book-demo?subject=NTSE" },
+     { "label": "🌎 SAT / Digital SAT (study abroad)", "to": "/courses/digital-sat-psat-math" },
+     { "label": "📝 ACT (study abroad)", "to": "/courses/act" },
+     { "label": "🌐 IELTS / TOEFL (study abroad)", "to": "/book-demo?subject=IELTS / TOEFL" }
     ]
    },
    {
@@ -869,16 +787,12 @@ export const CATALOG_NAV = [
     "to": "/book-demo?subject=Olympiads"
    },
    {
-    "label": "🌎 SAT / ACT",
+    "label": "🌎 SAT / ACT (study abroad)",
     "to": "/courses?category=standardized-tests"
    },
    {
     "label": "🌐 IELTS / TOEFL",
     "to": "/book-demo?subject=IELTS / TOEFL"
-   },
-   {
-    "label": "🎓 AP Courses",
-    "to": "/courses?category=ap-courses"
    }
   ],
   "footer": [

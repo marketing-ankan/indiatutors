@@ -146,6 +146,22 @@ class SeoMeta {
                     'jsonld' => [$person, self::crumbs($base, [['Find Tutors', '/find-tutors'], [$t->name, '/tutor/' . $t->slug]])],
                 ];
             }
+            if (Str::startsWith($path, 'board/')) {
+                static $boards = [
+                    'cbse' => ['CBSE', 'Central Board of Secondary Education'],
+                    'icse' => ['ICSE / ISC', 'Indian Certificate of Secondary Education'],
+                    'igcse' => ['IGCSE / Cambridge', 'Cambridge international curriculum'],
+                    'state-boards' => ['State Boards', 'State-level secondary boards'],
+                    'ncert' => ['NCERT', 'the national NCERT curriculum'],
+                ];
+                $b = $boards[Str::after($path, 'board/')] ?? null;
+                if (!$b) return [];
+                return [
+                    'title'       => $b[0] . ' Tuition — Online 1-on-1 Classes | ' . self::SITE,
+                    'description' => "Live online {$b[0]} tuition taught to {$b[1]}'s syllabus and exam pattern. Book a free demo with a verified tutor.",
+                    'jsonld'      => [self::crumbs($base, [['Courses', '/courses'], [$b[0], $path]])],
+                ];
+            }
             if (Str::startsWith($path, 'instruments/')) {
                 $sp = \App\Models\StoreProduct::published()->where('slug', Str::after($path, 'instruments/'))->first();
                 if (!$sp) return [];
