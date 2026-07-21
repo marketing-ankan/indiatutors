@@ -1,13 +1,22 @@
+import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { CheckCircle2 } from 'lucide-react';
 import { fetchCourses, inr } from '../lib/api.js';
-import { BOARD_BY_SLUG, ACADEMIC_CATEGORIES } from '../data/boards.js';
+import {
+  BOARD_BY_SLUG, ACADEMIC_CATEGORIES, ACADEMIC_PARENTS,
+  US_SUBCATS, US_SLUGS, SUBJECT_ORDER,
+} from '../data/boards.js';
 
 // Board landing page (/board/{slug}) — CBSE / ICSE / IGCSE / State Boards /
-// NCERT. Frames the existing academic courses for the chosen board and routes
-// enquiries with ?board=. Academic courses aren't board-tagged yet, so this is
-// a funnel, not a filter — deeper per-course tagging can come later.
+// NCERT. Surfaces the academic courses that belong to the chosen board's
+// syllabus, filterable by subject chip. Indian boards (scope 'indian') hide
+// US-curriculum courses (Honors, Pre-Calculus/Calculus, Algebra, Geometry,
+// Integrated Math, Essay Writing); IGCSE ('international') keeps them.
+
+// A course's subject subcategories (drop the grouping parents like "Academics").
+const subjectsOf = (c) => (c.categories || []).filter((cat) => !ACADEMIC_PARENTS.has(cat.slug));
+const rank = (slug) => { const i = SUBJECT_ORDER.indexOf(slug); return i === -1 ? 99 : i; };
 
 function CourseCard({ c }) {
   return (
@@ -31,11 +40,34 @@ function CourseCard({ c }) {
 export default function BoardPage() {
   const { slug } = useParams();
   const board = BOARD_BY_SLUG[slug];
+  const [subject, setSubject] = useState('');   // selected subject slug, '' = all
+
   const { data, isLoading } = useQuery({
-    queryKey: ['courses', { boards: ACADEMIC_CATEGORIES }],
+    queryKey: ['courses', 'all-200'],
     queryFn: () => fetchCourses({ per_page: 200 }),
     enabled: !!board,
   });
+
+  const all = data?.data ?? [];
+
+  // Academic courses that belong on this board — US-curriculum removed on Indian boards.
+  const academic = useMemo(() => {
+    let list = all.filter(c => (c.categories || []).some(cat => ACADEMIC_CATEGORIES.includes(cat.slug)));
+    if (board && board.scope !== 'international') {
+      list = list.filter(c => !US_SLUGS.has(c.slug) && !subjectsOf(c).some(cat => US_SUBCATS.has(cat.slug)));
+    }
+    return list;
+  }, [all, board]);
+
+  // Subject chips built from the visible courses (Mathematics, Science, …).
+  const subjects = useMemo(() => {
+    const m = new Map();
+    for (const c of academic) for (const cat of subjectsOf(c)) if (!m.has(cat.slug)) m.set(cat.slug, cat.name);
+    return [...m.entries()].map(([s, name]) => ({ slug: s, name }))
+      .sort((a, b) => rank(a.slug) - rank(b.slug) || a.name.localeCompare(b.name));
+  }, [academic]);
+
+  const shown = subject ? academic.filter(c => subjectsOf(c).some(cat => cat.slug === subject)) : academic;
 
   if (!board) return (
     <div className="container-wide py-20 text-center">
@@ -43,9 +75,6 @@ export default function BoardPage() {
       <Link to="/courses" className="mt-4 inline-block text-brand-600">← Browse all courses</Link>
     </div>
   );
-
-  const all = data?.data ?? [];
-  const academic = all.filter(c => (c.categories || []).some(cat => ACADEMIC_CATEGORIES.includes(cat.slug)));
 
   return (
     <div className="bg-[#f9f9fc]">
@@ -74,13 +103,30 @@ export default function BoardPage() {
 
       {/* ACADEMIC COURSES */}
       <div className="container-wide py-12">
-        <h2 className="font-heading mb-1 text-2xl font-extrabold text-[#0B1220]">Academic courses for {board.name}</h2>
-        <p className="mb-6 text-slate-500">Live 1-on-1 tuition, taught to the {board.name} syllabus and exam pattern. Every plan starts with a free demo.</p>
+        <h2 className="font-heading mb-1 text-2xl font-extrabold text-[#0B1220]">Subjects for {board.name}</h2>
+        <p className="mb-6 text-slate-500">Live 1-on-1 tuition, taught to the {board.name} syllabus and exam pattern. Pick a subject, or browse them all — every plan starts with a free demo.</p>
+
+        {/* SUBJECT CHIPS */}
+        {!isLoading && subjects.length > 0 && (
+          <div className="mb-8 flex flex-wrap gap-2">
+            <button onClick={() => setSubject('')}
+              className={`rounded-full px-4 py-1.5 text-sm font-semibold ring-1 transition ${subject === '' ? 'bg-brand-600 text-white ring-brand-600' : 'bg-white text-brand-700 ring-slate-200 hover:ring-brand-400'}`}>
+              All subjects
+            </button>
+            {subjects.map(s => (
+              <button key={s.slug} onClick={() => setSubject(s.slug)}
+                className={`rounded-full px-4 py-1.5 text-sm font-semibold ring-1 transition ${subject === s.slug ? 'bg-brand-600 text-white ring-brand-600' : 'bg-white text-brand-700 ring-slate-200 hover:ring-brand-400'}`}>
+                {s.name}
+              </button>
+            ))}
+          </div>
+        )}
+
         {isLoading ? (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">{Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-56 animate-pulse rounded-[14px] bg-slate-100" />)}</div>
-        ) : academic.length ? (
+        ) : shown.length ? (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {academic.map(c => <CourseCard key={c.slug} c={c} />)}
+            {shown.map(c => <CourseCard key={c.slug} c={c} />)}
           </div>
         ) : (
           <p className="rounded-xl bg-white p-6 text-center text-slate-500 ring-1 ring-slate-100">Tell us your class and subject and we'll match a {board.name} tutor — <Link to={`/book-demo?board=${encodeURIComponent(board.name)}`} className="font-semibold text-brand-600">book a free demo</Link>.</p>
