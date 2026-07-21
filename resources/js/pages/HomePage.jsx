@@ -12,6 +12,7 @@ import {
   POPULAR_SUBJECTS, SUBJECT_TAGS, TEACHERS, TESTIMONIALS, WHY_ITEMS, PRICING,
   ABOUT_LEAD, ABOUT_LIST, ABOUT_STATS, HOW_STEPS, DEMO_VIDEOS,
 } from '../data/homeLive.js';
+import { BOARDS } from '../data/boards.js';
 
 // Mirrors the live indiatutorsonline.com homepage (WP theme "ito-ud" / "ito-cb"
 // sections) — same content, colors and layout, rebuilt in React + Tailwind.
@@ -444,6 +445,22 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* BROWSE BY BOARD */}
+      <section className="py-14" style={{ background: CREAM }}><div className="container-wide">
+        <H2 center>Browse by Board</H2>
+        <p className="mt-3 text-center text-slate-500 max-w-2xl mx-auto">Tuition aligned to your child's exact board — syllabus, exam pattern and marking scheme, from primary to Class 12.</p>
+        <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          {BOARDS.map(b => (
+            <Link key={b.slug} to={`/board/${b.slug}`}
+              className="group rounded-[14px] bg-white border border-[#E8E4FF] p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-brand-300">
+              <span className="block text-4xl transition-transform duration-300 group-hover:scale-110" aria-hidden="true">{b.icon}</span>
+              <span className="mt-3 block text-[15px] font-bold text-[#1A1A1A] leading-snug">{b.name}</span>
+              <span className="mt-1 block text-[11.5px] text-slate-500 leading-snug">{b.full}</span>
+            </Link>
+          ))}
+        </div>
+      </div></section>
 
       {/* MOST POPULAR SUBJECTS */}
       <section className="py-14 bg-white"><div className="container-wide">
