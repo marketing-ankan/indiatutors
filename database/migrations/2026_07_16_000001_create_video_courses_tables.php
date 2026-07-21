@@ -11,51 +11,65 @@ use Illuminate\Support\Facades\Schema;
 // data is seeded in-migration so the cron deploy populates staging.
 return new class extends Migration {
     public function up(): void {
-        Schema::create('video_courses', function (Blueprint $t) {
-            $t->id();
-            $t->string('title', 190);
-            $t->string('slug', 200)->unique();
-            $t->string('subtitle', 255)->nullable();
-            $t->text('description')->nullable();
-            $t->unsignedInteger('price')->default(0);       // INR, one-time
-            $t->string('level', 40)->nullable();
-            $t->string('category', 80)->nullable();
-            $t->string('thumbnail_url', 500)->nullable();
-            $t->unsignedInteger('position')->default(0);
-            $t->boolean('is_published')->default(true);
-            $t->timestamps();
-        });
+        // Idempotent throughout: a half-applied earlier run (some tables/columns
+        // created, then aborted) must not fail re-runs — otherwise every cron
+        // deploy aborts here under set -e and never reaches the asset copy step.
+        if (!Schema::hasTable('video_courses')) {
+            Schema::create('video_courses', function (Blueprint $t) {
+                $t->id();
+                $t->string('title', 190);
+                $t->string('slug', 200)->unique();
+                $t->string('subtitle', 255)->nullable();
+                $t->text('description')->nullable();
+                $t->unsignedInteger('price')->default(0);       // INR, one-time
+                $t->string('level', 40)->nullable();
+                $t->string('category', 80)->nullable();
+                $t->string('thumbnail_url', 500)->nullable();
+                $t->unsignedInteger('position')->default(0);
+                $t->boolean('is_published')->default(true);
+                $t->timestamps();
+            });
+        }
 
-        Schema::create('video_lessons', function (Blueprint $t) {
-            $t->id();
-            $t->foreignId('video_course_id')->constrained()->cascadeOnDelete();
-            $t->string('title', 190);
-            $t->string('provider', 20)->default('bunny');   // bunny | youtube
-            $t->string('video_id', 120);                    // Bunny GUID or YouTube id
-            $t->unsignedInteger('duration_seconds')->default(0);
-            $t->boolean('is_preview')->default(false);      // free, ungated
-            $t->unsignedInteger('position')->default(0);
-            $t->timestamps();
-        });
+        if (!Schema::hasTable('video_lessons')) {
+            Schema::create('video_lessons', function (Blueprint $t) {
+                $t->id();
+                $t->foreignId('video_course_id')->constrained()->cascadeOnDelete();
+                $t->string('title', 190);
+                $t->string('provider', 20)->default('bunny');   // bunny | youtube
+                $t->string('video_id', 120);                    // Bunny GUID or YouTube id
+                $t->unsignedInteger('duration_seconds')->default(0);
+                $t->boolean('is_preview')->default(false);      // free, ungated
+                $t->unsignedInteger('position')->default(0);
+                $t->timestamps();
+            });
+        }
 
-        Schema::create('video_entitlements', function (Blueprint $t) {
-            $t->id();
-            $t->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $t->foreignId('video_course_id')->constrained()->cascadeOnDelete();
-            $t->foreignId('order_id')->nullable()->constrained()->nullOnDelete();
-            $t->timestamp('granted_at')->nullable();
-            $t->timestamps();
-            $t->unique(['user_id', 'video_course_id']);
-        });
+        if (!Schema::hasTable('video_entitlements')) {
+            Schema::create('video_entitlements', function (Blueprint $t) {
+                $t->id();
+                $t->foreignId('user_id')->constrained()->cascadeOnDelete();
+                $t->foreignId('video_course_id')->constrained()->cascadeOnDelete();
+                $t->foreignId('order_id')->nullable()->constrained()->nullOnDelete();
+                $t->timestamp('granted_at')->nullable();
+                $t->timestamps();
+                $t->unique(['user_id', 'video_course_id']);
+            });
+        }
 
         // Orders can belong to an account (needed so video entitlements attach to
         // a user), and an order line can reference a video course.
-        Schema::table('orders', fn (Blueprint $t) => $t->foreignId('user_id')->nullable()->after('id')->constrained()->nullOnDelete());
-        Schema::table('order_items', fn (Blueprint $t) => $t->foreignId('video_course_id')->nullable()->after('course_id')->constrained()->nullOnDelete());
+        if (!Schema::hasColumn('orders', 'user_id')) {
+            Schema::table('orders', fn (Blueprint $t) => $t->foreignId('user_id')->nullable()->after('id')->constrained()->nullOnDelete());
+        }
+        if (!Schema::hasColumn('order_items', 'video_course_id')) {
+            Schema::table('order_items', fn (Blueprint $t) => $t->foreignId('video_course_id')->nullable()->after('course_id')->constrained()->nullOnDelete());
+        }
 
-        // Seed sample courses + lessons from the committed data file.
+        // Seed sample courses + lessons from the committed data file (only if empty,
+        // so a re-run doesn't duplicate rows).
         $path = base_path('database/seeders/data/video-courses.json');
-        if (is_file($path)) {
+        if (is_file($path) && DB::table('video_courses')->count() === 0) {
             $data = json_decode(file_get_contents($path), true);
             $now = now();
             foreach (($data['courses'] ?? []) as $c) {

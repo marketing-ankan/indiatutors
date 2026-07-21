@@ -8,9 +8,15 @@ use Illuminate\Support\Facades\Schema;
 // matching). Values are seeded by TutorSeeder so a fresh install has them too.
 return new class extends Migration {
     public function up(): void {
+        // Idempotent: a half-applied earlier run (one column added, then aborted)
+        // must not fail re-runs — that would stall the whole cron deploy under set -e.
         Schema::table('tutors', function (Blueprint $t) {
-            $t->string('pincodes', 400)->nullable()->after('localities'); // CSV of service pincodes
-            $t->string('grades', 220)->nullable()->after('pincodes');     // CSV of grades taught
+            if (!Schema::hasColumn('tutors', 'pincodes')) {
+                $t->string('pincodes', 400)->nullable()->after('localities'); // CSV of service pincodes
+            }
+            if (!Schema::hasColumn('tutors', 'grades')) {
+                $t->string('grades', 220)->nullable()->after('pincodes');     // CSV of grades taught
+            }
         });
     }
     public function down(): void {
