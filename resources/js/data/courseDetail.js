@@ -82,6 +82,34 @@ export const BLOG_POSTS = [
   { slug: 'hello-world', date: 'April 16, 2026', title: 'Hello world!', excerpt: 'Welcome to WordPress. This is your first post. Edit or delete it, then start writing!' },
 ];
 
+// WhatsApp-style testimonials (WinQuest product-page parity). PLACEHOLDER copy —
+// replace with real screenshots/messages from the WhatsApp community.
+export const WHATSAPP_TESTIMONIALS = [
+  { init: 'S', name: 'Sangeeta', time: '9:14 AM', text: 'My daughter actually looks forward to her class now 😊 Thank you for the personal attention!' },
+  { init: 'R', name: 'Rakesh', time: '7:42 PM', text: 'Booked a free demo on Sunday, enrolled the same week. Best decision — visible improvement in a month. 👍' },
+  { init: 'M', name: 'Meenakshi', time: '11:05 AM', text: 'The teacher is so patient with my son. He finished his first project today and was thrilled! 🎉' },
+  { init: 'A', name: 'Arun', time: '6:20 PM', text: 'Flexible timings really helped us with the time-zone difference. Highly recommend. 🙏' },
+  { init: 'P', name: 'Pooja', time: '3:30 PM', text: 'Loved the progress updates after every class. We always know how she is doing. ⭐⭐⭐⭐⭐' },
+  { init: 'V', name: 'Vikram', time: '8:55 PM', text: 'From shy to confident in three months. Worth every rupee. Thank you team! 💙' },
+];
+
+// Instagram feed (WinQuest product-page parity). PLACEHOLDER tiles — swap the
+// handle + real post thumbnails/links when the Instagram integration is ready.
+export const INSTAGRAM = {
+  handle: 'indiatutorsonline',
+  url: 'https://www.instagram.com/indiatutorsonline',
+  posts: [
+    { emoji: '🎨', tint: 'from-[#F58529] to-[#DD2A7B]' },
+    { emoji: '🎹', tint: 'from-[#DD2A7B] to-[#8134AF]' },
+    { emoji: '🧮', tint: 'from-[#8134AF] to-[#515BD4]' },
+    { emoji: '♟️', tint: 'from-[#515BD4] to-[#F58529]' },
+    { emoji: '🐍', tint: 'from-[#F58529] to-[#8134AF]' },
+    { emoji: '🎻', tint: 'from-[#DD2A7B] to-[#515BD4]' },
+    { emoji: '💃', tint: 'from-[#8134AF] to-[#F58529]' },
+    { emoji: '🗣️', tint: 'from-[#515BD4] to-[#DD2A7B]' },
+  ],
+};
+
 // Builds the live-style One-to-One / Group × Beginner/Intermediate/Advanced price
 // matrix from a single catalog base price (the lowest / "from" rate).
 export function buildPriceMatrix(base, slug) {

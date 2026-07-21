@@ -3,13 +3,13 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   CheckCircle2, Video, Users, Calendar, Clock, Baby, Star, Heart, Download,
-  Phone, Mail, Play, Plus, ShoppingCart, ChevronRight,
+  Phone, Mail, Play, Plus, ShoppingCart, ChevronRight, MessageCircle, Instagram,
 } from 'lucide-react';
 import { fetchCourse, fetchCourses, inr } from '../lib/api.js';
 import { cart, wishlist, useWishlist, cartItemOf } from '../lib/cart.js';
 import {
   buildPriceMatrix, CARD_FEATURES, FAQS, WORKSHOPS, PARENTS, TEACHERS,
-  ACHIEVEMENTS, BLOG_POSTS,
+  ACHIEVEMENTS, BLOG_POSTS, WHATSAPP_TESTIMONIALS, INSTAGRAM,
 } from '../data/courseDetail.js';
 
 // Course detail — a 1:1 rebuild of the live /product/{slug} template:
@@ -408,6 +408,37 @@ export default function CourseDetailPage() {
         </div>
       </section>
 
+      {/* WHATSAPP TESTIMONIALS */}
+      <section className="py-14 bg-white">
+        <div className="container-wide">
+          <SectionHead>WhatsApp Testimonials</SectionHead>
+          <p className="text-center text-slate-500 -mt-6 mb-9">Real voices from our WhatsApp community 💚📚</p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {WHATSAPP_TESTIMONIALS.map(w => (
+              <div key={w.name + w.time} className="rounded-2xl bg-[#ECE5DD] p-4">
+                <div className="relative rounded-xl rounded-tl-sm bg-white p-3 shadow-sm">
+                  <span className="absolute -left-1.5 top-0 h-3 w-3 bg-white [clip-path:polygon(100%_0,0_0,100%_100%)]" aria-hidden="true" />
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#25D366] text-xs font-bold text-white">{w.init}</span>
+                    <strong className="text-[13px] text-[#075E54]">{w.name}</strong>
+                  </div>
+                  <p className="mt-1.5 text-sm leading-relaxed text-slate-700">{w.text}</p>
+                  <div className="mt-1 flex items-center justify-end gap-1 text-[11px] text-slate-400">
+                    {w.time}
+                    <svg viewBox="0 0 18 18" className="h-3.5 w-3.5 text-[#34B7F1]" fill="currentColor" aria-label="read"><path d="M17.4 5.5l-1-.9-6.9 8-1.3-1.2-1 .9 2.3 2.4zM12.6 5.5l-1-.9-6.9 8L2 10.3l-1 1L4 14.5z"/></svg>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <a href="https://wa.me/919330811581" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-6 py-2.5 text-sm font-bold text-white hover:brightness-105">
+              <MessageCircle className="h-4 w-4" /> Chat with us on WhatsApp
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* MEET OUR TEACHERS */}
       <section className="py-14 bg-white">
         <div className="container-wide">
@@ -467,6 +498,31 @@ export default function CourseDetailPage() {
                 </span>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* INSTAGRAM FEED */}
+      <section className="py-14 bg-white">
+        <div className="container-wide">
+          <SectionHead>Instagram Feed</SectionHead>
+          <p className="text-center text-slate-500 -mt-6 mb-9">A glimpse into our classes, creativity &amp; student success — straight from our Instagram 📷✨</p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8">
+            {INSTAGRAM.posts.map((p, i) => (
+              <a key={i} href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"
+                className={`group relative flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br ${p.tint} text-4xl transition-transform duration-300 hover:scale-[1.03]`}>
+                <span>{p.emoji}</span>
+                <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/30 group-hover:opacity-100">
+                  <Instagram className="h-6 w-6 text-white" />
+                </span>
+              </a>
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#F58529] via-[#DD2A7B] to-[#8134AF] px-6 py-2.5 text-sm font-bold text-white hover:brightness-105">
+              <Instagram className="h-4 w-4" /> Follow @{INSTAGRAM.handle}
+            </a>
           </div>
         </div>
       </section>
