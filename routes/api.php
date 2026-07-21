@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PortfolioController;
 use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\Api\TeacherApplicationController;
 use App\Http\Controllers\Api\TeacherController;
 use App\Http\Controllers\Api\TutorController;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +53,7 @@ Route::post('/video-courses/{videoCourse}/lessons/{lesson}/playback', [VideoCour
 
 Route::post('/demo-requests',    [DemoRequestController::class, 'store']);
 Route::post('/contact',          [ContactController::class, 'store']);
+Route::post('/teacher-applications', [TeacherApplicationController::class, 'store'])->middleware('throttle:6,1');
 Route::post('/orders',           [OrderController::class, 'store'])->middleware('throttle:10,1');
 Route::post('/orders/verify',    [OrderController::class, 'verify'])->middleware('throttle:20,1');
 
@@ -117,6 +119,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/demo-requests/{demoRequest}/tutors',[AdminController::class, 'suggestTutors']);
         Route::patch('/demo-requests/{demoRequest}',     [AdminController::class, 'assignDemo']);
         Route::post('/demo-requests/{demoRequest}/convert',[AdminController::class, 'convert']);
+        Route::get('/teacher-applications',                        [TeacherApplicationController::class, 'adminIndex']);
+        Route::patch('/teacher-applications/{teacherApplication}', [TeacherApplicationController::class, 'updateStatus']);
+        Route::get('/teacher-applications/{teacherApplication}/cv',[TeacherApplicationController::class, 'downloadCv']);
         Route::get('/enrollments',                       [AdminController::class, 'enrollments']);
         Route::get('/orders',                            [AdminController::class, 'orders']);
         Route::patch('/orders/{order}',                  [AdminController::class, 'updateOrder']);
