@@ -25,11 +25,7 @@ const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const HOURS = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]; // 7 AM – 9 PM
 const fmtHour = (h) => { const ap = h < 12 ? 'AM' : 'PM'; const hr = h % 12 === 0 ? 12 : h % 12; return `${hr} ${ap}`; };
 
-const RADII = [
-  { label: 'Online only', km: null },
-  { label: '3 km', km: 3 }, { label: '5 km', km: 5 }, { label: '10 km', km: 10 },
-  { label: '15 km', km: 15 }, { label: '20 km', km: 20 }, { label: '25 km', km: 25 },
-];
+const MAX_RADIUS_KM = 30;   // 0 on the slider = "Online only"
 
 const field = 'w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500';
 const labelCls = 'block text-sm font-semibold text-slate-800 mb-1.5';
@@ -72,7 +68,7 @@ function RadiusVisual({ km }) {
       <p className="text-xs text-slate-500">You'll be matched with students for online classes.</p>
     </div>
   );
-  const r = 20 + (km / 25) * 40;   // 3km → ~24, 25km → 60
+  const r = 18 + (km / 30) * 44;   // 1km → ~19, 30km → 62
   return (
     <div className="flex flex-col items-center justify-center rounded-xl bg-brand-50 ring-1 ring-brand-100 py-4 px-4 text-center">
       <svg viewBox="0 0 160 140" className="h-28 w-auto" aria-hidden="true">
@@ -90,7 +86,7 @@ function RadiusVisual({ km }) {
 function ApplyForm() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', video_url: '', address: '', city: '', pincode: '', notes: '' });
   const [subjects, setSubjects] = useState([]);
-  const [radiusIdx, setRadiusIdx] = useState(0);   // default: Online only
+  const [radiusKm, setRadiusKm] = useState(0);     // 0 = Online only
   const [cv, setCv] = useState(null);
   const [avail, setAvail] = useState({});          // { Mon: [9,10], … }
   const [terms, setTerms] = useState(false);
@@ -105,8 +101,6 @@ function ApplyForm() {
     return { ...a, [day]: [...cur].sort((x, y) => x - y) };
   });
 
-  const radius = RADII[radiusIdx];
-
   const submit = async (e) => {
     e.preventDefault();
     if (!terms || status.state === 'submitting') return;
@@ -120,7 +114,7 @@ function ApplyForm() {
       if (form.address) fd.append('address', form.address);
       if (form.city) fd.append('city', form.city);
       if (form.pincode) fd.append('pincode', form.pincode);
-      if (radius.km != null) fd.append('service_radius_km', String(radius.km));
+      if (radiusKm > 0) fd.append('service_radius_km', String(radiusKm));
       fd.append('teaches_online', '1');
       Object.entries(avail).forEach(([day, hours]) => hours.forEach((h) => fd.append(`availability[${day}][]`, String(h))));
       if (form.notes) fd.append('notes', form.notes);
@@ -205,17 +199,21 @@ function ApplyForm() {
             </div>
             <div>
               <label className={labelCls}>How far will you travel?</label>
-              <div className="flex flex-wrap gap-2">
-                {RADII.map((r, i) => (
-                  <button key={r.label} type="button" onClick={() => setRadiusIdx(i)}
-                    className={`rounded-full px-3.5 py-1.5 text-[13px] font-semibold ring-1 transition ${i === radiusIdx ? 'bg-brand-600 text-white ring-brand-600' : 'bg-white text-slate-700 ring-slate-200 hover:ring-brand-400'}`}>
-                    {r.label}
-                  </button>
-                ))}
+              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3.5">
+                <div className="mb-2 flex items-baseline justify-between">
+                  <span className="text-sm text-slate-500">Service radius</span>
+                  <span className="text-base font-bold text-brand-700">{radiusKm === 0 ? 'Online only' : `${radiusKm} km`}</span>
+                </div>
+                <input type="range" min={0} max={MAX_RADIUS_KM} step={1} value={radiusKm}
+                  onChange={(e) => setRadiusKm(Number(e.target.value))}
+                  className="w-full cursor-pointer accent-brand-600" aria-label="Service radius in km" />
+                <div className="mt-1 flex justify-between text-[11px] text-slate-400">
+                  <span>Online</span><span>{MAX_RADIUS_KM / 2} km</span><span>{MAX_RADIUS_KM} km</span>
+                </div>
               </div>
             </div>
           </div>
-          <div className="lg:w-56"><RadiusVisual km={radius.km} /></div>
+          <div className="lg:w-56"><RadiusVisual km={radiusKm === 0 ? null : radiusKm} /></div>
         </div>
       </div>
 
