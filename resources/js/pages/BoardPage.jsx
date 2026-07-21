@@ -7,7 +7,6 @@ import {
   BOARD_BY_SLUG, ACADEMIC_CATEGORIES, ACADEMIC_PARENTS,
   US_SUBCATS, US_SLUGS, SUBJECT_ORDER,
 } from '../data/boards.js';
-import { BOARD_SYLLABUS } from '../data/boardSyllabus.js';
 
 // Board landing page (/board/{slug}) — CBSE / ICSE / IGCSE / State Boards /
 // NCERT. Surfaces the academic courses that belong to the chosen board's
@@ -42,43 +41,9 @@ function CourseCard({ c }) {
   );
 }
 
-// One collapsible stage/stream of the official board syllabus (reference).
-function SyllabusStage({ section, defaultOpen }) {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className="overflow-hidden rounded-xl bg-white ring-1 ring-slate-200">
-      <button onClick={() => setOpen(o => !o)} aria-expanded={open}
-        className="flex w-full items-center justify-between gap-3 px-5 py-3.5 text-left hover:bg-slate-50">
-        <span className="min-w-0">
-          <span className="font-bold text-slate-900">{section.title}</span>
-          {section.subtitle && <span className="mt-0.5 block text-xs leading-snug text-slate-500">{section.subtitle}</span>}
-        </span>
-        <span className="flex shrink-0 items-center gap-2">
-          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500">{section.subjects.length}</span>
-          <span className={`text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`}>▾</span>
-        </span>
-      </button>
-      {open && (
-        <div className="border-t border-slate-100 px-5 py-4">
-          <ul className="grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
-            {section.subjects.map((subj, i) => (
-              <li key={i} className="flex gap-2 text-sm text-slate-700">
-                <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-brand-400" />
-                <span>{subj}</span>
-              </li>
-            ))}
-          </ul>
-          {section.note && <p className="mt-3 border-t border-slate-100 pt-3 text-xs italic leading-relaxed text-slate-500">↳ {section.note}</p>}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function BoardPage() {
   const { slug } = useParams();
   const board = BOARD_BY_SLUG[slug];
-  const syllabus = BOARD_SYLLABUS[slug];
   const [subject, setSubject] = useState('');   // selected subject slug, '' = all
 
   const { data, isLoading } = useQuery({
@@ -171,23 +136,6 @@ export default function BoardPage() {
           </div>
         ) : (
           <p className="rounded-xl bg-white p-6 text-center text-slate-500 ring-1 ring-slate-100">Tell us your class and subject and we'll match a {board.name} tutor — <Link to={`/book-demo?board=${encodeURIComponent(board.name)}`} className="font-semibold text-brand-600">book a free demo</Link>.</p>
-        )}
-
-        {/* FULL BOARD SYLLABUS (official subject scheme, reference) */}
-        {syllabus && (
-          <div className="mt-16">
-            <h2 className="font-heading mb-1 text-2xl font-extrabold text-[#0B1220]">Full {board.name} syllabus</h2>
-            <p className="mb-6 max-w-3xl text-slate-500">The complete {board.name} subject scheme, stage by stage — we tutor across all of it. Tap a stage to see the subjects offered.</p>
-            <div className="space-y-2.5">
-              {syllabus.sections.map((s, i) => <SyllabusStage key={i} section={s} defaultOpen={i === 0} />)}
-            </div>
-            {syllabus.variesNote && (
-              <div className="mt-5 rounded-xl bg-[#F3F6FC] p-4 text-sm leading-relaxed text-slate-600 ring-1 ring-slate-100">
-                <span className="font-bold text-brand-700">How it varies: </span>{syllabus.variesNote}
-              </div>
-            )}
-            {syllabus.source && <p className="mt-3 text-xs leading-relaxed text-slate-400">Source: {syllabus.source}</p>}
-          </div>
         )}
 
         {/* CTA */}
