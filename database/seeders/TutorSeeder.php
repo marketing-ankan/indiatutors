@@ -268,10 +268,31 @@ class TutorSeeder extends Seeder {
             ],
         ];
 
+        // Physical-classes / home-tuition demo data: derive service pincodes from
+        // each tutor's localities, give them home-capable mode and a grade range,
+        // so the /physical-classes matcher has data to work with (fresh installs too).
+        $localityPincodes = [
+            'New Town' => ['700156', '700157'],
+            'Salt Lake' => ['700091', '700064'],
+            'Ballygunge' => ['700019', '700029'],
+            'Kolkata' => ['700001'],
+        ];
+        $allGrades = 'Pre-primary, Class 1, Class 2, Class 3, Class 4, Class 5, Class 6, Class 7, Class 8, Class 9, Class 10, Class 11, Class 12';
+
         foreach ($tutors as $data) {
+            if (empty($data['pincodes'])) {
+                $pins = [];
+                foreach (array_map('trim', explode(',', $data['localities'] ?? '')) as $loc) {
+                    foreach ($localityPincodes[$loc] ?? [] as $p) $pins[$p] = true;
+                }
+                $data['pincodes'] = implode(', ', array_keys($pins ?: ['700156' => true]));
+            }
+            $data['grades'] ??= $allGrades;
+            // Kolkata tutors offer home + online unless already home-only.
+            if (($data['teaching_mode'] ?? '') === 'online') $data['teaching_mode'] = 'both';
             Tutor::updateOrCreate(['slug' => $data['slug']], $data);
         }
 
-        $this->command->info('Seeded '.count($tutors).' tutors.');
+        $this->command->info('Seeded '.count($tutors).' tutors (with home-tuition pincodes + grades).');
     }
 }

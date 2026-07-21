@@ -239,6 +239,11 @@ class AdminController extends Controller {
             'fee_hourly'       => $profile->fee_hourly ?? 0,
             'city'             => $profile->city,
             'localities'       => $profile->service_areas,
+            // service_areas holds the teacher's pincodes (Phase 5) — mirror them
+            // into the physical-classes matching column. Grades default to the
+            // full range until the teacher/admin narrows them.
+            'pincodes'         => $profile->service_areas,
+            'grades'           => 'Pre-primary, Class 1, Class 2, Class 3, Class 4, Class 5, Class 6, Class 7, Class 8, Class 9, Class 10, Class 11, Class 12',
             'languages'        => $profile->languages,
             'teaching_mode'    => $profile->teaching_mode ?? 'online',
             'verified'         => true,

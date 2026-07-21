@@ -19,6 +19,17 @@ class TutorController extends Controller {
             // "both" tutors match either filter
             $query->where(fn($q) => $q->where('teaching_mode', $mode)->orWhere('teaching_mode', 'both'));
         }
+        // Physical-classes filters: home-tuition-capable, grade taught, and the
+        // pincode the tutor serves (matched against their CSV service areas).
+        if ($request->boolean('home')) {
+            $query->whereIn('teaching_mode', ['home', 'both']);
+        }
+        if ($grade = $request->string('grade')->toString()) {
+            $query->where('grades', 'like', "%{$grade}%");
+        }
+        if ($pincode = $request->string('pincode')->toString()) {
+            $query->where('pincodes', 'like', "%{$pincode}%");
+        }
         if ($q = $request->string('search')->toString()) {
             $query->where(fn($s) => $s->where('name','like',"%$q%")
                 ->orWhere('subjects','like',"%$q%")

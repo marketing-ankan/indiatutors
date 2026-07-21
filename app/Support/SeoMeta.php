@@ -50,6 +50,7 @@ class SeoMeta {
             ''                  => ['title' => self::SITE . ' — Live Online Tutoring & Verified Home Tutors Across India'],
             'courses'           => ['title' => 'Shop — ' . self::SITE, 'description' => 'Browse 130+ live and self-paced courses across academics, coding, music, dance, languages and more.'],
             'find-tutors'       => ['title' => 'Find a Verified Tutor — ' . self::SITE, 'description' => 'Browse verified, qualification-checked tutors by subject, city and mode. Book a free trial class.'],
+            'physical-classes'  => ['title' => 'Home Tuition — Find a Home Tutor Near You | ' . self::SITE, 'description' => 'Find verified home tutors near you by pincode, subject and class. Book a free home demo with a tutor who teaches in your area.'],
             'plans'             => ['title' => 'Plans & Pricing — ' . self::SITE, 'description' => 'Simple, honest pricing for live tutoring. First class is always free.'],
             'about'             => ['title' => 'About Us — ' . self::SITE, 'description' => "India's trusted platform for live 1-on-1 tutoring and verified home tutors."],
             'contact'           => ['title' => 'Contact — ' . self::SITE, 'description' => 'Get in touch with Indiatutors Online.'],

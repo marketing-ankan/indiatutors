@@ -753,7 +753,7 @@ export const CATALOG_NAV = [
  },
  {
   "label": "Physical Classes",
-  "to": "/find-tutors",
+  "to": "/physical-classes",
   "mega": null,
   "items": [],
   "footer": []

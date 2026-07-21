@@ -37,6 +37,13 @@ export default function BookDemoPage() {
   const { data: students = [] } = useQuery({ queryKey:['students'], queryFn: fetchStudents, enabled: isAuthed });
   useEffect(() => { if (course) setForm(f => ({ ...f, subject: f.subject || course.name, course_id: course.id })); }, [course]);
   useEffect(() => { if (tutor) setForm(f => ({ ...f, message: f.message || `I'd like to request a demo with ${tutor.name}.` })); }, [tutor]);
+  // Arriving from the Physical Classes / Home-Tuition or Board pages: switch to
+  // the home-tutor flow and note the pincode/board in the message.
+  useEffect(() => {
+    const pincode = params.get('pincode'), board = params.get('board');
+    if (pincode) { setTypeKey('physical'); setForm(f => ({ ...f, mode: 'home' })); }
+    if (pincode || board) setForm(f => ({ ...f, message: f.message || [board && `Board: ${board}`, pincode && `Home tuition — my pincode is ${pincode}`].filter(Boolean).join('. ') }));
+  }, [params]);
   // Prefill contact details for a signed-in user.
   useEffect(() => { if (user) setForm(f => ({ ...f, name: f.name || user.name, email: f.email || user.email, phone: f.phone || user.phone || '' })); }, [user]);
 

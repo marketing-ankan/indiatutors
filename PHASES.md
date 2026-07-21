@@ -92,6 +92,12 @@ Legend: ✅ done · 🔜 next · ⬜ planned
 - ✅ **Staff Console “Video Courses” tab**: course CRUD + per-course lessons manager (add/reorder-by-position/preview-toggle/delete). **/my/video-courses** endpoint for the buyer’s library.
 - ⬜ Left: create the Bunny account + set BUNNY_STREAM_LIBRARY_ID/TOKEN_KEY (then paid playback goes live); upload real lesson videos; optional dashboard “My Courses” UI.
 
+## Physical Classes module (note #5, 2026-07-16)
+- ✅ **Tutor location/grade data**: tutors carry service pincodes (CSV) + grades taught (Pre-primary–Class 12); seeded for all 13 demo tutors (pincodes derived from localities; Kolkata tutors home-capable); teacher approval now mirrors service_areas → pincodes and defaults full grades
+- ✅ **/physical-classes**: location-first Home Tuition search — pincode + subject + class → home-capable tutors serving that pincode (LIKE match), “Serves your pincode” badge, and a subject/grade fallback with a tell-us-your-area banner when no tutor lists the pincode; nav “Physical Classes” now points here
+- ✅ **API**: /api/tutors gains home=1, grade=, pincode= filters; TutorResource exposes pincodes/grades/teaches_home; book-demo prefills the physical-tutor flow from ?pincode= (and ?board=)
+- ⬜ Later (needs your input/ops): Google-location + map view (config-driven add-on, needs a Maps key), the full coordination workflow (visit assignment/confirmation/check-in — Phase 8 territory)
+
 ## Phase 7 — Payments & payouts 🔨 (v1 done 2026-07-14; live capture blocked on Razorpay keys + GST details)
 - ✅ **Cart → checkout → order**: WooCommerce-parity /cart, /checkout, /wishlist; guest orders re-priced server-side, recorded as `pending` with items (POST /api/orders)
 - ✅ **Razorpay integration (config-driven)**: set `RAZORPAY_KEY_ID`/`RAZORPAY_KEY_SECRET` and checkout creates a gateway order + opens the Razorpay modal; `POST /api/orders/verify` checks the HMAC signature and marks the order `paid`. Without keys the pending-payment stub flow runs unchanged.

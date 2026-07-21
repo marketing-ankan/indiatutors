@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 class Tutor extends Model {
     protected $fillable = [
         'user_id','name','slug','tagline','qualification','experience_years','subjects',
-        'fee_hourly','fee_trial','city','state','localities','languages',
+        'fee_hourly','fee_trial','city','state','localities','pincodes','grades','languages',
         'teaching_mode','verified','is_published','bio','image_url','position',
     ];
 
@@ -33,6 +33,16 @@ class Tutor extends Model {
     }
     public function getLocalitiesListAttribute(): array {
         return $this->splitCsv($this->localities);
+    }
+    public function getPincodesListAttribute(): array {
+        return $this->splitCsv($this->pincodes);
+    }
+    public function getGradesListAttribute(): array {
+        return $this->splitCsv($this->grades);
+    }
+    /** Does this tutor teach home/offline (home or both)? */
+    public function getTeachesHomeAttribute(): bool {
+        return in_array($this->teaching_mode, ['home', 'both'], true);
     }
 
     private function splitCsv(?string $v): array {

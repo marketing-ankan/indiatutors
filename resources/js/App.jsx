@@ -24,6 +24,7 @@ import BuyingGuidePage from './pages/BuyingGuidePage.jsx';
 import BoardPage from './pages/BoardPage.jsx';
 import VideoCoursesPage from './pages/VideoCoursesPage.jsx';
 import VideoCourseDetailPage from './pages/VideoCourseDetailPage.jsx';
+import PhysicalClassesPage from './pages/PhysicalClassesPage.jsx';
 import BlogPostPage from './pages/BlogPostPage.jsx';
 import ReferEarnPage from './pages/ReferEarnPage.jsx';
 import BecomeTeacherPage from './pages/BecomeTeacherPage.jsx';
@@ -64,6 +65,7 @@ export default function App() {
         <Route path="/book-demo" element={<BookDemoPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/find-tutors" element={<FindTutorsPage />} />
+        <Route path="/physical-classes" element={<PhysicalClassesPage />} />
         <Route path="/tutors/:slug" element={<TutorProfilePage />} />
         <Route path="/subject/:slug" element={<SubjectPage />} />
         <Route path="/tutors-in/:city" element={<CityPage />} />
