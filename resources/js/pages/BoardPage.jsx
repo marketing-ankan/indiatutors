@@ -17,6 +17,10 @@ import {
 // A course's subject subcategories (drop the grouping parents like "Academics").
 const subjectsOf = (c) => (c.categories || []).filter((cat) => !ACADEMIC_PARENTS.has(cat.slug));
 const rank = (slug) => { const i = SUBJECT_ORDER.indexOf(slug); return i === -1 ? 99 : i; };
+// Order a course by its best (lowest-ranked) subject, then by starting grade so
+// the grid reads English 1-7 → 8 → 9-10 → 11-12 (not the alphabetical 1-7, 11-12, 8…).
+const subjRank = (c) => Math.min(999, ...subjectsOf(c).map((cat) => rank(cat.slug)));
+const gradeOf = (name) => { const m = String(name).match(/\d+/); return m ? parseInt(m[0], 10) : 999; };
 
 function CourseCard({ c }) {
   return (
@@ -56,7 +60,9 @@ export default function BoardPage() {
     if (board && board.scope !== 'international') {
       list = list.filter(c => !US_SLUGS.has(c.slug) && !subjectsOf(c).some(cat => US_SUBCATS.has(cat.slug)));
     }
-    return list;
+    // Align the grid with the subject chips: group by subject order, then grade.
+    return [...list].sort((a, b) =>
+      subjRank(a) - subjRank(b) || gradeOf(a.name) - gradeOf(b.name) || a.name.localeCompare(b.name));
   }, [all, board]);
 
   // Subject chips built from the visible courses (Mathematics, Science, …).
