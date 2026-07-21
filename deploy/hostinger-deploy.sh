@@ -69,3 +69,15 @@ echo "[$(date '+%Y-%m-%d %H:%M:%S')] pwa assets synced"
 php artisan route:clear || true
 php artisan route:cache || php artisan route:clear || true
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] route cache refreshed"
+
+# --- build-integrity self-heal ----------------------------------------
+# A partial cp can leave DOCROOT/build with a manifest.json that references
+# hashed assets which aren't present → the SPA loads a blank white page.
+# If the manifest's main JS isn't in the web root, re-copy the whole build.
+MAIN_JS="$(grep -oE 'assets/main-[A-Za-z0-9_-]+\.js' "$LARAVEL_DIR/public/build/manifest.json" 2>/dev/null | head -1)"
+if [ -n "$MAIN_JS" ] && [ ! -f "$DOCROOT/build/$MAIN_JS" ]; then
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] build mismatch ($MAIN_JS missing) — re-copying build"
+  rm -rf "$DOCROOT/build"
+  cp -r "$LARAVEL_DIR/public/build" "$DOCROOT/build"
+fi
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] build integrity checked"
