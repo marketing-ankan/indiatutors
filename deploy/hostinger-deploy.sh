@@ -28,16 +28,22 @@ fi
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] deploying $BEFORE -> $AFTER"
 
-# Apply any new migrations (safe: only runs pending ones — never fresh/refresh)
+# DB steps run BEST-EFFORT (set +e): a migration/seeder failure must NEVER abort
+# the deploy. It used to — under set -e a single failing seeder killed the script
+# BEFORE the asset copy + route-cache refresh below, freezing the copied build at
+# the web root (blank white SPA, because the served HTML references newer Vite
+# hashes that were never copied) and leaving new /api routes 404'ing on a stale
+# route cache. Migrations only apply pending ones (never fresh/refresh) and are
+# idempotency-guarded; seeders are idempotent (updateOrCreate by stable slug,
+# prune stale) so they update in place and never delete user data. Any failure
+# here is logged by artisan and retried next deploy — the front-end still ships.
+set +e
 php artisan migrate --force
-
-# Sync catalog + tutor reference data. Seeders are idempotent (updateOrCreate
-# by stable slug, prune stale) so this updates in place and never deletes
-# user data (demo requests, contacts, users).
 php artisan db:seed --class=CourseSeeder --force
 php artisan db:seed --class=TutorSeeder --force
 php artisan db:seed --class=PostSeeder --force
 php artisan db:seed --class=AdminSeeder --force
+set -e
 
 # Refresh built front-end assets exposed at the web root
 rm -rf "$DOCROOT/build"
