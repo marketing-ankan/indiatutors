@@ -22,6 +22,30 @@ BEFORE="$(git rev-parse HEAD)"
 git pull --ff-only origin main
 AFTER="$(git rev-parse HEAD)"
 
+# Keep the web-root build in lock-step with the app build on EVERY run — even when
+# there's nothing new to pull. A previously-failed/partial copy self-heals HERE,
+# BEFORE the no-change early-exit, so the web root can't stay frozen on an old
+# build while the app (and the served Vite manifest) has already advanced — the
+# exact cause of the recurring blank page. Atomic temp-swap: copy fully into
+# build.new first, then swap, so a mid-copy failure never leaves the web root
+# without a build. Nothing here can abort the deploy (set -e safe).
+WROOT_JS="$(grep -oE 'assets/main-[A-Za-z0-9_-]+\.js' "$LARAVEL_DIR/public/build/manifest.json" 2>/dev/null | head -1)"
+if [ -n "$WROOT_JS" ] && [ ! -f "$DOCROOT/build/$WROOT_JS" ]; then
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] web-root build stale ($WROOT_JS missing) — syncing"
+  rm -rf "$DOCROOT/build.new" 2>/dev/null || true
+  if cp -r "$LARAVEL_DIR/public/build" "$DOCROOT/build.new"; then
+    if rm -rf "$DOCROOT/build" && mv "$DOCROOT/build.new" "$DOCROOT/build"; then
+      cp -f "$LARAVEL_DIR/public/sw.js" "$DOCROOT/sw.js" 2>/dev/null || true
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] web-root build synced to $WROOT_JS"
+    else
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] WARN: build swap failed"
+    fi
+  else
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] WARN: build copy failed"
+    rm -rf "$DOCROOT/build.new" 2>/dev/null || true
+  fi
+fi
+
 if [ "$BEFORE" = "$AFTER" ]; then
   exit 0   # nothing new — stay quiet
 fi
