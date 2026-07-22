@@ -427,7 +427,89 @@
   "category_chains": [
    "Academics — Elementary & Middle School",
    "Academics — Elementary & Middle School > Social Studies"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "Stage 1: Me, My Family and My Neighbourhood",
+     "age": "Ages 6-8",
+     "duration": "10 hours",
+     "topics": [
+      "Myself, my family and different types of families",
+      "Our home, school and neighbourhood places",
+      "People who help us and their work",
+      "Festivals and celebrations across communities",
+      "Good habits, manners and sharing spaces with others",
+      "Keeping our surroundings clean and safe"
+     ]
+    },
+    {
+     "title": "Stage 2: Our World — Land, Water and Living Together",
+     "age": "Ages 7-9",
+     "duration": "12 hours",
+     "topics": [
+      "Land, water and air around us",
+      "Weather and the changing seasons",
+      "Villages, towns and cities — how people live",
+      "Means of transport and communication",
+      "Plants, animals and caring for nature",
+      "Rules at home, school and on the road"
+     ]
+    },
+    {
+     "title": "Stage 3: Maps, Globe and Our Earth",
+     "age": "Ages 8-10",
+     "duration": "12 hours",
+     "topics": [
+      "The globe and the map — how they differ",
+      "Directions, symbols and simple map keys",
+      "Continents and oceans of the world",
+      "Locating India — neighbours, states and capitals",
+      "Major landforms: mountains, plains, plateaus, deserts",
+      "Rivers of India and why they matter"
+     ]
+    },
+    {
+     "title": "Stage 4: History Strand — Discovering Our Past",
+     "age": "Ages 10-12",
+     "duration": "14 hours",
+     "topics": [
+      "How we know about the past — sources of history",
+      "Early humans and the beginning of settled life",
+      "The Indus Valley cities and their planning",
+      "Life in the Vedic age",
+      "Great empires: Mauryas and Guptas at a glance",
+      "Ancient civilisations of the world: Egypt and Mesopotamia"
+     ]
+    },
+    {
+     "title": "Stage 5: Civics Strand — Community and Governance Basics",
+     "age": "Ages 11-13",
+     "duration": "12 hours",
+     "topics": [
+      "Why we need rules and government",
+      "Local self-government in villages: the panchayat",
+      "Local self-government in cities: municipalities",
+      "Rights, duties and being a responsible citizen",
+      "Diversity, tolerance and national symbols",
+      "Medieval India in brief: sultans, Mughals and everyday life"
+     ]
+    },
+    {
+     "title": "Stage 6: Geography Strand — India and the Wider World",
+     "age": "Ages 11-13",
+     "duration": "12 hours",
+     "topics": [
+      "Physical divisions of India",
+      "Climate zones and natural vegetation",
+      "Natural resources and why we must conserve them",
+      "Farming and occupations across regions",
+      "Reading and drawing simple sketch maps",
+      "Our country in the world: latitudes, longitudes and time"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": "ito-ai-ml",
@@ -662,7 +744,89 @@
   "category_chains": [
    "Academics — High School",
    "Academics — Elementary & Middle School > English"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "Paper 1: Composition Mastery",
+     "age": "Ages 14-16",
+     "duration": "14 hours",
+     "topics": [
+      "Board-style composition choices: narrative, descriptive, argumentative, original short story",
+      "Planning under time pressure: outline in five minutes",
+      "Openings that hook and conclusions that resolve",
+      "Idiom, imagery and sentence variety for higher bands",
+      "Staying on topic and within word limits",
+      "Marking-scheme awareness: what earns and loses marks"
+     ]
+    },
+    {
+     "title": "Paper 1: Directed Writing — Letter & Email",
+     "age": "Ages 14-16",
+     "duration": "10 hours",
+     "topics": [
+      "Formal letter formats: application, complaint, enquiry, editor",
+      "Informal letter: warmth without slang",
+      "Email writing as per current board pattern",
+      "Covering all given points while sounding natural",
+      "Register and tone matched to recipient",
+      "Timed practice with examiner-style feedback"
+     ]
+    },
+    {
+     "title": "Paper 1: Comprehension & Summary Writing",
+     "age": "Ages 14-16",
+     "duration": "12 hours",
+     "topics": [
+      "Unseen passage: literal, inferential and vocabulary questions",
+      "Answering precisely in own words",
+      "Summary in a fixed word limit: selecting and compressing",
+      "Avoiding lifting lines and losing content points",
+      "Discursive and narrative passage strategies",
+      "Full-length comprehension sections against the clock"
+     ]
+    },
+    {
+     "title": "Paper 1: Grammar & Structure",
+     "age": "Ages 14-16",
+     "duration": "12 hours",
+     "topics": [
+      "Sentence transformation: voice, speech, degrees, synthesis",
+      "Joining sentences without changing meaning",
+      "Prepositions and phrasal verbs frequently tested",
+      "Tense and verb-form cloze passages",
+      "Error patterns from past board papers",
+      "Rapid-fire grammar drills for full-mark accuracy"
+     ]
+    },
+    {
+     "title": "Paper 2: Drama & Prose Study Skills",
+     "age": "Ages 14-16",
+     "duration": "14 hours",
+     "topics": [
+      "Approaching the prescribed play: acts, scenes and plot arc",
+      "Extract-based questions: context, meaning, significance",
+      "Character development traced with evidence",
+      "Themes and dramatic devices in the prescribed drama",
+      "Short-story collection: plot, theme and character answers",
+      "Structuring long answers for full marks"
+     ]
+    },
+    {
+     "title": "Paper 2: Poetry Study & Exam Strategy",
+     "age": "Ages 14-16",
+     "duration": "12 hours",
+     "topics": [
+      "Prescribed poems: central idea, tone and devices",
+      "Extract questions on poetry: line meaning and effect",
+      "Comparing poets' treatment of similar themes",
+      "Quotation use: when and how much",
+      "Time allocation across both papers",
+      "Mock papers with detailed answer review"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -817,7 +981,89 @@
   "category_chains": [
    "Academics — High School",
    "Academics — High School > Economics"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "Foundations: Basic Economic Concepts",
+     "age": "Ages 14-16",
+     "duration": "10 hours",
+     "topics": [
+      "Wants, scarcity and choice — the economic problem",
+      "Factors of production: land, labour, capital, enterprise",
+      "Opportunity cost and production possibilities",
+      "Types of economies: market, planned and mixed",
+      "Utility, value and wealth in economics",
+      "Division of labour and specialisation"
+     ]
+    },
+    {
+     "title": "Demand, Supply and How Markets Work",
+     "age": "Ages 14-16",
+     "duration": "12 hours",
+     "topics": [
+      "The law of demand and movements along the curve",
+      "The law of supply and shifts in supply",
+      "Price determination: market equilibrium",
+      "Elasticity of demand and its measurement",
+      "Forms of market: perfect competition and monopoly",
+      "How prices ration goods and signal producers"
+     ]
+    },
+    {
+     "title": "Money, Banking and Credit",
+     "age": "Ages 14-16",
+     "duration": "10 hours",
+     "topics": [
+      "Barter to money: functions and forms of money",
+      "Commercial banks and the services they provide",
+      "Credit creation in simple terms",
+      "The Reserve Bank of India and its functions",
+      "Inflation: meaning, causes and effects on different groups",
+      "Digital payments and financial inclusion"
+     ]
+    },
+    {
+     "title": "Public Finance and the Government's Role",
+     "age": "Ages 15-17",
+     "duration": "10 hours",
+     "topics": [
+      "Public revenue: direct and indirect taxes, including GST",
+      "Public expenditure and its priorities",
+      "The Union Budget: deficits and debt",
+      "Progressive versus regressive taxation",
+      "Government intervention: subsidies and price controls",
+      "Fiscal policy as a tool for growth and stability"
+     ]
+    },
+    {
+     "title": "The Indian Economy: Structure and Reform",
+     "age": "Ages 16-18",
+     "duration": "12 hours",
+     "topics": [
+      "Features of a developing economy",
+      "Agriculture, industry and services in India",
+      "Planning to NITI Aayog: changing policy approaches",
+      "Liberalisation, privatisation and globalisation since 1991",
+      "Poverty, unemployment and human capital",
+      "Sustainable development and current challenges"
+     ]
+    },
+    {
+     "title": "Statistics for Economics",
+     "age": "Ages 16-18",
+     "duration": "10 hours",
+     "topics": [
+      "Collection and classification of data",
+      "Tables, bar diagrams and frequency distributions",
+      "Measures of central tendency: mean, median, mode",
+      "Measures of dispersion in brief",
+      "Correlation: meaning and simple computation",
+      "Index numbers and the cost of living"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -4324,7 +4570,83 @@
   "category_chains": [
    "Academics — Elementary & Middle School",
    "Academics — Elementary & Middle School > Mathematics"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "Stage 1: Numbers, Shapes & Everyday Maths (Classes 1-2)",
+     "age": "Ages 6-8",
+     "duration": "20 hours",
+     "topics": [
+      "Counting, comparing and place value up to 100",
+      "Addition and subtraction facts with regrouping",
+      "Multiplication introduced as repeated addition and equal groups",
+      "Recognising 2-D and 3-D shapes and extending patterns",
+      "Measuring length, weight and capacity with informal units",
+      "Indian coins and notes: identifying and making amounts",
+      "Reading a clock to the hour and half-hour"
+     ]
+    },
+    {
+     "title": "Stage 2: Number Fluency & Mental Arithmetic (Classes 3-4)",
+     "age": "Ages 8-10",
+     "duration": "22 hours",
+     "topics": [
+      "Place value to 5-digit numbers, rounding and estimation",
+      "Multiplication and division algorithms with word problems",
+      "Mental-maths strategies and speed drills (an ICSE classroom staple)",
+      "Introducing fractions: halves, quarters and equivalent forms",
+      "Standard units of measurement and simple conversions",
+      "Money: making bills and computing change",
+      "Time, calendar and elapsed-time problems",
+      "Lines, angles and basic geometry vocabulary"
+     ]
+    },
+    {
+     "title": "Stage 3: Fractions, Decimals & Data (Class 5)",
+     "age": "Ages 10-11",
+     "duration": "20 hours",
+     "topics": [
+      "Factors, multiples, HCF and LCM",
+      "Operations on fractions and mixed numbers",
+      "Decimals: place value, four operations and money links",
+      "First look at percentage and average",
+      "Perimeter and area of squares and rectangles",
+      "Rounding, estimation and unitary-method word problems",
+      "Reading and drawing pictographs and bar graphs"
+     ]
+    },
+    {
+     "title": "Stage 4: Integers, Sets & the Start of Algebra (Class 6)",
+     "age": "Ages 11-12",
+     "duration": "24 hours",
+     "topics": [
+      "Integers on the number line and operations with signs",
+      "Introduction to sets and set notation (a distinctly ICSE early start)",
+      "Ratio, proportion and the unitary method",
+      "Framing algebraic expressions and solving simple equations",
+      "Angles, triangles and basic geometrical constructions",
+      "Symmetry and reflection",
+      "Organising data: tally marks, mean of small data sets"
+     ]
+    },
+    {
+     "title": "Stage 5: Rational Numbers & Commercial Arithmetic (Class 7)",
+     "age": "Ages 12-13",
+     "duration": "24 hours",
+     "topics": [
+      "Rational numbers and their operations",
+      "Exponents and laws of indices",
+      "Percentage and its applications",
+      "Profit, loss and discount problems",
+      "Simple interest and everyday money calculations",
+      "Speed, distance and time",
+      "Congruence of triangles and construction work",
+      "Circumference and area of circles; mean, median and mode"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -4413,7 +4735,86 @@
   "category_chains": [
    "Academics — Elementary & Middle School",
    "Academics — Elementary & Middle School > Mathematics"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "Unit 1: The Number System",
+     "age": "Age 13+",
+     "duration": "12 hours",
+     "topics": [
+      "Rational numbers: properties, representation and operations",
+      "Squares and square roots by factorisation and division method",
+      "Cubes and cube roots",
+      "Exponents with integral powers and laws of indices",
+      "Playing with numbers: divisibility tests and generalised forms",
+      "Sets: revision of notation, subsets and Venn representation"
+     ]
+    },
+    {
+     "title": "Unit 2: Algebra — Identities, Factorisation & Equations",
+     "age": "Age 13+",
+     "duration": "14 hours",
+     "topics": [
+      "Operations on algebraic expressions",
+      "Standard identities and their use in expansion",
+      "Factorisation by common factors, grouping and identities",
+      "Linear equations in one variable with word problems",
+      "First look at linear inequations and their solution sets",
+      "Framing formulas and changing the subject"
+     ]
+    },
+    {
+     "title": "Unit 3: Commercial Mathematics",
+     "age": "Age 13+",
+     "duration": "10 hours",
+     "topics": [
+      "Percentage: increase, decrease and comparison problems",
+      "Profit, loss and discount including successive discounts",
+      "Simple interest revisited",
+      "Compound interest computed year by year and by formula",
+      "Direct and inverse variation with real-life applications",
+      "Time-and-work style unitary problems"
+     ]
+    },
+    {
+     "title": "Unit 4: Geometry — Quadrilaterals & Constructions",
+     "age": "Age 13+",
+     "duration": "12 hours",
+     "topics": [
+      "Angle-sum property of polygons and quadrilaterals",
+      "Properties of parallelogram, rhombus, rectangle and square",
+      "Constructing quadrilaterals from given measurements",
+      "Representing 3-D objects in 2-D; faces, edges and vertices",
+      "Reflection and symmetry in geometrical figures"
+     ]
+    },
+    {
+     "title": "Unit 5: Mensuration",
+     "age": "Age 13+",
+     "duration": "8 hours",
+     "topics": [
+      "Area of trapezium and general quadrilaterals",
+      "Area of combined plane figures",
+      "Surface area of cube, cuboid and cylinder",
+      "Volume and capacity with unit conversions",
+      "Cost-based word problems on painting and filling solids"
+     ]
+    },
+    {
+     "title": "Unit 6: Data Handling & Probability",
+     "age": "Age 13+",
+     "duration": "8 hours",
+     "topics": [
+      "Frequency distribution tables and grouped data",
+      "Drawing and interpreting histograms and pie charts",
+      "Reading line graphs and linear graphs on the plane",
+      "Probability of simple events with coins, dice and cards",
+      "Comparing experimental results with expected chance"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -4620,7 +5021,89 @@
   "category_chains": [
    "Academics — Elementary & Middle School",
    "Academics — Elementary & Middle School > English"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "Foundations: Phonics, Word Reading & Oral Expression",
+     "age": "Ages 6-8",
+     "duration": "12 hours",
+     "topics": [
+      "Letter sounds, blends and simple word building",
+      "Sight words and picture-supported reading",
+      "Rhymes and recitation with clear pronunciation",
+      "Listening to short stories and answering aloud",
+      "Naming words, action words and simple describing words",
+      "Speaking in complete sentences about self and surroundings"
+     ]
+    },
+    {
+     "title": "Sentence Craft & Early Composition",
+     "age": "Ages 7-9",
+     "duration": "12 hours",
+     "topics": [
+      "Sentence types: statements, questions and exclamations",
+      "Capital letters, full stops and question marks in use",
+      "Picture composition and guided paragraph writing",
+      "Nouns, pronouns and verbs identified inside real sentences",
+      "Building vocabulary through opposites, rhyming sets and word families",
+      "Short dictation and neat handwriting practice"
+     ]
+    },
+    {
+     "title": "Grammar in Context & Vocabulary Growth",
+     "age": "Ages 8-10",
+     "duration": "14 hours",
+     "topics": [
+      "Tenses (simple present, past, future) drawn from passages",
+      "Adjectives, adverbs and degrees of comparison",
+      "Subject-verb agreement through error-spotting games",
+      "Prefixes, suffixes and words often confused",
+      "Punctuation: commas, apostrophes and speech marks",
+      "Cloze passages that test grammar inside meaning"
+     ]
+    },
+    {
+     "title": "Reading Comprehension & Summary Skills",
+     "age": "Ages 9-12",
+     "duration": "14 hours",
+     "topics": [
+      "Unseen prose passages: factual and literary",
+      "Locating answers, inferring meaning and giving opinions",
+      "Word-meaning from context and reference-to-context questions",
+      "Note-making and shortening a passage in own words",
+      "Sequencing events and identifying main idea versus detail",
+      "Reading poems aloud for rhythm and meaning"
+     ]
+    },
+    {
+     "title": "Composition Workshop: Narrative, Descriptive & Letters",
+     "age": "Ages 10-13",
+     "duration": "16 hours",
+     "topics": [
+      "Paragraph unity: topic sentence, detail, closing line",
+      "Story writing from outlines, titles and picture prompts",
+      "Descriptive writing of people, places and events",
+      "Informal letters and simple formal letters with correct layout",
+      "Diary entries and short messages",
+      "Editing own work for spelling, grammar and flow"
+     ]
+    },
+    {
+     "title": "Literature Appreciation & Confident Speaking",
+     "age": "Ages 11-13",
+     "duration": "12 hours",
+     "topics": [
+      "Short stories: character, setting and moral discussion",
+      "Poetry: rhyme, rhythm, simile and personification",
+      "Simple play scenes read in roles",
+      "Recitation, show-and-tell and prepared short talks",
+      "Responding to literature in written answers of own words",
+      "Class debate starters: agreeing, disagreeing politely"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -4709,7 +5192,89 @@
   "category_chains": [
    "Academics — Elementary & Middle School",
    "Academics — Elementary & Middle School > English"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "English Language: Composition Skills",
+     "age": "Age 13+",
+     "duration": "12 hours",
+     "topics": [
+      "Planning a composition: brainstorming, outline, paragraphing",
+      "Narrative and descriptive essays with strong openings and endings",
+      "Argumentative writing: taking a stand with reasons",
+      "Picture-based and proverb-based composition practice",
+      "Vocabulary upgrading: precise verbs and varied sentence starts",
+      "Self-editing checklist for accuracy and length control"
+     ]
+    },
+    {
+     "title": "English Language: Letters, Notices & Emails",
+     "age": "Age 13+",
+     "duration": "10 hours",
+     "topics": [
+      "Informal letter: tone, format and natural expression",
+      "Formal letter: applications, complaints and requests",
+      "Email conventions for school and official purposes",
+      "Notice writing: essentials in a box format",
+      "Choosing register: formal versus friendly language",
+      "Common format errors and how examiners view them"
+     ]
+    },
+    {
+     "title": "English Language: Comprehension & Summary",
+     "age": "Age 13+",
+     "duration": "10 hours",
+     "topics": [
+      "Unseen passage strategy: skim, scan, answer in own words",
+      "Vocabulary-in-context and inference questions",
+      "Title-giving and main-idea identification",
+      "Condensing a passage to a set word limit",
+      "Handling factual, literary and discursive passages",
+      "Timed comprehension drills with answer framing"
+     ]
+    },
+    {
+     "title": "English Language: Grammar & Usage",
+     "age": "Age 13+",
+     "duration": "12 hours",
+     "topics": [
+      "Tense consistency across paragraphs",
+      "Active and passive voice transformation",
+      "Direct and indirect speech",
+      "Prepositions, conjunctions and phrasal verbs in use",
+      "Sentence synthesis and transformation exercises",
+      "Fill-in-the-blank cloze grammar in passage form",
+      "Correcting common Indian-English errors"
+     ]
+    },
+    {
+     "title": "Literature: Prose & Short Story Study",
+     "age": "Age 13+",
+     "duration": "10 hours",
+     "topics": [
+      "Reading prose closely: plot, character and theme",
+      "Reference-to-context answering technique",
+      "Character sketches supported by textual evidence",
+      "Author's purpose and narrative point of view",
+      "Writing structured long answers in own words"
+     ]
+    },
+    {
+     "title": "Literature: Poetry & Drama Appreciation",
+     "age": "Age 13+",
+     "duration": "10 hours",
+     "topics": [
+      "Poetic devices: imagery, alliteration, metaphor, tone",
+      "Paraphrasing stanzas and explaining central idea",
+      "Reading a play: dialogue, stage directions and conflict",
+      "Dramatic irony and character motivation",
+      "Comparing how prose, poetry and drama tell a story",
+      "Oral performance: recitation and scene reading"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -4820,7 +5385,97 @@
   "category_chains": [
    "Academics — Elementary & Middle School",
    "Academics — Elementary & Middle School > Science"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "Stage 1 — Living World Around Us (Biology Strand Begins)",
+     "age": "Age 6-8",
+     "duration": "14 hours",
+     "topics": [
+      "Telling living from non-living things and the seven signs of life",
+      "Plants and animals in our neighbourhood, and simple ways to group them",
+      "Parts of a plant and the everyday job each part does",
+      "External parts of the human body and the five sense organs",
+      "Wild and tame animals, their homes, movement and the food they eat",
+      "Good habits: wholesome food, clean water, rest, exercise and cleanliness",
+      "Careful observation, drawing from life and describing what we see"
+     ]
+    },
+    {
+     "title": "Stage 2 — Matter, Weather & Our Environment (Chemistry & Earth Strand Begins)",
+     "age": "Age 7-9",
+     "duration": "14 hours",
+     "topics": [
+      "Air, water and soil around us and why each is precious for life",
+      "Solids, liquids and gases sorted by simple observable properties",
+      "Materials we use every day and where they come from",
+      "The water cycle, sources of water and using water wisely",
+      "Weather, seasons, day and night, and how they shape daily life",
+      "Directions, the Sun, Moon and stars in the sky",
+      "Keeping a weather chart and a nature-observation notebook"
+     ]
+    },
+    {
+     "title": "Stage 3 — Human Body, Food & Healthy Living (Biology Strand Grows)",
+     "age": "Age 9-11",
+     "duration": "16 hours",
+     "topics": [
+      "Main organ systems introduced: digestion, breathing, circulation and skeleton",
+      "Food groups, a balanced diet and the work each nutrient does",
+      "Types of teeth, dental care and the path food takes through the body",
+      "How the heart pumps blood and why the lungs are needed",
+      "Communicable diseases, germs and simple ways to stay well",
+      "Safety at home, on the road and at play, plus basic first aid",
+      "Comparing pulse and breathing rate before and after exercise"
+     ]
+    },
+    {
+     "title": "Stage 4 — Materials & Everyday Chemistry (Chemistry Strand Grows)",
+     "age": "Age 9-12",
+     "duration": "16 hours",
+     "topics": [
+      "Changes of state on heating and cooling: melting, boiling, condensing, freezing",
+      "Natural and man-made materials sorted by useful properties",
+      "Soluble and insoluble substances, and separating everyday mixtures",
+      "Reversible and irreversible changes such as dissolving versus burning",
+      "Rusting, spoilage and simple ways to prevent them",
+      "Fibres and fabrics: natural sources versus synthetic ones",
+      "Safe experiments with filtering, evaporating and simple crystallising"
+     ]
+    },
+    {
+     "title": "Stage 5 — Force, Energy, Light & Machines (Physics Strand Begins)",
+     "age": "Age 11-13",
+     "duration": "16 hours",
+     "topics": [
+      "Pushes and pulls: how forces start, stop, speed up or turn objects",
+      "Friction, gravity and magnetism seen in everyday situations",
+      "Simple machines — levers, pulleys, inclined planes — that make work easier",
+      "Forms of energy and how one form changes into another",
+      "Light, shadows, reflection in a mirror and how we see things",
+      "Sound as vibration, loud versus soft, and how it reaches our ears",
+      "Simple electric circuits with a cell, bulb and switch, and staying safe with electricity",
+      "Building a working torch circuit and a balanced see-saw lever"
+     ]
+    },
+    {
+     "title": "Stage 6 — Earth, Ecosystems & the Young Investigator",
+     "age": "Age 11-13",
+     "duration": "14 hours",
+     "topics": [
+      "Habitats, food chains and how living things depend on one another",
+      "Air, water and land pollution: causes and everyday ways to reduce it",
+      "Reduce, reuse, recycle and the responsible handling of waste",
+      "Natural resources, conservation and protecting forests and wildlife",
+      "The solar system, phases of the Moon and the reason for seasons",
+      "Soil types, erosion and why healthy soil matters for food",
+      "Framing a question, planning a fair test and recording results honestly",
+      "Designing, carrying out and presenting a short science project"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -4930,7 +5585,95 @@
   "category_chains": [
    "Academics — Elementary & Middle School",
    "Academics — Elementary & Middle School > Science"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "Physics Strand — Force, Pressure & Energy",
+     "age": "Age 13+",
+     "duration": "14 hours",
+     "topics": [
+      "Force as a push or pull, contact and non-contact forces, and their effects",
+      "Pressure in solids, liquids and gases, and everyday atmospheric-pressure examples",
+      "Friction: its causes, useful and harmful effects, and ways to change it",
+      "Work, energy and power in simple terms with common examples",
+      "Forms of energy and the conservation of energy in transformations",
+      "Sources of energy: renewable versus non-renewable and wise use",
+      "Measuring force with a spring balance and investigating friction on surfaces"
+     ]
+    },
+    {
+     "title": "Physics Strand — Light, Sound & Everyday Electricity",
+     "age": "Age 13+",
+     "duration": "12 hours",
+     "topics": [
+      "Reflection of light, laws of reflection and images in a plane mirror",
+      "How the human eye works and simple care of eyesight",
+      "Sound produced by vibrations, its need for a medium, and how it travels",
+      "Pitch, loudness, frequency and amplitude, and noise pollution",
+      "Electric current, conductors and insulators, and simple circuits",
+      "Chemical and heating effects of current in everyday devices",
+      "Making a simple circuit and observing reflection with mirrors"
+     ]
+    },
+    {
+     "title": "Chemistry Strand — Matter, Elements, Compounds & Mixtures",
+     "age": "Age 13+",
+     "duration": "14 hours",
+     "topics": [
+      "Matter and its particle nature; states of matter and their properties",
+      "Atoms and molecules as the building blocks of substances",
+      "Elements, compounds and mixtures told apart with examples",
+      "Symbols, simple formulae and the idea of valency",
+      "Homogeneous and heterogeneous mixtures and methods of separation",
+      "Physical and chemical changes distinguished by evidence",
+      "Separating a salt–sand–water mixture using filtration and evaporation"
+     ]
+    },
+    {
+     "title": "Chemistry Strand — Chemical Reactions, Metals & Non-Metals",
+     "age": "Age 13+",
+     "duration": "12 hours",
+     "topics": [
+      "Signs of a chemical reaction and word equations for common changes",
+      "Combination, decomposition and displacement reactions with examples",
+      "Physical properties that separate metals from non-metals",
+      "Reactions of metals and non-metals with air, water and dilute acids",
+      "The reactivity series and simple displacement of one metal by another",
+      "Everyday uses of common metals, non-metals and their alloys",
+      "Testing conductivity, malleability and metal reactions in the laboratory"
+     ]
+    },
+    {
+     "title": "Biology Strand — Cells, Micro-organisms & Food Production",
+     "age": "Age 13+",
+     "duration": "14 hours",
+     "topics": [
+      "The cell as the unit of life; plant and animal cells compared",
+      "Cell parts and their functions, and the idea of tissues and organs",
+      "Micro-organisms — bacteria, fungi, protozoa, algae and viruses",
+      "Helpful microbes in curd, bread, brewing and medicine, and food preservation",
+      "Harmful microbes, common diseases they cause and the role of vaccination",
+      "Crop production, improved farming practices, manures and fertilisers",
+      "Observing onion-peel and cheek cells under the microscope"
+     ]
+    },
+    {
+     "title": "Biology Strand — Human Body Systems & Ecosystems",
+     "age": "Age 13+",
+     "duration": "12 hours",
+     "topics": [
+      "Digestive, respiratory and circulatory systems and how they cooperate",
+      "The nervous system and sense organs in outline, plus reaching adolescence",
+      "Reproduction in humans introduced with sensitivity and correct terms",
+      "Ecosystems, food chains, food webs and energy flow",
+      "Interdependence of plants, animals and the physical environment",
+      "Conservation of plants and wildlife and the meaning of biodiversity",
+      "Deforestation, its effects and simple ways to protect the environment"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -5021,7 +5764,73 @@
   "category_chains": [
    "Academics — Elementary & Middle School",
    "Academics — Elementary & Middle School > Social Studies"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "History: The Coming of British Rule",
+     "age": "Age 13+",
+     "duration": "12 hours",
+     "topics": [
+      "India in the eighteenth century — a period of change",
+      "Trading companies and the rise of British power",
+      "Battles of Plassey and Buxar and their outcomes",
+      "Expansion policies: alliances and annexations",
+      "Impact of colonial rule on land, trade and crafts"
+     ]
+    },
+    {
+     "title": "History: Awakening and Early Nationalism",
+     "age": "Age 13+",
+     "duration": "12 hours",
+     "topics": [
+      "Social and religious reform movements of the nineteenth century",
+      "Great reformers and their contributions",
+      "Spread of modern education and the press",
+      "The Revolt of 1857 — causes and consequences",
+      "Birth of organised nationalism and early political associations"
+     ]
+    },
+    {
+     "title": "Civics: The Constitution and How India Is Governed",
+     "age": "Age 13+",
+     "duration": "10 hours",
+     "topics": [
+      "What a constitution is and why India needed one",
+      "The Preamble and its key values",
+      "Fundamental Rights and Fundamental Duties",
+      "Directive Principles in simple terms",
+      "The three organs of government — an introduction",
+      "The Union Parliament: how laws are made"
+     ]
+    },
+    {
+     "title": "Geography: Map Work and Earth Skills",
+     "age": "Age 13+",
+     "duration": "10 hours",
+     "topics": [
+      "Types of maps and their uses",
+      "Scale, direction and conventional symbols",
+      "Reading physical and political maps of India",
+      "Locating places using latitude and longitude",
+      "Interpreting simple weather data and instruments"
+     ]
+    },
+    {
+     "title": "Geography: Resources and Industries",
+     "age": "Age 13+",
+     "duration": "12 hours",
+     "topics": [
+      "Natural resources: types and conservation",
+      "Land, soil and water as resources",
+      "Minerals and power resources of India",
+      "Agriculture: major crops and farming methods",
+      "Major industries: textiles, iron and steel, IT",
+      "Human resources and why people are an asset"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -5229,7 +6038,93 @@
   "category_chains": [
    "Academics — High School",
    "Academics — Elementary & Middle School > Mathematics"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "Unit 1: Pure Arithmetic, Indices & Logarithms (Class 9)",
+     "age": "Ages 14-15",
+     "duration": "14 hours",
+     "topics": [
+      "Rational and irrational numbers; decimal expansions",
+      "Surds and rationalising the denominator",
+      "Laws of indices with fractional and negative powers",
+      "Logarithms and their laws (a distinctive ICSE Class 9 topic)",
+      "Compound interest as repeated growth, with and without formula",
+      "Growth and depreciation applications"
+     ]
+    },
+    {
+     "title": "Unit 2: Algebra Foundations (Class 9)",
+     "age": "Ages 14-15",
+     "duration": "14 hours",
+     "topics": [
+      "Expansions using standard identities",
+      "Factorisation including sum and difference of cubes",
+      "Simultaneous linear equations by substitution, elimination and cross-multiplication",
+      "Word problems modelled with pairs of equations",
+      "Indices-based equation solving",
+      "Coordinate plane: plotting points and graphs of linear equations"
+     ]
+    },
+    {
+     "title": "Unit 3: Geometry, Mensuration & Intro Trigonometry (Class 9)",
+     "age": "Ages 14-15",
+     "duration": "16 hours",
+     "topics": [
+      "Congruence of triangles and inequalities in a triangle",
+      "Pythagoras theorem with applications",
+      "Rectilinear figures: mid-point and intercept theorems",
+      "Chord and arc properties of circles",
+      "Area and perimeter of plane figures; solids: cube, cuboid, cylinder",
+      "Trigonometric ratios of standard angles and complementary angles",
+      "Distance formula in coordinate geometry"
+     ]
+    },
+    {
+     "title": "Unit 4: Commercial Mathematics — GST, Banking, Shares (Class 10)",
+     "age": "Ages 15-16",
+     "duration": "10 hours",
+     "topics": [
+      "Goods and Services Tax: computing tax in a chain of transactions",
+      "Banking: recurring deposit accounts and maturity value",
+      "Shares and dividends: face value, market value, yield",
+      "Choosing better investments by comparing returns",
+      "Board-style multi-step commercial word problems"
+     ]
+    },
+    {
+     "title": "Unit 5: Algebra & Coordinate Geometry (Class 10)",
+     "age": "Ages 15-16",
+     "duration": "16 hours",
+     "topics": [
+      "Linear inequations in one variable and number-line solutions",
+      "Quadratic equations: factorisation, formula and word problems",
+      "Ratio and proportion including componendo-dividendo",
+      "Remainder and factor theorems",
+      "Matrices: order, operations and simple 2x2 multiplication (ICSE-specific)",
+      "Arithmetic and geometric progressions",
+      "Section formula, midpoint and centroid",
+      "Slope and the equation of a straight line"
+     ]
+    },
+    {
+     "title": "Unit 6: Geometry, Trigonometry, Statistics & Probability (Class 10)",
+     "age": "Ages 15-16",
+     "duration": "16 hours",
+     "topics": [
+      "Similarity of triangles with basic proportionality results",
+      "Loci: standard theorems and applications",
+      "Angle and tangent properties of circles; cyclic quadrilaterals",
+      "Constructions: tangents to a circle, inscribed and circumscribed circles",
+      "Proving trigonometric identities",
+      "Heights and distances with angles of elevation and depression",
+      "Statistics: mean by all methods, median, ogive and histogram",
+      "Probability of single events in board-exam style settings"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -5335,7 +6230,92 @@
   "category_chains": [
    "Academics — High School",
    "Academics — Elementary & Middle School > Mathematics"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "Unit 1: Sets, Functions & Trigonometry (Class 11)",
+     "age": "Ages 16-17",
+     "duration": "18 hours",
+     "topics": [
+      "Sets, operations and Venn-diagram problems",
+      "Relations and functions: domain, range and types of functions",
+      "Trigonometric functions of any angle and their graphs",
+      "Compound, multiple and sub-multiple angle formulae",
+      "General solutions of trigonometric equations",
+      "Properties of triangles: sine and cosine rules"
+     ]
+    },
+    {
+     "title": "Unit 2: Algebra — Complex Numbers to Series (Class 11)",
+     "age": "Ages 16-17",
+     "duration": "18 hours",
+     "topics": [
+      "Complex numbers: algebra, modulus, argument and cube roots of unity",
+      "Quadratic equations: nature of roots and symmetric functions of roots",
+      "Linear inequalities in one and two variables",
+      "Permutations and combinations",
+      "Binomial theorem for positive integral index",
+      "Sequences and series: AP, GP and special sums",
+      "Principle of mathematical induction"
+     ]
+    },
+    {
+     "title": "Unit 3: Coordinate Geometry, Limits & Statistics (Class 11)",
+     "age": "Ages 16-17",
+     "duration": "16 hours",
+     "topics": [
+      "Straight lines: slope forms, angle between lines, distance of a point",
+      "Circles: standard and general equations",
+      "Conic sections: parabola, ellipse and hyperbola",
+      "Limits and the derivative from first principles",
+      "Rules of differentiation for algebraic and trigonometric functions",
+      "Measures of dispersion and analysis of frequency distributions",
+      "Introductory probability using outcomes and events"
+     ]
+    },
+    {
+     "title": "Unit 4: Functions, Matrices & Differential Calculus (Class 12)",
+     "age": "Ages 17-18",
+     "duration": "18 hours",
+     "topics": [
+      "Types of relations, invertible functions and inverse trigonometric functions",
+      "Matrices and determinants; solving systems by matrix method",
+      "Continuity and differentiability including implicit and logarithmic forms",
+      "Derivatives of parametric and composite functions",
+      "Applications of derivatives: rate of change, increasing-decreasing behaviour",
+      "Tangents, normals and maxima-minima problems"
+     ]
+    },
+    {
+     "title": "Unit 5: Integral Calculus & Differential Equations (Class 12)",
+     "age": "Ages 17-18",
+     "duration": "16 hours",
+     "topics": [
+      "Indefinite integrals: substitution, parts and partial fractions",
+      "Definite integrals and their properties",
+      "Area under curves and between curves",
+      "Formation and solution of first-order differential equations",
+      "Variable-separable and linear differential equations",
+      "Modelling growth and decay with differential equations"
+     ]
+    },
+    {
+     "title": "Unit 6: Vectors, 3-D Geometry, Probability & Applications (Class 12)",
+     "age": "Ages 17-18",
+     "duration": "16 hours",
+     "topics": [
+      "Vectors: algebra, dot and cross products",
+      "Three-dimensional geometry: lines and planes in space",
+      "Conditional probability, independence and Bayes' theorem",
+      "Random variables and probability distributions",
+      "ISC Section C options: cost-revenue applications of calculus",
+      "Linear regression: lines of best fit and estimation",
+      "Linear programming: formulating and solving graphically"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -5425,7 +6405,89 @@
   "category_chains": [
    "Academics — High School",
    "Academics — Elementary & Middle School > English"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "ISC Language: Essay Writing",
+     "age": "Ages 16-18",
+     "duration": "14 hours",
+     "topics": [
+      "Essay types: argumentative, discursive, descriptive, narrative, reflective",
+      "Thesis, structure and progression of ideas",
+      "Mature vocabulary and controlled sentence rhythm",
+      "Balancing viewpoints in discursive writing",
+      "Original short-story option: voice and pacing",
+      "Grading criteria and self-assessment against them"
+     ]
+    },
+    {
+     "title": "ISC Language: Proposal & Directed Writing",
+     "age": "Ages 16-18",
+     "duration": "10 hours",
+     "topics": [
+      "Proposal writing: heading, introduction, objectives, action plan",
+      "Formal register and persuasive framing in proposals",
+      "Article and speech writing conventions",
+      "Report writing on events and issues",
+      "Interpreting the question stem to cover all demands",
+      "Timed directed-writing tasks with model comparisons"
+     ]
+    },
+    {
+     "title": "ISC Language: Comprehension & Grammar Precision",
+     "age": "Ages 16-18",
+     "duration": "12 hours",
+     "topics": [
+      "Advanced unseen passages: argument, tone and implication",
+      "Answering analytically in own words",
+      "Vocabulary questions: nuance and connotation",
+      "Transformation, synthesis and error correction at ISC level",
+      "Cohesion devices: linking ideas across paragraphs",
+      "Full Paper 1 simulations under exam timing"
+     ]
+    },
+    {
+     "title": "ISC Literature: Drama in Depth",
+     "age": "Ages 16-18",
+     "duration": "14 hours",
+     "topics": [
+      "Prescribed play: act-wise plot and structural design",
+      "Character studies: motivation, conflict and change",
+      "Themes, symbols and dramatic technique",
+      "Context questions and long-answer construction",
+      "Critical viewpoints: reading the play from more than one angle",
+      "Using textual evidence without over-quoting"
+     ]
+    },
+    {
+     "title": "ISC Literature: Prose & Poetry Analysis",
+     "age": "Ages 16-18",
+     "duration": "14 hours",
+     "topics": [
+      "Prescribed prose texts: narrative technique and theme",
+      "Prescribed poetry: form, imagery, tone and movement of thought",
+      "Comparative questions across texts and poets",
+      "Writing literary essays: argument built on close reading",
+      "Personal response grounded in the text",
+      "Common examiner expectations for top-band answers"
+     ]
+    },
+    {
+     "title": "Text Analysis & Board Exam Mastery",
+     "age": "Ages 16-18",
+     "duration": "10 hours",
+     "topics": [
+      "Unpacking question verbs: discuss, examine, justify, evaluate",
+      "Planning long answers in five minutes",
+      "Time budgeting across Language and Literature papers",
+      "Full-length mock papers for both papers",
+      "Error analysis and targeted revision plans",
+      "Final revision: quotation banks and theme maps"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -5540,7 +6602,101 @@
   "category_chains": [
    "Academics — High School",
    "Academics — Elementary & Middle School > Science"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "Physics Paper — Measurement, Motion, Force & Machines",
+     "age": "Age 14-16",
+     "duration": "18 hours",
+     "topics": [
+      "SI units, measurement of length, mass and time, and the vernier and screw gauge",
+      "Motion in a straight line, speed, velocity, acceleration and graphs",
+      "Newton's laws of motion, inertia, momentum and the idea of force",
+      "Turning effect of a force, moments, centre of gravity and equilibrium",
+      "Work, energy and power, with kinetic and potential energy calculations",
+      "Machines, mechanical advantage, velocity ratio and efficiency",
+      "Simple pendulum, uniform circular motion and gravitation basics",
+      "Practical work with the beam balance, spring balance and levers"
+     ]
+    },
+    {
+     "title": "Physics Paper — Sound, Light, Heat & Electricity",
+     "age": "Age 14-16",
+     "duration": "18 hours",
+     "topics": [
+      "Sound as a wave, its properties, reflection, echoes and resonance",
+      "Reflection and refraction of light, refractive index and total internal reflection",
+      "Lenses, the human eye, defects of vision and the spectrum",
+      "Heat, calorimetry, specific heat capacity and latent heat",
+      "Thermal expansion and the transfer of heat by conduction, convection and radiation",
+      "Current electricity, Ohm's law, resistance and combinations of resistors",
+      "Household electricity, electric power, safety and the heating effect of current",
+      "Magnetic effect of current and simple electromagnetic induction"
+     ]
+    },
+    {
+     "title": "Chemistry Paper — Periodic Table, Bonding & Chemical Change",
+     "age": "Age 14-16",
+     "duration": "18 hours",
+     "topics": [
+      "Atomic structure, electronic configuration, isotopes and atomicity",
+      "The modern periodic table and periodic trends across groups and periods",
+      "Ionic (electrovalent) and covalent bonding with dot-and-cross diagrams",
+      "Properties of ionic and covalent compounds compared",
+      "Types of chemical reactions and writing and balancing equations",
+      "Study of gases: hydrogen, oxygen, ammonia and hydrogen chloride preparation",
+      "Water of crystallisation, hydrated salts and efflorescence",
+      "Laboratory preparation and testing of common gases"
+     ]
+    },
+    {
+     "title": "Chemistry Paper — Acids, Bases, Salts, Mole Concept & Organic Intro",
+     "age": "Age 14-16",
+     "duration": "18 hours",
+     "topics": [
+      "Acids, bases and salts, the pH scale and indicators",
+      "Types of salts and general methods of salt preparation",
+      "The mole concept, Avogadro's number and molar mass",
+      "Relating mass, moles and volume in simple stoichiometry",
+      "Electrolysis and its everyday applications such as electroplating",
+      "Study of important compounds: sulphuric, nitric and hydrochloric acids",
+      "Introduction to organic chemistry, hydrocarbons and the idea of homologous series",
+      "Salt analysis and qualitative tests for common ions"
+     ]
+    },
+    {
+     "title": "Biology Paper — Cell, Plant Physiology & Life Processes",
+     "age": "Age 14-16",
+     "duration": "18 hours",
+     "topics": [
+      "Cell structure, cell division by mitosis and meiosis, and tissues",
+      "Plant and animal tissues and their specialised functions",
+      "Transpiration, osmosis, diffusion and absorption of water by roots",
+      "Photosynthesis and respiration as complementary life processes",
+      "Transport in plants through xylem and phloem",
+      "Human nutrition and the digestive system",
+      "Circulatory system, blood, heart and blood vessels",
+      "Excretory and nervous systems and the endocrine glands"
+     ]
+    },
+    {
+     "title": "Biology Paper — Genetics, Health, Ecology & Pollution",
+     "age": "Age 14-16",
+     "duration": "16 hours",
+     "topics": [
+      "Reproduction in plants and humans and the reproductive system",
+      "Basics of heredity, chromosomes, genes and Mendel's ideas",
+      "Sense organs — structure and working of the eye and ear",
+      "Human health, hygiene, communicable diseases and immunity",
+      "Ecosystems, food chains, food webs and the flow of energy",
+      "Pollution of air, water and soil, its effects and control measures",
+      "Conservation of natural resources and protection of biodiversity",
+      "Dissections replaced by models, charts and slide observation practicals"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -5655,7 +6811,95 @@
   "category_chains": [
    "Academics — High School",
    "Academics — High School > Physics"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "Mechanics I — Measurement, Kinematics & Laws of Motion",
+     "age": "Age 16-18",
+     "duration": "20 hours",
+     "topics": [
+      "Units, dimensions, significant figures and errors in measurement",
+      "Motion in a straight line and in a plane; vectors and projectile motion",
+      "Newton's laws of motion, momentum, impulse and their applications",
+      "Friction, circular motion and banking of roads",
+      "Work, energy and power and the work–energy theorem",
+      "Conservation of energy and collisions in one and two dimensions",
+      "Numerical problem-solving and graphical analysis of motion"
+     ]
+    },
+    {
+     "title": "Mechanics II — Rotation, Gravitation & Properties of Matter",
+     "age": "Age 16-18",
+     "duration": "18 hours",
+     "topics": [
+      "System of particles, centre of mass and rotational motion",
+      "Torque, angular momentum and moment of inertia",
+      "Newton's law of gravitation, gravitational potential and satellites",
+      "Elasticity, stress, strain and moduli of elasticity",
+      "Fluid mechanics: pressure, Pascal's and Archimedes' principles",
+      "Bernoulli's theorem, viscosity and surface tension",
+      "Applications in engineering and everyday phenomena"
+     ]
+    },
+    {
+     "title": "Heat, Thermodynamics & Oscillations and Waves",
+     "age": "Age 16-18",
+     "duration": "18 hours",
+     "topics": [
+      "Thermal properties of matter, calorimetry and heat transfer",
+      "Kinetic theory of gases and the ideal-gas equation",
+      "Laws of thermodynamics and thermodynamic processes",
+      "Heat engines, refrigerators and efficiency",
+      "Simple harmonic motion and the energy in oscillations",
+      "Wave motion, superposition, standing waves and resonance",
+      "Doppler effect and applications to sound"
+     ]
+    },
+    {
+     "title": "Electrostatics & Current Electricity",
+     "age": "Age 16-18",
+     "duration": "20 hours",
+     "topics": [
+      "Coulomb's law, electric field and Gauss's theorem",
+      "Electric potential, potential energy and capacitance",
+      "Combinations of capacitors and energy stored in a capacitor",
+      "Electric current, drift velocity, Ohm's law and resistivity",
+      "Kirchhoff's laws, Wheatstone bridge and potentiometer",
+      "Heating effect of current and electrical power",
+      "Circuit analysis and error-aware numerical practice"
+     ]
+    },
+    {
+     "title": "Magnetism, Electromagnetic Induction & Alternating Current",
+     "age": "Age 16-18",
+     "duration": "18 hours",
+     "topics": [
+      "Magnetic effect of current, Biot–Savart and Ampere's laws",
+      "Force on charges and conductors; moving-coil galvanometer",
+      "Magnetic materials and Earth's magnetism",
+      "Electromagnetic induction, Faraday's and Lenz's laws",
+      "Self and mutual inductance and the AC generator",
+      "Alternating current, reactance, impedance and resonance",
+      "Transformers, power transmission and electromagnetic waves"
+     ]
+    },
+    {
+     "title": "Optics, Modern Physics & Electronics",
+     "age": "Age 16-18",
+     "duration": "20 hours",
+     "topics": [
+      "Ray optics: mirrors, lenses, optical instruments and the human eye",
+      "Wave optics: interference, diffraction and polarisation",
+      "Dual nature of radiation and matter and the photoelectric effect",
+      "Atomic models, the hydrogen spectrum and Bohr's theory",
+      "Nuclei, radioactivity, and nuclear fission and fusion",
+      "Semiconductor devices, diodes, transistors and logic gates",
+      "Investigatory project and ISC practical skills"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -5770,7 +7014,95 @@
   "category_chains": [
    "Academics — High School",
    "Academics — High School > Chemistry"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "Atomic Structure, Periodicity & Chemical Bonding",
+     "age": "Age 16-18",
+     "duration": "20 hours",
+     "topics": [
+      "Atomic models, quantum numbers and electronic configuration",
+      "Periodic table, periodic trends and effective nuclear charge",
+      "Ionic, covalent and coordinate bonding",
+      "VSEPR theory, hybridisation and molecular geometry",
+      "Molecular orbital theory in outline and bond parameters",
+      "Hydrogen bonding and its effect on properties",
+      "Numerical practice on atomic and molecular quantities"
+     ]
+    },
+    {
+     "title": "States of Matter, Energetics & Equilibrium",
+     "age": "Age 16-18",
+     "duration": "20 hours",
+     "topics": [
+      "Gaseous state, gas laws and the ideal-gas equation; liquid state",
+      "The mole concept, stoichiometry and empirical formulae",
+      "Chemical thermodynamics: enthalpy, entropy and Gibbs energy",
+      "Hess's law and spontaneity of reactions",
+      "Chemical equilibrium and Le Chatelier's principle",
+      "Ionic equilibrium: acids, bases, pH, buffers and solubility product",
+      "Redox reactions and balancing by the oxidation-number method"
+     ]
+    },
+    {
+     "title": "Inorganic Chemistry — s-, p- and d-Block Elements",
+     "age": "Age 16-18",
+     "duration": "18 hours",
+     "topics": [
+      "Hydrogen, water and hydrogen peroxide",
+      "s-block: alkali and alkaline-earth metals and their compounds",
+      "p-block groups 13 to 18 and periodic trends within them",
+      "Study of representative compounds and their uses",
+      "d- and f-block elements and characteristics of transition metals",
+      "Coordination compounds, nomenclature and bonding theories",
+      "Metallurgy principles and extraction of common metals"
+     ]
+    },
+    {
+     "title": "Organic Chemistry — Fundamentals & Hydrocarbons",
+     "age": "Age 16-18",
+     "duration": "18 hours",
+     "topics": [
+      "IUPAC nomenclature, isomerism and classification of organic compounds",
+      "Electronic effects: inductive, resonance, hyperconjugation and electromeric",
+      "Reaction mechanisms and types of organic reactions",
+      "Alkanes, alkenes and alkynes: preparation, properties and reactions",
+      "Aromatic hydrocarbons, benzene and electrophilic substitution",
+      "Purification and qualitative analysis of organic compounds",
+      "Environmental chemistry and pollution control"
+     ]
+    },
+    {
+     "title": "Physical Chemistry — Solutions, Electrochemistry, Kinetics & Surface",
+     "age": "Age 16-18",
+     "duration": "18 hours",
+     "topics": [
+      "Solid state: crystal lattices, unit cells and packing",
+      "Solutions, concentration terms and colligative properties",
+      "Electrochemistry, electrode potential, cells and the Nernst equation",
+      "Conductance, electrolysis and Faraday's laws",
+      "Chemical kinetics, rate laws, order and molecularity",
+      "Collision theory, activation energy and the Arrhenius equation",
+      "Surface chemistry: adsorption, colloids and catalysis"
+     ]
+    },
+    {
+     "title": "Organic Functional Groups & Biomolecules",
+     "age": "Age 16-18",
+     "duration": "18 hours",
+     "topics": [
+      "Haloalkanes and haloarenes: preparation, properties and reactions",
+      "Alcohols, phenols and ethers and their characteristic reactions",
+      "Aldehydes, ketones and carboxylic acids",
+      "Amines, diazonium salts and nitrogen-containing compounds",
+      "Biomolecules: carbohydrates, proteins, lipids, vitamins and nucleic acids",
+      "Polymers, their classification and everyday uses",
+      "ISC qualitative and quantitative practical chemistry"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -5882,7 +7214,95 @@
   "category_chains": [
    "Academics — High School",
    "Academics — High School > Biology"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "Diversity & Structural Organisation of Living Things",
+     "age": "Age 16-18",
+     "duration": "18 hours",
+     "topics": [
+      "The living world, taxonomy, nomenclature and the five-kingdom system",
+      "Monera, Protista, Fungi and the classification of plants and animals",
+      "Morphology and anatomy of flowering plants",
+      "Structural organisation and tissues in animals",
+      "Comparison of body plans across major animal groups",
+      "Herbarium, specimen study and identification techniques",
+      "Field observation and recording of biodiversity"
+     ]
+    },
+    {
+     "title": "Cell Biology & Biomolecules",
+     "age": "Age 16-18",
+     "duration": "18 hours",
+     "topics": [
+      "Cell theory and the prokaryotic and eukaryotic cell",
+      "Cell membrane, organelles and the nucleus",
+      "Biomolecules: carbohydrates, proteins, lipids and nucleic acids",
+      "Enzymes, their properties and mechanism of action",
+      "Cell cycle, mitosis and meiosis compared",
+      "Microscopy and preparation of temporary mounts",
+      "Study of cell division stages from prepared slides"
+     ]
+    },
+    {
+     "title": "Plant Physiology",
+     "age": "Age 16-18",
+     "duration": "16 hours",
+     "topics": [
+      "Transport in plants: diffusion, osmosis and water potential",
+      "Mineral nutrition and the role of essential elements",
+      "Photosynthesis: light and dark reactions and influencing factors",
+      "Respiration in plants and the release of energy",
+      "Plant growth, development and plant hormones",
+      "Experiments on transpiration, osmosis and photosynthesis",
+      "Interpreting physiological data and graphs"
+     ]
+    },
+    {
+     "title": "Human Physiology",
+     "age": "Age 16-18",
+     "duration": "20 hours",
+     "topics": [
+      "Digestion and absorption of food",
+      "Breathing and exchange of gases",
+      "Body fluids, circulation and the working of the heart",
+      "Excretory products and osmoregulation",
+      "Locomotion, movement and the skeletal-muscular system",
+      "Neural control and coordination and the sense organs",
+      "Chemical coordination through the endocrine system"
+     ]
+    },
+    {
+     "title": "Reproduction, Genetics & Evolution",
+     "age": "Age 16-18",
+     "duration": "20 hours",
+     "topics": [
+      "Reproduction in flowering plants and human reproduction",
+      "Reproductive health and the principles of family welfare",
+      "Mendelian inheritance and the chromosomal theory",
+      "Molecular basis of inheritance: DNA, RNA and the genetic code",
+      "Gene expression, replication, transcription and translation",
+      "Evolution: evidence, mechanisms and natural selection",
+      "Solving genetics problems and pedigree analysis"
+     ]
+    },
+    {
+     "title": "Biology in Human Welfare, Biotechnology & Ecology",
+     "age": "Age 16-18",
+     "duration": "18 hours",
+     "topics": [
+      "Human health, disease, immunity and the immune system",
+      "Microbes in human welfare and food production",
+      "Principles and processes of biotechnology",
+      "Applications of biotechnology in health and agriculture",
+      "Organisms and populations; ecosystems and energy flow",
+      "Biodiversity, conservation and environmental issues",
+      "ISC project work and practical ecology skills"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -5989,7 +7409,86 @@
   "category_chains": [
    "Academics — High School",
    "Academics — Elementary & Middle School > Social Studies"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "H.C.G. Paper 1 — Civics: The Union Government",
+     "age": "Ages 14-16",
+     "duration": "14 hours",
+     "topics": [
+      "The Union Legislature: Lok Sabha and Rajya Sabha",
+      "Powers and functions of Parliament; how a bill becomes law",
+      "The Union Executive: President, Vice-President and Council of Ministers",
+      "The Prime Minister and collective responsibility",
+      "The Union Judiciary: Supreme Court and High Courts",
+      "Independence of the judiciary and judicial review"
+     ]
+    },
+    {
+     "title": "H.C.G. Paper 1 — History: 1857 to the Rise of Nationalism",
+     "age": "Ages 14-16",
+     "duration": "14 hours",
+     "topics": [
+      "The First War of Independence, 1857: causes and consequences",
+      "Growth of nationalism and the founding of the Indian National Congress",
+      "Early Nationalists and Assertive Nationalists — methods compared",
+      "Partition of Bengal and the Swadeshi movement",
+      "Formation of the Muslim League and the Lucknow Pact"
+     ]
+    },
+    {
+     "title": "H.C.G. Paper 1 — History: The Gandhian Era to Independence",
+     "age": "Ages 14-16",
+     "duration": "14 hours",
+     "topics": [
+      "Mahatma Gandhi and mass movements: Non-Cooperation and Civil Disobedience",
+      "The Quit India Movement of 1942",
+      "Forward Bloc, INA and Subhas Chandra Bose",
+      "Towards partition: the Mountbatten Plan and the Independence Act",
+      "Independence, partition and their immediate aftermath"
+     ]
+    },
+    {
+     "title": "H.C.G. Paper 1 — History: The World Wars and the United Nations",
+     "age": "Ages 14-16",
+     "duration": "12 hours",
+     "topics": [
+      "Causes and consequences of the First World War",
+      "Rise of dictatorships: Fascism and Nazism",
+      "The Second World War: causes and global impact",
+      "The United Nations: organs and agencies",
+      "The Universal Declaration of Human Rights and the Non-Aligned Movement"
+     ]
+    },
+    {
+     "title": "H.C.G. Paper 2 — Geography: Map Work and Physical India",
+     "age": "Ages 14-16",
+     "duration": "14 hours",
+     "topics": [
+      "Interpreting topographical survey maps",
+      "Map of India: locating physical features, rivers and cities",
+      "The Indian climate: monsoon mechanism and rainfall patterns",
+      "Soils of India: types, distribution and conservation",
+      "Natural vegetation and forest conservation",
+      "Water resources and irrigation methods"
+     ]
+    },
+    {
+     "title": "H.C.G. Paper 2 — Geography: Economy, Industry and Environment",
+     "age": "Ages 14-16",
+     "duration": "14 hours",
+     "topics": [
+      "Agriculture in India: food crops and cash crops",
+      "Minerals and conventional and non-conventional energy",
+      "Agro-based and mineral-based industries",
+      "Transport networks: roadways, railways, airways and waterways",
+      "Waste generation, segregation and safe disposal",
+      "Waste management: reduce, reuse, recycle in practice"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,
@@ -6096,7 +7595,89 @@
   "category_chains": [
    "Academics — High School",
    "Academics — Elementary & Middle School > Social Studies"
-  ]
+  ],
+  "curriculum_variants": {
+   "India · ICSE (CISCE)": [
+    {
+     "title": "ISC History: India — From Company Rule to Freedom",
+     "age": "Ages 16-18",
+     "duration": "16 hours",
+     "topics": [
+      "Colonial economy and its impact on Indian society",
+      "The national movement: moderates, extremists and revolutionaries",
+      "Gandhian mass politics and constitutional developments",
+      "Communal politics and the road to partition",
+      "Integration of princely states and framing the republic",
+      "Nation-building challenges in the Nehru years"
+     ]
+    },
+    {
+     "title": "ISC History: The World in the Twentieth Century",
+     "age": "Ages 16-18",
+     "duration": "16 hours",
+     "topics": [
+      "The world wars and the collapse of old empires",
+      "The Russian Revolution and the socialist experiment",
+      "Totalitarian regimes between the wars",
+      "The Cold War: blocs, crises and detente",
+      "Decolonisation across Asia and Africa",
+      "The end of the Cold War and a changing world order"
+     ]
+    },
+    {
+     "title": "ISC Political Science: Theory and the Indian Constitution",
+     "age": "Ages 16-18",
+     "duration": "14 hours",
+     "topics": [
+      "State, sovereignty and forms of government",
+      "Constitutions: written, unwritten, rigid and flexible",
+      "Salient features of the Indian Constitution",
+      "Fundamental Rights, Duties and Directive Principles in depth",
+      "Federalism and Centre-State relations",
+      "Amendment procedure and basic structure"
+     ]
+    },
+    {
+     "title": "ISC Political Science: Institutions and Democratic Practice",
+     "age": "Ages 16-18",
+     "duration": "14 hours",
+     "topics": [
+      "Legislature, executive and judiciary — comparative working",
+      "Elections, the Election Commission and representation",
+      "Political parties and coalition politics in India",
+      "Local government: Panchayati Raj and urban bodies",
+      "Rights movements, public opinion and the media",
+      "India's foreign policy: principles and practice"
+     ]
+    },
+    {
+     "title": "ISC Geography: Physical and World Geography",
+     "age": "Ages 16-18",
+     "duration": "14 hours",
+     "topics": [
+      "Earth's interior, plate tectonics and landform processes",
+      "Atmosphere, weather systems and world climate types",
+      "Oceans, currents and the hydrological cycle",
+      "Biosphere: soils, biomes and ecosystems",
+      "Natural hazards and disaster management",
+      "Map projections and geographic data interpretation"
+     ]
+    },
+    {
+     "title": "ISC Geography: India — People, Economy and Practical Work",
+     "age": "Ages 16-18",
+     "duration": "14 hours",
+     "topics": [
+      "Physiography and drainage of the subcontinent",
+      "Population: distribution, migration and urbanisation",
+      "Agriculture, industry and planning regions of India",
+      "Transport, trade and communication networks",
+      "Sustainable development and environmental concerns",
+      "Topographical map interpretation and fieldwork skills"
+     ]
+    }
+   ]
+  }
  },
  {
   "sku": null,

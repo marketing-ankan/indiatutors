@@ -41,6 +41,7 @@ class CourseSeeder extends Seeder {
                     'age'               => $data['age'] ?? null,
                     'pills'             => $data['pills'] ?? [],
                     'curriculum'        => $data['curriculum'] ?? [],
+                    'curriculum_variants' => $data['curriculum_variants'] ?? null,
                     'regular_price'     => $data['regular_price'] ?? 0,
                     'sale_price'        => ($data['sale_price'] ?? null) ?: null,
                     'image_url'         => $data['image_url'] ?: null,

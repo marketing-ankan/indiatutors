@@ -263,6 +263,8 @@ export default function CourseDetailPage() {
   const { slug } = useParams();
   const [tab, setTab] = useState(0);
   const [openFaq, setOpenFaq] = useState(0);
+  const [boardTab, setBoardTab] = useState(0);   // curriculum board-variant chip
+  const [openUnit, setOpenUnit] = useState(0);   // curriculum accordion (-1 = all closed)
   const { data: course, isLoading, isError } = useQuery({ queryKey: ['course', slug], queryFn: () => fetchCourse(slug) });
   const { data: coursesResp } = useQuery({ queryKey: ['courses', { per_page: 200 }], queryFn: () => fetchCourses({ per_page: 200 }) });
 
@@ -271,6 +273,17 @@ export default function CourseDetailPage() {
 
   const curriculum = course.curriculum ?? [];
   const learn = curriculum.flatMap(l => l.topics || []).slice(0, 8);
+
+  // Board-variant curricula (WinQuest-parity chips): `curriculum` is the
+  // CBSE/NCERT default; curriculum_variants holds e.g. ICSE (CISCE) units.
+  const variantMap = {
+    ...(curriculum.length ? { 'India · CBSE (NCERT)': curriculum } : {}),
+    ...(course.curriculum_variants || {}),
+  };
+  const variantNames = Object.keys(variantMap);
+  const activeUnits = variantMap[variantNames[Math.min(boardTab, variantNames.length - 1)]] || [];
+  const totalHours = activeUnits.reduce((s, u) => s + (parseInt(u.duration) || 0), 0);
+  const gradeLabel = (course.name.match(/Grade\s[\d\-–]+(?:-\d+)?/) || [])[0] || null;
   const tabLabel = i => i === 1 ? `Why Choose Online ${course.name} Classes` : TABS[i];
   const rating = ratingOf(course.slug);
   const enrolled = enrolledOf(course.slug);
@@ -383,21 +396,51 @@ export default function CourseDetailPage() {
               </>
             )}
             {tab === 4 && (
-              curriculum.length ? (
+              activeUnits.length ? (
                 <div className="space-y-4">
-                  {curriculum.map((level, i) => (
-                    <div key={i} className="rounded-2xl ring-1 ring-slate-100 bg-white overflow-hidden">
-                      <div className="flex flex-wrap items-center gap-3 bg-slate-50 px-5 py-3 border-b border-slate-100">
-                        <span className="w-7 h-7 rounded-full bg-brand-600 text-white flex items-center justify-center text-xs font-bold shrink-0">{i + 1}</span>
-                        <h4 className="font-bold text-slate-900">{level.title}</h4>
-                        <div className="ml-auto flex items-center gap-3 text-xs text-slate-500">
-                          {level.age && <span className="inline-flex items-center gap-1"><Baby className="h-3.5 w-3.5" />{level.age}</span>}
-                          {level.duration && <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{level.duration}</span>}
+                  {/* Pills */}
+                  <div className="flex flex-wrap gap-2">
+                    <span className="rounded-full bg-[#D4AF37] px-4 py-1.5 text-sm font-bold text-[#0B1220]">Curriculum</span>
+                    {gradeLabel && <span className="rounded-full bg-brand-600 px-4 py-1.5 text-sm font-bold text-white">{gradeLabel}</span>}
+                  </div>
+
+                  {/* Grade banner */}
+                  <div className="rounded-2xl px-6 py-5 text-white" style={{ background: 'linear-gradient(120deg,#0B1220,#1E3A8A)' }}>
+                    <h4 className="font-heading text-xl font-extrabold">{gradeLabel || course.name}</h4>
+                    <div className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
+                      {(course.age || activeUnits[0]?.age) && <span className="rounded-full bg-white/15 px-3 py-1 ring-1 ring-white/25">{course.age || activeUnits[0].age}</span>}
+                      {totalHours > 0 && <span className="rounded-full bg-white/15 px-3 py-1 ring-1 ring-white/25">{totalHours} hrs</span>}
+                    </div>
+                  </div>
+
+                  {/* Board-variant chips */}
+                  {variantNames.length > 1 && (
+                    <div className="flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-white p-2.5">
+                      {variantNames.map((n, i) => (
+                        <button key={n} onClick={() => { setBoardTab(i); setOpenUnit(0); }}
+                          className={`rounded-full px-3.5 py-1.5 text-[13px] font-semibold ring-1 transition ${i === boardTab ? 'bg-brand-600 text-white ring-brand-600' : 'bg-white text-slate-700 ring-slate-200 hover:ring-brand-400'}`}>
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Unit accordion */}
+                  {activeUnits.map((level, i) => (
+                    <div key={i} className="overflow-hidden rounded-2xl ring-1 ring-slate-100">
+                      <button onClick={() => setOpenUnit(openUnit === i ? -1 : i)} aria-expanded={openUnit === i}
+                        className="flex w-full items-center gap-3 px-5 py-3.5 text-left text-white"
+                        style={{ background: 'linear-gradient(120deg,#1E40AF,#0B1220)' }}>
+                        <h4 className="font-bold">{level.title}</h4>
+                        <div className="ml-auto flex items-center gap-3 text-xs text-white/75">
+                          {level.age && <span className="hidden items-center gap-1 sm:inline-flex"><Baby className="h-3.5 w-3.5" />{level.age}</span>}
+                          {level.duration && <span className="hidden items-center gap-1 sm:inline-flex"><Clock className="h-3.5 w-3.5" />{level.duration}</span>}
+                          <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/20 text-sm transition-transform ${openUnit === i ? 'rotate-45' : ''}`}>+</span>
                         </div>
-                      </div>
-                      {level.topics?.length > 0 && (
-                        <ul className="p-5 grid sm:grid-cols-2 gap-x-6 gap-y-2">
-                          {level.topics.map((t, j) => <li key={j} className="flex gap-2 items-start text-sm text-slate-600"><CheckCircle2 className="h-4 w-4 mt-0.5 text-green-500 shrink-0" />{t}</li>)}
+                      </button>
+                      {openUnit === i && level.topics?.length > 0 && (
+                        <ul className="grid gap-x-6 gap-y-2 bg-white p-5 sm:grid-cols-2">
+                          {level.topics.map((t, j) => <li key={j} className="flex items-start gap-2 text-sm text-slate-600"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />{t}</li>)}
                         </ul>
                       )}
                     </div>

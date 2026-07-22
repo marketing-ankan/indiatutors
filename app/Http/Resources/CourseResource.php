@@ -16,6 +16,7 @@ class CourseResource extends JsonResource {
             'pills'             => $this->pills ?? [],
             'description'       => $this->when($request->routeIs('api.courses.show'), $this->description),
             'curriculum'        => $this->when($request->routeIs('api.courses.show'), $this->curriculum ?? []),
+            'curriculum_variants' => $this->when($request->routeIs('api.courses.show'), $this->curriculum_variants),
             'regular_price'     => (float)$this->regular_price,
             'sale_price'        => $this->sale_price !== null ? (float)$this->sale_price : null,
             'effective_price'   => $this->effective_price,
