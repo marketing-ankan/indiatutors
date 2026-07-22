@@ -290,11 +290,11 @@ export default function CourseDetailPage() {
         {imageFor(course) && (
           <>
             {/* Mobile: photo on top (full width) */}
-            <img src={imageFor(course)} alt={course.name} className="h-52 w-full object-cover sm:h-64 lg:hidden" />
+            <img src={imageFor(course)} alt={course.name} className="h-52 w-full object-cover object-top sm:h-64 lg:hidden" />
             {/* Desktop: photo bleeds off the right with a gold diagonal band */}
             <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[56%] lg:block" aria-hidden="true">
               <div className="absolute inset-0" style={{ background: '#D4AF37', clipPath: 'polygon(7% 0, 100% 0, 100% 100%, 0% 100%)' }} />
-              <img src={imageFor(course)} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ clipPath: 'polygon(12% 0, 100% 0, 100% 100%, 5% 100%)' }} />
+              <img src={imageFor(course)} alt="" className="absolute inset-0 h-full w-full object-cover object-top" style={{ clipPath: 'polygon(12% 0, 100% 0, 100% 100%, 5% 100%)' }} />
             </div>
           </>
         )}
