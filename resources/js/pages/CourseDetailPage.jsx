@@ -290,12 +290,12 @@ export default function CourseDetailPage() {
         {imageFor(course) && (
           <>
             {/* Mobile: photo on top (full width) */}
-            <img src={imageFor(course)} alt={course.name} className="h-52 w-full object-cover object-top sm:h-64 lg:hidden" />
+            <img src={imageFor(course)} alt={course.name} className="h-52 w-full object-cover sm:h-64 lg:hidden" style={{ objectPosition: '50% 30%' }} />
             {/* Desktop: photo bleeds off the right with a gold diagonal band */}
             {/* Desktop: gold diagonal band + photo — exact WinQuest geometry
                 (image 55% / gold 56.2%, clip 120px top slant flush at bottom). */}
             <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[56.2%] lg:block" aria-hidden="true" style={{ background: '#D4AF37', clipPath: 'polygon(120px 0, 100% 0, 100% 100%, 0 100%)' }} />
-            <img src={imageFor(course)} alt="" aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[55%] object-cover object-top lg:block" style={{ clipPath: 'polygon(120px 0, 100% 0, 100% 100%, 0 100%)' }} />
+            <img src={imageFor(course)} alt="" aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[55%] object-cover lg:block" style={{ clipPath: 'polygon(120px 0, 100% 0, 100% 100%, 0 100%)', objectPosition: '50% 30%' }} />
           </>
         )}
         <div className="relative container-wide flex items-center py-10 lg:min-h-[431px] lg:py-12">
