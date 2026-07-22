@@ -66,6 +66,22 @@ export const STUDENT_WINS = [
   { tag: '+2 grades', name: 'Diya N. · Class 8', detail: 'Advanced two grade levels in Maths in a year' },
 ];
 
+// "Start your child's journey today" — WinQuest-parity closing CTA (India-centric).
+export const JOURNEY = [
+  { icon: '👩‍🏫', t: '1-on-1 Online Tutors', d: 'Experienced tutors so your child learns from the best.' },
+  { icon: '🎯', t: 'Free Demo Session', d: 'Try a demo to make sure your child enjoys it before you commit.' },
+  { icon: '💸', t: 'Affordable Pricing', d: 'Premium teaching at prices that fit every family.' },
+  { icon: '💬', t: 'Need Help?', d: 'WhatsApp us anytime — our team helps you pick the right class.' },
+];
+
+// "Trusted by 10,000+ families" strip (WinQuest-parity, India-centric).
+export const TRUST_POINTS = [
+  '👩‍🏫 Verified expert tutors',
+  '🎯 1-on-1 personalised attention',
+  '🎁 First class is 100% free',
+  '⭐ 4.9 / 5 from 1,200+ reviews',
+];
+
 export const PARENTS = [
   { init: 'P', quote: 'My daughter went from shy to confident in three months. The 1:1 attention made all the difference.', name: 'Priya S.', place: 'Parent · Bengaluru' },
   { init: 'R', quote: 'Flexible timings actually worked around our schedule, and the mentor genuinely cared about progress.', name: 'Rahul M.', place: 'Parent · Delhi' },

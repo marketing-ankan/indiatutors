@@ -10,6 +10,7 @@ import { cart, wishlist, useWishlist, cartItemOf } from '../lib/cart.js';
 import {
   buildPriceMatrix, CARD_FEATURES, FAQS, WORKSHOPS, PARENTS, TEACHERS,
   ACHIEVEMENTS, BLOG_POSTS, WHATSAPP_TESTIMONIALS, INSTAGRAM, STUDENT_WINS,
+  JOURNEY, TRUST_POINTS,
 } from '../data/courseDetail.js';
 import { imageFor } from '../data/courseImages.js';
 
@@ -612,6 +613,34 @@ export default function CourseDetailPage() {
               <Instagram className="h-4 w-4" /> Follow @{INSTAGRAM.handle}
             </a>
           </div>
+        </div>
+      </section>
+
+      {/* START YOUR CHILD'S JOURNEY — WinQuest-parity closing CTA */}
+      <section className="py-16 text-white" style={{ background: 'linear-gradient(135deg,#0B1220 0%,#1E40AF 100%)' }}>
+        <div className="container-wide text-center">
+          <h2 className="font-heading text-2xl font-extrabold tracking-tight sm:text-3xl">Start your child's journey today</h2>
+          <p className="mt-2 text-white/80">Free first class — meet a tutor, see how a session works, no card needed.</p>
+          <div className="mt-9 grid gap-4 text-left sm:grid-cols-2 lg:grid-cols-4">
+            {JOURNEY.map(j => (
+              <div key={j.t} className="rounded-2xl bg-white/[.08] p-5 ring-1 ring-white/15">
+                <div className="text-2xl">{j.icon}</div>
+                <h3 className="mt-2 font-bold">{j.t}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-white/75">{j.d}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Link to={`/book-demo?subject=${encodeURIComponent(course.name)}`} className="rounded-[11px] bg-[#D4AF37] px-8 py-3 text-sm font-bold text-[#0B1220] shadow-lg shadow-[#D4AF37]/25 transition hover:brightness-105">🎯 Book a Free Demo</Link>
+            <span className="inline-flex items-center gap-2 text-sm text-white/85"><span className="text-[#D4AF37]">★★★★★</span> 4.9/5 · trusted by 10,000+ families</span>
+          </div>
+        </div>
+      </section>
+
+      {/* TRUSTED BY strip */}
+      <section className="border-t border-slate-100 bg-white py-8">
+        <div className="container-wide flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-center text-sm font-semibold text-slate-600">
+          {TRUST_POINTS.map(p => <span key={p}>{p}</span>)}
         </div>
       </section>
     </div>
