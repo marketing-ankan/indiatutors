@@ -111,3 +111,9 @@ if [ -n "$MAIN_JS" ] && [ ! -f "$DOCROOT/build/$MAIN_JS" ]; then
   cp -r "$LARAVEL_DIR/public/build" "$DOCROOT/build"
 fi
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] build integrity checked"
+
+# --- course/hero images served from the web root ------------------------
+# Self-hosted course photos (public/images) copied alongside build/ & icons/.
+rm -rf "$DOCROOT/images" 2>/dev/null || true
+cp -r "$LARAVEL_DIR/public/images" "$DOCROOT/images" 2>/dev/null || true
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] course images synced"

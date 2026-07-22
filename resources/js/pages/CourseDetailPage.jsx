@@ -11,6 +11,7 @@ import {
   buildPriceMatrix, CARD_FEATURES, FAQS, WORKSHOPS, PARENTS, TEACHERS,
   ACHIEVEMENTS, BLOG_POSTS, WHATSAPP_TESTIMONIALS, INSTAGRAM, STUDENT_WINS,
 } from '../data/courseDetail.js';
+import { imageFor } from '../data/courseImages.js';
 
 // Course detail — a 1:1 rebuild of the live /product/{slug} template:
 // breadcrumb hero, a main column (title + pills + tabbed sections) and a sticky
@@ -83,8 +84,8 @@ function BuyCard({ course }) {
 
   return (
     <aside className="rounded-2xl bg-white shadow-lg ring-1 ring-slate-100 overflow-hidden lg:sticky lg:top-24">
-      {course.image_url && (
-        <div className="aspect-video bg-slate-100"><img src={course.image_url} alt={course.name} className="w-full h-full object-cover" /></div>
+      {imageFor(course) && (
+        <div className="aspect-video bg-slate-100"><img src={imageFor(course)} alt={course.name} className="w-full h-full object-cover" /></div>
       )}
       <div className="p-5 space-y-4">
         {/* Plan tabs (only when a Group option exists) */}
@@ -224,8 +225,8 @@ function ProductCard({ c }) {
   return (
     <Link to={`/courses/${c.slug}`} className="group rounded-[14px] bg-white border border-[#E7E7EF] overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-brand-300">
       <div className="h-[150px] bg-[#F3F6FC] overflow-hidden">
-        {c.image_url
-          ? <img src={c.image_url} alt={c.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+        {imageFor(c)
+          ? <img src={imageFor(c)} alt={c.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
           : <span className="flex h-full w-full items-center justify-center text-3xl text-white/90 font-heading font-bold bg-gradient-to-br from-[#1E40AF] to-[#1E3A8A]">{c.name[0]}</span>}
       </div>
       <div className="p-4 flex flex-col flex-1">
@@ -284,24 +285,37 @@ export default function CourseDetailPage() {
 
   return (
     <div className="bg-white">
-      {/* BREADCRUMB HERO */}
-      <section className="relative bg-gradient-to-br from-[#0B1220] to-brand-900 text-white text-center py-16 overflow-hidden">
-        {course.image_url && <img src={course.image_url} alt="" className="absolute inset-0 w-full h-full object-cover opacity-20" />}
-        <div className="relative container-wide">
-          <nav className="text-xs text-slate-300 mb-3">
-            <Link to="/" className="hover:text-white">Home</Link> <span className="text-slate-500">›</span> <Link to="/courses" className="hover:text-white">Courses</Link> <span className="text-slate-500">›</span> <span className="text-white">{course.name}</span>
-          </nav>
-          <p className="text-xs font-bold tracking-[0.2em] text-[#D4AF37] uppercase mb-2">Course Details</p>
-          <h1 className="font-heading text-4xl sm:text-5xl font-extrabold tracking-tight">{course.name}</h1>
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-sm">
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#D4AF37] px-3 py-1 text-xs font-bold text-[#0B1220]">🏆 Bestseller</span>
-            <span className="inline-flex items-center gap-1 font-semibold text-white"><Star className="h-4 w-4 fill-[#D4AF37] text-[#D4AF37]" />{rating.toFixed(1)}/5</span>
-            <span className="text-slate-500" aria-hidden="true">·</span>
-            <span className="font-semibold text-white">{enrolled}+ enrolled</span>
-            <span className="text-slate-500" aria-hidden="true">·</span>
-            <span className="inline-flex items-center gap-1 text-slate-200"><Video className="h-4 w-4" />1:1 Personalised Session</span>
+      {/* BREADCRUMB HERO — image-forward (WinQuest layout, IndiaTutors colours) */}
+      <section className="relative overflow-hidden text-white" style={{ background: 'linear-gradient(135deg,#0B1220,#1E3A8A)' }}>
+        <div aria-hidden="true" className="absolute -right-24 -top-24 h-72 w-72 rounded-full" style={{ background: 'radial-gradient(circle,rgba(212,175,55,.22),transparent 70%)' }} />
+        <div className="relative container-wide grid items-center gap-8 py-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+          <div>
+            <nav className="mb-3 text-xs text-slate-300">
+              <Link to="/" className="hover:text-white">Home</Link> <span className="text-slate-500">›</span> <Link to="/courses" className="hover:text-white">Courses</Link> <span className="text-slate-500">›</span> <span className="text-white">{course.name}</span>
+            </nav>
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-[#D4AF37]">{course.categories?.[0]?.name || 'Course Details'}</p>
+            <h1 className="font-heading text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">{course.name}</h1>
+            {(course.subtitle || course.short_description) && <p className="mt-3 max-w-xl leading-relaxed text-slate-300">{course.subtitle || course.short_description}</p>}
+            <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#D4AF37] px-3 py-1 text-xs font-bold text-[#0B1220]">🏆 Bestseller</span>
+              <span className="inline-flex items-center gap-1 font-semibold text-white"><Star className="h-4 w-4 fill-[#D4AF37] text-[#D4AF37]" />{rating.toFixed(1)}/5</span>
+              <span className="text-slate-400" aria-hidden="true">·</span>
+              <span className="font-semibold text-white">{enrolled}+ enrolled</span>
+              <span className="text-slate-400" aria-hidden="true">·</span>
+              <span className="inline-flex items-center gap-1 text-slate-200"><Video className="h-4 w-4" />1:1 Personalised Session</span>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link to={`/book-demo?subject=${encodeURIComponent(course.name)}`} className="rounded-[11px] bg-[#D4AF37] px-6 py-3 text-sm font-bold text-[#0B1220] shadow-lg shadow-[#D4AF37]/25 transition hover:brightness-105">🎯 Book a Free Demo</Link>
+              <Link to="/plans-pricing" className="rounded-[11px] border-[1.5px] border-white/50 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10">View Plans &amp; Pricing</Link>
+            </div>
           </div>
-          <div className="mx-auto mt-4 h-1 w-16 rounded bg-[#D4AF37]" />
+          <div className="order-first lg:order-last">
+            <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-white/5 shadow-2xl ring-1 ring-white/15">
+              {imageFor(course)
+                ? <img src={imageFor(course)} alt={course.name} className="h-full w-full object-cover" />
+                : <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-700 to-[#0B1220]"><span className="font-heading text-7xl font-extrabold text-white/90">{course.name[0]}</span></div>}
+            </div>
+          </div>
         </div>
       </section>
 
