@@ -245,7 +245,73 @@
    "Vedic Maths",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Foundations: Number Sense the Vedic Way",
+    "age": "Age 8+",
+    "duration": "8 hours",
+    "topics": [
+     "How Vedic Maths works: sutras as thinking shortcuts, not rote tricks",
+     "Complements of 10, 100 and 1000 using 'All from 9 and the last from 10'",
+     "Digit sums (Beejank) and using them to check answers instantly",
+     "Left-to-right thinking versus right-to-left written arithmetic",
+     "Place-value warm-ups and friendly-number rounding",
+     "Building a daily 5-minute mental-drill habit"
+    ]
+   },
+   {
+    "title": "Rapid Addition & Subtraction",
+    "age": "Age 8+",
+    "duration": "10 hours",
+    "topics": [
+     "Completing the whole: pairing numbers that make 10s and 100s",
+     "Left-to-right addition of 2- and 3-digit numbers in the head",
+     "Subtracting from bases (100, 1000) without borrowing",
+     "Compensation: add a bit extra, then adjust back",
+     "Adding long lists quickly by grouping",
+     "Timed accuracy drills with digit-sum checking"
+    ]
+   },
+   {
+    "title": "Multiplication Magic",
+    "age": "Age 9+",
+    "duration": "12 hours",
+    "topics": [
+     "Multiplying any number by 11 in one line",
+     "Near-base multiplication (numbers close to 10, 100, 1000) with Nikhilam",
+     "Vertically-and-crosswise (Urdhva Tiryak) for 2-digit by 2-digit products",
+     "Doubling and halving to simplify hard products",
+     "Multiplying by 5, 25 and 50 using base shortcuts",
+     "Strengthening tables through pattern spotting"
+    ]
+   },
+   {
+    "title": "Squares, Division & Divisibility",
+    "age": "Age 10+",
+    "duration": "10 hours",
+    "topics": [
+     "Squaring numbers ending in 5 with 'By one more than the previous one'",
+     "Squares of numbers near a base (98², 103², etc.)",
+     "Quick division by 5, 25 and 9 using complements",
+     "Simple flag ideas for dividing by numbers like 11 and 12",
+     "Divisibility rules for 2, 3, 4, 5, 6, 9 and 10 through digit patterns",
+     "Estimating answers before calculating to catch errors"
+    ]
+   },
+   {
+    "title": "Speed Maths Championship",
+    "age": "Age 10+",
+    "duration": "8 hours",
+    "topics": [
+     "Choosing the right sutra: mixed-operation strategy practice",
+     "Timed relay drills combining all four operations",
+     "Applying speed methods to school word problems and money sums",
+     "Mental-maths games, puzzles and class competitions",
+     "Self-checking routines with digit sums",
+     "Personal speed-and-accuracy scorecard and next-step goals"
+    ]
+   }
+  ],
   "short_description": "Personalised live Vedic Maths (Grade 3-6) coaching.",
   "description": "",
   "regular_price": 600,
@@ -269,7 +335,88 @@
    "Social Studies",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Foundation: Myself, My Family & Neighbourhood",
+    "age": "Age 6+",
+    "duration": "10 hours",
+    "topics": [
+     "Talking about myself, my family and the roles people play at home",
+     "Neighbourhood helpers: teachers, doctors, postal workers, farmers",
+     "Festivals and celebrations we share with our community",
+     "Good habits, manners and caring for others",
+     "Staying safe at home, in school and on the road",
+     "My school as a small community with rules"
+    ]
+   },
+   {
+    "title": "Foundation: Our Surroundings & Community Life",
+    "age": "Age 7+",
+    "duration": "10 hours",
+    "topics": [
+     "Plants and animals around us and how we depend on them",
+     "Food, water and shelter: where they come from",
+     "Different kinds of houses and clothing across India",
+     "Work people do: villages, towns and cities compared",
+     "Local markets and how goods reach us",
+     "Keeping our surroundings clean: waste and water care"
+    ]
+   },
+   {
+    "title": "Consolidation: Our Country India",
+    "age": "Age 9+",
+    "duration": "12 hours",
+    "topics": [
+     "States, union territories and their capitals on the map",
+     "National symbols, anthem and festivals of national importance",
+     "Mountains, plains, deserts and coasts of India",
+     "Major rivers and why settlements grow near them",
+     "Food, dress, languages and dances across regions",
+     "Unity in diversity: what binds Indians together"
+    ]
+   },
+   {
+    "title": "Consolidation: Maps, Globes & Our Earth",
+    "age": "Age 10+",
+    "duration": "10 hours",
+    "topics": [
+     "Globe versus map: what each shows well",
+     "Cardinal directions and finding places using them",
+     "Map symbols, colours and simple scale",
+     "Continents and oceans of the world",
+     "Introduction to latitudes, longitudes and hemispheres",
+     "Weather versus climate with everyday examples",
+     "Reading a simple atlas confidently"
+    ]
+   },
+   {
+    "title": "Mastery: Journey into the Past",
+    "age": "Age 11+",
+    "duration": "12 hours",
+    "topics": [
+     "How we know about the past: sources and archaeology",
+     "Early humans: hunting, gathering and the first farmers",
+     "The first cities of the Indus Valley",
+     "Great empires in outline: Maurya and Gupta ages",
+     "Monuments, coins and inscriptions as storytellers",
+     "Building timelines and telling 'then and now' apart"
+    ]
+   },
+   {
+    "title": "Mastery: Civic Sense, Government & Livelihoods",
+    "age": "Age 12+",
+    "duration": "12 hours",
+    "topics": [
+     "Why we need rules and government",
+     "Local government: panchayats and municipalities in action",
+     "Democracy and equality explained with daily-life examples",
+     "Rights and duties of a good citizen",
+     "Natural resources and how people earn livelihoods",
+     "Rural and urban work: farms, factories, services",
+     "Caring for the environment as a civic habit"
+    ]
+   }
+  ],
   "short_description": "Personalised live Social Studies Grade 1-7 coaching.",
   "description": "",
   "regular_price": 600,
@@ -426,7 +573,85 @@
    "English",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Unseen Passage Mastery",
+    "age": "Age 14+",
+    "duration": "12 hours",
+    "topics": [
+     "Discursive and factual passages in the board-exam pattern",
+     "Multiple-choice and short-answer question strategies",
+     "Inference, tone and purpose questions",
+     "Handling vocabulary questions from context",
+     "Time management for the reading section",
+     "Timed practice with marking-scheme-based feedback"
+    ]
+   },
+   {
+    "title": "Grammar & Editing for Boards",
+    "age": "Age 14+",
+    "duration": "12 hours",
+    "topics": [
+     "Tenses, modals and subject-verb concord",
+     "Reported speech in exam formats",
+     "Determiners and prepositions",
+     "Gap filling, editing and omission exercises",
+     "Sentence reordering and transformation",
+     "Full-length grammar section practice under time limits"
+    ]
+   },
+   {
+    "title": "Writing Section: Letters, Paragraphs & Articles",
+    "age": "Age 14+",
+    "duration": "12 hours",
+    "topics": [
+     "Formal letters: complaint, enquiry and letters to the editor",
+     "Analytical paragraphs based on charts, maps and data",
+     "Article writing with a clear stance and structure",
+     "Story and descriptive writing where the board requires it",
+     "Format, content and expression as examiners mark them",
+     "Model answers and rewriting for higher scores"
+    ]
+   },
+   {
+    "title": "Literature: Prose & Drama",
+    "age": "Age 15+",
+    "duration": "14 hours",
+    "topics": [
+     "Chapter-wise study of prescribed prose and drama texts",
+     "Extract-based questions with reference to context",
+     "Character sketches supported by textual evidence",
+     "Theme- and value-based long answers",
+     "Answer-writing frameworks for 3-mark and 6-mark questions",
+     "Revision notes and quick-recall summaries per chapter"
+    ]
+   },
+   {
+    "title": "Literature: Poetry & Supplementary Reader",
+    "age": "Age 15+",
+    "duration": "12 hours",
+    "topics": [
+     "Poem-wise study with paraphrase and central idea",
+     "Poetic devices: imagery, alliteration, symbolism and more",
+     "Extract-based questions on poetry",
+     "Supplementary reader stories and their message",
+     "Comparing characters and situations across texts",
+     "Previous-year question practice and self-assessment"
+    ]
+   },
+   {
+    "title": "Oral Fluency & Internal Assessment Prep",
+    "age": "Age 14+",
+    "duration": "8 hours",
+    "topics": [
+     "Speaking tasks modelled on school assessment formats",
+     "Listening comprehension practice with audio texts",
+     "Reading aloud with fluency and expression",
+     "Preparing and delivering a short presentation",
+     "Confidence building for viva-style questions"
+    ]
+   }
+  ],
   "short_description": "Personalised live English Grade 9-10 coaching.",
   "description": "",
   "regular_price": 1000,
@@ -498,7 +723,90 @@
    "Economics",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Foundations & Microeconomics",
+    "age": "Age 14+",
+    "duration": "12 hours",
+    "topics": [
+     "Scarcity, choice and the central problems of an economy",
+     "Demand: determinants, law and movement along vs shift",
+     "Supply and how producers respond to price",
+     "Elasticity and why it matters for sellers and governments",
+     "Market equilibrium and price determination",
+     "Forms of market: competition to monopoly",
+     "Numericals and diagram practice for exams"
+    ]
+   },
+   {
+    "title": "Statistics for Economics",
+    "age": "Age 15+",
+    "duration": "10 hours",
+    "topics": [
+     "Collecting and organising economic data",
+     "Presenting data: tables, bar charts, frequency curves",
+     "Averages: mean, median, mode and when to use each",
+     "Measuring spread: range and standard deviation",
+     "Correlation: reading relationships in data",
+     "Index numbers, including price indices used in the news"
+    ]
+   },
+   {
+    "title": "National Income & Macro Basics",
+    "age": "Age 16+",
+    "duration": "12 hours",
+    "topics": [
+     "Circular flow of income in an economy",
+     "GDP, GNP and related aggregates untangled",
+     "Value-added, income and expenditure methods of measurement",
+     "Real vs nominal income and price deflators",
+     "Aggregate demand, aggregate supply and equilibrium",
+     "The government budget: deficits and their meaning",
+     "Inflation: causes, measures and effects"
+    ]
+   },
+   {
+    "title": "Money & Banking",
+    "age": "Age 16+",
+    "duration": "8 hours",
+    "topics": [
+     "Functions of money and why barter fails",
+     "How commercial banks create credit",
+     "The RBI: functions and monetary policy tools",
+     "Repo rate, CRR and SLR decoded from headlines",
+     "Digital payments and the UPI revolution",
+     "Foreign exchange and balance of payments introduction"
+    ]
+   },
+   {
+    "title": "Indian Economy: Development & Reforms",
+    "age": "Age 16+",
+    "duration": "12 hours",
+    "topics": [
+     "Indian economy at independence and the planning era",
+     "The 1991 crisis and liberalisation reforms",
+     "Agriculture, industry and services: shifting shares",
+     "Poverty, inequality and government programmes",
+     "Employment trends and the informal sector",
+     "Infrastructure: energy, health and education",
+     "Sustainable development and India's green transition"
+    ]
+   },
+   {
+    "title": "Current Economic Affairs & Applied Practice",
+    "age": "Age 17+",
+    "duration": "8 hours",
+    "topics": [
+     "Reading the Union Budget and Economic Survey",
+     "GST and how India's tax system works",
+     "Decoding RBI announcements and inflation news",
+     "The rupee, trade deficits and export headlines",
+     "Startups and the digital economy in India",
+     "Case-study and data-response answer writing",
+     "Linking current affairs to syllabus concepts in exams"
+    ]
+   }
+  ],
   "short_description": "Personalised live Economics coaching.",
   "description": "",
   "regular_price": 1200,
@@ -3835,7 +4143,73 @@
    "Phonics",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Letter Sounds & Alphabet Awareness",
+    "age": "Age 3+",
+    "duration": "10 hours",
+    "topics": [
+     "Recognising letters through songs, actions and play",
+     "First letter sounds introduced in a phonics-friendly order",
+     "Matching sounds to objects and pictures",
+     "Tracing letters with correct formation",
+     "Hearing the starting sound of familiar words",
+     "Alphabet games that build sound memory"
+    ]
+   },
+   {
+    "title": "Blending & Word Building",
+    "age": "Age 4+",
+    "duration": "10 hours",
+    "topics": [
+     "Blending sounds into simple three-letter words",
+     "Breaking words into sounds (segmenting) for spelling",
+     "Word families such as -at, -en and -og",
+     "Building words with letter cards and movable letters",
+     "Simple dictation of sounds and short words",
+     "Celebrating first independently read words"
+    ]
+   },
+   {
+    "title": "Sight Words & Early Reading",
+    "age": "Age 5+",
+    "duration": "10 hours",
+    "topics": [
+     "High-frequency words recognised on sight",
+     "Reading short decodable sentences with support",
+     "Picture books: holding, turning pages and tracking print",
+     "Predicting what happens next in a story",
+     "Reading aloud together with an adult (shared reading)",
+     "Simple comprehension through talk about the story"
+    ]
+   },
+   {
+    "title": "Pre-Numeracy Foundations",
+    "age": "Age 3+",
+    "duration": "10 hours",
+    "topics": [
+     "Counting objects up to 20 with one-to-one matching",
+     "Recognising and tracing numerals",
+     "Shapes and patterns in everyday things",
+     "Sorting and grouping by colour, size and kind",
+     "Comparing: big/small, more/less, tall/short",
+     "Number rhymes and counting games"
+    ]
+   },
+   {
+    "title": "Language through Stories & Rhymes",
+    "age": "Age 3+",
+    "duration": "8 hours",
+    "topics": [
+     "New words learnt through daily story time",
+     "Action rhymes that build listening and memory",
+     "Spotting rhyming words and making up new ones",
+     "Answering simple questions about a story",
+     "Speaking in short, complete sentences about pictures",
+     "Retelling a favourite story in the child's own words"
+    ]
+   }
+  ],
   "short_description": "Personalised live Phonics, Numbers & Language Development coaching.",
   "description": "",
   "regular_price": 600,
@@ -3859,7 +4233,87 @@
    "Mathematics",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Foundation Stage: Numbers, Counting & Place Value",
+    "age": "Age 6-8",
+    "duration": "12 hours",
+    "topics": [
+     "Counting, comparing and ordering numbers up to 3 digits",
+     "Place value with ones, tens and hundreds using blocks and abacus",
+     "Addition and subtraction with and without regrouping",
+     "Recognising basic 2D shapes and simple patterns",
+     "Reading a clock and the calendar in everyday situations",
+     "Handling money: coins, notes and simple totals"
+    ]
+   },
+   {
+    "title": "Foundation Stage: Multiplication, Division & Everyday Maths",
+    "age": "Age 7-9",
+    "duration": "12 hours",
+    "topics": [
+     "Building multiplication tables through skip counting and arrays",
+     "Division as equal sharing and repeated subtraction",
+     "Mental-maths strategies for quick two-digit calculations",
+     "Measuring length, weight and capacity with standard units",
+     "Reading pictographs and simple tally charts",
+     "Word problems that mix all four operations"
+    ]
+   },
+   {
+    "title": "Consolidation Stage: Large Numbers, Fractions & Decimals",
+    "age": "Age 9-11",
+    "duration": "14 hours",
+    "topics": [
+     "Place value up to lakhs and crores; Indian and international systems",
+     "Factors, multiples, HCF and LCM through patterns",
+     "Understanding fractions: equivalent, like/unlike, comparison",
+     "Introducing decimals and linking them to money and measurement",
+     "Estimation and rounding for sensible answers",
+     "Multi-step word problems with the four operations"
+    ]
+   },
+   {
+    "title": "Consolidation Stage: Geometry, Measurement & Data",
+    "age": "Age 10-12",
+    "duration": "12 hours",
+    "topics": [
+     "Lines, angles and how to measure them with a protractor",
+     "Classifying triangles and quadrilaterals by sides and angles",
+     "Perimeter and area of squares and rectangles",
+     "Symmetry, reflections and simple 3D shapes with their nets",
+     "Converting between units of length, mass, capacity and time",
+     "Collecting data and drawing bar graphs"
+    ]
+   },
+   {
+    "title": "Mastery Stage: Integers, Fractions & Decimals in Depth",
+    "age": "Age 11-13",
+    "duration": "14 hours",
+    "topics": [
+     "Integers on the number line; adding and subtracting with signs",
+     "Operations on fractions and decimals with real-life applications",
+     "Ratio, unitary method and an introduction to proportion",
+     "Percentages and their link to fractions and decimals",
+     "Simple interest and everyday commercial maths",
+     "Playing with numbers: divisibility tests and number puzzles"
+    ]
+   },
+   {
+    "title": "Mastery Stage: Early Algebra & Practical Geometry",
+    "age": "Age 12-13",
+    "duration": "14 hours",
+    "topics": [
+     "From patterns to variables: writing algebraic expressions",
+     "Solving simple equations by balancing both sides",
+     "Properties of triangles including the angle-sum idea",
+     "Congruence and basic geometric constructions with compass",
+     "Perimeter and area of triangles, parallelograms and circles",
+     "Mean, median, mode and chance in daily life",
+     "Visualising solid shapes from different views"
+    ]
+   }
+  ],
   "short_description": "Personalised live Mathematics Grade 1-7 coaching.",
   "description": "",
   "regular_price": 600,
@@ -3883,7 +4337,72 @@
    "Mathematics",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Rational Numbers, Exponents & Powers",
+    "age": "Age 13+",
+    "duration": "10 hours",
+    "topics": [
+     "Properties of rational numbers and representing them on the number line",
+     "Finding rational numbers between any two given numbers",
+     "Laws of exponents extended to negative powers",
+     "Expressing very large and very small numbers in standard form",
+     "Applying exponent rules to simplify expressions"
+    ]
+   },
+   {
+    "title": "Linear Equations & Algebraic Manipulation",
+    "age": "Age 13+",
+    "duration": "12 hours",
+    "topics": [
+     "Solving linear equations in one variable, including variables on both sides",
+     "Framing equations from word problems on ages, numbers and money",
+     "Adding, subtracting and multiplying algebraic expressions",
+     "Standard identities and using them for quick expansion",
+     "Factorisation by common factors, regrouping and identities",
+     "Dividing algebraic expressions"
+    ]
+   },
+   {
+    "title": "Squares, Cubes & Comparing Quantities",
+    "age": "Age 13+",
+    "duration": "10 hours",
+    "topics": [
+     "Square numbers, patterns and finding square roots",
+     "Cubes and cube roots through prime factorisation",
+     "Ratios, percentages, discount and marked price",
+     "Profit, loss and sales tax in real transactions",
+     "Compound interest and how it differs from simple interest",
+     "Direct and inverse proportion with practical examples"
+    ]
+   },
+   {
+    "title": "Geometry of Quadrilaterals",
+    "age": "Age 13+",
+    "duration": "10 hours",
+    "topics": [
+     "Classifying polygons and the angle-sum property",
+     "Properties of parallelograms, rhombuses, rectangles and squares",
+     "Special quadrilaterals: trapezium and kite",
+     "Reasoning with diagonals and angle relationships",
+     "Constructing quadrilaterals from given measurements"
+    ]
+   },
+   {
+    "title": "Mensuration, Graphs & Data Handling",
+    "age": "Age 13+",
+    "duration": "12 hours",
+    "topics": [
+     "Area of trapeziums and general polygons",
+     "Surface area and volume of cubes, cuboids and cylinders",
+     "Relating volume to capacity in daily contexts",
+     "Organising data with grouped frequency tables and histograms",
+     "Pie charts and interpreting circle graphs",
+     "Probability of simple events",
+     "Plotting points and reading linear graphs on the Cartesian plane"
+    ]
+   }
+  ],
   "short_description": "Personalised live Mathematics Grade 8 coaching.",
   "description": "",
   "regular_price": 750,
@@ -3907,7 +4426,86 @@
    "Vedic Maths",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "The Sutra System in Depth",
+    "age": "Age 12+",
+    "duration": "10 hours",
+    "topics": [
+     "Survey of the 16 sutras and key sub-sutras, and when each applies",
+     "Nikhilam and Anurupyena for working from any convenient base",
+     "General vertically-and-crosswise multiplication for 3-digit and larger numbers",
+     "Why the methods work: algebraic proofs behind the shortcuts",
+     "Choosing the fastest route for a given calculation",
+     "Precision habits: casting out nines and elevens as checks"
+    ]
+   },
+   {
+    "title": "Advanced Multiplication, Squares & Cubes",
+    "age": "Age 12+",
+    "duration": "12 hours",
+    "topics": [
+     "The duplex method for squaring any number",
+     "Cubing near a base using proportional (Anurupyena) reasoning",
+     "Multiplying numbers near different bases",
+     "Handling decimals and fractions inside speed methods",
+     "Binomial patterns hiding inside Vedic products",
+     "One-line answers with running mental carry management"
+    ]
+   },
+   {
+    "title": "Straight Division, Roots & Recurring Decimals",
+    "age": "Age 13+",
+    "duration": "12 hours",
+    "topics": [
+     "Straight division with the flag-digit (Dhvajanka) technique",
+     "Square roots of perfect and non-perfect squares via the duplex",
+     "Cube roots of perfect cubes by observation (Vilokanam)",
+     "Converting fractions like 1/19 to decimals with 'By one more' recursion",
+     "Auxiliary fractions for fast decimal expansion",
+     "Estimating and bounding roots for exam answers"
+    ]
+   },
+   {
+    "title": "Algebra with Vedic Methods",
+    "age": "Age 13+",
+    "duration": "10 hours",
+    "topics": [
+     "Polynomial division by transpose-and-apply (Paravartya)",
+     "Solving equations instantly when 'the other is zero' (Sunyam Samyasamuccaye)",
+     "Simultaneous equations by addition-subtraction and cross ratios",
+     "Quick factorisation of quadratics and simple cubics",
+     "Partial fractions the shortcut way",
+     "Linking sutra reasoning to school-board algebra syllabi"
+    ]
+   },
+   {
+    "title": "Divisibility, Osculation & Number Play",
+    "age": "Age 13+",
+    "duration": "8 hours",
+    "topics": [
+     "Osculators (Vestanas) for testing divisibility by 7, 13, 19 and beyond",
+     "Positive and negative osculation and when to switch",
+     "Remainder shortcuts and simple modular thinking",
+     "Digit-sum and alternating-sum tests unified",
+     "Spotting number patterns used in Olympiad problems",
+     "Building your own divisibility rules from first principles"
+    ]
+   },
+   {
+    "title": "Competitive-Exam Speed Lab",
+    "age": "Age 14+",
+    "duration": "10 hours",
+    "topics": [
+     "Percentages, ratios and averages in seconds",
+     "Comparing and simplifying fractions at speed",
+     "Approximation strategies for MCQ elimination",
+     "Timed mock sections modelled on NTSE, Olympiad and foundation exams",
+     "Error logs: analysing where speed costs accuracy",
+     "Personal toolkit: your fastest method for each question type"
+    ]
+   }
+  ],
   "short_description": "Personalised live Vedic Maths (Advanced) coaching.",
   "description": "",
   "regular_price": 1000,
@@ -3931,7 +4529,87 @@
    "English",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Foundation: Phonics & Early Reading",
+    "age": "Age 6+",
+    "duration": "12 hours",
+    "topics": [
+     "Letter-sound matching for all 26 letters with picture cues",
+     "Blending three-letter (CVC) words aloud",
+     "First 50 sight words through games and flashcards",
+     "Reading simple sentences with expression",
+     "Rhymes and rhyming-word families",
+     "Answering picture-based questions in full sentences"
+    ]
+   },
+   {
+    "title": "Foundation: Vocabulary & Sentence Building",
+    "age": "Age 7+",
+    "duration": "12 hours",
+    "topics": [
+     "Naming words, action words and describing words in everyday contexts",
+     "Opposites, plurals and gender words",
+     "Building and writing complete simple sentences",
+     "Capital letters, full stops and question marks",
+     "Reading short stories aloud with growing fluency",
+     "New-word notebooks and word-meaning games"
+    ]
+   },
+   {
+    "title": "Consolidation: Grammar Foundations",
+    "age": "Age 9+",
+    "duration": "14 hours",
+    "topics": [
+     "Nouns, pronouns, verbs, adjectives and adverbs",
+     "Articles (a, an, the) and common prepositions",
+     "Simple present, past and future tenses",
+     "Subject-verb agreement in short sentences",
+     "Punctuation practice including commas and apostrophes",
+     "Jumbled words into meaningful sentences",
+     "Spotting and correcting common errors"
+    ]
+   },
+   {
+    "title": "Consolidation: Reading Comprehension & Fluency",
+    "age": "Age 10+",
+    "duration": "12 hours",
+    "topics": [
+     "Silent reading of short unseen passages",
+     "Finding the main idea and supporting details",
+     "Sequencing events in a story",
+     "Making simple inferences from clues in the text",
+     "Guessing word meanings from context and using a dictionary",
+     "Reading poems, notices and simple non-fiction"
+    ]
+   },
+   {
+    "title": "Mastery: Paragraph & Creative Writing",
+    "age": "Age 11+",
+    "duration": "14 hours",
+    "topics": [
+     "Planning and writing a well-organised paragraph",
+     "Picture composition and guided story writing",
+     "Informal letters to friends and family",
+     "Diary entries and short descriptions of people and places",
+     "Linking words to connect ideas smoothly",
+     "Self-checking work for spelling, grammar and punctuation"
+    ]
+   },
+   {
+    "title": "Mastery: Speaking, Listening & Confidence",
+    "age": "Age 12+",
+    "duration": "10 hours",
+    "topics": [
+     "Show-and-tell and one-minute talks on familiar topics",
+     "Recitation with correct stress and intonation",
+     "Everyday conversation practice and role play",
+     "Listening to audio passages and answering questions",
+     "Asking and answering questions politely",
+     "Building confidence to speak in front of a group"
+    ]
+   }
+  ],
   "short_description": "Personalised live English Grade 1-7 coaching.",
   "description": "",
   "regular_price": 600,
@@ -3955,7 +4633,72 @@
    "English",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Grammar in Depth",
+    "age": "Age 13+",
+    "duration": "12 hours",
+    "topics": [
+     "Complete revision of tenses with usage in context",
+     "Active and passive voice transformations",
+     "Direct and indirect (reported) speech",
+     "Modals for permission, ability, obligation and advice",
+     "Clauses, conjunctions and complex sentences",
+     "Error spotting and sentence correction drills"
+    ]
+   },
+   {
+    "title": "Reading Comprehension Skills",
+    "age": "Age 13+",
+    "duration": "10 hours",
+    "topics": [
+     "Factual, descriptive and story-based unseen passages",
+     "Locating information quickly through skimming and scanning",
+     "Inference and interpretation questions",
+     "Vocabulary in context: synonyms, antonyms, phrases",
+     "Summarising a passage in one's own words",
+     "Introduction to note-making from a passage"
+    ]
+   },
+   {
+    "title": "Formal & Informal Writing",
+    "age": "Age 13+",
+    "duration": "12 hours",
+    "topics": [
+     "Formal letters: applications, complaints and requests",
+     "Informal letters and emails with the right tone",
+     "Notice writing and message writing",
+     "Diary entries and short narratives",
+     "Paragraph and short essay organisation",
+     "Drafting, revising and editing one's own writing"
+    ]
+   },
+   {
+    "title": "Literature Appreciation",
+    "age": "Age 13+",
+    "duration": "12 hours",
+    "topics": [
+     "Close reading of prescribed prose chapters",
+     "Poetry: simile, metaphor, personification and rhyme scheme",
+     "Character sketches with evidence from the text",
+     "Identifying themes and the writer's message",
+     "Extract-based questions and how to answer them",
+     "Connecting texts to one's own experiences"
+    ]
+   },
+   {
+    "title": "Speaking & Listening Skills",
+    "age": "Age 13+",
+    "duration": "8 hours",
+    "topics": [
+     "Structured short speeches with an opening, body and close",
+     "Introduction to debating: stating and supporting an opinion",
+     "Listening comprehension with audio tasks",
+     "Pronunciation, word stress and clear delivery",
+     "Group discussion etiquette and turn-taking"
+    ]
+   }
+  ],
   "short_description": "Personalised live English Grade 8 coaching.",
   "description": "",
   "regular_price": 750,
@@ -3979,7 +4722,94 @@
    "Science",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Foundation: Our Living World & Surroundings",
+    "age": "Age 6-8",
+    "duration": "14 hours",
+    "topics": [
+     "Sorting things around us into living and non-living, and spotting what living things need",
+     "Meeting common plants and animals near home and school, and how we group them",
+     "Body parts we use every day and the five senses that help us explore",
+     "Healthy habits: nourishing food, clean water, rest and keeping ourselves tidy",
+     "Water, air and light as things we can see working all around us",
+     "Weather, day and night, and how they change what we do",
+     "Hands-on looking: observing, drawing and describing what we notice"
+    ]
+   },
+   {
+    "title": "Foundation: Plants, Animals & Where They Live",
+    "age": "Age 7-9",
+    "duration": "14 hours",
+    "topics": [
+     "Parts of a plant and the job each part does for the whole plant",
+     "How seeds sprout and what young plants need to grow well",
+     "Animal homes, movement and the food different animals eat",
+     "Herbivores, carnivores and omnivores told apart by what they eat",
+     "Life cycles: from egg or seed to a grown plant or animal",
+     "Adaptations that help creatures survive in water, land and air",
+     "Growing a bean seed and keeping a simple observation diary"
+    ]
+   },
+   {
+    "title": "Consolidation: Human Body, Food & Health",
+    "age": "Age 9-11",
+    "duration": "16 hours",
+    "topics": [
+     "Major organ systems introduced: digestion, breathing, blood and bones",
+     "Balanced meals, food groups and why our bodies need each nutrient",
+     "Teeth types, dental care and the journey food takes inside us",
+     "How germs spread and simple ways to prevent common illnesses",
+     "First aid basics and staying safe at home, school and play",
+     "The skeleton and muscles working together so we can move",
+     "Comparing pulse and breathing rates before and after activity"
+    ]
+   },
+   {
+    "title": "Consolidation: Materials, Matter & Everyday Chemistry",
+    "age": "Age 9-12",
+    "duration": "16 hours",
+    "topics": [
+     "Solids, liquids and gases and how heating or cooling changes them",
+     "Natural and human-made materials sorted by their useful properties",
+     "Soluble and insoluble substances, and separating simple mixtures",
+     "Where our clothing fibres come from, natural versus synthetic",
+     "Rusting, dissolving and other changes we can and cannot reverse",
+     "Water: its many uses, the water cycle and using it wisely",
+     "Safe kitchen experiments with dissolving, filtering and evaporating"
+    ]
+   },
+   {
+    "title": "Mastery: Force, Motion, Energy & Light",
+    "age": "Age 11-13",
+    "duration": "16 hours",
+    "topics": [
+     "Pushes, pulls and how forces start, stop or turn objects",
+     "Friction, gravity and magnetism seen through everyday examples",
+     "Simple machines like levers, pulleys and inclined planes that ease work",
+     "Energy in its forms and how it changes from one to another",
+     "Light, shadows, reflection and how we actually see objects",
+     "Sound made by vibrations and how it travels to our ears",
+     "Electric circuits with cells, bulbs, switches and safe wiring",
+     "Building a working torch circuit and a balanced simple lever"
+    ]
+   },
+   {
+    "title": "Mastery: Earth, Environment & Young Scientists",
+    "age": "Age 11-13",
+    "duration": "14 hours",
+    "topics": [
+     "Air and water pollution, its causes and everyday ways to reduce it",
+     "Reduce, reuse, recycle and responsible handling of waste",
+     "Habitats, food chains and how living things depend on one another",
+     "Natural resources, conservation and protecting forests and wildlife",
+     "Our solar system, phases of the Moon and the reason for seasons",
+     "Soil types, weathering and why healthy soil matters for food",
+     "Framing a question, testing a fair experiment and recording results",
+     "Designing and presenting a small independent science project"
+    ]
+   }
+  ],
   "short_description": "Personalised live Science Grade 1-7 coaching.",
   "description": "",
   "regular_price": 600,
@@ -4003,7 +4833,93 @@
    "Science",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Living World: Crops, Microbes & Cells",
+    "age": "Age 13+",
+    "duration": "14 hours",
+    "topics": [
+     "Crop production stages from soil preparation and sowing to harvest and storage",
+     "Manure, fertilisers, irrigation and modern farming practices",
+     "Microorganisms as friends and foes: bacteria, fungi, protozoa and viruses",
+     "Useful microbes in curd, bread and medicine, plus food preservation",
+     "Diseases spread by microbes and the role of vaccination",
+     "The cell as life's basic unit, with plant and animal cell parts compared",
+     "Observing onion peel and cheek cells under a microscope"
+    ]
+   },
+   {
+    "title": "Materials: Fibres, Metals & Non-Metals",
+    "age": "Age 13+",
+    "duration": "12 hours",
+    "topics": [
+     "Synthetic fibres such as rayon, nylon, polyester and acrylic and their uses",
+     "Types of plastics, their properties and the problem of plastic waste",
+     "Physical properties that set metals apart from non-metals",
+     "Chemical behaviour of metals and non-metals with air, water and acids",
+     "Displacement reactions and the reactivity of common metals",
+     "Everyday uses of metals and non-metals we depend on",
+     "Testing malleability, conductivity and reactions in the lab"
+    ]
+   },
+   {
+    "title": "Chemical Changes: Combustion, Flame & Current",
+    "age": "Age 13+",
+    "duration": "12 hours",
+    "topics": [
+     "Conditions needed for burning and different types of combustion",
+     "Structure of a flame and comparing fuels by their efficiency",
+     "Calorific value, ideal fuel qualities and fire safety",
+     "How electric current causes chemical effects in liquids",
+     "Electroplating and its practical everyday applications",
+     "Conductors and insulators tested through simple circuits",
+     "Demonstrating electrolysis and observing gas at the electrodes"
+    ]
+   },
+   {
+    "title": "Physics: Force, Pressure, Friction & Sound",
+    "age": "Age 13+",
+    "duration": "14 hours",
+    "topics": [
+     "Force as a push or pull, contact and non-contact forces",
+     "Pressure in solids, liquids and gases, including atmospheric pressure",
+     "Friction: its causes, useful and harmful effects and how to change it",
+     "Fluid friction and streamlined shapes that reduce drag",
+     "Sound produced by vibrations and how it needs a medium to travel",
+     "Pitch, loudness, frequency and amplitude of sound",
+     "Noise pollution, its effects and ways to control it",
+     "Simple experiments with friction on ramps and vibrating objects"
+    ]
+   },
+   {
+    "title": "Light & Natural Phenomena",
+    "age": "Age 13+",
+    "duration": "12 hours",
+    "topics": [
+     "Laws of reflection and how images form in plane mirrors",
+     "Regular and diffused reflection and multiple reflections",
+     "The human eye, how we see, and caring for our vision",
+     "Dispersion of light and the colours within white light",
+     "Braille and support for the visually impaired",
+     "Introduction to natural events like lightning and earthquakes",
+     "Building a periscope and a simple kaleidoscope"
+    ]
+   },
+   {
+    "title": "Environment: Pollution & Conservation",
+    "age": "Age 13+",
+    "duration": "10 hours",
+    "topics": [
+     "Air pollution, greenhouse gases and the reality of global warming",
+     "Water pollution, sources of contamination and making water potable",
+     "Deforestation, its consequences and the value of reforestation",
+     "Conservation of forests, wildlife and endangered species",
+     "Biosphere reserves, national parks and sanctuaries in India",
+     "The role of the ozone layer and why it matters",
+     "Planning a class survey on local air or water quality"
+    ]
+   }
+  ],
   "short_description": "Personalised live Science Grade 8 coaching.",
   "description": "",
   "regular_price": 750,
@@ -4027,7 +4943,74 @@
    "Social Studies",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "How the British Came to Rule India",
+    "age": "Age 13+",
+    "duration": "10 hours",
+    "topics": [
+     "From trading company to territorial power",
+     "Battles of Plassey and Buxar and what they changed",
+     "New land revenue systems and life in the countryside",
+     "Tribal communities and their response to colonial rule",
+     "The Revolt of 1857: causes, spread and aftermath",
+     "Reading historical sources: records, reports, paintings"
+    ]
+   },
+   {
+    "title": "Colonial Society & the National Movement",
+    "age": "Age 13+",
+    "duration": "12 hours",
+    "topics": [
+     "Education and 'civilising' claims under colonial rule",
+     "Social reformers and campaigns on caste and women's rights",
+     "Birth of the Indian National Congress and early nationalism",
+     "Gandhi's methods: Non-Cooperation and Civil Disobedience",
+     "Quit India and the final decade of struggle",
+     "Independence, Partition and framing a new nation"
+    ]
+   },
+   {
+    "title": "Resources, Agriculture & Conservation",
+    "age": "Age 13+",
+    "duration": "8 hours",
+    "topics": [
+     "Types of resources and why conservation matters",
+     "Land, soil and water: use and misuse",
+     "Natural vegetation and wildlife protection",
+     "Types of farming and major crops of India",
+     "Comparing farm life in India with other countries",
+     "Sustainable use of resources in daily life"
+    ]
+   },
+   {
+    "title": "Industries & Human Resources",
+    "age": "Age 13+",
+    "duration": "8 hours",
+    "topics": [
+     "Classifying industries: raw material, size, ownership",
+     "Iron & steel and cotton textiles as case studies",
+     "The IT industry and India's service boom",
+     "What decides where an industry is located",
+     "Population distribution and change",
+     "People as a resource: skills, health, education"
+    ]
+   },
+   {
+    "title": "The Constitution, Law & Justice",
+    "age": "Age 13+",
+    "duration": "12 hours",
+    "topics": [
+     "Why a country needs a constitution",
+     "Key features: federalism, secularism, fundamental rights",
+     "How Parliament makes laws and stays answerable",
+     "Courts, FIRs and what a fair trial means",
+     "Understanding marginalisation and social justice",
+     "Public facilities and the government's economic role",
+     "Laws for workers and consumers in everyday life"
+    ]
+   }
+  ],
   "short_description": "Personalised live Social Studies Grade 8 coaching.",
   "description": "",
   "regular_price": 750,
@@ -4051,7 +5034,86 @@
    "Abacus",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Foundation: Meet the Abacus",
+    "age": "Age 5+",
+    "duration": "10 hours",
+    "topics": [
+     "Parts of the abacus: frame, beam, earth beads and heaven beads",
+     "Correct finger technique: thumb up, index finger down",
+     "Setting and reading numbers up to 99 on the rods",
+     "Simple addition and subtraction with direct bead moves",
+     "Posture, pace and clear bead strokes",
+     "Fun counting games to build bead familiarity"
+    ]
+   },
+   {
+    "title": "Foundation: Small Friends & Big Friends",
+    "age": "Age 6+",
+    "duration": "12 hours",
+    "topics": [
+     "Small-friend formulas: using complements of 5 to add and subtract",
+     "Big-friend formulas: using complements of 10 across rods",
+     "Mixed addition and subtraction up to 100",
+     "Listening practice: solving numbers called out aloud",
+     "Accuracy-first drills before speed",
+     "Reading and writing answers quickly and neatly"
+    ]
+   },
+   {
+    "title": "Consolidation: Multi-Digit Mastery",
+    "age": "Age 7+",
+    "duration": "12 hours",
+    "topics": [
+     "Combination formulas mixing small and big friends",
+     "Three-digit addition and subtraction with confident carrying",
+     "Dictation at increasing pace",
+     "First steps in visualisation: picturing the abacus with eyes closed",
+     "Row-sum practice sheets against the clock",
+     "Self-checking answers by re-running the beads"
+    ]
+   },
+   {
+    "title": "Consolidation: Mental Maths (Anzan)",
+    "age": "Age 8+",
+    "duration": "12 hours",
+    "topics": [
+     "Moving beads on the imagined abacus for 2- and 3-digit sums",
+     "Flash-card and flash-number (anzan) training",
+     "Multiplication tables set out on the abacus",
+     "Two-digit by one-digit multiplication on the frame",
+     "Switching smoothly between physical and mental abacus",
+     "Concentration and memory games that sharpen visualisation"
+    ]
+   },
+   {
+    "title": "Mastery: Multiplication & Division",
+    "age": "Age 9+",
+    "duration": "14 hours",
+    "topics": [
+     "Multi-digit multiplication with correct rod placement",
+     "Division on the abacus: trial quotients and remainders",
+     "Introducing decimal points on the rods",
+     "Mixed-operation problems done mentally",
+     "Longer anzan sequences at steady speed",
+     "Applying abacus skill to school arithmetic and money problems"
+    ]
+   },
+   {
+    "title": "Mastery: Speed, Accuracy & Grading",
+    "age": "Age 10+",
+    "duration": "10 hours",
+    "topics": [
+     "Grading-exam formats: timed papers by level",
+     "High-speed flash anzan with growing digit spans",
+     "Accuracy habits: rhythm, breathing and error recovery",
+     "Competition-style rounds and personal-best tracking",
+     "Mental maths across everyday situations",
+     "Certificate-level assessment and next-level roadmap"
+    ]
+   }
+  ],
   "short_description": "Personalised live Abacus coaching.",
   "description": "",
   "regular_price": 600,
@@ -4075,7 +5137,88 @@
    "Mathematics",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Number Systems & Polynomials",
+    "age": "Age 14-16",
+    "duration": "14 hours",
+    "topics": [
+     "Irrational numbers and locating them on the number line",
+     "Decimal expansions: terminating, recurring and non-recurring",
+     "Laws of exponents for real numbers and rationalising denominators",
+     "Zeros of a polynomial and their geometric meaning",
+     "Remainder and factor theorems with applications",
+     "Algebraic identities for expansion and factorisation",
+     "Fundamental theorem of arithmetic, HCF and LCM"
+    ]
+   },
+   {
+    "title": "Equations & Arithmetic Progressions",
+    "age": "Age 14-16",
+    "duration": "14 hours",
+    "topics": [
+     "Linear equations in two variables and their graphs",
+     "Solving pairs of equations by substitution, elimination and cross-multiplication",
+     "Consistency of systems interpreted graphically",
+     "Quadratic equations by factorisation and the quadratic formula",
+     "Nature of roots using the discriminant",
+     "Arithmetic progressions: nth term and sum of n terms",
+     "Word problems modelled with equations and APs"
+    ]
+   },
+   {
+    "title": "Coordinate Geometry & Introduction to Trigonometry",
+    "age": "Age 14-16",
+    "duration": "12 hours",
+    "topics": [
+     "The Cartesian plane: plotting and reading points",
+     "Distance formula and section formula",
+     "Area of a triangle from vertex coordinates",
+     "Trigonometric ratios of acute angles and standard values",
+     "Fundamental trigonometric identities",
+     "Heights and distances: angles of elevation and depression"
+    ]
+   },
+   {
+    "title": "Geometry: Triangles, Circles & Constructions",
+    "age": "Age 14-16",
+    "duration": "14 hours",
+    "topics": [
+     "Congruence criteria and properties of triangles",
+     "Similar triangles: basic proportionality and area ratios",
+     "Pythagoras theorem and its converse with proofs",
+     "Angle and chord properties of circles; cyclic quadrilaterals",
+     "Tangents to a circle and lengths from an external point",
+     "Constructions: bisectors, triangles and dividing line segments",
+     "Quadrilaterals: mid-point theorem and parallelogram results"
+    ]
+   },
+   {
+    "title": "Mensuration: Areas & Volumes",
+    "age": "Age 14-16",
+    "duration": "10 hours",
+    "topics": [
+     "Heron's formula for the area of a triangle",
+     "Areas of sectors and segments of a circle",
+     "Surface areas and volumes of cones, spheres and cylinders",
+     "Combinations of solids and conversion from one solid to another",
+     "Real-world packaging and capacity problems"
+    ]
+   },
+   {
+    "title": "Statistics & Probability",
+    "age": "Age 14-16",
+    "duration": "10 hours",
+    "topics": [
+     "Presenting data with histograms and frequency polygons",
+     "Mean, median and mode of grouped data",
+     "Cumulative frequency curves (ogives) and reading the median",
+     "Experimental versus theoretical probability",
+     "Probability of simple events with cards, dice and coins",
+     "Interpreting data critically in real contexts"
+    ]
+   }
+  ],
   "short_description": "Personalised live Mathematics Grade 9-10 coaching.",
   "description": "",
   "regular_price": 1000,
@@ -4099,7 +5242,89 @@
    "Mathematics",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Sets, Relations, Functions & Trigonometry",
+    "age": "Age 16-18",
+    "duration": "14 hours",
+    "topics": [
+     "Sets, subsets, Venn diagrams and set operations",
+     "Relations, functions, domain and range",
+     "Types of functions and composition; invertible functions",
+     "Trigonometric functions of any angle and their graphs",
+     "Compound-angle and transformation formulae",
+     "Trigonometric equations and principal solutions",
+     "Inverse trigonometric functions and their properties"
+    ]
+   },
+   {
+    "title": "Algebra: Complex Numbers, Sequences & Binomial Theorem",
+    "age": "Age 16-18",
+    "duration": "12 hours",
+    "topics": [
+     "Complex numbers, the Argand plane and modulus-argument form",
+     "Quadratic equations with complex roots",
+     "Arithmetic and geometric progressions and their sums",
+     "Relationship between AM and GM; special series",
+     "Permutations and combinations as counting tools",
+     "Binomial theorem for positive integral powers"
+    ]
+   },
+   {
+    "title": "Matrices, Determinants & Linear Systems",
+    "age": "Age 16-18",
+    "duration": "10 hours",
+    "topics": [
+     "Types of matrices and matrix algebra",
+     "Transpose, symmetric and skew-symmetric matrices",
+     "Determinants and their properties",
+     "Adjoint and inverse of a matrix",
+     "Solving systems of linear equations using matrices",
+     "Applications to consistency of equations"
+    ]
+   },
+   {
+    "title": "Coordinate Geometry: Straight Lines & Conic Sections",
+    "age": "Age 16-18",
+    "duration": "12 hours",
+    "topics": [
+     "Slope, forms of the equation of a line and angle between lines",
+     "Distance of a point from a line",
+     "Circles: standard and general equations",
+     "Parabola, ellipse and hyperbola: standard forms and properties",
+     "Focus, directrix, eccentricity and latus rectum",
+     "Introduction to three-dimensional coordinates"
+    ]
+   },
+   {
+    "title": "Calculus: Limits to Differential Equations",
+    "age": "Age 16-18",
+    "duration": "18 hours",
+    "topics": [
+     "Limits of algebraic and trigonometric functions",
+     "Derivatives from first principles and standard rules",
+     "Continuity and differentiability; chain rule and implicit differentiation",
+     "Applications of derivatives: rates, tangents, increasing/decreasing, maxima-minima",
+     "Indefinite integrals: substitution, parts and partial fractions",
+     "Definite integrals and area under curves",
+     "Forming and solving first-order differential equations"
+    ]
+   },
+   {
+    "title": "Vectors, 3D Geometry & Probability",
+    "age": "Age 16-18",
+    "duration": "12 hours",
+    "topics": [
+     "Vector algebra: addition, scalar and vector products",
+     "Direction cosines and ratios in three dimensions",
+     "Equations of lines in space and the angle between them",
+     "Conditional probability and the multiplication rule",
+     "Bayes' theorem with applications",
+     "Random variables, probability distributions and their means",
+     "Independent events and repeated trials"
+    ]
+   }
+  ],
   "short_description": "Personalised live Mathematics Grade 11-12 coaching.",
   "description": "",
   "regular_price": 1200,
@@ -4123,7 +5348,73 @@
    "English",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Advanced Reading Comprehension",
+    "age": "Age 16+",
+    "duration": "12 hours",
+    "topics": [
+     "Long discursive and case-based passages",
+     "Identifying tone, purpose and the writer's viewpoint",
+     "Multi-step inference and critical-evaluation questions",
+     "Advanced vocabulary: idiom, register and nuance",
+     "Objective-type reading questions in the senior board pattern",
+     "Speed reading with accuracy under exam timing"
+    ]
+   },
+   {
+    "title": "Note-Making & Summarisation",
+    "age": "Age 16+",
+    "duration": "10 hours",
+    "topics": [
+     "Title, headings and sub-headings in the prescribed format",
+     "Using recognisable abbreviations with a key",
+     "Condensing a passage without losing key points",
+     "Writing a connected summary from notes",
+     "Common errors that cost marks and how to avoid them",
+     "Timed practice on exam-style passages"
+    ]
+   },
+   {
+    "title": "Advanced Writing: Reports, Speeches & Applications",
+    "age": "Age 16+",
+    "duration": "14 hours",
+    "topics": [
+     "Notices, invitations and replies in fixed formats",
+     "Formal letters and job applications with a resume/bio-data",
+     "Report writing for events and newspaper-style reports",
+     "Article and speech writing with argument and evidence",
+     "Debate scripts: assertion, reasoning and rebuttal on paper",
+     "Polishing expression: cohesion, precision and formal tone"
+    ]
+   },
+   {
+    "title": "Literature Analysis",
+    "age": "Age 17+",
+    "duration": "14 hours",
+    "topics": [
+     "Close reading of prescribed prose and poetry texts",
+     "Extract-based questions with interpretation and appreciation",
+     "Character, conflict and theme analysis in long answers",
+     "Structuring high-scoring long-form literary answers",
+     "The supplementary text or novel: plot, people and ideas",
+     "Linking texts to contemporary issues for value-based questions"
+    ]
+   },
+   {
+    "title": "Debate, Discussion & Presentation Skills",
+    "age": "Age 16+",
+    "duration": "10 hours",
+    "topics": [
+     "Building an argument: claim, evidence and impact",
+     "Rebuttal techniques and thinking on one's feet",
+     "Group discussion strategy and leadership without dominating",
+     "Designing and delivering a structured presentation",
+     "Interview-style Q&A and formal self-introduction",
+     "Voice, pace and body language for persuasive delivery"
+    ]
+   }
+  ],
   "short_description": "Personalised live English Grade 11-12 coaching.",
   "description": "",
   "regular_price": 1200,
@@ -4147,7 +5438,98 @@
    "Science",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Matter, Atoms & Molecules",
+    "age": "Age 14-16",
+    "duration": "16 hours",
+    "topics": [
+     "States of matter, changes of state, evaporation and the effect of temperature",
+     "Pure substances, mixtures, solutions, suspensions and colloids",
+     "Separation techniques and calculating concentration of a solution",
+     "Elements, compounds and the laws of chemical combination",
+     "Atomic theory, atomic and molecular mass, and the mole concept",
+     "Structure of the atom: electrons, protons, neutrons and shells",
+     "Valency, atomic number, mass number and isotopes",
+     "Numerical practice on mole calculations and formula mass"
+    ]
+   },
+   {
+    "title": "The Living Organism: Cells, Tissues & Life Processes",
+    "age": "Age 14-16",
+    "duration": "16 hours",
+    "topics": [
+     "The cell as the fundamental unit, prokaryotic versus eukaryotic",
+     "Cell organelles and their functions, plant versus animal cells",
+     "Diffusion, osmosis and how substances move across membranes",
+     "Plant tissues and animal tissues and the jobs they perform",
+     "Nutrition in plants and animals, including photosynthesis",
+     "Respiration, transportation and excretion in living organisms",
+     "Control and coordination through nerves and hormones",
+     "Microscope work on tissue slides and osmosis demonstrations"
+    ]
+   },
+   {
+    "title": "Motion, Forces & Gravitation",
+    "age": "Age 14-16",
+    "duration": "16 hours",
+    "topics": [
+     "Describing motion: distance, displacement, speed, velocity and acceleration",
+     "Interpreting and drawing distance-time and velocity-time graphs",
+     "Equations of uniformly accelerated motion and their applications",
+     "Newton's three laws of motion and the idea of inertia",
+     "Momentum, conservation of momentum and everyday examples",
+     "Universal law of gravitation, free fall and value of g",
+     "Mass, weight, thrust, pressure and why objects float",
+     "Numerical problem-solving across motion and force questions"
+    ]
+   },
+   {
+    "title": "Work, Energy & Sound",
+    "age": "Age 14-16",
+    "duration": "12 hours",
+    "topics": [
+     "Scientific meaning of work and the conditions for work done",
+     "Kinetic and potential energy and the law of conservation of energy",
+     "Power, commercial units of energy and everyday energy use",
+     "Production and propagation of sound and the need for a medium",
+     "Characteristics of sound waves: frequency, wavelength and speed",
+     "Reflection of sound, echo, reverberation and their uses",
+     "Ultrasound applications and the working of SONAR",
+     "Calculations on work, power and sound wave speed"
+    ]
+   },
+   {
+    "title": "Chemical Reactions, Acids, Bases & Metals",
+    "age": "Age 15-16",
+    "duration": "16 hours",
+    "topics": [
+     "Types of chemical reactions and balancing chemical equations",
+     "Oxidation, reduction, corrosion and rancidity",
+     "Properties of acids and bases and the pH scale in daily life",
+     "Salts, their preparation and important salts we use",
+     "Reactivity series and extraction of metals from ores",
+     "Metallic and non-metallic properties and ionic bonding",
+     "Carbon compounds, covalent bonding and homologous series",
+     "Lab tests for acids, bases and single displacement reactions"
+    ]
+   },
+   {
+    "title": "Heredity, Electricity, Magnetism & Light",
+    "age": "Age 15-16",
+    "duration": "18 hours",
+    "topics": [
+     "Heredity, inheritance of traits and a first look at evolution",
+     "Electric current, potential difference and Ohm's law",
+     "Resistance, series and parallel circuits and heating effect of current",
+     "Magnetic field, field lines and the effect of current on a magnet",
+     "Electromagnetic induction and how motors and generators work",
+     "Reflection and refraction of light through mirrors and lenses",
+     "The human eye, defects of vision and their correction",
+     "Circuit-building experiments and ray diagrams for lenses"
+    ]
+   }
+  ],
   "short_description": "Personalised live Science Grade 9-10 coaching.",
   "description": "",
   "regular_price": 1000,
@@ -4171,7 +5553,98 @@
    "Physics",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Measurement & Kinematics",
+    "age": "Age 16-18",
+    "duration": "18 hours",
+    "topics": [
+     "Physical quantities, SI units and dimensional analysis",
+     "Significant figures, errors and the treatment of uncertainty",
+     "Motion in a straight line: position, velocity and acceleration",
+     "Motion graphs and equations of uniformly accelerated motion",
+     "Scalars, vectors and vector addition and resolution",
+     "Projectile motion and the independence of components",
+     "Uniform circular motion and centripetal acceleration",
+     "Solving multi-step numerical problems on motion"
+    ]
+   },
+   {
+    "title": "Laws of Motion, Work-Energy & Rotation",
+    "age": "Age 16-18",
+    "duration": "18 hours",
+    "topics": [
+     "Newton's laws, free-body diagrams and applications",
+     "Friction, tension and motion on inclined planes",
+     "Work, energy, power and the work-energy theorem",
+     "Conservation of energy and elastic versus inelastic collisions",
+     "Centre of mass and its motion for a system of particles",
+     "Torque, angular momentum and its conservation",
+     "Moment of inertia and rotational kinematics and dynamics",
+     "Rolling motion and rotational-equivalent problem solving"
+    ]
+   },
+   {
+    "title": "Gravitation, Solids, Fluids & Thermal Physics",
+    "age": "Age 16-18",
+    "duration": "18 hours",
+    "topics": [
+     "Universal gravitation, gravitational field and potential energy",
+     "Satellite motion, orbital velocity and escape speed",
+     "Elasticity, stress, strain and moduli of materials",
+     "Fluid pressure, buoyancy, Bernoulli's principle and viscosity",
+     "Surface tension, capillarity and thermal expansion",
+     "Calorimetry, specific and latent heat and heat transfer",
+     "Kinetic theory of gases and the ideal gas equation",
+     "Numerical work spanning gravitation, fluids and heat"
+    ]
+   },
+   {
+    "title": "Thermodynamics, Oscillations & Waves",
+    "age": "Age 17-18",
+    "duration": "16 hours",
+    "topics": [
+     "Thermal equilibrium, the zeroth and first laws of thermodynamics",
+     "Thermodynamic processes, work done and the second law",
+     "Heat engines, refrigerators and Carnot efficiency",
+     "Simple harmonic motion: displacement, energy and period",
+     "Oscillations of springs and simple pendulums",
+     "Wave motion, transverse and longitudinal waves",
+     "Superposition, standing waves, beats and resonance",
+     "Doppler effect and problem solving on oscillations and waves"
+    ]
+   },
+   {
+    "title": "Electrostatics, Current & Magnetism",
+    "age": "Age 17-18",
+    "duration": "20 hours",
+    "topics": [
+     "Coulomb's law, electric field and Gauss's theorem",
+     "Electric potential, capacitance and combinations of capacitors",
+     "Electric current, drift velocity, resistivity and Ohm's law",
+     "Kirchhoff's rules, Wheatstone bridge and potentiometer",
+     "Magnetic effects of current, Biot-Savart and Ampere's law",
+     "Force on charges and conductors and the moving-coil galvanometer",
+     "Magnetism, magnetic materials and Earth's magnetism",
+     "Circuit and field numericals with careful sign conventions"
+    ]
+   },
+   {
+    "title": "EM Induction, AC, Optics & Modern Physics",
+    "age": "Age 17-18",
+    "duration": "20 hours",
+    "topics": [
+     "Faraday's and Lenz's laws, self and mutual inductance",
+     "Alternating current, reactance, impedance and LCR circuits",
+     "Electromagnetic waves and the electromagnetic spectrum",
+     "Ray optics: reflection, refraction, lenses and optical instruments",
+     "Wave optics: interference, diffraction and polarisation",
+     "Dual nature of matter, photoelectric effect and de Broglie waves",
+     "Atomic models, nuclei, radioactivity and mass-energy",
+     "Semiconductors, diodes and logic gates with applications"
+    ]
+   }
+  ],
   "short_description": "Personalised live Physics Grade 11-12 coaching.",
   "description": "",
   "regular_price": 1200,
@@ -4195,7 +5668,98 @@
    "Chemistry",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Atomic Structure, Periodicity & Bonding",
+    "age": "Age 16-18",
+    "duration": "18 hours",
+    "topics": [
+     "Basic concepts, mole concept and stoichiometric calculations",
+     "Development of atomic models up to the quantum mechanical model",
+     "Quantum numbers, orbitals and electronic configuration rules",
+     "Modern periodic table and periodic trends across and down groups",
+     "Ionic, covalent and coordinate bonding and lattice energy",
+     "VSEPR theory, hybridisation and molecular geometry",
+     "Valence bond and molecular orbital theory basics",
+     "Hydrogen bonding and its effect on physical properties"
+    ]
+   },
+   {
+    "title": "States of Matter, Thermodynamics & Equilibrium",
+    "age": "Age 16-18",
+    "duration": "18 hours",
+    "topics": [
+     "Gas laws, ideal gas equation and kinetic molecular theory",
+     "Real gases, liquefaction and properties of liquids and solids",
+     "Thermodynamic terms, enthalpy and Hess's law",
+     "Spontaneity, entropy and Gibbs free energy",
+     "Chemical equilibrium, equilibrium constant and Le Chatelier's principle",
+     "Ionic equilibrium, acids, bases and the pH concept",
+     "Buffer solutions, solubility product and common ion effect",
+     "Numerical problems on thermochemistry and equilibrium"
+    ]
+   },
+   {
+    "title": "Redox, Solutions & Electrochemistry",
+    "age": "Age 16-18",
+    "duration": "16 hours",
+    "topics": [
+     "Oxidation numbers, balancing redox equations and redox titrations",
+     "Types of solutions and ways of expressing concentration",
+     "Raoult's law, ideal and non-ideal solutions",
+     "Colligative properties and determination of molar mass",
+     "Electrochemical cells, electrode potential and the Nernst equation",
+     "Conductance of electrolytes and Kohlrausch's law",
+     "Electrolysis, Faraday's laws and commercial batteries",
+     "Corrosion, fuel cells and applied electrochemistry problems"
+    ]
+   },
+   {
+    "title": "Chemical Kinetics, d/f-Block & Coordination Chemistry",
+    "age": "Age 17-18",
+    "duration": "16 hours",
+    "topics": [
+     "Rate of reaction, order, molecularity and rate laws",
+     "Integrated rate equations, half-life and Arrhenius equation",
+     "Collision theory and the role of catalysts",
+     "General properties of transition and inner-transition elements",
+     "Variable oxidation states, colour and magnetic behaviour",
+     "Lanthanoid and actinoid chemistry and their trends",
+     "Coordination compounds, ligands, nomenclature and isomerism",
+     "Werner's theory, valence bond and crystal field explanations"
+    ]
+   },
+   {
+    "title": "Organic Chemistry: Fundamentals & Hydrocarbons",
+    "age": "Age 17-18",
+    "duration": "18 hours",
+    "topics": [
+     "Classification, IUPAC nomenclature and isomerism of organic compounds",
+     "Electronic effects: inductive, resonance and hyperconjugation",
+     "Reaction intermediates and types of organic reactions",
+     "Alkanes, alkenes and alkynes: preparation and reactions",
+     "Mechanisms of substitution, addition and elimination",
+     "Aromatic hydrocarbons and electrophilic aromatic substitution",
+     "Purification and qualitative analysis of organic compounds",
+     "Practice on naming, mechanisms and reaction products"
+    ]
+   },
+   {
+    "title": "Functional Groups, Biomolecules & Everyday Chemistry",
+    "age": "Age 17-18",
+    "duration": "18 hours",
+    "topics": [
+     "Haloalkanes and haloarenes and their reaction mechanisms",
+     "Alcohols, phenols and ethers: properties and reactions",
+     "Aldehydes, ketones and carboxylic acids and their derivatives",
+     "Amines, diazonium salts and nitrogen-containing compounds",
+     "Carbohydrates, proteins, lipids, nucleic acids and vitamins",
+     "Polymers: classification, addition and condensation types",
+     "Chemistry in medicines, food and cleansing agents",
+     "Distinguishing functional groups through characteristic tests"
+    ]
+   }
+  ],
   "short_description": "Personalised live Chemistry Grade 11-12 coaching.",
   "description": "",
   "regular_price": 1200,
@@ -4219,7 +5783,95 @@
    "Biology",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Diversity & Classification of Living Organisms",
+    "age": "Age 16-18",
+    "duration": "16 hours",
+    "topics": [
+     "The living world, taxonomy and the need for classification",
+     "Five kingdom classification and the basis for grouping organisms",
+     "Monera, Protista and Fungi and their defining features",
+     "Plant kingdom: algae, bryophytes, pteridophytes and seed plants",
+     "Animal kingdom classification and phylum-level characteristics",
+     "Binomial nomenclature and hierarchy of taxonomic categories",
+     "Comparing representative organisms across kingdoms"
+    ]
+   },
+   {
+    "title": "Structural Organisation in Plants & Animals",
+    "age": "Age 16-18",
+    "duration": "16 hours",
+    "topics": [
+     "Morphology of flowering plants: root, stem, leaf, flower and seed",
+     "Anatomy of plant tissues and tissue systems",
+     "Modifications of plant parts and floral formulae",
+     "Animal tissues: epithelial, connective, muscular and nervous",
+     "Structural organisation studied through the earthworm and cockroach",
+     "Frog anatomy as a representative vertebrate",
+     "Slide observation and labelled diagram practice"
+    ]
+   },
+   {
+    "title": "Cell Biology & Biomolecules",
+    "age": "Age 16-18",
+    "duration": "16 hours",
+    "topics": [
+     "Cell theory and the structure of prokaryotic and eukaryotic cells",
+     "Cell organelles and their specific functions",
+     "Structure of the plasma membrane and transport across it",
+     "Biomolecules: carbohydrates, proteins, lipids and nucleic acids",
+     "Enzymes, their properties and factors affecting enzyme action",
+     "The cell cycle, mitosis and meiosis compared",
+     "Significance of cell division in growth and reproduction"
+    ]
+   },
+   {
+    "title": "Plant Physiology & Human Physiology",
+    "age": "Age 17-18",
+    "duration": "20 hours",
+    "topics": [
+     "Transport in plants, transpiration and mineral nutrition",
+     "Photosynthesis and respiration in plants",
+     "Plant growth, development and the role of hormones",
+     "Human digestion, absorption, breathing and gas exchange",
+     "Circulation of body fluids and excretory system function",
+     "Locomotion, movement and the neural control system",
+     "Chemical coordination through the endocrine glands",
+     "Interpreting physiological processes through diagrams and flowcharts"
+    ]
+   },
+   {
+    "title": "Reproduction, Genetics & Evolution",
+    "age": "Age 17-18",
+    "duration": "20 hours",
+    "topics": [
+     "Sexual reproduction in flowering plants and pollination",
+     "Human reproductive system and reproductive health",
+     "Mendel's laws of inheritance and deviations from them",
+     "Chromosomal basis of inheritance and genetic disorders",
+     "Molecular basis of inheritance: DNA, RNA and gene expression",
+     "DNA replication, transcription and translation",
+     "Theories of evolution and evidence supporting them",
+     "Solving genetics problems with Punnett squares and pedigrees"
+    ]
+   },
+   {
+    "title": "Biology in Human Welfare, Biotechnology & Ecology",
+    "age": "Age 17-18",
+    "duration": "18 hours",
+    "topics": [
+     "Human health, common diseases and the immune system",
+     "Microbes in food production, sewage treatment and industry",
+     "Strategies for enhancement in food and crop production",
+     "Principles and processes of genetic engineering",
+     "Applications of biotechnology in health and agriculture",
+     "Organisms and populations: adaptations and population interactions",
+     "Ecosystems, energy flow and biogeochemical cycles",
+     "Biodiversity, conservation and current environmental issues"
+    ]
+   }
+  ],
   "short_description": "Personalised live Biology Grade 11-12 coaching.",
   "description": "",
   "regular_price": 1200,
@@ -4243,7 +5895,90 @@
    "Social Studies",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Revolutions that Shaped the Modern World",
+    "age": "Age 14+",
+    "duration": "12 hours",
+    "topics": [
+     "The French Revolution: causes, events, outcomes",
+     "Liberty, equality, fraternity as world-changing ideas",
+     "Socialism in Europe and the Russian Revolution",
+     "Hitler's rise and the Nazi worldview",
+     "Comparing revolutions: what triggers mass change",
+     "Source-based questions: posters, speeches, documents"
+    ]
+   },
+   {
+    "title": "Nationalism in Europe & India",
+    "age": "Age 15+",
+    "duration": "12 hours",
+    "topics": [
+     "How nation-states emerged in 19th-century Europe",
+     "The First World War and its effect on India",
+     "Non-Cooperation and Civil Disobedience movements",
+     "Different groups within the national movement",
+     "Symbols, songs and images that built collective identity",
+     "The road to independence: negotiation and mass action"
+    ]
+   },
+   {
+    "title": "India: Physical Setting & Climate",
+    "age": "Age 14+",
+    "duration": "10 hours",
+    "topics": [
+     "India's location, size and neighbours",
+     "Physiographic divisions: Himalayas to islands",
+     "Drainage: Himalayan and peninsular rivers",
+     "The monsoon: mechanism, onset and withdrawal",
+     "Natural vegetation and wildlife belts",
+     "Population size, distribution and growth",
+     "Map-marking practice for board exams"
+    ]
+   },
+   {
+    "title": "Resources, Agriculture & Industry",
+    "age": "Age 15+",
+    "duration": "10 hours",
+    "topics": [
+     "Resource planning and sustainable development",
+     "Soil types, erosion and conservation",
+     "Water resources and multipurpose river projects",
+     "Cropping seasons and major food and cash crops",
+     "Minerals and conventional vs non-conventional energy",
+     "Manufacturing industries and their location factors",
+     "Transport and communication as lifelines of the economy"
+    ]
+   },
+   {
+    "title": "Democracy & Its Working",
+    "age": "Age 14+",
+    "duration": "10 hours",
+    "topics": [
+     "What democracy is and why it matters",
+     "How India's constitution was designed",
+     "Elections: how they work and why they are free and fair",
+     "Parliament, executive and judiciary in action",
+     "Federalism and power sharing, including local government",
+     "Political parties and pressure groups",
+     "Outcomes and ongoing challenges of democracy"
+    ]
+   },
+   {
+    "title": "Economics: From Village Production to Development",
+    "age": "Age 14+",
+    "duration": "10 hours",
+    "topics": [
+     "The story of production in a village economy",
+     "People as a resource; poverty and food security",
+     "What development means: income and other goals",
+     "Sectors of the economy: primary, secondary, tertiary",
+     "Money, credit and the role of banks",
+     "Globalisation and the Indian economy",
+     "Consumer rights and being an informed buyer"
+    ]
+   }
+  ],
   "short_description": "Personalised live Social Studies Grade 9-10 coaching.",
   "description": "",
   "regular_price": 1000,
@@ -4267,7 +6002,90 @@
    "Social Studies",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Themes in World History",
+    "age": "Age 16+",
+    "duration": "14 hours",
+    "topics": [
+     "Early societies, writing and the first empires",
+     "Nomadic empires and cross-continental exchange",
+     "Feudalism and the three orders of medieval Europe",
+     "Renaissance and changing cultural traditions",
+     "The Industrial Revolution and its social costs",
+     "Paths to modernisation: China and Japan compared",
+     "Building historical arguments from primary sources"
+    ]
+   },
+   {
+    "title": "Fundamentals of Physical & Human Geography",
+    "age": "Age 16+",
+    "duration": "12 hours",
+    "topics": [
+     "Earth's interior, landforms and their evolution",
+     "Atmosphere, world climate and climate change",
+     "Water on earth: oceans and movements",
+     "Population distribution, density and migration",
+     "Human settlements: rural and urban patterns",
+     "Human development and world economic activities"
+    ]
+   },
+   {
+    "title": "India: People & Economy",
+    "age": "Age 17+",
+    "duration": "10 hours",
+    "topics": [
+     "Population composition and migration within India",
+     "Land resources and agricultural patterns",
+     "Water resources and their careful management",
+     "Minerals, energy and planning for sustainability",
+     "Manufacturing and the services surge",
+     "Transport, communication and international trade",
+     "Geographical perspective on selected issues"
+    ]
+   },
+   {
+    "title": "Political Theory & the Indian Constitution",
+    "age": "Age 16+",
+    "duration": "14 hours",
+    "topics": [
+     "Freedom, equality, justice and rights as concepts",
+     "Citizenship, secularism and nationalism debated",
+     "How and why the Constitution was made",
+     "Fundamental Rights and Directive Principles",
+     "Executive, legislature and judiciary at work",
+     "Federalism and local governments",
+     "The Constitution as a living document"
+    ]
+   },
+   {
+    "title": "Contemporary World & Indian Politics",
+    "age": "Age 17+",
+    "duration": "10 hours",
+    "topics": [
+     "The Cold War era and non-alignment",
+     "End of bipolarity and new centres of power",
+     "International organisations and India's role",
+     "One-party dominance to coalition politics in India",
+     "Regional aspirations and challenges to nation-building",
+     "Globalisation and its political consequences"
+    ]
+   },
+   {
+    "title": "Indian Economic Development",
+    "age": "Age 17+",
+    "duration": "14 hours",
+    "topics": [
+     "The economy on the eve of independence",
+     "Planning era: goals, achievements, shortfalls",
+     "The 1991 reforms: liberalisation, privatisation, globalisation",
+     "Poverty, human capital and rural development",
+     "Employment: growth, informalisation, policy",
+     "Infrastructure, environment and sustainable development",
+     "Comparing India's development with its neighbours"
+    ]
+   }
+  ],
   "short_description": "Personalised live Social Studies Grade 11-12 coaching.",
   "description": "",
   "regular_price": 1200,

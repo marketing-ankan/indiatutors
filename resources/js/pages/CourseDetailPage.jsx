@@ -10,7 +10,7 @@ import { cart, wishlist, useWishlist, cartItemOf } from '../lib/cart.js';
 import {
   buildPriceMatrix, CARD_FEATURES, FAQS, WORKSHOPS, PARENTS, TEACHERS,
   ACHIEVEMENTS, BLOG_POSTS, WHATSAPP_TESTIMONIALS, INSTAGRAM, STUDENT_WINS,
-  JOURNEY, TRUST_POINTS,
+  JOURNEY, TRUST_POINTS, WHY_CHOOSE, ACADEMIC_REQUIREMENTS, overviewFor,
 } from '../data/courseDetail.js';
 import { imageFor } from '../data/courseImages.js';
 
@@ -280,6 +280,7 @@ export default function CourseDetailPage() {
   // The section is hidden when a course has no siblings, matching live.
   const allCourses = coursesResp?.data ?? [];
   const catSlugs = new Set((course.categories || []).map(c => c.slug));
+  const isAcademic = [...catSlugs].some(s => s.startsWith('academics'));
   const related = allCourses
     .filter(c => c.slug !== course.slug && (c.categories || []).some(cc => catSlugs.has(cc.slug)))
     .slice(0, 8);
@@ -350,23 +351,36 @@ export default function CourseDetailPage() {
             )}
             {tab === 1 && (
               <>
-                <h3 className="text-lg font-bold text-slate-900">Why Choose Online {course.name} Classes</h3>
-                <ul className="space-y-2">
-                  {['Learn from a background-verified, subject-expert tutor', 'Personalised curriculum built around your goals and pace', 'Small batches or 1-on-1 — your choice', 'Flexible scheduling across time zones, reschedule anytime', 'Progress tracked and shared after every class'].map(x => <li key={x} className="flex gap-2"><CheckCircle2 className="h-4 w-4 mt-1 text-green-500 shrink-0" />{x}</li>)}
-                </ul>
+                <h3 className="text-lg font-bold text-slate-900">Why Choose Online {course.name} Classes?</h3>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {WHY_CHOOSE.map(w => (
+                    <div key={w.t} className="rounded-xl border border-[#E7E7EF] bg-white p-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                      <h4 className="text-sm font-bold text-slate-900">{w.t}</h4>
+                      <p className="mt-1 text-sm leading-relaxed text-slate-600">{w.d}</p>
+                    </div>
+                  ))}
+                </div>
               </>
             )}
             {tab === 2 && (
-              course.description
-                ? <div className="prose prose-slate max-w-none" dangerouslySetInnerHTML={{ __html: course.description }} />
-                : <p>{course.short_description || course.subtitle || `Live, expert-led ${course.name} classes with a structured curriculum, regular practice and personalised feedback.`}</p>
+              <>
+                <h3 className="text-lg font-bold text-slate-900">Overview</h3>
+                {course.description
+                  ? <div className="prose prose-slate max-w-none" dangerouslySetInnerHTML={{ __html: course.description }} />
+                  : <p>{overviewFor(course.name)}</p>}
+              </>
             )}
             {tab === 3 && (
-              learn.length ? (
-                <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2">
-                  {learn.map((t, i) => <li key={i} className="flex gap-2"><CheckCircle2 className="h-4 w-4 mt-1 text-green-500 shrink-0" />{t}</li>)}
-                </ul>
-              ) : <p>A structured, level-by-level path covering fundamentals to advanced topics — tailored further after your free demo.</p>
+              <>
+                <h3 className="text-lg font-bold text-slate-900">What You'll Learn</h3>
+                <div className="rounded-xl border border-[#E7E7EF] bg-white p-5">
+                  <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2.5">
+                    {(learn.length ? learn : CARD_FEATURES).map((t, i) => (
+                      <li key={i} className="flex gap-2 text-sm"><CheckCircle2 className="h-4 w-4 mt-0.5 text-green-500 shrink-0" />{t}</li>
+                    ))}
+                  </ul>
+                </div>
+              </>
             )}
             {tab === 4 && (
               curriculum.length ? (
@@ -392,12 +406,24 @@ export default function CourseDetailPage() {
               ) : <p>A structured, level-by-level curriculum — personalised further after your free demo class.</p>
             )}
             {tab === 5 && (
-              <ul className="space-y-2">
-                {['A laptop, tablet or desktop with a stable internet connection', 'A quiet space for the live class', 'Enthusiasm to learn — no prior experience needed for beginner levels', 'Any subject-specific materials will be shared by your tutor'].map(x => <li key={x} className="flex gap-2"><CheckCircle2 className="h-4 w-4 mt-1 text-green-500 shrink-0" />{x}</li>)}
-              </ul>
+              <>
+                <h3 className="text-lg font-bold text-slate-900">Requirements</h3>
+                <div className="space-y-2.5">
+                  {[
+                    'A laptop, tablet or desktop with a stable internet connection',
+                    'A quiet space for the live class',
+                    ...(isAcademic ? ACADEMIC_REQUIREMENTS : ['Any subject-specific materials will be shared by your tutor']),
+                    'Enthusiasm to learn — no prior experience needed for beginner levels',
+                  ].map(x => (
+                    <div key={x} className="flex gap-2.5 rounded-xl border border-[#E7E7EF] bg-white px-4 py-3 text-sm">
+                      <CheckCircle2 className="h-4 w-4 mt-0.5 text-green-500 shrink-0" />{x}
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
             {tab === 6 && (
-              <div className="rounded-2xl bg-slate-50 ring-1 ring-slate-100 p-5">
+              <div className="rounded-r-2xl border-l-4 border-brand-600 bg-slate-50 p-5 ring-1 ring-slate-100">
                 <h4 className="font-bold text-slate-900">{rating.toFixed(1)} / 5 ★ · {enrolled}+ students enrolled</h4>
                 <p className="mt-1 text-sm text-slate-600">Parents consistently rate our mentors for personalised attention, clear concepts and steady progress. Book a free demo to experience a class first-hand.</p>
               </div>

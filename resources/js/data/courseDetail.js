@@ -66,6 +66,31 @@ export const STUDENT_WINS = [
   { tag: '+2 grades', name: 'Diya N. · Class 8', detail: 'Advanced two grade levels in Maths in a year' },
 ];
 
+// "Why Choose" card grid (WinQuest-parity tab content, India-centric — Indian
+// boards only, no US/international curricula, available across India).
+export const WHY_CHOOSE = [
+  { t: 'Board-aligned tutors', d: "We match the tutor to your child's curriculum — CBSE, ICSE, IGCSE / Cambridge, State Boards or NCERT." },
+  { t: 'Live, interactive 1:1 or small-group classes', d: "The tutor sees your child's work in real time and corrects it on the spot." },
+  { t: 'Customised practice worksheets', d: 'Graded, reviewed and explained class by class.' },
+  { t: 'Weekly homework support', d: 'Assignments and concept revision before the next class.' },
+  { t: 'Periodic class tests', d: "Aligned to the board's exam pattern and marking scheme." },
+  { t: 'Detailed progress reports', d: 'For parents, every month — see exactly how your child is improving.' },
+  { t: 'Flexible scheduling', d: 'Pick time slots that fit school, tuition and after-school activities.' },
+  { t: 'Free demo class', d: 'Meet the tutor and see how a session works before you commit.' },
+  { t: 'Available across India', d: 'From metros to small towns — all your child needs is an internet connection.' },
+  { t: 'Recorded sessions for missed classes', d: 'Group format — no concept is left behind.' },
+];
+
+// Extra requirements for academic (board-syllabus) courses.
+export const ACADEMIC_REQUIREMENTS = [
+  'Notebook and stationery for working out problems',
+  'School textbook (any board — CBSE / ICSE / State) — your tutor adapts to it',
+];
+
+// Generated Overview paragraph when a course has no description (India-centric).
+export const overviewFor = (name) =>
+  `${name} classes on Indiatutors Online are live, one-on-one sessions built around your child's own school syllabus — CBSE, ICSE, IGCSE or State board. The tutor follows the exact chapter sequence and exam pattern your child faces, with focused instruction, regular practice and doubt-clearing in every class. Families across India benefit from flexible scheduling and a consistent tutor who tracks progress session to session — and the first demo class is always free.`;
+
 // "Start your child's journey today" — WinQuest-parity closing CTA (India-centric).
 export const JOURNEY = [
   { icon: '👩‍🏫', t: '1-on-1 Online Tutors', d: 'Experienced tutors so your child learns from the best.' },
