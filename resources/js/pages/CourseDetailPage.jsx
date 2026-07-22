@@ -3,12 +3,12 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   CheckCircle2, Video, Users, Calendar, Clock, Baby, Star, Heart, Download,
-  Phone, Mail, Play, Plus, ShoppingCart, ChevronRight, MessageCircle, Instagram,
+  Phone, Mail, Play, ShoppingCart, ChevronRight, MessageCircle, Instagram,
 } from 'lucide-react';
 import { fetchCourse, fetchCourses, fetchStoreProducts, inr } from '../lib/api.js';
 import { cart, wishlist, useWishlist, cartItemOf } from '../lib/cart.js';
 import {
-  buildPriceMatrix, CARD_FEATURES, FAQS, WORKSHOPS, PARENTS, TEACHERS,
+  buildPriceMatrix, CARD_FEATURES, WORKSHOPS, PARENTS, TEACHERS,
   ACHIEVEMENTS, BLOG_POSTS, WHATSAPP_TESTIMONIALS, INSTAGRAM, STUDENT_WINS,
   JOURNEY, TRUST_POINTS, WHY_CHOOSE, ACADEMIC_REQUIREMENTS, overviewFor,
   COURSE_FAQS,
@@ -243,27 +243,10 @@ function ProductCard({ c }) {
   );
 }
 
-// ------------------------------------------------------------- FAQ ITEM ------
-function FaqItem({ q, a, open, onToggle }) {
-  return (
-    <div className="rounded-xl bg-white border border-[#E7E7EF] overflow-hidden">
-      <button type="button" onClick={onToggle} aria-expanded={open}
-        className={`w-full flex items-center justify-between gap-3 text-left px-5 py-4 font-bold transition ${open ? 'text-white bg-gradient-to-br from-brand-600 to-[#152C49]' : 'text-[#1A1A1A] bg-[#FAFBFE] hover:bg-slate-100'}`}>
-        <span>{q}</span>
-        <span className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${open ? 'bg-white text-brand-600 rotate-45' : 'bg-brand-600 text-white'} transition-transform`}>
-          <Plus className="h-4 w-4" />
-        </span>
-      </button>
-      {open && <div className="px-5 py-4 text-sm text-slate-600 leading-relaxed">{a}</div>}
-    </div>
-  );
-}
-
 // ------------------------------------------------------------------ PAGE -----
 export default function CourseDetailPage() {
   const { slug } = useParams();
   const [tab, setTab] = useState(0);
-  const [openFaq, setOpenFaq] = useState(0);
   const [boardTab, setBoardTab] = useState(0);   // curriculum board-variant chip
   const [openUnit, setOpenUnit] = useState(0);   // curriculum accordion (-1 = all closed)
   const [openCourseFaq, setOpenCourseFaq] = useState(0); // FAQ tab accordion (-1 = all closed)
@@ -503,16 +486,6 @@ export default function CourseDetailPage() {
           <SectionHead>Course Reviews</SectionHead>
           <p className="text-center text-slate-500 mb-8">No reviews yet — be the first to share your experience with this course.</p>
           <ReviewForm />
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="py-14 bg-white">
-        <div className="container-wide">
-          <SectionHead>Frequently Asked Questions</SectionHead>
-          <div className="space-y-3">
-            {FAQS.map((f, i) => <FaqItem key={f.q} q={f.q} a={f.a} open={openFaq === i} onToggle={() => setOpenFaq(openFaq === i ? -1 : i)} />)}
-          </div>
         </div>
       </section>
 
