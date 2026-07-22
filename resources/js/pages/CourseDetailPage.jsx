@@ -285,8 +285,10 @@ export default function CourseDetailPage() {
 
   return (
     <div className="bg-white">
-      {/* BREADCRUMB HERO — WinQuest diagonal-split layout, IndiaTutors navy/gold */}
-      <section className="relative overflow-hidden text-white" style={{ background: 'linear-gradient(115deg,#0B1220 0%,#152a63 58%,#1E3A8A 100%)' }}>
+      {/* BREADCRUMB HERO — WinQuest diagonal-split layout, IndiaTutors navy/gold.
+          Boxed like WinQuest: max-w 1800px centred (side margins appear ≥1800px)
+          and the hero height scales 431px@1300 → 457px@1920 via clamp. */}
+      <section className="relative mx-auto max-w-[1800px] overflow-hidden text-white" style={{ background: 'linear-gradient(115deg,#0B1220 0%,#152a63 58%,#1E3A8A 100%)' }}>
         {imageFor(course) && (
           <>
             {/* Mobile: photo on top (full width) */}
@@ -298,7 +300,7 @@ export default function CourseDetailPage() {
             <img src={imageFor(course)} alt="" aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[55%] object-cover lg:block" style={{ clipPath: 'polygon(120px 0, 100% 0, 100% 100%, 0 100%)', objectPosition: '50% 30%' }} />
           </>
         )}
-        <div className="relative container-wide flex items-center py-10 lg:min-h-[431px] lg:py-12">
+        <div className="relative container-wide flex items-center py-10 lg:min-h-[clamp(431px,376px_+_4.2vw,457px)] lg:py-12">
           <div className="w-full lg:max-w-[43%]">
             <nav className="mb-3 text-xs text-slate-300">
               <Link to="/" className="hover:text-white">Home</Link> <span className="text-slate-500">›</span> <Link to="/courses" className="hover:text-white">Courses</Link> <span className="text-slate-500">›</span> <span className="text-white">{course.name}</span>
