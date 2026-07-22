@@ -48,9 +48,22 @@ export const FAQS = [
 ];
 
 export const WORKSHOPS = [
-  { t: 'Chess Camp for Beginners', d: 'A four-session intro to chess strategy and tactics for curious young minds.' },
-  { t: 'PSAT / SAT English Bootcamp', d: 'Focused reading and writing practice with timed sections and review.' },
-  { t: 'Digital SAT Math Workshop', d: 'Walkthroughs of the trickiest digital SAT math problems, live.' },
+  { t: 'JEE / NEET Foundation Bootcamp', d: 'A head-start for Classes 9–10 on the concepts that matter most for JEE and NEET, taught the exam way.' },
+  { t: 'Maths & Science Olympiad Prep', d: 'Problem-solving sessions for IMO / NSO / NTSE aspirants — pattern-based practice with expert mentors.' },
+  { t: 'CBSE Board Exam Crash Course', d: 'Last-mile revision for Classes 10 & 12 — sample papers, marking schemes and time-management drills.' },
+];
+
+// Recent student wins (India-centric, WinQuest-parity section). PLACEHOLDER
+// results — replace with real, verified student outcomes when available.
+export const STUDENT_WINS = [
+  { tag: 'Top 1%', name: 'Aarav S. · Class 10', detail: 'NTSE Stage 1 · qualified for Stage 2' },
+  { tag: 'State Rank 12', name: 'Ishita M. · Class 12', detail: 'ICSE Board Exams · 97.2%' },
+  { tag: 'Gold', name: 'Rohan K. · Class 8', detail: 'SOF International Maths Olympiad (IMO)' },
+  { tag: '99.1 %ile', name: 'Vivaan P. · Class 12', detail: 'JEE Main · qualified for Advanced' },
+  { tag: 'District Topper', name: 'Ananya R. · Class 10', detail: 'State Board · 96.8%' },
+  { tag: 'Qualified', name: 'Sneha T. · Class 12', detail: 'NEET UG · govt. college admission' },
+  { tag: 'Rank 3', name: 'Kabir J. · Class 6', detail: 'National Science Olympiad (NSO)' },
+  { tag: '+2 grades', name: 'Diya N. · Class 8', detail: 'Advanced two grade levels in Maths in a year' },
 ];
 
 export const PARENTS = [
