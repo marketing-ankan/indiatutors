@@ -292,14 +292,14 @@ export default function CourseDetailPage() {
             {/* Mobile: photo on top (full width) */}
             <img src={imageFor(course)} alt={course.name} className="h-52 w-full object-cover object-top sm:h-64 lg:hidden" />
             {/* Desktop: photo bleeds off the right with a gold diagonal band */}
-            <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[56%] lg:block" aria-hidden="true">
-              <div className="absolute inset-0" style={{ background: '#D4AF37', clipPath: 'polygon(7% 0, 100% 0, 100% 100%, 0% 100%)' }} />
-              <img src={imageFor(course)} alt="" className="absolute inset-0 h-full w-full object-cover object-top" style={{ clipPath: 'polygon(12% 0, 100% 0, 100% 100%, 5% 100%)' }} />
-            </div>
+            {/* Desktop: gold diagonal band + photo — exact WinQuest geometry
+                (image 55% / gold 56.2%, clip 120px top slant flush at bottom). */}
+            <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[56.2%] lg:block" aria-hidden="true" style={{ background: '#D4AF37', clipPath: 'polygon(120px 0, 100% 0, 100% 100%, 0 100%)' }} />
+            <img src={imageFor(course)} alt="" aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[55%] object-cover object-top lg:block" style={{ clipPath: 'polygon(120px 0, 100% 0, 100% 100%, 0 100%)' }} />
           </>
         )}
-        <div className="relative container-wide flex items-center py-10 lg:min-h-[440px] lg:py-14">
-          <div className="w-full lg:max-w-[46%]">
+        <div className="relative container-wide flex items-center py-10 lg:min-h-[431px] lg:py-12">
+          <div className="w-full lg:max-w-[43%]">
             <nav className="mb-3 text-xs text-slate-300">
               <Link to="/" className="hover:text-white">Home</Link> <span className="text-slate-500">›</span> <Link to="/courses" className="hover:text-white">Courses</Link> <span className="text-slate-500">›</span> <span className="text-white">{course.name}</span>
             </nav>
