@@ -285,35 +285,36 @@ export default function CourseDetailPage() {
 
   return (
     <div className="bg-white">
-      {/* BREADCRUMB HERO — image-forward (WinQuest layout, IndiaTutors colours) */}
-      <section className="relative overflow-hidden text-white" style={{ background: 'linear-gradient(135deg,#0B1220,#1E3A8A)' }}>
-        <div aria-hidden="true" className="absolute -right-24 -top-24 h-72 w-72 rounded-full" style={{ background: 'radial-gradient(circle,rgba(212,175,55,.22),transparent 70%)' }} />
-        <div className="relative container-wide grid items-center gap-8 py-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
-          <div>
+      {/* BREADCRUMB HERO — WinQuest diagonal-split layout, IndiaTutors navy/gold */}
+      <section className="relative overflow-hidden text-white" style={{ background: 'linear-gradient(115deg,#0B1220 0%,#152a63 58%,#1E3A8A 100%)' }}>
+        {imageFor(course) && (
+          <>
+            {/* Mobile: photo on top (full width) */}
+            <img src={imageFor(course)} alt={course.name} className="h-52 w-full object-cover sm:h-64 lg:hidden" />
+            {/* Desktop: photo bleeds off the right with a gold diagonal band */}
+            <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[56%] lg:block" aria-hidden="true">
+              <div className="absolute inset-0" style={{ background: '#D4AF37', clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 1% 100%)' }} />
+              <img src={imageFor(course)} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ clipPath: 'polygon(18% 0, 100% 0, 100% 100%, 4% 100%)' }} />
+            </div>
+          </>
+        )}
+        <div className="relative container-wide py-10 lg:py-16">
+          <div className="lg:max-w-[48%]">
             <nav className="mb-3 text-xs text-slate-300">
               <Link to="/" className="hover:text-white">Home</Link> <span className="text-slate-500">›</span> <Link to="/courses" className="hover:text-white">Courses</Link> <span className="text-slate-500">›</span> <span className="text-white">{course.name}</span>
             </nav>
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-[#D4AF37]">{course.categories?.[0]?.name || 'Course Details'}</p>
             <h1 className="font-heading text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">{course.name}</h1>
-            {(course.subtitle || course.short_description) && <p className="mt-3 max-w-xl leading-relaxed text-slate-300">{course.subtitle || course.short_description}</p>}
-            <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#D4AF37] px-3 py-1 text-xs font-bold text-[#0B1220]">🏆 Bestseller</span>
-              <span className="inline-flex items-center gap-1 font-semibold text-white"><Star className="h-4 w-4 fill-[#D4AF37] text-[#D4AF37]" />{rating.toFixed(1)}/5</span>
-              <span className="text-slate-400" aria-hidden="true">·</span>
-              <span className="font-semibold text-white">{enrolled}+ enrolled</span>
-              <span className="text-slate-400" aria-hidden="true">·</span>
-              <span className="inline-flex items-center gap-1 text-slate-200"><Video className="h-4 w-4" />1:1 Personalised Session</span>
+            {(course.subtitle || course.short_description) && <p className="mt-3 max-w-md leading-relaxed text-slate-300">{course.subtitle || course.short_description}</p>}
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="rounded-full bg-[#D4AF37] px-3.5 py-1.5 text-xs font-bold text-[#0B1220]">Bestseller</span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20"><Star className="h-3.5 w-3.5 fill-[#D4AF37] text-[#D4AF37]" />{rating.toFixed(1)}/5</span>
+              <span className="rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20">{enrolled}+ enrolled</span>
+              <span className="rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20">1:1 Personalised Session</span>
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link to={`/book-demo?subject=${encodeURIComponent(course.name)}`} className="rounded-[11px] bg-[#D4AF37] px-6 py-3 text-sm font-bold text-[#0B1220] shadow-lg shadow-[#D4AF37]/25 transition hover:brightness-105">🎯 Book a Free Demo</Link>
+              <Link to={`/book-demo?subject=${encodeURIComponent(course.name)}`} className="rounded-[11px] bg-[#D4AF37] px-6 py-3 text-sm font-bold text-[#0B1220] shadow-lg shadow-[#D4AF37]/25 transition hover:brightness-105">Book a Free Demo</Link>
               <Link to="/plans-pricing" className="rounded-[11px] border-[1.5px] border-white/50 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10">View Plans &amp; Pricing</Link>
-            </div>
-          </div>
-          <div className="order-first lg:order-last">
-            <div className="aspect-[4/3] overflow-hidden rounded-2xl bg-white/5 shadow-2xl ring-1 ring-white/15">
-              {imageFor(course)
-                ? <img src={imageFor(course)} alt={course.name} className="h-full w-full object-cover" />
-                : <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-700 to-[#0B1220]"><span className="font-heading text-7xl font-extrabold text-white/90">{course.name[0]}</span></div>}
             </div>
           </div>
         </div>
