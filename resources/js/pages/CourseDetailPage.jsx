@@ -11,6 +11,7 @@ import {
   buildPriceMatrix, CARD_FEATURES, FAQS, WORKSHOPS, PARENTS, TEACHERS,
   ACHIEVEMENTS, BLOG_POSTS, WHATSAPP_TESTIMONIALS, INSTAGRAM, STUDENT_WINS,
   JOURNEY, TRUST_POINTS, WHY_CHOOSE, ACADEMIC_REQUIREMENTS, overviewFor,
+  COURSE_FAQS,
 } from '../data/courseDetail.js';
 import { imageFor } from '../data/courseImages.js';
 
@@ -21,7 +22,7 @@ import { imageFor } from '../data/courseImages.js';
 // FAQ, reviews, other courses, workshops, testimonials, teachers, demo,
 // achievements and blog.
 
-const TABS = ['About Indiatutors Online', 'Why Choose', 'Overview', "What You'll Learn", 'Curriculum', 'Requirements', 'Reviews'];
+const TABS = ['About Indiatutors Online', 'Why Choose', 'Overview', "What You'll Learn", 'Curriculum', 'Requirements', 'Reviews', 'FAQ'];
 
 // Deterministic per-course social proof — stable rating + enrolled count per slug.
 const seed = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
@@ -265,6 +266,7 @@ export default function CourseDetailPage() {
   const [openFaq, setOpenFaq] = useState(0);
   const [boardTab, setBoardTab] = useState(0);   // curriculum board-variant chip
   const [openUnit, setOpenUnit] = useState(0);   // curriculum accordion (-1 = all closed)
+  const [openCourseFaq, setOpenCourseFaq] = useState(0); // FAQ tab accordion (-1 = all closed)
   const { data: course, isLoading, isError } = useQuery({ queryKey: ['course', slug], queryFn: () => fetchCourse(slug) });
   const { data: coursesResp } = useQuery({ queryKey: ['courses', { per_page: 200 }], queryFn: () => fetchCourses({ per_page: 200 }) });
 
@@ -470,6 +472,24 @@ export default function CourseDetailPage() {
                 <h4 className="font-bold text-slate-900">{rating.toFixed(1)} / 5 ★ · {enrolled}+ students enrolled</h4>
                 <p className="mt-1 text-sm text-slate-600">Parents consistently rate our mentors for personalised attention, clear concepts and steady progress. Book a free demo to experience a class first-hand.</p>
               </div>
+            )}
+            {tab === 7 && (
+              <>
+                <h3 className="text-lg font-bold text-slate-900">Frequently Asked Questions</h3>
+                <div className="space-y-3">
+                  {COURSE_FAQS.map((f, i) => (
+                    <div key={f.q} className={`overflow-hidden rounded-xl ${openCourseFaq === i ? 'shadow-md ring-1 ring-brand-200' : 'ring-1 ring-slate-200'}`}>
+                      <button onClick={() => setOpenCourseFaq(openCourseFaq === i ? -1 : i)} aria-expanded={openCourseFaq === i}
+                        className={`flex w-full items-center gap-3 px-5 py-3.5 text-left font-bold ${openCourseFaq === i ? 'text-white' : 'bg-white text-slate-900 hover:bg-slate-50'}`}
+                        style={openCourseFaq === i ? { background: 'linear-gradient(120deg,#1E40AF,#0B1220)' } : undefined}>
+                        {f.q}
+                        <span className={`ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-sm transition-transform ${openCourseFaq === i ? 'rotate-45 bg-white/20 text-white' : 'bg-brand-600 text-white'}`}>+</span>
+                      </button>
+                      {openCourseFaq === i && <p className="bg-white px-5 py-4 text-sm leading-relaxed text-slate-600">{f.a}</p>}
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>

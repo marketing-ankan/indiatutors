@@ -91,6 +91,17 @@ export const ACADEMIC_REQUIREMENTS = [
 export const overviewFor = (name) =>
   `${name} classes on Indiatutors Online are live, one-on-one sessions built around your child's own school syllabus — CBSE, ICSE, IGCSE or State board. The tutor follows the exact chapter sequence and exam pattern your child faces, with focused instruction, regular practice and doubt-clearing in every class. Families across India benefit from flexible scheduling and a consistent tutor who tracks progress session to session — and the first demo class is always free.`;
 
+// Course-page FAQ tab (WinQuest-parity, India-centric). Accordion in the tab row;
+// the fuller site-wide FAQ section lower on the page stays as-is.
+export const COURSE_FAQS = [
+  { q: 'How do I get started?', a: "Click the Book a Free Demo button on this page and fill in your child's grade and school board (CBSE / ICSE / IGCSE / State board). We'll schedule a free trial session with a matching tutor. For help, WhatsApp our coordinator on +91 93308 11581 or email connect@indiatutorsonline.com." },
+  { q: "Will the tutor follow my child's school board?", a: "Yes — we match the tutor to your child's exact board and class. Classes follow the same chapter sequence, textbook and exam pattern your child faces at school, whether that's CBSE (NCERT), ICSE (CISCE), IGCSE / Cambridge or a State board." },
+  { q: 'How does payment work?', a: 'We collect a monthly advance for the classes scheduled that month, via UPI, cards, net banking or other payment apps. There is no long-term commitment — you can pause or stop any time, and fees for untaken classes are refunded.' },
+  { q: 'What if my child misses a class?', a: 'For 1-on-1 sessions we simply reschedule the class at no cost — just inform us in advance. For group classes we share a timed recording on request, so no concept is left behind.' },
+  { q: 'How long is each class?', a: 'A typical session is 55–60 minutes. For younger children (below Class 3) we recommend 40–45 minute sessions to match their attention span — the schedule is agreed with you at the start.' },
+  { q: 'How is progress measured?', a: "Your tutor shares an update after every class, sets periodic tests aligned to the board's exam pattern, and sends parents a detailed progress report every month. You can also discuss progress directly with the tutor or our coordinator at any time." },
+];
+
 // "Start your child's journey today" — WinQuest-parity closing CTA (India-centric).
 export const JOURNEY = [
   { icon: '👩‍🏫', t: '1-on-1 Online Tutors', d: 'Experienced tutors so your child learns from the best.' },
