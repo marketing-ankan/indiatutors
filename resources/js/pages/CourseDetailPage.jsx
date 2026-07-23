@@ -1,9 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   CheckCircle2, Video, Users, Calendar, Clock, Baby, Star, Heart, Download,
-  Phone, Mail, Play, ShoppingCart, ChevronRight, MessageCircle, Instagram,
+  Phone, Mail, Play, ShoppingCart, ChevronLeft, ChevronRight, MessageCircle, Instagram,
 } from 'lucide-react';
 import { fetchCourse, fetchCourses, fetchStoreProducts, inr } from '../lib/api.js';
 import { cart, wishlist, useWishlist, cartItemOf } from '../lib/cart.js';
@@ -66,6 +66,40 @@ function InstrumentsStrip() {
         </div>
         <div className="mt-8 text-center">
           <Link to="/instruments" className="inline-flex rounded-lg border-2 border-brand-600/35 text-brand-600 px-6 py-2.5 text-sm font-bold hover:bg-brand-50">Visit the Store →</Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Meet our Teachers — WinQuest-parity portrait carousel (navy/gold theme).
+// A scroll-snap rail of the full mentor roster with prev/next arrows; arrows
+// page the rail by ~85% of its width and are hidden on touch (swipe instead).
+function TeachersCarousel() {
+  const rail = useRef(null);
+  const page = (dir) => rail.current?.scrollBy({ left: dir * rail.current.clientWidth * 0.85, behavior: 'smooth' });
+  const Arrow = ({ dir, side, Icon, label }) => (
+    <button type="button" onClick={() => page(dir)} aria-label={label}
+      className={`absolute top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg ring-1 ring-black/5 transition hover:bg-[#D4AF37] hover:text-[#0B1220] md:flex ${side}`}>
+      <Icon className="h-5 w-5" />
+    </button>
+  );
+  return (
+    <section className="py-14 bg-white">
+      <div className="container-wide">
+        <SectionHead>Meet our Teachers</SectionHead>
+        <p className="-mt-6 mb-9 text-center text-slate-500">Expert educators who connect, guide, and prepare students with special personalised care ❤️📚✨</p>
+        <div className="relative">
+          <Arrow dir={-1} side="-left-3" Icon={ChevronLeft} label="Previous teachers" />
+          <div ref={rail} className="flex gap-4 overflow-x-auto scroll-smooth snap-x pb-2 scrollbar-hide">
+            {TEACHERS.map(t => (
+              <figure key={t.name} className="group flex-shrink-0 snap-start w-[46%] sm:w-[178px] overflow-hidden rounded-2xl border border-[#E7E7EF] bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-brand-300">
+                <img src={t.img} alt={t.name} loading="lazy" className="aspect-[223/300] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]" />
+                <figcaption className="py-3 text-center font-heading text-sm font-bold text-[#0B1220]">{t.name}</figcaption>
+              </figure>
+            ))}
+          </div>
+          <Arrow dir={1} side="-right-3" Icon={ChevronRight} label="Next teachers" />
         </div>
       </div>
     </section>
@@ -570,20 +604,8 @@ export default function CourseDetailPage() {
         </div>
       </section>
 
-      {/* MEET OUR TEACHERS */}
-      <section className="py-14 bg-white">
-        <div className="container-wide">
-          <SectionHead>Meet our Teachers</SectionHead>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-            {TEACHERS.map(t => (
-              <Link key={t.slug} to={`/tutor/${t.slug}`} className="group rounded-[14px] bg-white border border-[#E7E7EF] overflow-hidden text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-brand-300">
-                <span className="block h-[150px] bg-brand-600 bg-cover bg-center" style={{ backgroundImage: `url('${t.img}')` }} />
-                <span className="block py-2.5 font-heading text-sm font-bold text-slate-900">{t.name}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* MEET OUR TEACHERS — WinQuest-parity portrait carousel */}
+      <TeachersCarousel />
 
       {/* INSTRUMENTS & ROBOTICS KITS (store strip) */}
       <InstrumentsStrip />

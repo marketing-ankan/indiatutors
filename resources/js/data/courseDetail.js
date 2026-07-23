@@ -125,15 +125,35 @@ export const PARENTS = [
   { init: 'D', quote: 'Across time zones it still felt personal. Clear updates and real improvement we could see.', name: 'David T.', place: 'Parent · Dubai' },
 ];
 
+// "Meet our Teachers" carousel — the full mentor roster shown on every product
+// page (WinQuest-parity). Portraits are self-hosted under /public/images/teachers
+// (copied from the sister brand's uploads) so they survive the domain cutover
+// instead of hotlinking. Cards are not linked to profiles — this is a showcase
+// strip, matching the live layout.
 export const TEACHERS = [
-  { name: 'Vipul', slug: 'vipul', img: UP + '2026/05/Untitled-design-71-760x1024-2-223x300.png' },
-  { name: 'Vijayalakshmi', slug: 'vijayalakshmi', img: UP + '2026/05/Untitled-design-70-760x1024-2-223x300.png' },
-  { name: 'Surajit', slug: 'surajit', img: UP + '2026/05/Untitled-design-69-760x1024-2-223x300.png' },
-  { name: 'Shamim', slug: 'shamim', img: UP + '2026/05/Untitled-design-62-760x1024-2-223x300.png' },
-  { name: 'Rahul', slug: 'rahul', img: UP + '2026/05/Untitled-design-68-760x1024-1-223x300.png' },
-  { name: 'Prashasti', slug: 'prashasti', img: UP + '2026/05/Untitled-design-67-760x1024-1-223x300.png' },
-  { name: 'Pinki', slug: 'pinki', img: UP + '2026/05/Untitled-design-61-760x1024-1-223x300.png' },
-  { name: 'Nisitha', slug: 'nisitha', img: UP + '2026/05/Untitled-design-66-760x1024-1-223x300.png' },
+  { name: 'Anney', img: '/images/teachers/anney.png' },
+  { name: 'Kainaaz', img: '/images/teachers/kainaaz.png' },
+  { name: 'Pinki', img: '/images/teachers/pinki.png' },
+  { name: 'Shamim', img: '/images/teachers/shamim.png' },
+  { name: 'Angeline', img: '/images/teachers/angeline.png' },
+  { name: 'Anubrato', img: '/images/teachers/anubrato.png' },
+  { name: 'Deana', img: '/images/teachers/deana.png' },
+  { name: 'Nisitha', img: '/images/teachers/nisitha.png' },
+  { name: 'Visha Singh', img: '/images/teachers/visha-singh.webp' },
+  { name: 'Subin Dey', img: '/images/teachers/subin-dey.webp' },
+  { name: 'Rohan Singh Rathore', img: '/images/teachers/rohan-singh-rathore.webp' },
+  { name: 'Divya Kamra', img: '/images/teachers/divya-kamra.webp' },
+  { name: 'Prakesh Kumar Pandey', img: '/images/teachers/prakesh-kumar-pandey.webp' },
+  { name: 'Rajlaxmi Kesharwani', img: '/images/teachers/rajlaxmi-kesharwani.webp' },
+  { name: 'Vivek Kumar Sharma', img: '/images/teachers/vivek-kumar-sharma.webp' },
+  { name: 'Ruchi Ghosh', img: '/images/teachers/ruchi-ghosh.webp' },
+  { name: 'Ranjana Sarkar', img: '/images/teachers/ranjana-sarkar.webp' },
+  { name: 'Charumathi Jaikumar', img: '/images/teachers/charumathi-jaikumar.webp' },
+  { name: 'Anukriti Gahlout', img: '/images/teachers/anukriti-gahlout.webp' },
+  { name: 'Neetu Malhotra', img: '/images/teachers/neetu-malhotra.webp' },
+  { name: 'Navya Kesharwani', img: '/images/teachers/navya-kesharwani.webp' },
+  { name: 'Aravind Mathews', img: '/images/teachers/aravind-mathews.webp' },
+  { name: 'Arpan Sen', img: '/images/teachers/arpan-sen.webp' },
 ];
 
 export const ACHIEVEMENTS = [
