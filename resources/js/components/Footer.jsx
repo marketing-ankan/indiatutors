@@ -26,7 +26,7 @@ const LEARN_DISCOVER = [
   ['🏠 Home Tutors', '/find-tutors?mode=home'], ['📡 Live Classes', '/courses'],
   ['👥 Group Classes', '/group-classes'], ['🎁 Free Classes', '/free-classes'],
   ['🌟 Events & Workshops', '/events-workshops'], ['🏆 Competitive Exams', '/competitive-exams'],
-  ['💼 Skill Programmes', '/skill-programmes'], ['🎸 Instruments & Kits', '/instruments'],
+  ['💼 Skill Programmes', '/skill-programmes'], ['🏫 Physical Classes', '/physical-classes'],
 ];
 const SUPPORT = [
   ['🎓 Student Login', '/login'], ['👩‍🏫 Teacher Login', '/login'],

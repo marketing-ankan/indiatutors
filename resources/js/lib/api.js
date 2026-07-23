@@ -153,12 +153,6 @@ export const fetchAdminEvents   = async () => { const { data } = await api.get('
 export const createAdminEvent   = async (p) => { const { data } = await api.post('/admin/events', p); return data; };
 export const updateAdminEvent   = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/events/${id}`, p); return data; };
 export const deleteAdminEvent   = async (id) => { const { data } = await api.delete(`/admin/events/${id}`); return data; };
-export const fetchStoreProducts     = async () => { const { data } = await api.get('/store-products'); return data.data; };
-export const fetchStoreProduct      = async (slug) => { const { data } = await api.get(`/store-products/${slug}`); return data; };
-export const fetchAdminStoreProducts= async () => { const { data } = await api.get('/admin/store-products'); return data.data; };
-export const createAdminStoreProduct= async (p) => { const { data } = await api.post('/admin/store-products', p); return data; };
-export const updateAdminStoreProduct= async ({ id, ...p }) => { const { data } = await api.patch(`/admin/store-products/${id}`, p); return data; };
-export const deleteAdminStoreProduct= async (id) => { const { data } = await api.delete(`/admin/store-products/${id}`); return data; };
 export const fetchVideoCourses      = async () => { const { data } = await api.get('/video-courses'); return data.data; };
 export const fetchVideoCourse       = async (slug) => { const { data } = await api.get(`/video-courses/${slug}`); return data; };
 export const fetchLessonPlayback    = async ({ courseId, lessonId }) => { const { data } = await api.post(`/video-courses/${courseId}/lessons/${lessonId}/playback`); return data; };
