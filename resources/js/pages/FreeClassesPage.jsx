@@ -1,16 +1,14 @@
 import { Link } from 'react-router-dom';
 
-// Dedicated /free-classes landing page, ported from the live site:
-// green hero, reassurance strip, six subject cards (one-time ₹750
-// registration), fine print and a closing CTA band.
+// Dedicated /free-classes landing page — green hero, reassurance strip,
+// subject cards, fine print and a closing CTA band. Offering + one-time
+// registration fees follow the official "IN Plan and Pricing" PDF (Jul 2026):
+// Crafts ₹600, Hand Writing ₹600, Rubik's Cube ₹2000.
 
 const CLASSES = [
-  { icon:'🎨', title:'Art & Painting',      blurb:'Explore colours, sketching and creative self-expression.',        slug:'arts-painting',  subject:'Art and Painting' },
-  { icon:'✂️', title:'Art & Craft Classes', blurb:'Hands-on craft projects that spark imagination and motor skills.', slug:'art-and-craft',  subject:'Art and Craft' },
-  { icon:'♟️', title:'Chess Classes',       blurb:'Strategy, focus and critical thinking from the very basics.',      slug:'chess',          subject:'Chess' },
-  { icon:'🧩', title:"Rubik's Cube",        blurb:'Solve the cube and boost memory, patience & spatial skills.',      slug:'rubiks-cube',    subject:"Rubik's Cube" },
-  { icon:'🇪🇸', title:'Spanish Language',    blurb:'A fun introduction to Spanish for young learners.',                slug:'spanish',        subject:'Spanish' },
-  { icon:'🇫🇷', title:'French Language',     blurb:'Begin French through songs, words and simple conversation.',       slug:'french',         subject:'French' },
+  { icon:'✂️', title:'Craft Classes', fee:600,  blurb:'Hands-on craft projects that spark imagination and motor skills. Material list shared before classes begin.', slug:'art-and-craft', subject:'Art and Craft' },
+  { icon:'✍️', title:'Hand Writing',  fee:600,  blurb:'Neat, confident handwriting through guided daily practice.', slug:null, subject:'Hand Writing' },
+  { icon:'🧩', title:"Rubik's Cube",  fee:2000, blurb:'Solve the cube and boost memory, patience & spatial skills.', slug:'rubiks-cube', subject:"Rubik's Cube" },
 ];
 
 export default function FreeClassesPage() {
@@ -32,7 +30,7 @@ export default function FreeClassesPage() {
         {/* REASSURANCE STRIP */}
         <section className="rounded-2xl bg-white ring-1 ring-slate-100 px-6 py-4 flex flex-wrap gap-x-8 gap-y-2 justify-center text-sm font-semibold text-slate-700">
           <span>✅ No commitment</span>
-          <span>✅ One-time registration fee only — ₹750</span>
+          <span>✅ One-time registration fee only — from ₹600</span>
           <span>✅ Pure learning, zero pressure</span>
         </section>
 
@@ -43,10 +41,10 @@ export default function FreeClassesPage() {
               <div className="text-4xl mb-3">{c.icon}</div>
               <h2 className="font-extrabold text-lg text-slate-900">{c.title}</h2>
               <p className="text-sm text-slate-500 mt-1.5 leading-relaxed flex-1">{c.blurb}</p>
-              <p className="mt-4 text-sm text-slate-600">One-time registration: <span className="font-extrabold text-slate-900">₹750</span></p>
-              <div className="mt-3 grid grid-cols-2 gap-2">
+              <p className="mt-4 text-sm text-slate-600">One-time registration: <span className="font-extrabold text-slate-900">₹{c.fee.toLocaleString('en-IN')}</span></p>
+              <div className={`mt-3 grid gap-2 ${c.slug ? 'grid-cols-2' : ''}`}>
                 <Link to={`/book-demo?type=free&subject=${encodeURIComponent(c.subject)}`} className="rounded-lg bg-brand-600 text-white py-2.5 text-sm font-bold hover:bg-brand-700">Book Now</Link>
-                <Link to={`/courses/${c.slug}`} className="rounded-lg ring-1 ring-brand-600 text-brand-700 py-2.5 text-sm font-bold hover:bg-brand-50">View Details</Link>
+                {c.slug && <Link to={`/courses/${c.slug}`} className="rounded-lg ring-1 ring-brand-600 text-brand-700 py-2.5 text-sm font-bold hover:bg-brand-50">View Details</Link>}
               </div>
             </article>
           ))}

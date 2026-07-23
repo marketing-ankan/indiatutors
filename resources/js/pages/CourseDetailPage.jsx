@@ -5,7 +5,7 @@ import {
   CheckCircle2, Video, Users, Calendar, Clock, Baby, Star, Heart, Download,
   Phone, Mail, Play, ShoppingCart, ChevronLeft, ChevronRight, MessageCircle, Instagram,
 } from 'lucide-react';
-import { fetchCourse, fetchCourses, fetchStoreProducts, inr } from '../lib/api.js';
+import { fetchCourse, fetchCourses, inr } from '../lib/api.js';
 import { cart, wishlist, useWishlist, cartItemOf } from '../lib/cart.js';
 import {
   buildPriceMatrix, CARD_FEATURES, WORKSHOPS, PARENTS, TEACHERS,
@@ -35,42 +35,6 @@ const SectionHead = ({ children }) => (
     <span className="mt-3 mx-auto block h-1 w-16 rounded bg-[#D4AF37]" />
   </div>
 );
-
-// Instruments & Robotics Kits — store strip on the product page (India shipping).
-function InstrumentsStrip() {
-  const { data: items = [] } = useQuery({ queryKey: ['store-products', 'course-strip'], queryFn: fetchStoreProducts });
-  if (!items.length) return null;
-  const gross = (n) => Math.ceil((n / 0.6) / 50) * 50;
-  return (
-    <section className="py-14 bg-white">
-      <div className="container-wide">
-        <SectionHead>🎸 Instruments &amp; Robotics Kits — order for your child</SectionHead>
-        <p className="text-center text-slate-500 -mt-6 mb-9">Teacher-curated gear from the Indiatutors Store, shipped across India 🇮🇳</p>
-        <div className="flex gap-4 overflow-x-auto snap-x pb-2 scrollbar-hide">
-          {items.slice(0, 12).map((p) => (
-            <Link key={p.slug} to={`/instruments/${p.slug}`} className="group flex-shrink-0 snap-start w-[46%] sm:w-[31%] lg:w-[23%] xl:w-[18%] rounded-[14px] bg-white border border-[#E7E7EF] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-              {p.image_url
-                ? <span className="block h-32 bg-cover bg-center" style={{ backgroundImage: `url('${p.image_url}')` }} />
-                : <span className="flex h-32 items-center justify-center bg-gradient-to-br from-brand-700 to-brand-900 text-3xl">🎸</span>}
-              <span className="block p-3">
-                <span className="block text-[13px] font-bold text-slate-900 leading-snug line-clamp-2">{p.name}</span>
-                <span className="mt-1.5 flex flex-wrap items-center gap-1.5 text-sm">
-                  <span className="font-extrabold text-brand-700">{inr(p.price)}</span>
-                  <span className="text-xs text-slate-400 line-through">{inr(gross(p.price))}</span>
-                  <span className="rounded bg-green-100 text-green-700 px-1 py-0.5 text-[10px] font-bold">40% OFF</span>
-                </span>
-                <span className="mt-1.5 block text-xs font-bold text-brand-600 group-hover:text-brand-700">View details →</span>
-              </span>
-            </Link>
-          ))}
-        </div>
-        <div className="mt-8 text-center">
-          <Link to="/instruments" className="inline-flex rounded-lg border-2 border-brand-600/35 text-brand-600 px-6 py-2.5 text-sm font-bold hover:bg-brand-50">Visit the Store →</Link>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // Meet our Teachers — WinQuest-parity portrait carousel (navy/gold theme).
 // A scroll-snap rail of the full mentor roster with prev/next arrows; arrows
@@ -606,9 +570,6 @@ export default function CourseDetailPage() {
 
       {/* MEET OUR TEACHERS — WinQuest-parity portrait carousel */}
       <TeachersCarousel />
-
-      {/* INSTRUMENTS & ROBOTICS KITS (store strip) */}
-      <InstrumentsStrip />
 
       {/* DEMO OF OUR CLASSES */}
       <section className="py-14 bg-[#FAFBFE]">

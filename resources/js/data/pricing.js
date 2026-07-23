@@ -1,4 +1,7 @@
-// Pricing engine data — ported from the live site (ITO_PP config on /plans-pricing/).
+// Pricing engine data — ported from the live site (ITO_PP config on /plans-pricing/),
+// then reconciled against the official "IN Plan and Pricing" PDF (Jul 2026):
+// Java 850/1200/1500, AWS 900/900/1200, and ₹600 group rates for the AP courses
+// and competitive exams listed on the PDF's group sheet.
 // Rates are per-class, per level [Beginner, Intermediate, Advanced]; *G = group-class rates.
 export const PRICING = {
   "discount": "40",
@@ -575,8 +578,8 @@ export const PRICING = {
       "cat": "IT Technologies",
       "inr": [
         850,
-        900,
-        1200
+        1200,
+        1500
       ],
       "usd": [
         15,
@@ -862,7 +865,7 @@ export const PRICING = {
       "name": "AWS",
       "cat": "IT Technologies",
       "inr": [
-        600,
+        900,
         900,
         1200
       ],
@@ -1903,7 +1906,9 @@ export const PRICING = {
       "usd": [
         18
       ],
-      "inrG": null,
+      "inrG": [
+        600
+      ],
       "usdG": null
     },
     {
@@ -1915,7 +1920,9 @@ export const PRICING = {
       "usd": [
         20
       ],
-      "inrG": null,
+      "inrG": [
+        600
+      ],
       "usdG": null
     },
     {
@@ -1927,7 +1934,9 @@ export const PRICING = {
       "usd": [
         20
       ],
-      "inrG": null,
+      "inrG": [
+        600
+      ],
       "usdG": null
     },
     {
@@ -1939,7 +1948,9 @@ export const PRICING = {
       "usd": [
         18
       ],
-      "inrG": null,
+      "inrG": [
+        600
+      ],
       "usdG": null
     },
     {
@@ -1951,7 +1962,9 @@ export const PRICING = {
       "usd": [
         18
       ],
-      "inrG": null,
+      "inrG": [
+        600
+      ],
       "usdG": null
     },
     {
@@ -1963,7 +1976,9 @@ export const PRICING = {
       "usd": [
         18
       ],
-      "inrG": null,
+      "inrG": [
+        600
+      ],
       "usdG": null
     },
     {
@@ -1975,7 +1990,9 @@ export const PRICING = {
       "usd": [
         20
       ],
-      "inrG": null,
+      "inrG": [
+        600
+      ],
       "usdG": null
     },
     {
@@ -1987,7 +2004,9 @@ export const PRICING = {
       "usd": [
         20
       ],
-      "inrG": null,
+      "inrG": [
+        600
+      ],
       "usdG": null
     },
     {
@@ -2131,7 +2150,9 @@ export const PRICING = {
       "usd": [
         18
       ],
-      "inrG": null,
+      "inrG": [
+        600
+      ],
       "usdG": null
     },
     {
@@ -2143,7 +2164,9 @@ export const PRICING = {
       "usd": [
         18
       ],
-      "inrG": null,
+      "inrG": [
+        600
+      ],
       "usdG": null
     },
     {
@@ -2165,7 +2188,9 @@ export const PRICING = {
       "usd": [
         18
       ],
-      "inrG": null,
+      "inrG": [
+        600
+      ],
       "usdG": null
     },
     {
@@ -2177,7 +2202,9 @@ export const PRICING = {
       "usd": [
         18
       ],
-      "inrG": null,
+      "inrG": [
+        600
+      ],
       "usdG": null
     }
   ],
