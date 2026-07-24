@@ -414,8 +414,8 @@ export default function CourseDetailPage() {
               <span className="rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20">1:1 Personalised Session</span>
             </div>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link to={`/book-demo?subject=${encodeURIComponent(course.name)}`} className="rounded-[11px] bg-[#D4AF37] px-6 py-3 text-sm font-bold text-[#0B1220] shadow-lg shadow-[#D4AF37]/25 transition hover:brightness-105">Book a Free Demo</Link>
-              <Link to="/plans-pricing" className="rounded-[11px] border-[1.5px] border-white/50 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10">View Plans &amp; Pricing</Link>
+              <Link to={`/book-demo?subject=${encodeURIComponent(course.name)}`} className="rounded-[11px] bg-[#D4AF37] px-6 py-3 text-sm font-bold text-[#0B1220] shadow-lg shadow-[#D4AF37]/25 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#D4AF37]/40 hover:brightness-105">Book a Free Demo</Link>
+              <Link to="/plans-pricing" className="rounded-[11px] border-[1.5px] border-white/50 px-6 py-3 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-white/10 hover:shadow-lg hover:shadow-black/25">View Plans &amp; Pricing</Link>
             </div>
           </div>
         </div>
