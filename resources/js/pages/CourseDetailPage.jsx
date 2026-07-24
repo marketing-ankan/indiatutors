@@ -9,7 +9,7 @@ import { fetchCourse, fetchCourses, inr } from '../lib/api.js';
 import { cart, wishlist, useWishlist, cartItemOf } from '../lib/cart.js';
 import {
   buildPriceMatrix, CARD_FEATURES, WORKSHOPS, PARENTS, TEACHERS,
-  ACHIEVEMENTS, BLOG_POSTS, WHATSAPP_TESTIMONIALS, INSTAGRAM, STUDENT_WINS,
+  ACHIEVEMENT_PHOTOS, BLOG_POSTS, WHATSAPP_TESTIMONIALS, INSTAGRAM, STUDENT_WINS,
   JOURNEY, TRUST_POINTS, WHY_CHOOSE, ACADEMIC_REQUIREMENTS, overviewFor,
   COURSE_FAQS,
 } from '../data/courseDetail.js';
@@ -66,6 +66,39 @@ function TeachersCarousel() {
             ))}
           </div>
           <Arrow dir={1} side="-right-3" Icon={ChevronRight} label="Next teachers" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Student Achievements — WinQuest-parity photo carousel: large portrait photo
+// cards on a scroll-snap rail with prev/next arrows (same pattern as the
+// teachers carousel). Photos are placeholders until real ones are provided.
+function AchievementsCarousel() {
+  const rail = useRef(null);
+  const page = (dir) => rail.current?.scrollBy({ left: dir * rail.current.clientWidth * 0.85, behavior: 'smooth' });
+  const Arrow = ({ dir, side, Icon, label }) => (
+    <button type="button" onClick={() => page(dir)} aria-label={label}
+      className={`absolute top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg ring-1 ring-black/5 transition hover:bg-[#D4AF37] hover:text-[#0B1220] md:flex ${side}`}>
+      <Icon className="h-5 w-5" />
+    </button>
+  );
+  return (
+    <section className="py-14 bg-white">
+      <div className="container-wide">
+        <SectionHead>Student Achievements</SectionHead>
+        <p className="-mt-6 mb-9 text-center text-slate-500">Making an Impact: 🏆 Student Achievements That Shine | 🌱 Your Growth. Our Mission.</p>
+        <div className="relative">
+          <Arrow dir={-1} side="-left-3" Icon={ChevronLeft} label="Previous achievements" />
+          <div ref={rail} className="flex gap-4 overflow-x-auto scroll-smooth snap-x pb-2 scrollbar-hide sm:gap-6">
+            {ACHIEVEMENT_PHOTOS.map((src, i) => (
+              <figure key={src} className="group flex-shrink-0 snap-start w-[72%] sm:w-[340px] overflow-hidden rounded-2xl border border-[#E7E7EF] bg-white shadow-[0_4px_18px_rgba(6,30,67,.10)] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                <img src={src} alt={`Student achievement ${i + 1}`} loading="lazy" className="aspect-[3/4] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+              </figure>
+            ))}
+          </div>
+          <Arrow dir={1} side="-right-3" Icon={ChevronRight} label="Next achievements" />
         </div>
       </div>
     </section>
@@ -524,22 +557,10 @@ export default function CourseDetailPage() {
         </div>
       </section>
 
-      {/* STUDENT ACHIEVEMENTS — WinQuest order: right after Recent Student Wins */}
-      <section className="py-14 bg-white">
-        <div className="container-wide">
-          <SectionHead>Student Achievements</SectionHead>
-          <p className="text-center text-slate-500 -mt-6 mb-9">Highlighting excellence across all disciplines</p>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {ACHIEVEMENTS.map(a => (
-              <div key={a.name} className="rounded-[14px] border border-[#E7E7EF] p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <span className="inline-block rounded-full bg-brand-600 text-white text-[11px] font-bold uppercase tracking-wide px-3 py-1">{a.tag}</span>
-                <span className="mt-3 block font-heading font-bold text-slate-900">{a.name}</span>
-                <span className="mt-0.5 block text-xs text-slate-500">{a.detail}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* STUDENT ACHIEVEMENTS — WinQuest order: right after Recent Student Wins.
+          Photo carousel (WinQuest-parity); placeholder photos until real
+          Indiatutors student photos are provided. */}
+      <AchievementsCarousel />
 
       {/* FREE WORKSHOPS */}
       <section className="py-14 bg-white">

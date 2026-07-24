@@ -158,6 +158,20 @@ export const TEACHERS = [
   { name: 'Arpan Sen', img: '/build/images/teachers/arpan-sen.webp' },
 ];
 
+// Student Achievements photo gallery (WinQuest-parity carousel). PLACEHOLDER
+// photos copied from the sister brand's section per user instruction
+// (2026-07-24) — replace with real Indiatutors student photos when provided.
+// Self-hosted under public/images/achievements (shipped via /build/images).
+export const ACHIEVEMENT_PHOTOS = [
+  "/build/images/achievements/win-1.png",
+  "/build/images/achievements/win-2.png",
+  "/build/images/achievements/win-3.png",
+  "/build/images/achievements/win-4.webp",
+  "/build/images/achievements/win-5.png",
+  "/build/images/achievements/win-6.png",
+  "/build/images/achievements/win-7.png",
+];
+
 export const ACHIEVEMENTS = [
   { tag: 'Distinction', name: 'Aisha R.', detail: 'Grade 1 · Music Theory' },
   { tag: 'Runner-up', name: 'Zaid A.', detail: 'Chess State Tournament' },
