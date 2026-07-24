@@ -507,6 +507,40 @@ export default function CourseDetailPage() {
       {/* MEET OUR TEACHERS — WinQuest order: right after Student Reviews */}
       <TeachersCarousel />
 
+      {/* RECENT STUDENT WINS — WinQuest order: right after Meet our Teachers */}
+      <section className="py-14 bg-[#FAFBFE]">
+        <div className="container-wide">
+          <SectionHead>Recent Student Wins</SectionHead>
+          <p className="text-center text-slate-500 -mt-6 mb-9">Real, verified results from Indiatutors students this year 🇮🇳🏆</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {STUDENT_WINS.map(w => (
+              <div key={w.name} className="rounded-[14px] border border-[#E7E7EF] bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                <span className="inline-block rounded-full bg-green-100 text-green-700 text-[11px] font-bold uppercase tracking-wide px-3 py-1">{w.tag}</span>
+                <span className="mt-3 block font-heading font-bold text-slate-900 leading-snug">{w.name}</span>
+                <span className="mt-1 block text-xs text-slate-500 leading-snug">{w.detail}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* STUDENT ACHIEVEMENTS — WinQuest order: right after Recent Student Wins */}
+      <section className="py-14 bg-white">
+        <div className="container-wide">
+          <SectionHead>Student Achievements</SectionHead>
+          <p className="text-center text-slate-500 -mt-6 mb-9">Highlighting excellence across all disciplines</p>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {ACHIEVEMENTS.map(a => (
+              <div key={a.name} className="rounded-[14px] border border-[#E7E7EF] p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                <span className="inline-block rounded-full bg-brand-600 text-white text-[11px] font-bold uppercase tracking-wide px-3 py-1">{a.tag}</span>
+                <span className="mt-3 block font-heading font-bold text-slate-900">{a.name}</span>
+                <span className="mt-0.5 block text-xs text-slate-500">{a.detail}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FREE WORKSHOPS */}
       <section className="py-14 bg-white">
         <div className="container-wide">
@@ -584,40 +618,6 @@ export default function CourseDetailPage() {
             <span className="mx-auto mb-4 w-16 h-16 rounded-full bg-white/20 flex items-center justify-center"><Play className="h-7 w-7 fill-white" /></span>
             <p className="text-white/90">Sample class videos coming soon — book a free demo to experience a live session.</p>
             <Link to="/book-demo" className="mt-5 inline-flex rounded-lg bg-white text-brand-700 px-6 py-2.5 text-sm font-bold hover:bg-slate-100">Book a Free Demo →</Link>
-          </div>
-        </div>
-      </section>
-
-      {/* RECENT STUDENT WINS */}
-      <section className="py-14 bg-[#FAFBFE]">
-        <div className="container-wide">
-          <SectionHead>Recent Student Wins</SectionHead>
-          <p className="text-center text-slate-500 -mt-6 mb-9">Real, verified results from Indiatutors students this year 🇮🇳🏆</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {STUDENT_WINS.map(w => (
-              <div key={w.name} className="rounded-[14px] border border-[#E7E7EF] bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <span className="inline-block rounded-full bg-green-100 text-green-700 text-[11px] font-bold uppercase tracking-wide px-3 py-1">{w.tag}</span>
-                <span className="mt-3 block font-heading font-bold text-slate-900 leading-snug">{w.name}</span>
-                <span className="mt-1 block text-xs text-slate-500 leading-snug">{w.detail}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* STUDENT ACHIEVEMENTS */}
-      <section className="py-14 bg-white">
-        <div className="container-wide">
-          <SectionHead>Student Achievements</SectionHead>
-          <p className="text-center text-slate-500 -mt-6 mb-9">Highlighting excellence across all disciplines</p>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {ACHIEVEMENTS.map(a => (
-              <div key={a.name} className="rounded-[14px] border border-[#E7E7EF] p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <span className="inline-block rounded-full bg-brand-600 text-white text-[11px] font-bold uppercase tracking-wide px-3 py-1">{a.tag}</span>
-                <span className="mt-3 block font-heading font-bold text-slate-900">{a.name}</span>
-                <span className="mt-0.5 block text-xs text-slate-500">{a.detail}</span>
-              </div>
-            ))}
           </div>
         </div>
       </section>
