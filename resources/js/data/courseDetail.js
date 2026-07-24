@@ -70,6 +70,21 @@ export const STUDENT_WINS = [
   { icon: '🎹', title: 'Trinity Grade 5 — Distinction', name: 'Ananya T. · Piano', detail: '94/100 in the Trinity College London exam · started as a beginner with us' },
 ];
 
+// "About Indiatutors Online" tab — stat tiles + a 3-step "How it works" flow,
+// so the default tab fills the desktop column attractively (and stacks on
+// mobile) instead of a lone paragraph. India-centric.
+export const ABOUT_STATS = [
+  { icon: '📚', num: '100+', label: 'Subjects & skills' },
+  { icon: '🎓', num: '10,000+', label: 'Classes delivered' },
+  { icon: '⭐', num: '4.9/5', label: 'Average rating' },
+  { icon: '🎁', num: 'Free', label: 'First demo class' },
+];
+export const ABOUT_STEPS = [
+  { t: 'Book a free demo', d: 'Pick a subject and a slot that suits you — no card, no commitment.' },
+  { t: 'Meet your tutor', d: 'A verified mentor understands your child and plans a personalised path.' },
+  { t: 'Learn & track progress', d: 'Live classes, practice worksheets and a monthly progress report.' },
+];
+
 // "Why Choose" card grid (WinQuest-parity tab content, India-centric — Indian
 // boards only, no US/international curricula, available across India).
 export const WHY_CHOOSE = [

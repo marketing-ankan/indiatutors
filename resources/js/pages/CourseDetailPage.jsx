@@ -11,7 +11,7 @@ import {
   buildPriceMatrix, CARD_FEATURES, WORKSHOPS, PARENTS, FAMILY_NOTES, TEACHERS,
   ACHIEVEMENT_PHOTOS, BLOG_POSTS, WHATSAPP_TESTIMONIALS, INSTAGRAM, STUDENT_WINS,
   TRUST_POINTS, WHY_CHOOSE, ACADEMIC_REQUIREMENTS, overviewFor,
-  COURSE_FAQS, CHANNEL_VIDEOS, YOUTUBE_CHANNEL_URL,
+  COURSE_FAQS, CHANNEL_VIDEOS, YOUTUBE_CHANNEL_URL, ABOUT_STATS, ABOUT_STEPS,
 } from '../data/courseDetail.js';
 import { imageFor } from '../data/courseImages.js';
 
@@ -444,6 +444,31 @@ export default function CourseDetailPage() {
               <>
                 <h3 className="text-lg font-bold text-slate-900">About Indiatutors Online</h3>
                 <p>Indiatutors Online is a live tutoring marketplace connecting students with verified, expert educators across 100+ subjects. Every class is live and interactive, with a personalised curriculum, regular practice and a progress tracker after each session — and your first demo class is always free.</p>
+
+                {/* Stat tiles — fills the desktop column beside the tall buy card */}
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {ABOUT_STATS.map(s => (
+                    <div key={s.label} className="rounded-xl border border-[#E7E7EF] bg-white p-4 text-center transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+                      <span className="block text-2xl">{s.icon}</span>
+                      <span className="mt-1 block font-heading text-xl font-extrabold text-brand-700">{s.num}</span>
+                      <span className="block text-xs text-slate-500">{s.label}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* How it works — 3 numbered steps */}
+                <h4 className="pt-2 font-bold text-slate-900">How it works</h4>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {ABOUT_STEPS.map((s, i) => (
+                    <div key={s.t} className="rounded-xl border border-[#E7E7EF] bg-white p-4">
+                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 font-heading text-sm font-bold text-white">{i + 1}</span>
+                      <h5 className="mt-2.5 text-sm font-bold text-slate-900">{s.t}</h5>
+                      <p className="mt-1 text-sm leading-relaxed text-slate-600">{s.d}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <Link to={`/book-demo?subject=${encodeURIComponent(course.name)}`} className="inline-flex rounded-[10px] bg-[#D4AF37] px-6 py-2.5 text-sm font-bold text-[#0B1220] shadow-md shadow-[#D4AF37]/25 transition-all duration-300 hover:-translate-y-0.5 hover:brightness-105">Book your free demo →</Link>
               </>
             )}
             {tab === 1 && (
