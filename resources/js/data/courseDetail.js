@@ -3,6 +3,8 @@
 // testimonials, teachers, achievements, blog). These are identical across every
 // product on the live site, so they live here rather than in the course API.
 
+import { PRICING } from './pricing.js';
+
 const UP = 'https://indiatutorsonline.com/wp-content/uploads/';
 
 // Course slugs offered as Group classes on the live site. For these, the catalog
@@ -195,13 +197,51 @@ export const INSTAGRAM = {
   ],
 };
 
-// Builds the live-style One-to-One / Group × Beginner/Intermediate/Advanced price
-// matrix from a single catalog base price (the lowest / "from" rate).
-export function buildPriceMatrix(base, slug) {
-  const isGroup = GROUP_SLUGS.has(slug);
+// Course-name → PRICING.rates row lookup, so the product-page buy card shows
+// the OFFICIAL per-level rates from the "IN Plan and Pricing" PDF rather than
+// a synthetic ×1.5/×2 ladder (which only coincides with the PDF for the
+// standard 600/900/1200 subjects — music, Java, cello etc. differ).
+// Long-title variant courses map onto their base subject via RATE_ALIASES.
+const normName = t => t.toLowerCase().replace(/[^a-z0-9]+/g, '');
+const RATE_ALIASES = {
+  'customizedonlineguitarlessonsforkidsbasicstomastery': 'Guitar',
+  'onlinepianokeyboardclassesforkidsandbeginners': 'Piano',
+  'pythonprogrammingforkidscodeyourfirstprojects': 'Python',
+  'pythonprogrammingforbeginners': 'Python',
+  'artificialintelligencemachinelearning': 'AI & ML',
+  'roboticscomputationalthinking': 'Robotics',
+  'algebraifoundation': 'Algebra I',
+  'chessstrategymindsports': 'Chess',
+  'violinviolalessonsforbeginners': 'Violin',
+  'satpsatmathmastery': 'Math SAT/PSAT',
+};
+function rateRowFor(name) {
+  if (!name) return null;
+  const key = normName(RATE_ALIASES[normName(name)] || name);
+  return PRICING.rates.find(r => normName(r.name) === key) || null;
+}
+
+// Builds the One-to-One / Group × Beginner/Intermediate/Advanced price matrix.
+// Preferred source: the official INR rates (per the IN pricing PDF) matched by
+// course name — Group appears exactly when the PDF lists a group rate.
+// Fallback (unmatched names, e.g. Spoken English): the previous synthetic
+// ladder from the catalog base price (base ×1 / ×1.5 / ×2; Group = half).
+export function buildPriceMatrix(base, slug, name) {
   const LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
-  const mult = [1, 1.5, 2];
   const grossOf = net => Math.round((net / 0.6) / 10) * 10; // ~40% off, rounded
+  const row = rateRowFor(name);
+  if (row && Array.isArray(row.inr) && row.inr.length) {
+    const pick = (arr, i) => arr[Math.min(i, arr.length - 1)];
+    const matrix = { 'One-to-One': {} };
+    LEVELS.forEach((lv, i) => { const net = pick(row.inr, i); matrix['One-to-One'][lv] = { net, gross: grossOf(net) }; });
+    if (Array.isArray(row.inrG) && row.inrG.length) {
+      matrix['Group'] = {};
+      LEVELS.forEach((lv, i) => { const net = pick(row.inrG, i); matrix['Group'][lv] = { net, gross: grossOf(net) }; });
+    }
+    return { matrix, plans: Object.keys(matrix), levels: LEVELS };
+  }
+  const isGroup = GROUP_SLUGS.has(slug);
+  const mult = [1, 1.5, 2];
   const tier = (unit, m) => { const net = Math.round(unit * m); return { net, gross: grossOf(net) }; };
   // For group-enabled courses base = Group-Beginner and One-to-One is 2×.
   const groupUnit = isGroup ? base : base / 2;

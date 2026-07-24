@@ -73,8 +73,8 @@ function TeachersCarousel() {
 // ---------------------------------------------------------------- BUY CARD ---
 function BuyCard({ course }) {
   const { matrix, plans, levels } = useMemo(
-    () => buildPriceMatrix(course.effective_price || course.regular_price || 0, course.slug),
-    [course.slug, course.effective_price, course.regular_price]
+    () => buildPriceMatrix(course.effective_price || course.regular_price || 0, course.slug, course.name),
+    [course.slug, course.name, course.effective_price, course.regular_price]
   );
   const [plan, setPlan] = useState(plans[0]);
   const [level, setLevel] = useState(0);
