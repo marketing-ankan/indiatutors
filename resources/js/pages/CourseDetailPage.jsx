@@ -480,15 +480,6 @@ export default function CourseDetailPage() {
         <BuyCard course={course} />
       </div>
 
-      {/* COURSE REVIEWS — live order: reviews come right after the tabs, before the FAQ */}
-      <section className="py-14 bg-[#FAFBFE]">
-        <div className="container-wide">
-          <SectionHead>Course Reviews</SectionHead>
-          <p className="text-center text-slate-500 mb-8">No reviews yet — be the first to share your experience with this course.</p>
-          <ReviewForm />
-        </div>
-      </section>
-
       {/* OTHER COURSES */}
       {related.length > 0 && (
         <section className="py-14 bg-[#FAFBFE]">
@@ -500,6 +491,18 @@ export default function CourseDetailPage() {
           </div>
         </section>
       )}
+
+      {/* STUDENT REVIEWS — WinQuest order: right after Other Courses */}
+      <section className="py-14 bg-white">
+        <div className="container-wide">
+          <SectionHead>Student Reviews</SectionHead>
+          <div className="mx-auto mb-8 max-w-4xl rounded-2xl border border-[#E7E7EF] px-6 py-10 text-center">
+            <span className="mb-2 block text-2xl text-[#D4AF37]">☆</span>
+            <p className="text-slate-500">No reviews yet — be the first to share your experience with this course!</p>
+          </div>
+          <ReviewForm />
+        </div>
+      </section>
 
       {/* FREE WORKSHOPS */}
       <section className="py-14 bg-white">
