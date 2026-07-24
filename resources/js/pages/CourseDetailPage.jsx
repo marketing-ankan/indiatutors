@@ -8,7 +8,7 @@ import {
 import { fetchCourse, fetchCourses, inr } from '../lib/api.js';
 import { cart, wishlist, useWishlist, cartItemOf } from '../lib/cart.js';
 import {
-  buildPriceMatrix, CARD_FEATURES, WORKSHOPS, PARENTS, TEACHERS,
+  buildPriceMatrix, CARD_FEATURES, WORKSHOPS, PARENTS, FAMILY_NOTES, TEACHERS,
   ACHIEVEMENT_PHOTOS, BLOG_POSTS, WHATSAPP_TESTIMONIALS, INSTAGRAM, STUDENT_WINS,
   JOURNEY, TRUST_POINTS, WHY_CHOOSE, ACADEMIC_REQUIREMENTS, overviewFor,
   COURSE_FAQS,
@@ -584,38 +584,40 @@ export default function CourseDetailPage() {
           Indiatutors student photos are provided. */}
       <AchievementsCarousel />
 
-      {/* FREE WORKSHOPS */}
-      <section className="py-14 bg-white">
+      {/* WHAT OUR PARENTS SAY ABOUT US — WinQuest-parity spotlight cards */}
+      <section className="py-14 bg-[#FAFBFE]">
         <div className="container-wide">
-          <SectionHead>Free Workshops</SectionHead>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {WORKSHOPS.map(w => (
-              <div key={w.t} className="rounded-[14px] bg-white border border-[#E7E7EF] overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                <div className="h-[140px] bg-gradient-to-br from-brand-600 to-brand-800" />
-                <div className="p-5 flex flex-col flex-1">
-                  <h3 className="font-heading font-bold text-slate-900">{w.t}</h3>
-                  <p className="mt-1 text-sm text-slate-500 flex-1">{w.d}</p>
-                  <Link to="/events-workshops" className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-brand-600 hover:text-brand-700">Attend <ChevronRight className="h-4 w-4" /></Link>
-                </div>
-              </div>
+          <SectionHead>What Our Parents Say About Us</SectionHead>
+          <p className="-mt-6 mb-9 text-center text-slate-500">👨‍👩‍👧 Real Results. Real Parent Voices. 🏆 Futures Built with Care</p>
+          <div className="flex gap-5 overflow-x-auto snap-x pb-2 scrollbar-hide">
+            {PARENTS.map(p => (
+              <figure key={p.name} className="relative flex-shrink-0 snap-start w-[86%] sm:w-[46%] lg:w-[31.5%] rounded-2xl bg-white border border-[#E7E7EF] p-6 shadow-[0_4px_18px_rgba(6,30,67,.08)]">
+                <figcaption className="flex items-center gap-3">
+                  <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-600 to-brand-800 font-heading text-lg font-bold text-white ring-2 ring-[#D4AF37] ring-offset-2">{p.init}</span>
+                  <span>
+                    <strong className="block font-heading text-slate-900">{p.name}</strong>
+                    <span className="block text-xs text-slate-500">{p.role}</span>
+                  </span>
+                </figcaption>
+                <div className="mt-3 text-[#D4AF37]" aria-label="5/5">★★★★★</div>
+                <blockquote className="mt-2 rounded-xl border-l-4 border-[#D4AF37] bg-[#FAFBFE] p-4 text-sm italic leading-relaxed text-slate-600">{p.quote}</blockquote>
+              </figure>
             ))}
           </div>
         </div>
       </section>
 
-      {/* WHAT OUR PARENTS SAY */}
-      <section className="py-14 bg-[#FAFBFE]">
+      {/* WHAT FAMILIES SAY — WinQuest-parity notes rail */}
+      <section className="py-14 bg-white">
         <div className="container-wide">
-          <SectionHead>What Our Parents Say</SectionHead>
-          <div className="flex gap-5 overflow-x-auto snap-x pb-2 scrollbar-hide">
-            {PARENTS.map(p => (
-              <figure key={p.name} className="flex-shrink-0 snap-start w-[86%] sm:w-[46%] lg:w-[31.5%] rounded-2xl bg-white border border-[#E7E7EF] p-6">
-                <div className="text-[#D4AF37] mb-2" aria-label="5/5">★★★★★</div>
-                <blockquote className="text-sm text-slate-600 leading-relaxed">{p.quote}</blockquote>
-                <figcaption className="mt-4 flex items-center gap-3">
-                  <span className="w-9 h-9 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold text-sm">{p.init}</span>
-                  <span><strong className="block text-sm text-slate-900">{p.name}</strong><span className="block text-xs text-slate-500">{p.place}</span></span>
-                </figcaption>
+          <SectionHead>What Families Say</SectionHead>
+          <p className="-mt-6 mb-9 text-center text-slate-500">In their own words — recent notes from Indiatutors parents &amp; students 💙</p>
+          <div className="flex gap-4 overflow-x-auto snap-x pb-2 scrollbar-hide">
+            {FAMILY_NOTES.map(f => (
+              <figure key={f.name} className="flex-shrink-0 snap-start w-[80%] sm:w-[340px] rounded-2xl border border-[#E7E7EF] bg-white p-6 shadow-sm">
+                <div className="text-[#D4AF37]" aria-label="5/5">★ ★ ★ ★ ★</div>
+                <blockquote className="mt-3 border-l-2 border-slate-200 pl-4 text-sm italic leading-relaxed text-slate-600">“{f.quote}”</blockquote>
+                <figcaption className="mt-3 pl-4 text-xs font-semibold text-slate-500">— {f.name}</figcaption>
               </figure>
             ))}
           </div>
@@ -705,6 +707,25 @@ export default function CourseDetailPage() {
               className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#F58529] via-[#DD2A7B] to-[#8134AF] px-6 py-2.5 text-sm font-bold text-white hover:brightness-105">
               <Instagram className="h-4 w-4" /> Follow @{INSTAGRAM.handle}
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* FREE WORKSHOPS — last content section (user-requested order) */}
+      <section className="py-14 bg-[#FAFBFE]">
+        <div className="container-wide">
+          <SectionHead>Free Workshops</SectionHead>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {WORKSHOPS.map(w => (
+              <div key={w.t} className="rounded-[14px] bg-white border border-[#E7E7EF] overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <div className="h-[140px] bg-gradient-to-br from-brand-600 to-brand-800" />
+                <div className="p-5 flex flex-col flex-1">
+                  <h3 className="font-heading font-bold text-slate-900">{w.t}</h3>
+                  <p className="mt-1 text-sm text-slate-500 flex-1">{w.d}</p>
+                  <Link to="/events-workshops" className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-brand-600 hover:text-brand-700">Attend <ChevronRight className="h-4 w-4" /></Link>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

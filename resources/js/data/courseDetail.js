@@ -122,11 +122,25 @@ export const TRUST_POINTS = [
   '⭐ 4.9 / 5 from 1,200+ reviews',
 ];
 
+// "What Our Parents Say About Us" — WinQuest-parity spotlight cards (avatar,
+// name, role line, stars, first-person quote). India-centric PLACEHOLDER
+// voices — replace with real parent testimonials when provided.
 export const PARENTS = [
-  { init: 'P', quote: 'My daughter went from shy to confident in three months. The 1:1 attention made all the difference.', name: 'Priya S.', place: 'Parent · Bengaluru' },
-  { init: 'R', quote: 'Flexible timings actually worked around our schedule, and the mentor genuinely cared about progress.', name: 'Rahul M.', place: 'Parent · Delhi' },
-  { init: 'A', quote: 'The free demo convinced us. Six months in, my son looks forward to every single class.', name: 'Anita K.', place: 'Parent · Kolkata' },
-  { init: 'D', quote: 'Across time zones it still felt personal. Clear updates and real improvement we could see.', name: 'David T.', place: 'Parent · Dubai' },
+  { init: 'P', name: 'Priya Subramanian', role: "Parent of Aditi · Class 10 Maths (CBSE)", quote: 'I am so proud to share that Aditi scored 96 in her Class 10 Maths pre-boards! 🙌 Sunita Ma\'am explains every concept until it truly clicks. Huge thanks to Indiatutors for such a fantastic learning experience!' },
+  { init: 'R', name: 'Rahul Mehta', role: "Parent of Arjun · 'Our Scratch (Coding) Student'", quote: "Arjun built his first three games in Scratch and now he's asking for Python! 🚀 He's getting appreciation everywhere for his coding projects. Thank you for making learning feel like play." },
+  { init: 'A', name: 'Anita Kulkarni', role: "Parent of Advika · 'Our Chess Student'", quote: 'We are thrilled to share that Advika secured 1st place in the U-14 district championship! ♟️ Thank you, Indiatutors, for providing such an amazing platform for young minds to grow and shine.' },
+  { init: 'D', name: 'Deepa Nair', role: 'Parent of Ananya · Piano (Trinity)', quote: "Ananya cleared Trinity Grade 5 with Distinction — 94/100! 🎹 Her teacher's patience and structured practice plans made all the difference. We couldn't be happier." },
+];
+
+// "What Families Say" — short first-person notes rail (WinQuest-parity).
+// India-centric PLACEHOLDER quotes — swap for real notes when available.
+export const FAMILY_NOTES = [
+  { quote: "I'm truly grateful for such an incredible teacher for Tanish. The support in keeping him focused on his ICSE syllabus has been amazing.", name: 'Sharmila B. · Kolkata' },
+  { quote: 'Thank you so much for teaching Ishaan and for all your support through the academic year — he cleared his Class 8 finals with 92%.', name: 'Vikram S. · Pune' },
+  { quote: "She scored 100 in Standard Maths — we're delighted! Next year she'll start JEE foundation with the same mentor.", name: 'Kavitha R. · Chennai' },
+  { quote: 'Meera reached the national round of NSO this year. Thank you for your guidance and all-time support with Olympiad practice.', name: 'Suresh M. · Hyderabad' },
+  { quote: 'Dhruv has been selected for the accelerated Maths batch for 2026! Thank you for believing in him from day one.', name: 'Pooja D. · Bengaluru' },
+  { quote: 'The recorded sessions are a lifesaver during exam season — revision became so much easier for both my kids.', name: 'Farhan A. · Mumbai' },
 ];
 
 // "Meet our Teachers" carousel — the full mentor roster shown on every product
@@ -169,9 +183,6 @@ export const ACHIEVEMENT_PHOTOS = [
   "/build/images/achievements/win-2.png",
   "/build/images/achievements/win-3.png",
   "/build/images/achievements/win-4.webp",
-  "/build/images/achievements/win-5.png",
-  "/build/images/achievements/win-6.png",
-  "/build/images/achievements/win-7.png",
 ];
 
 export const ACHIEVEMENTS = [
