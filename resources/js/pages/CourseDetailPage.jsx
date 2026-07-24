@@ -5,7 +5,7 @@ import {
   CheckCircle2, Video, Users, Calendar, Clock, Baby, Star, Heart, Download,
   Phone, Mail, Play, ShoppingCart, ChevronLeft, ChevronRight, MessageCircle, Instagram, Youtube,
 } from 'lucide-react';
-import { fetchCourse, fetchCourses, inr } from '../lib/api.js';
+import { fetchCourse, fetchCourses, fetchSocialYoutube, fetchSocialInstagram, inr } from '../lib/api.js';
 import { cart, wishlist, useWishlist, cartItemOf } from '../lib/cart.js';
 import {
   buildPriceMatrix, CARD_FEATURES, WORKSHOPS, PARENTS, FAMILY_NOTES, TEACHERS,
@@ -66,6 +66,49 @@ function TeachersCarousel() {
             ))}
           </div>
           <Arrow dir={1} side="-right-3" Icon={ChevronRight} label="Next teachers" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Instagram Feed — real latest posts via /api/social/instagram once the
+// account's Graph API token is configured (they then auto-refresh hourly as
+// new posts land); branded placeholder tiles linking to the profile until then.
+function InstagramFeed() {
+  const { data } = useQuery({ queryKey: ['social-instagram'], queryFn: fetchSocialInstagram, staleTime: 3600_000 });
+  const posts = data?.configured ? (data.data || []) : [];
+  return (
+    <section className="py-14 bg-white">
+      <div className="container-wide">
+        <SectionHead>Instagram Feed</SectionHead>
+        <p className="text-center text-slate-500 -mt-6 mb-9">A glimpse into our classes, creativity &amp; student success — straight from our Instagram 📷✨</p>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8">
+          {posts.length > 0
+            ? posts.slice(0, 8).map(p => (
+              <a key={p.id} href={p.permalink} target="_blank" rel="noopener noreferrer"
+                className="group relative aspect-square overflow-hidden rounded-xl bg-slate-100">
+                <img src={p.image} alt={p.caption || 'Instagram post'} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.05]" />
+                <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/30 group-hover:opacity-100">
+                  <Instagram className="h-6 w-6 text-white" />
+                </span>
+              </a>
+            ))
+            : INSTAGRAM.posts.map((p, i) => (
+              <a key={i} href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"
+                className={`group relative flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br ${p.tint} text-4xl transition-transform duration-300 hover:scale-[1.03]`}>
+                <span>{p.emoji}</span>
+                <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/30 group-hover:opacity-100">
+                  <Instagram className="h-6 w-6 text-white" />
+                </span>
+              </a>
+            ))}
+        </div>
+        <div className="mt-8 text-center">
+          <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#F58529] via-[#DD2A7B] to-[#8134AF] px-6 py-2.5 text-sm font-bold text-white hover:brightness-105">
+            <Instagram className="h-4 w-4" /> Follow @{INSTAGRAM.handle}
+          </a>
         </div>
       </div>
     </section>
@@ -178,6 +221,9 @@ function BuyCard({ course }) {
   const cell = matrix[plan]?.[levels[level]] || { net: 0, gross: 0 };
   const nav = useNavigate();
   const wished = useWishlist().some(w => w.slug === course.slug);
+  // Top-viewed channel videos (server-ranked); static list until loaded.
+  const { data: ytVideos } = useQuery({ queryKey: ['social-youtube'], queryFn: fetchSocialYoutube, staleTime: 3600_000 });
+  const videos = (ytVideos?.length >= 3 ? ytVideos : CHANNEL_VIDEOS).slice(0, 5);
 
   return (
     <aside className="rounded-2xl bg-white shadow-lg ring-1 ring-slate-100 overflow-hidden lg:sticky lg:top-24">
@@ -256,13 +302,15 @@ function BuyCard({ course }) {
           </div>
         </div>
 
-        {/* Videos — top uploads from the Indiatutors Online YouTube channel */}
+        {/* Videos — the channel's top-viewed uploads, fetched live from
+            /api/social/youtube (server-cached, re-ranked as views change);
+            falls back to the baked CHANNEL_VIDEOS list until it loads. */}
         <div className="pt-3 border-t border-slate-100">
           <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Videos</p>
-          <VideoThumb id={CHANNEL_VIDEOS[0].id} title={CHANNEL_VIDEOS[0].title} len={CHANNEL_VIDEOS[0].len} />
-          <p className="mt-1.5 mb-3 text-[13px] font-semibold leading-snug text-slate-700">{CHANNEL_VIDEOS[0].title}</p>
+          <VideoThumb id={videos[0].id} title={videos[0].title} len={videos[0].len} />
+          <p className="mt-1.5 mb-3 text-[13px] font-semibold leading-snug text-slate-700">{videos[0].title}</p>
           <div className="grid grid-cols-2 gap-2">
-            {CHANNEL_VIDEOS.slice(1, 5).map(v => (
+            {videos.slice(1, 5).map(v => (
               <div key={v.id}>
                 <VideoThumb id={v.id} title={v.title} len={v.len} />
                 <p className="mt-1 text-[11px] font-semibold leading-snug text-slate-600 line-clamp-2">{v.title}</p>
@@ -734,29 +782,7 @@ export default function CourseDetailPage() {
       </section>
 
       {/* INSTAGRAM FEED */}
-      <section className="py-14 bg-white">
-        <div className="container-wide">
-          <SectionHead>Instagram Feed</SectionHead>
-          <p className="text-center text-slate-500 -mt-6 mb-9">A glimpse into our classes, creativity &amp; student success — straight from our Instagram 📷✨</p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8">
-            {INSTAGRAM.posts.map((p, i) => (
-              <a key={i} href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"
-                className={`group relative flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br ${p.tint} text-4xl transition-transform duration-300 hover:scale-[1.03]`}>
-                <span>{p.emoji}</span>
-                <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/30 group-hover:opacity-100">
-                  <Instagram className="h-6 w-6 text-white" />
-                </span>
-              </a>
-            ))}
-          </div>
-          <div className="mt-8 text-center">
-            <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#F58529] via-[#DD2A7B] to-[#8134AF] px-6 py-2.5 text-sm font-bold text-white hover:brightness-105">
-              <Instagram className="h-4 w-4" /> Follow @{INSTAGRAM.handle}
-            </a>
-          </div>
-        </div>
-      </section>
+      <InstagramFeed />
 
       {/* FREE WORKSHOPS — last content section (user-requested order) */}
       <section className="py-14 bg-[#FAFBFE]">

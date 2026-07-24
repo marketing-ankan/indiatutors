@@ -51,4 +51,16 @@ return [
         'embed_host' => env('BUNNY_STREAM_EMBED_HOST', 'iframe.mediadelivery.net'),
     ],
 
+    // Social feeds on the course page. YouTube needs no credentials — the
+    // channel /videos page is fetched + parsed server-side (cached) so the
+    // top-viewed videos update automatically. Instagram posts require a
+    // Graph API access token from the account owner; without it the frontend
+    // shows branded placeholder tiles linking to the profile.
+    'youtube' => [
+        'channel_url' => env('YOUTUBE_CHANNEL_URL', 'https://www.youtube.com/@IndiantutorsOnline/videos'),
+    ],
+    'instagram' => [
+        'token' => env('INSTAGRAM_ACCESS_TOKEN'),
+    ],
+
 ];

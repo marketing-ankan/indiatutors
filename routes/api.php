@@ -38,6 +38,10 @@ Route::get('/cities/{slug}',     [CityController::class, 'show']);
 Route::get('/posts',             [BlogController::class, 'index']);
 Route::get('/posts/{slug}',      [BlogController::class, 'show'])->name('api.posts.show');
 
+// Social feeds (cached server-side; see SocialFeedController)
+Route::get('/social/youtube',   [\App\Http\Controllers\Api\SocialFeedController::class, 'youtube']);
+Route::get('/social/instagram', [\App\Http\Controllers\Api\SocialFeedController::class, 'instagram']);
+
 Route::get('/events',            [EventController::class, 'index']);
 Route::get('/events/{slug}',     [EventController::class, 'show'])->name('api.events.show');
 
