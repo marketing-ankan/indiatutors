@@ -76,7 +76,7 @@ class SocialFeedController extends Controller {
     }
 
     public function instagram() {
-        $token = config('services.instagram.token');
+        $token = $this->instagramToken();
         if (!$token) return response()->json(['configured' => false, 'data' => []]);
 
         $posts = Cache::remember('social:instagram-latest', now()->addHour(), function () use ($token) {
@@ -101,5 +101,36 @@ class SocialFeedController extends Controller {
             }
         });
         return response()->json(['configured' => true, 'data' => $posts]);
+    }
+
+    /**
+     * The live Instagram token — seeded from INSTAGRAM_ACCESS_TOKEN and then
+     * self-renewing so it never expires. Instagram long-lived tokens last 60
+     * days and can be refreshed once they're ≥24h old; we refresh at most once
+     * a day (a cache lock is the throttle) and keep the refreshed token in the
+     * cache. On day one the seed token is used as-is; from ~24h on, each daily
+     * refresh extends it another 60 days. Refresh failures are swallowed — the
+     * last good token keeps working.
+     */
+    private function instagramToken(): ?string {
+        $seed = config('services.instagram.token');
+        if (!$seed) return null;
+        $token = Cache::get('social:instagram-token', $seed);
+
+        if (Cache::add('social:instagram-token-refreshed', 1, now()->addDay())) {
+            try {
+                $resp = Http::timeout(10)->get('https://graph.instagram.com/refresh_access_token', [
+                    'grant_type'   => 'ig_refresh_token',
+                    'access_token' => $token,
+                ])->json();
+                if (!empty($resp['access_token'])) {
+                    $token = $resp['access_token'];
+                    Cache::put('social:instagram-token', $token, now()->addDays(58));
+                }
+            } catch (\Throwable $e) {
+                // keep the current token; retry tomorrow
+            }
+        }
+        return $token;
     }
 }
