@@ -1,16 +1,16 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-DEIoify4.css",
+    "file": "assets/app-BAr3-K6K.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/main.jsx": {
-    "file": "assets/main-DnlRCbSj.js",
+    "file": "assets/main-Dek4WSCt.js",
     "name": "main",
     "src": "resources/js/main.jsx",
     "isEntry": true,
     "css": [
-      "assets/app-DEIoify4.css"
+      "assets/app-BAr3-K6K.css"
     ]
   }
 }

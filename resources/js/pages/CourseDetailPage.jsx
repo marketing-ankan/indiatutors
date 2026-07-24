@@ -72,6 +72,42 @@ function TeachersCarousel() {
   );
 }
 
+// Recent Student Wins — WinQuest-parity carousel: white cards with a gold top
+// edge, an emoji icon, the win as a bold brand-coloured headline, the student
+// name line and a muted detail line, on a scroll-snap rail with arrows.
+function StudentWinsCarousel() {
+  const rail = useRef(null);
+  const page = (dir) => rail.current?.scrollBy({ left: dir * rail.current.clientWidth * 0.85, behavior: 'smooth' });
+  const Arrow = ({ dir, side, Icon, label }) => (
+    <button type="button" onClick={() => page(dir)} aria-label={label}
+      className={`absolute top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg ring-1 ring-black/5 transition hover:bg-[#D4AF37] hover:text-[#0B1220] md:flex ${side}`}>
+      <Icon className="h-5 w-5" />
+    </button>
+  );
+  return (
+    <section className="py-14 bg-[#FAFBFE]">
+      <div className="container-wide">
+        <SectionHead>Recent Student Wins</SectionHead>
+        <p className="-mt-6 mb-9 text-center text-slate-500">Real, verified results from Indiatutors students this year 🇮🇳🏆</p>
+        <div className="relative">
+          <Arrow dir={-1} side="-left-3" Icon={ChevronLeft} label="Previous wins" />
+          <div ref={rail} className="flex gap-4 overflow-x-auto scroll-smooth snap-x pb-2 scrollbar-hide sm:gap-5">
+            {STUDENT_WINS.map(w => (
+              <div key={w.title} className="flex-shrink-0 snap-start w-[80%] sm:w-[290px] rounded-2xl border-t-[3px] border-[#D4AF37] bg-white p-5 shadow-[0_4px_18px_rgba(6,30,67,.08)] ring-1 ring-[#E7E7EF] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                <span className="block text-2xl">{w.icon}</span>
+                <h3 className="mt-2 font-heading text-[17px] font-extrabold leading-snug text-brand-700">{w.title}</h3>
+                <p className="mt-2 text-sm font-bold text-slate-900">{w.name}</p>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-slate-500">{w.detail}</p>
+              </div>
+            ))}
+          </div>
+          <Arrow dir={1} side="-right-3" Icon={ChevronRight} label="Next wins" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // Student Achievements — WinQuest-parity photo carousel: large portrait photo
 // cards on a scroll-snap rail with prev/next arrows (same pattern as the
 // teachers carousel). Photos are placeholders until real ones are provided.
@@ -541,21 +577,7 @@ export default function CourseDetailPage() {
       <TeachersCarousel />
 
       {/* RECENT STUDENT WINS — WinQuest order: right after Meet our Teachers */}
-      <section className="py-14 bg-[#FAFBFE]">
-        <div className="container-wide">
-          <SectionHead>Recent Student Wins</SectionHead>
-          <p className="text-center text-slate-500 -mt-6 mb-9">Real, verified results from Indiatutors students this year 🇮🇳🏆</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {STUDENT_WINS.map(w => (
-              <div key={w.name} className="rounded-[14px] border border-[#E7E7EF] bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <span className="inline-block rounded-full bg-green-100 text-green-700 text-[11px] font-bold uppercase tracking-wide px-3 py-1">{w.tag}</span>
-                <span className="mt-3 block font-heading font-bold text-slate-900 leading-snug">{w.name}</span>
-                <span className="mt-1 block text-xs text-slate-500 leading-snug">{w.detail}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <StudentWinsCarousel />
 
       {/* STUDENT ACHIEVEMENTS — WinQuest order: right after Recent Student Wins.
           Photo carousel (WinQuest-parity); placeholder photos until real

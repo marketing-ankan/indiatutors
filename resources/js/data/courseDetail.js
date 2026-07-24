@@ -55,17 +55,19 @@ export const WORKSHOPS = [
   { t: 'CBSE Board Exam Crash Course', d: 'Last-mile revision for Classes 10 & 12 — sample papers, marking schemes and time-management drills.' },
 ];
 
-// Recent student wins (India-centric, WinQuest-parity section). PLACEHOLDER
-// results — replace with real, verified student outcomes when available.
+// Recent student wins — WinQuest-parity carousel cards: emoji icon, bold win
+// headline, "Name · Grade/Subject" line and a muted detail line. Content is
+// India-centric (boards, NTSE/Olympiads, JEE/NEET, chess, Trinity music).
+// PLACEHOLDER results — replace with real, verified outcomes when available.
 export const STUDENT_WINS = [
-  { tag: 'Top 1%', name: 'Aarav S. · Class 10', detail: 'NTSE Stage 1 · qualified for Stage 2' },
-  { tag: 'State Rank 12', name: 'Ishita M. · Class 12', detail: 'ICSE Board Exams · 97.2%' },
-  { tag: 'Gold', name: 'Rohan K. · Class 8', detail: 'SOF International Maths Olympiad (IMO)' },
-  { tag: '99.1 %ile', name: 'Vivaan P. · Class 12', detail: 'JEE Main · qualified for Advanced' },
-  { tag: 'District Topper', name: 'Ananya R. · Class 10', detail: 'State Board · 96.8%' },
-  { tag: 'Qualified', name: 'Sneha T. · Class 12', detail: 'NEET UG · govt. college admission' },
-  { tag: 'Rank 3', name: 'Kabir J. · Class 6', detail: 'National Science Olympiad (NSO)' },
-  { tag: '+2 grades', name: 'Diya N. · Class 8', detail: 'Advanced two grade levels in Maths in a year' },
+  { icon: '🥇', title: 'Top 1% in the country', name: 'Aarav S. · Class 10 Maths', detail: 'NTSE Stage 1 cleared on the first attempt · now preparing for Stage 2' },
+  { icon: '🎓', title: '97.2% in ICSE Boards', name: 'Ishita M. · Class 12', detail: 'School topper in English & Economics · Kolkata' },
+  { icon: '🏅', title: 'Gold — Maths Olympiad', name: 'Rohan K. · Class 8', detail: 'SOF IMO gold medal · international rank inside the top 50' },
+  { icon: '📈', title: '99.1 percentile in JEE Main', name: 'Vivaan P. · Class 12', detail: 'Qualified for JEE Advanced after a year of 1:1 Physics & Maths' },
+  { icon: '👑', title: 'District Chess Champion', name: 'Advika R. · U-14 Chess', detail: 'District title + 180 rating points gained in one season' },
+  { icon: '💯', title: '100/100 in Standard Maths', name: 'Meera J. · Class 10', detail: 'CBSE Board exam centum · school’s only perfect score this year' },
+  { icon: '🔬', title: 'State Rank 3 — Science Olympiad', name: 'Kabir J. · Class 6', detail: 'NSO state rank 3 · selected for the national round' },
+  { icon: '🎹', title: 'Trinity Grade 5 — Distinction', name: 'Ananya T. · Piano', detail: '94/100 in the Trinity College London exam · started as a beginner with us' },
 ];
 
 // "Why Choose" card grid (WinQuest-parity tab content, India-centric — Indian
