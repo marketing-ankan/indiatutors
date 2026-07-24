@@ -504,6 +504,9 @@ export default function CourseDetailPage() {
         </div>
       </section>
 
+      {/* MEET OUR TEACHERS — WinQuest order: right after Student Reviews */}
+      <TeachersCarousel />
+
       {/* FREE WORKSHOPS */}
       <section className="py-14 bg-white">
         <div className="container-wide">
@@ -572,9 +575,6 @@ export default function CourseDetailPage() {
           </div>
         </div>
       </section>
-
-      {/* MEET OUR TEACHERS — WinQuest-parity portrait carousel */}
-      <TeachersCarousel />
 
       {/* DEMO OF OUR CLASSES */}
       <section className="py-14 bg-[#FAFBFE]">
