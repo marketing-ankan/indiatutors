@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { JOURNEY } from '../data/courseDetail.js';
 
 // Global pre-footer band the live site shows on every marketing page.
 // Hidden on the app routes (dashboard / admin / login) where the live site
@@ -17,6 +18,17 @@ export default function MarketplaceBand() {
         <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
           <Link to="/book-demo" className="rounded-xl bg-[#D4AF37] text-[#0B1220] px-7 py-3 text-sm font-bold shadow-lg shadow-[#D4AF37]/30 hover:brightness-105">📅 Book a Free Demo</Link>
           <Link to="/find-tutors" className="rounded-xl border border-white/60 px-7 py-3 text-sm font-bold hover:bg-white/10">👩‍🏫 Find a Tutor</Link>
+        </div>
+
+        {/* Feature cards (relocated here from the course-page closing CTA) */}
+        <div className="mt-10 grid gap-4 text-left sm:grid-cols-2 lg:grid-cols-4">
+          {JOURNEY.map(j => (
+            <div key={j.t} className="rounded-2xl bg-white/[.06] p-5 ring-1 ring-white/10">
+              <div className="text-2xl">{j.icon}</div>
+              <h3 className="mt-2 font-bold">{j.t}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-slate-300">{j.d}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
