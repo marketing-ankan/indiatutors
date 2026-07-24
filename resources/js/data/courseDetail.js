@@ -192,6 +192,20 @@ export const ACHIEVEMENTS = [
   { tag: 'Top 1%', name: 'Meera N.', detail: 'Spoken English' },
 ];
 
+// Top uploads from the Indiatutors Online YouTube channel, shown in the buy
+// card's "Videos" panel (WinQuest-parity). Ordered by views. Thumbnails are
+// served from YouTube's CDN (i.ytimg.com) and play inline via a nocookie
+// embed. Refresh this list when the channel's popular videos change.
+export const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@IndiantutorsOnline/videos';
+export const CHANNEL_VIDEOS = [
+  { id: '9_ECn8SAuSo', title: 'DIY Princess Crown — Easy Paper Crown for Kids', len: '1:22' },
+  { id: 'G_9RIBCM80E', title: 'How to Draw a Lion — Easy Step-by-Step for Kids', len: '10:46' },
+  { id: 'gUYjrjEjyzA', title: 'Mermaid Watercolour Painting for Beginners', len: '16:46' },
+  { id: '4yjo8nrmlGc', title: 'Mandala in the Clouds — Step by Step', len: '15:02' },
+  { id: 'BLKRdEgJGOg', title: 'Paper Folding Carrot & Bunny', len: '6:59' },
+  { id: 'cSFfJLWctI4', title: 'Splash Art Landscape Painting for Beginners', len: '16:25' },
+];
+
 // "Latest News and Resources" cards (WinQuest-parity section). Cover photos
 // self-hosted under public/images/news (from the sister brand); titles and
 // excerpts India-adapted (no NRI/abroad framing). Cards link to /blog until

@@ -3,7 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   CheckCircle2, Video, Users, Calendar, Clock, Baby, Star, Heart, Download,
-  Phone, Mail, Play, ShoppingCart, ChevronLeft, ChevronRight, MessageCircle, Instagram,
+  Phone, Mail, Play, ShoppingCart, ChevronLeft, ChevronRight, MessageCircle, Instagram, Youtube,
 } from 'lucide-react';
 import { fetchCourse, fetchCourses, inr } from '../lib/api.js';
 import { cart, wishlist, useWishlist, cartItemOf } from '../lib/cart.js';
@@ -11,7 +11,7 @@ import {
   buildPriceMatrix, CARD_FEATURES, WORKSHOPS, PARENTS, FAMILY_NOTES, TEACHERS,
   ACHIEVEMENT_PHOTOS, BLOG_POSTS, WHATSAPP_TESTIMONIALS, INSTAGRAM, STUDENT_WINS,
   TRUST_POINTS, WHY_CHOOSE, ACADEMIC_REQUIREMENTS, overviewFor,
-  COURSE_FAQS,
+  COURSE_FAQS, CHANNEL_VIDEOS, YOUTUBE_CHANNEL_URL,
 } from '../data/courseDetail.js';
 import { imageFor } from '../data/courseImages.js';
 
@@ -141,6 +141,32 @@ function AchievementsCarousel() {
   );
 }
 
+// YouTube facade for the buy-card Videos panel: shows the channel thumbnail
+// with a play button; clicking swaps to an inline privacy-friendly autoplay
+// embed. Cross-origin, so the service worker passes it through and (no CSP)
+// nothing blocks it.
+function VideoThumb({ id, title, len }) {
+  const [play, setPlay] = useState(false);
+  return (
+    <div className="group relative aspect-video overflow-hidden rounded-lg bg-slate-900">
+      {play ? (
+        <iframe className="absolute inset-0 h-full w-full" src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`}
+          title={title} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen />
+      ) : (
+        <button type="button" onClick={() => setPlay(true)} aria-label={`Play: ${title}`} className="absolute inset-0 h-full w-full">
+          <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+          <span className="absolute inset-0 flex items-center justify-center bg-black/10">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FF0000] text-white shadow-lg transition group-hover:scale-110">
+              <Play className="h-5 w-5 translate-x-0.5 fill-white" />
+            </span>
+          </span>
+          {len && <span className="absolute bottom-1 right-1 rounded bg-black/80 px-1 py-0.5 text-[10px] font-semibold text-white">{len}</span>}
+        </button>
+      )}
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------- BUY CARD ---
 function BuyCard({ course }) {
   const { matrix, plans, levels } = useMemo(
@@ -230,18 +256,22 @@ function BuyCard({ course }) {
           </div>
         </div>
 
-        {/* Videos */}
+        {/* Videos — top uploads from the Indiatutors Online YouTube channel */}
         <div className="pt-3 border-t border-slate-100">
           <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Videos</p>
-          {[['Profile Video', 'Book a free demo to meet our mentors'], ['Demo Video', 'Book a free demo to see a live class'], ['Course Videos', 'Preview coming soon — book a free demo']].map(([h, t]) => (
-            <div key={h} className="mb-2">
-              <p className="text-[11px] font-semibold text-slate-400 mb-1">{h}</p>
-              <Link to="/book-demo" className="flex items-center gap-2 rounded-lg bg-slate-50 hover:bg-slate-100 px-3 py-2 text-sm text-slate-600">
-                <span className="w-6 h-6 rounded-full bg-brand-600 text-white flex items-center justify-center text-[10px] shrink-0"><Play className="h-3 w-3 fill-white" /></span>
-                {t}
-              </Link>
-            </div>
-          ))}
+          <VideoThumb id={CHANNEL_VIDEOS[0].id} title={CHANNEL_VIDEOS[0].title} len={CHANNEL_VIDEOS[0].len} />
+          <p className="mt-1.5 mb-3 text-[13px] font-semibold leading-snug text-slate-700">{CHANNEL_VIDEOS[0].title}</p>
+          <div className="grid grid-cols-2 gap-2">
+            {CHANNEL_VIDEOS.slice(1, 5).map(v => (
+              <div key={v.id}>
+                <VideoThumb id={v.id} title={v.title} len={v.len} />
+                <p className="mt-1 text-[11px] font-semibold leading-snug text-slate-600 line-clamp-2">{v.title}</p>
+              </div>
+            ))}
+          </div>
+          <a href={YOUTUBE_CHANNEL_URL} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-brand-600 hover:text-brand-700">
+            <Youtube className="h-4 w-4" /> Visit our YouTube channel →
+          </a>
         </div>
       </div>
     </aside>
