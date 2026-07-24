@@ -55,11 +55,13 @@ function TeachersCarousel() {
         <p className="-mt-6 mb-9 text-center text-slate-500">Expert educators who connect, guide, and prepare students with special personalised care ❤️📚✨</p>
         <div className="relative">
           <Arrow dir={-1} side="-left-3" Icon={ChevronLeft} label="Previous teachers" />
-          <div ref={rail} className="flex gap-4 overflow-x-auto scroll-smooth snap-x pb-2 scrollbar-hide">
+          {/* Card geometry matches WinQuest's slider at desktop: 229px-wide
+              portrait cards (223:300 image ≈ 229×308) with ~40px between. */}
+          <div ref={rail} className="flex gap-4 overflow-x-auto scroll-smooth snap-x pb-2 scrollbar-hide sm:gap-10">
             {TEACHERS.map(t => (
-              <figure key={t.name} className="group flex-shrink-0 snap-start w-[46%] sm:w-[178px] overflow-hidden rounded-2xl border border-[#E7E7EF] bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-brand-300">
+              <figure key={t.name} className="group flex-shrink-0 snap-start w-[46%] sm:w-[229px] overflow-hidden rounded-2xl border border-[#E7E7EF] bg-white shadow-[0_4px_18px_rgba(6,30,67,.10)] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-brand-300">
                 <img src={t.img} alt={t.name} loading="lazy" className="aspect-[223/300] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]" />
-                <figcaption className="py-3 text-center font-heading text-sm font-bold text-[#0B1220]">{t.name}</figcaption>
+                <figcaption className="py-3.5 text-center font-heading text-[15px] font-bold text-[#0B1220]">{t.name}</figcaption>
               </figure>
             ))}
           </div>
