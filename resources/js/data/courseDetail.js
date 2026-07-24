@@ -192,8 +192,14 @@ export const ACHIEVEMENTS = [
   { tag: 'Top 1%', name: 'Meera N.', detail: 'Spoken English' },
 ];
 
+// "Latest News and Resources" cards (WinQuest-parity section). Cover photos
+// self-hosted under public/images/news (from the sister brand); titles and
+// excerpts India-adapted (no NRI/abroad framing). Cards link to /blog until
+// the full articles are authored locally.
 export const BLOG_POSTS = [
-  { slug: 'hello-world', date: 'April 16, 2026', title: 'Hello world!', excerpt: 'Welcome to WordPress. This is your first post. Edit or delete it, then start writing!' },
+  { img: '/build/images/news/coding.png', date: 'July 16, 2026', title: "What's the Best Age for a Child to Start Coding? An Honest Guide for Parents", excerpt: 'If you work in tech, you have probably wondered whether your child should be coding by now. Ads…' },
+  { img: '/build/images/news/bilingual.png', date: 'July 16, 2026', title: 'How to Raise a Bilingual Child: What Actually Works (From Families Who\'ve Done It)', excerpt: 'You say something in Hindi — or Tamil, Telugu, Kannada, Bengali — and your child answers in flawless English…' },
+  { img: '/build/images/news/regional-language.png', date: 'July 16, 2026', title: 'Teaching Telugu (or Any Regional Language) to Kids: A Practical Playbook', excerpt: 'Your mother calls from Hyderabad and asks why her grandchildren answer only in English. Sound familiar?…' },
 ];
 
 // WhatsApp-style testimonials (WinQuest product-page parity). PLACEHOLDER copy —

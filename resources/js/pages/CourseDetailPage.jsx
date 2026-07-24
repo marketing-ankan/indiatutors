@@ -655,30 +655,22 @@ export default function CourseDetailPage() {
         </div>
       </section>
 
-      {/* DEMO OF OUR CLASSES */}
+      {/* LATEST NEWS AND RESOURCES — WinQuest-parity (replaces From Our Blog;
+          the Demo of Our Classes section was removed, matching WinQuest). */}
       <section className="py-14 bg-[#FAFBFE]">
         <div className="container-wide">
-          <SectionHead>Demo of Our Classes</SectionHead>
-          <div className="rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 text-white text-center px-6 py-16 max-w-4xl mx-auto">
-            <span className="mx-auto mb-4 w-16 h-16 rounded-full bg-white/20 flex items-center justify-center"><Play className="h-7 w-7 fill-white" /></span>
-            <p className="text-white/90">Sample class videos coming soon — book a free demo to experience a live session.</p>
-            <Link to="/book-demo" className="mt-5 inline-flex rounded-lg bg-white text-brand-700 px-6 py-2.5 text-sm font-bold hover:bg-slate-100">Book a Free Demo →</Link>
-          </div>
-        </div>
-      </section>
-
-      {/* FROM OUR BLOG */}
-      <section className="py-14 bg-[#FAFBFE]">
-        <div className="container-wide">
-          <SectionHead>From Our Blog</SectionHead>
+          <SectionHead>Latest News and Resources</SectionHead>
+          <p className="-mt-6 mb-9 text-center text-sm font-semibold text-slate-600">📰 Learning Updates <span className="text-slate-300">|</span> 📘 Tips <span className="text-slate-300">|</span> 🎓 Resources <span className="text-slate-300">|</span> 💻 Online Courses</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {BLOG_POSTS.map(b => (
-              <Link key={b.slug} to={`/blog/${b.slug}`} className="group rounded-[14px] bg-white border border-[#E7E7EF] overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                <span className="block h-[160px] bg-gradient-to-br from-[#C7BDF5] to-brand-600" />
+              <Link key={b.title} to="/blog" className="group rounded-[14px] bg-white border border-[#E7E7EF] overflow-hidden flex flex-col shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <span className="block h-[190px] overflow-hidden">
+                  <img src={b.img} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
+                </span>
                 <span className="p-5 flex flex-col flex-1">
-                  <span className="text-xs text-slate-400">{b.date}</span>
-                  <span className="mt-1 font-heading font-bold text-slate-900">{b.title}</span>
-                  <span className="mt-1 text-sm text-slate-500">{b.excerpt}</span>
+                  <span className="text-xs font-bold text-brand-600">{b.date}</span>
+                  <span className="mt-1.5 font-heading font-bold leading-snug text-slate-900">{b.title}</span>
+                  <span className="mt-2 text-sm leading-relaxed text-slate-500">{b.excerpt}</span>
                 </span>
               </Link>
             ))}
