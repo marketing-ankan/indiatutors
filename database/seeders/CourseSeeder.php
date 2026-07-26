@@ -2,7 +2,9 @@
 namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Course;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class CourseSeeder extends Seeder {
@@ -18,6 +20,23 @@ class CourseSeeder extends Seeder {
             return;
         }
 
+        // Self-heal the curriculum_variants column. On Hostinger the deploy's
+        // `migrate` step is flaky, so the column can be missing even though the
+        // migration is committed — and then EVERY upsert below would throw
+        // "Unknown column", leaving the whole catalog without curriculum. Create
+        // it here (idempotent) so the seeder is self-sufficient; if creation
+        // fails for any reason, $hasVariants stays false and we simply skip
+        // writing that one field (CBSE curriculum still seeds).
+        $hasVariants = Schema::hasColumn('courses', 'curriculum_variants');
+        if (!$hasVariants) {
+            try {
+                Schema::table('courses', fn (Blueprint $t) => $t->json('curriculum_variants')->nullable()->after('curriculum'));
+                $hasVariants = true;
+            } catch (\Throwable $e) {
+                $this->command->warn('curriculum_variants column missing and could not be created; skipping variants.');
+            }
+        }
+
         // Slugs present in the source (WP post_name).
         $sourceSlugs = array_map(fn ($d) => ($d['slug'] ?? '') ?: Str::slug($d['name']), $courses);
 
@@ -30,26 +49,26 @@ class CourseSeeder extends Seeder {
         $categoryCache = [];
         foreach ($courses as $data) {
             $slug = ($data['slug'] ?? '') ?: Str::slug($data['name']);
-            $course = Course::updateOrCreate(
-                ['slug' => $slug],
-                [
-                    'sku'               => $data['sku'] ?? null,
-                    'name'              => $data['name'],
-                    'subtitle'          => $data['subtitle'] ?? null,
-                    'short_description' => $data['short_description'] ?? '',
-                    'description'       => $data['description'] ?? '',
-                    'age'               => $data['age'] ?? null,
-                    'pills'             => $data['pills'] ?? [],
-                    'curriculum'        => $data['curriculum'] ?? [],
-                    'curriculum_variants' => $data['curriculum_variants'] ?? null,
-                    'regular_price'     => $data['regular_price'] ?? 0,
-                    'sale_price'        => ($data['sale_price'] ?? null) ?: null,
-                    'image_url'         => $data['image_url'] ?: null,
-                    'is_featured'       => (bool)($data['is_featured'] ?? false),
-                    'is_published'      => true,
-                    'position'          => (int)($data['position'] ?? 0),
-                ]
-            );
+            $attrs = [
+                'sku'               => $data['sku'] ?? null,
+                'name'              => $data['name'],
+                'subtitle'          => $data['subtitle'] ?? null,
+                'short_description' => $data['short_description'] ?? '',
+                'description'       => $data['description'] ?? '',
+                'age'               => $data['age'] ?? null,
+                'pills'             => $data['pills'] ?? [],
+                'curriculum'        => $data['curriculum'] ?? [],
+                'regular_price'     => $data['regular_price'] ?? 0,
+                'sale_price'        => ($data['sale_price'] ?? null) ?: null,
+                'image_url'         => $data['image_url'] ?: null,
+                'is_featured'       => (bool)($data['is_featured'] ?? false),
+                'is_published'      => true,
+                'position'          => (int)($data['position'] ?? 0),
+            ];
+            // Only write curriculum_variants when the column is present (see the
+            // self-heal above) so a missing column can never abort the seed.
+            if ($hasVariants) $attrs['curriculum_variants'] = $data['curriculum_variants'] ?? null;
+            $course = Course::updateOrCreate(['slug' => $slug], $attrs);
 
             // Resolve hierarchical categories from "Parent > Child" chains
             $ids = [];
