@@ -1,7 +1,18 @@
 import { useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchCategoriesTree, fetchCourses } from '../lib/api.js';
+import { cart, cartItemOf } from '../lib/cart.js';
+
+// Sidebar emoji per top-level category (WinQuest shop parity); 📘 fallback.
+const CAT_EMOJI = {
+  'musical-instruments': '🎸', 'vocal-music': '🎤', 'it-technologies': '💻',
+  'it-technologies-for-kids': '💻', 'coding': '💻', 'mind-sports': '♟️',
+  'creative-skills': '🎨', 'dance': '💃', 'languages': '🌐', 'music': '🎵',
+  'academics-elementary-middle-school': '🎒', 'academics-high-school': '🏫',
+  'academics': '📚', 'standardized-tests': '📝', 'abacus': '🧮',
+  'vedic-maths': '➗', 'spoken-english': '🗣️',
+};
 
 // "Our Courses" — ported from the live /shop page: hero banner, Browse
 // Categories sidebar, and an accordion of course cards (chips · About · Key
@@ -27,12 +38,15 @@ const LEVELS = ['Beginner','Intermediate','Advanced'];
 const inr = n => '₹' + Math.round(n).toLocaleString('en-IN');
 
 function CourseAccordion({ c, open, onToggle }) {
+  const nav = useNavigate();
   const now = c.effective_price || c.regular_price || 0;
   const was = Math.ceil((now / 0.6) / 50) * 50;   // 40% off model, rounded up to ₹50
-  const batches = pick(c.slug + 'b', 65, 200);
-  const ongoing = pick(c.slug + 'o', 10, 26);
+  const enrolled = pick(c.slug + 'e', 300, 800);  // WinQuest-style counters
+  const ongoing = pick(c.slug + 'o', 120, 400);
   const weeks = [8, 12][seed(c.slug + 'w') % 2];
   const rootCat = c.categories?.[0]?.name;
+  // Level split of the enrolled count (≈50/35/15), stable per slug.
+  const lvlCount = { Beginner: Math.round(enrolled * 0.5), Intermediate: Math.round(enrolled * 0.35), Advanced: Math.max(10, Math.round(enrolled * 0.15)) };
 
   return (
     <article className={`rounded-2xl bg-white ring-1 overflow-hidden ${open ? 'ring-brand-200 shadow-md' : 'ring-slate-100 shadow-sm'}`}>
@@ -40,7 +54,7 @@ function CourseAccordion({ c, open, onToggle }) {
         <div className="min-w-0">
           <h3 className="font-extrabold text-slate-900">{c.name}</h3>
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
-            <span className="rounded-full bg-slate-100 text-slate-600 px-2.5 py-1 text-[11px] font-semibold">🔁 {batches} Batches done</span>
+            <span className="rounded-full bg-slate-100 text-slate-600 px-2.5 py-1 text-[11px] font-semibold">🎓 {enrolled} Students Enrolled</span>
             <span className="rounded-full bg-slate-100 text-slate-600 px-2.5 py-1 text-[11px] font-semibold">🟢 {ongoing} Ongoing</span>
             {c.age && <span className="rounded-full bg-slate-100 text-slate-600 px-2.5 py-1 text-[11px] font-semibold">👧 {c.age}</span>}
             <span className="rounded-full bg-slate-100 text-slate-600 px-2.5 py-1 text-[11px] font-semibold">📅 {weeks} Weeks</span>
@@ -72,96 +86,22 @@ function CourseAccordion({ c, open, onToggle }) {
               {LEVELS.map(lvl => (
                 <div key={lvl} className="rounded-xl ring-1 ring-slate-100 bg-slate-50 p-3">
                   <p className="font-bold text-sm text-slate-800">{lvl}</p>
-                  <p className="text-xs text-slate-500 mt-1">👥 {pick(c.slug + lvl, 10, 15)} students</p>
-                  <p className="text-xs text-slate-500 mt-0.5">{SCHEDULES[seed(c.slug + lvl) % SCHEDULES.length]}</p>
+                  <p className="text-xs text-slate-500 mt-1">👥 {lvlCount[lvl]} students</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Flexible scheduling</p>
                 </div>
               ))}
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
               <Link to={`/book-demo?subject=${encodeURIComponent(c.name)}`} className="rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700">Book a Free Demo</Link>
               <Link to={`/courses/${c.slug}`} className="rounded-lg ring-1 ring-slate-200 px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50">View Details</Link>
+              <button type="button" onClick={() => { cart.add(cartItemOf(c)); nav('/cart'); }}
+                className="rounded-lg bg-[#D4AF37] text-[#0B1220] px-4 py-2 text-sm font-bold hover:brightness-105">Book Now</button>
               {rootCat && <span className="ml-auto self-center text-[11px] font-semibold text-slate-400 uppercase tracking-wide">{rootCat}</span>}
             </div>
           </div>
         </div>
       )}
     </article>
-  );
-}
-
-// Category archive — mirrors the live /product-category/* template:
-// dark hero with breadcrumb + title, child-category pills, image-card grid
-// ("From ₹now ₹was 40% OFF · View course →"). No sidebar, exactly like live.
-function CategoryArchive({ located, categories, courses, isLoading }) {
-  const node = located?.node;
-  const root = located?.root;
-  const isChild = node && root && node.slug !== root.slug;
-  // Pills: the parent's children (siblings when viewing a child), active highlighted.
-  const pills = (root?.children?.length ? root.children : categories.find(c=>c.slug===node?.slug)?.children) || [];
-  const gross = (now) => Math.ceil((now / 0.6) / 50) * 50;
-
-  return (
-    <>
-      {/* HERO with breadcrumb, like ito-br-hero */}
-      <section className="bg-gradient-to-br from-[#0B1220] via-brand-900 to-brand-800 text-white">
-        <div className="container-wide py-14 text-center">
-          <nav className="text-sm text-slate-300 flex items-center justify-center gap-2 flex-wrap">
-            <Link to="/" className="hover:text-white">Home</Link><span>›</span>
-            <Link to="/courses" className="hover:text-white">Courses</Link><span>›</span>
-            {isChild && <><Link to={`/courses?category=${root.slug}`} className="hover:text-white">{root.name}</Link><span>›</span></>}
-            <strong className="text-white">{node?.name}</strong>
-          </nav>
-          <h1 className="mt-4 text-4xl sm:text-5xl font-extrabold tracking-tight">{node?.name}</h1>
-          <span className="mt-4 inline-block h-1 w-14 rounded bg-[#D4AF37]"/>
-        </div>
-      </section>
-
-      <div className="container-wide py-8">
-        {/* CHILD-CATEGORY PILLS (ito-br-subs) */}
-        {pills.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
-            {pills.map(p => (
-              <Link key={p.id} to={`/courses?category=${p.slug}`}
-                className={`rounded-full px-4 py-1.5 text-sm font-semibold ring-1 ${p.slug===node?.slug ? 'bg-brand-600 text-white ring-brand-600' : 'bg-white text-brand-700 ring-slate-200 hover:ring-brand-400'}`}>
-                {p.name}
-              </Link>
-            ))}
-          </div>
-        )}
-
-        {/* CARD GRID (ito-br-grid) */}
-        {isLoading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">{Array.from({length:8}).map((_,i)=><div key={i} className="rounded-xl bg-slate-100 h-64 animate-pulse"/>)}</div>
-        ) : courses.length ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {courses.map(c => {
-              const now = c.effective_price || c.regular_price || 0;
-              return (
-                <Link key={c.id} to={`/courses/${c.slug}`} className="group rounded-xl bg-white ring-1 ring-slate-200 shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
-                  {c.image_url
-                    ? <span className="block h-36 bg-cover bg-center" style={{ backgroundImage:`url('${c.image_url}')` }}/>
-                    : <span className="flex h-36 items-center justify-center text-5xl font-extrabold text-white bg-gradient-to-br from-brand-700 to-brand-900">{c.name[0]}</span>}
-                  <span className="block p-4">
-                    <span className="block font-extrabold text-slate-900 leading-snug">{c.name}</span>
-                    {now > 0 && (
-                      <span className="mt-2 flex items-center flex-wrap gap-1.5 text-sm">
-                        <span className="text-slate-500">From</span>
-                        <span className="font-extrabold text-brand-700">{inr(now)}</span>
-                        <span className="text-xs text-slate-400 line-through">{inr(gross(now))}</span>
-                        <span className="rounded bg-green-100 text-green-700 px-1.5 py-0.5 text-[11px] font-bold">40% OFF</span>
-                      </span>
-                    )}
-                    <span className="mt-2 block text-sm font-bold text-brand-600 group-hover:text-brand-700">View course →</span>
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
-        ) : (
-          <p className="text-center py-16 text-slate-500">No courses in this category yet.</p>
-        )}
-      </div>
-    </>
   );
 }
 
@@ -193,20 +133,10 @@ export default function CoursesPage() {
   // First card open by default (like the live page), until the user picks another.
   const effectiveOpen = openSlug ?? courses[0]?.slug;
 
-  // Category views use the live /product-category/* archive template;
-  // the plain /courses view keeps the /shop accordion.
-  if (category) {
-    return (
-      <div className="bg-slate-50 min-h-[60vh]">
-        <CategoryArchive located={located} categories={categories} courses={courses} isLoading={isLoading} />
-      </div>
-    );
-  }
-
   const CatButton = ({ c, child = false }) => (
     <button onClick={()=>setParam('category', c.slug)}
       className={`w-full text-left rounded flex justify-between items-center gap-2 ${child ? 'pl-6 pr-2 py-1 text-[13px]' : 'px-2 py-1.5 text-sm'} ${category===c.slug?'bg-brand-50 text-brand-700 font-semibold':'text-slate-700 hover:bg-slate-50'}`}>
-      <span className="truncate">{c.name}</span>
+      <span className="truncate">{!child && <span className="mr-1.5">{CAT_EMOJI[c.slug] || '📘'}</span>}{c.name}</span>
       {c.course_count != null && <span className="text-xs text-slate-400 shrink-0">{c.course_count}</span>}
     </button>
   );
@@ -247,6 +177,13 @@ export default function CoursesPage() {
                   </li>
                 ))}
               </ul>
+            </div>
+
+            {/* Promo box (WinQuest shop parity) */}
+            <div className="rounded-xl bg-gradient-to-br from-[#0B1220] to-brand-800 p-4 text-white">
+              <p className="text-sm font-bold">🎁 First demo class is free</p>
+              <Link to="/book-demo" className="mt-3 block rounded-lg bg-[#D4AF37] px-4 py-2 text-center text-sm font-bold text-[#0B1220] hover:brightness-105">Book a Free Demo</Link>
+              <Link to="/plans-pricing" className="mt-2 block rounded-lg border border-white/50 px-4 py-2 text-center text-sm font-bold hover:bg-white/10">See Plans &amp; Pricing</Link>
             </div>
           </aside>
 
