@@ -78,7 +78,30 @@ class CourseController extends Controller {
     }
 
     public function show(string $slug) {
+        $this->selfHealCurriculum();
         $course = Course::where('slug',$slug)->published()->with('categories')->firstOrFail();
         return (new CourseResource($course))->additional(['route' => 'api.courses.show']);
+    }
+
+    /**
+     * Lazy curriculum self-heal. On Hostinger the cron deploy's DB step dies
+     * mid-script, so `db:seed` never runs there and the catalog was serving
+     * WITHOUT curriculum even though courses.json (committed) has it. Mirror
+     * of the deploy's build self-heal, but app-side: when the sentinel course
+     * (mathematics-grade-8, which always has curriculum in courses.json) has
+     * none in the DB, run the idempotent CourseSeeder once — triggered by the
+     * first product-page visit, throttled by a 6h cache lock, and never
+     * allowed to break the request.
+     */
+    private function selfHealCurriculum(): void {
+        try {
+            if (!\Illuminate\Support\Facades\Cache::add('courses:curriculum-heal-check', 1, now()->addHours(6))) return;
+            $sentinel = Course::where('slug', 'mathematics-grade-8')->first();
+            if ($sentinel && count($sentinel->curriculum ?? []) === 0) {
+                \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\CourseSeeder', '--force' => true]);
+            }
+        } catch (\Throwable $e) {
+            // Self-heal must never take the page down; retry after the lock expires.
+        }
     }
 }

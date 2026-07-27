@@ -117,4 +117,8 @@ export const COURSE_IMAGES = {
 };
 
 // Prefer a DB image_url if present, else our self-hosted copy, else null.
-export const imageFor = (course) => (course && (course.image_url || COURSE_IMAGES[course.slug])) || null;
+// Self-hosted WinQuest photo FIRST — the catalog's image_url still points at
+// the old WP uploads for many courses, which (a) isn't the WinQuest look the
+// product pages standardise on and (b) breaks at domain cutover. image_url is
+// only the fallback for the few slugs without an imported photo.
+export const imageFor = (course) => (course && (COURSE_IMAGES[course.slug] || course.image_url)) || null;

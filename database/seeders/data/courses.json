@@ -839,7 +839,75 @@
    "Mathematics",
    "Live"
   ],
-  "curriculum": [],
+  "curriculum": [
+   {
+    "title": "Math I — Linear Functions & Equations",
+    "age": "Age 13+",
+    "duration": "10 hrs",
+    "topics": [
+     "Solving linear equations and inequalities in one variable",
+     "Linear functions, slope and rate of change",
+     "Systems of linear equations — graphical and algebraic methods",
+     "Sequences as functions; arithmetic sequences",
+     "Statistics: representing and comparing one-variable data"
+    ]
+   },
+   {
+    "title": "Math I — Congruence & Coordinate Geometry",
+    "age": "Age 13+",
+    "duration": "10 hrs",
+    "topics": [
+     "Transformations: reflections, rotations, translations",
+     "Triangle congruence criteria (SSS, SAS, ASA)",
+     "Coordinate proofs — distance and midpoint",
+     "Constructions with compass and straightedge"
+    ]
+   },
+   {
+    "title": "Math II — Quadratics & Polynomials",
+    "age": "Age 14+",
+    "duration": "10 hrs",
+    "topics": [
+     "Quadratic functions — graphing, vertex and intercept forms",
+     "Solving quadratics: factoring, completing the square, quadratic formula",
+     "Complex numbers as solutions",
+     "Polynomial arithmetic and identities"
+    ]
+   },
+   {
+    "title": "Math II — Similarity, Trigonometry & Probability",
+    "age": "Age 14+",
+    "duration": "10 hrs",
+    "topics": [
+     "Similar triangles and dilations",
+     "Right-triangle trigonometry — sine, cosine, tangent",
+     "Circle theorems: arcs, chords and angles",
+     "Conditional probability and two-way tables"
+    ]
+   },
+   {
+    "title": "Math III — Functions & Modelling",
+    "age": "Age 15+",
+    "duration": "10 hrs",
+    "topics": [
+     "Polynomial, rational and radical functions",
+     "Exponential and logarithmic functions",
+     "Transformations and inverses of functions",
+     "Modelling real-world data with appropriate function families"
+    ]
+   },
+   {
+    "title": "Math III — Trigonometric Functions & Statistics",
+    "age": "Age 15+",
+    "duration": "10 hrs",
+    "topics": [
+     "Unit circle and radian measure",
+     "Graphing sine and cosine; amplitude, period, phase",
+     "Statistical inference — sampling, margin of error",
+     "Normal distributions and z-scores"
+    ]
+   }
+  ],
   "short_description": "Personalised live Integrated Math I/II/III coaching.",
   "description": "",
   "regular_price": 1200,
