@@ -3,6 +3,7 @@ import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchCategoriesTree, fetchCourses } from '../lib/api.js';
 import { cart, cartItemOf } from '../lib/cart.js';
+import SocialProofSections from '../components/SocialProofSections.jsx';
 
 // Sidebar emoji per top-level category (WinQuest shop parity); 📘 fallback.
 const CAT_EMOJI = {
@@ -236,6 +237,11 @@ export default function CoursesPage() {
           </div>
         </div>
       </div>
+
+      {/* Shared social-proof block — WinQuest renders the same sections on its
+          /shop page (teachers, wins, achievements, parents, families,
+          WhatsApp, news, Instagram). */}
+      <SocialProofSections />
     </div>
   );
 }

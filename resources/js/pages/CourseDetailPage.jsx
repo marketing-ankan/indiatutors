@@ -1,19 +1,19 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   CheckCircle2, Video, Users, Calendar, Clock, Baby, Star, Heart, Download,
-  Phone, Mail, Play, ShoppingCart, ChevronLeft, ChevronRight, MessageCircle, Instagram, Youtube,
+  Phone, Mail, Play, ShoppingCart, ChevronRight, Youtube,
 } from 'lucide-react';
-import { fetchCourse, fetchCourses, fetchSocialYoutube, fetchSocialInstagram, inr } from '../lib/api.js';
+import { fetchCourse, fetchCourses, fetchSocialYoutube, inr } from '../lib/api.js';
 import { cart, wishlist, useWishlist, cartItemOf } from '../lib/cart.js';
 import {
-  buildPriceMatrix, CARD_FEATURES, WORKSHOPS, PARENTS, FAMILY_NOTES, TEACHERS,
-  ACHIEVEMENT_PHOTOS, BLOG_POSTS, WHATSAPP_TESTIMONIALS, INSTAGRAM, STUDENT_WINS,
+  buildPriceMatrix, CARD_FEATURES, WORKSHOPS,
   TRUST_POINTS, WHY_CHOOSE, ACADEMIC_REQUIREMENTS, overviewFor,
   COURSE_FAQS, CHANNEL_VIDEOS, YOUTUBE_CHANNEL_URL, ABOUT_STATS, ABOUT_STEPS,
 } from '../data/courseDetail.js';
 import { imageFor, heroImageFor } from '../data/courseImages.js';
+import SocialProofSections from '../components/SocialProofSections.jsx';
 
 // Course detail — a 1:1 rebuild of the live /product/{slug} template:
 // breadcrumb hero, a main column (title + pills + tabbed sections) and a sticky
@@ -35,154 +35,6 @@ const SectionHead = ({ children }) => (
     <span className="mt-3 mx-auto block h-1 w-16 rounded bg-[#D4AF37]" />
   </div>
 );
-
-// Meet our Teachers — WinQuest-parity portrait carousel (navy/gold theme).
-// A scroll-snap rail of the full mentor roster with prev/next arrows; arrows
-// page the rail by ~85% of its width and are hidden on touch (swipe instead).
-function TeachersCarousel() {
-  const rail = useRef(null);
-  const page = (dir) => rail.current?.scrollBy({ left: dir * rail.current.clientWidth * 0.85, behavior: 'smooth' });
-  const Arrow = ({ dir, side, Icon, label }) => (
-    <button type="button" onClick={() => page(dir)} aria-label={label}
-      className={`absolute top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg ring-1 ring-black/5 transition hover:bg-[#D4AF37] hover:text-[#0B1220] md:flex ${side}`}>
-      <Icon className="h-5 w-5" />
-    </button>
-  );
-  return (
-    <section className="py-14 bg-white">
-      <div className="container-wide">
-        <SectionHead>Meet our Teachers</SectionHead>
-        <p className="-mt-6 mb-9 text-center text-slate-500">Expert educators who connect, guide, and prepare students with special personalised care ❤️📚✨</p>
-        <div className="relative">
-          <Arrow dir={-1} side="-left-3" Icon={ChevronLeft} label="Previous teachers" />
-          {/* Card geometry matches WinQuest's slider at desktop: 229px-wide
-              portrait cards (223:300 image ≈ 229×308) with ~40px between. */}
-          <div ref={rail} className="flex gap-4 overflow-x-auto scroll-smooth snap-x pb-2 scrollbar-hide sm:gap-10">
-            {TEACHERS.map(t => (
-              <figure key={t.name} className="group flex-shrink-0 snap-start w-[46%] sm:w-[229px] overflow-hidden rounded-2xl border border-[#E7E7EF] bg-white shadow-[0_4px_18px_rgba(6,30,67,.10)] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-brand-300">
-                <img src={t.img} alt={t.name} loading="lazy" className="aspect-[223/300] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]" />
-                <figcaption className="py-3.5 text-center font-heading text-[15px] font-bold text-[#0B1220]">{t.name}</figcaption>
-              </figure>
-            ))}
-          </div>
-          <Arrow dir={1} side="-right-3" Icon={ChevronRight} label="Next teachers" />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Instagram Feed — real latest posts via /api/social/instagram once the
-// account's Graph API token is configured (they then auto-refresh hourly as
-// new posts land); branded placeholder tiles linking to the profile until then.
-function InstagramFeed() {
-  const { data } = useQuery({ queryKey: ['social-instagram'], queryFn: fetchSocialInstagram, staleTime: 3600_000 });
-  const posts = data?.configured ? (data.data || []) : [];
-  return (
-    <section className="py-14 bg-white">
-      <div className="container-wide">
-        <SectionHead>Instagram Feed</SectionHead>
-        <p className="text-center text-slate-500 -mt-6 mb-9">A glimpse into our classes, creativity &amp; student success — straight from our Instagram 📷✨</p>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8">
-          {posts.length > 0
-            ? posts.slice(0, 8).map(p => (
-              <a key={p.id} href={p.permalink} target="_blank" rel="noopener noreferrer"
-                className="group relative aspect-square overflow-hidden rounded-xl bg-slate-100">
-                <img src={p.image} alt={p.caption || 'Instagram post'} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.05]" />
-                <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/30 group-hover:opacity-100">
-                  <Instagram className="h-6 w-6 text-white" />
-                </span>
-              </a>
-            ))
-            : INSTAGRAM.posts.map((p, i) => (
-              <a key={i} href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"
-                className={`group relative flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br ${p.tint} text-4xl transition-transform duration-300 hover:scale-[1.03]`}>
-                <span>{p.emoji}</span>
-                <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/30 group-hover:opacity-100">
-                  <Instagram className="h-6 w-6 text-white" />
-                </span>
-              </a>
-            ))}
-        </div>
-        <div className="mt-8 text-center">
-          <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#F58529] via-[#DD2A7B] to-[#8134AF] px-6 py-2.5 text-sm font-bold text-white hover:brightness-105">
-            <Instagram className="h-4 w-4" /> Follow @{INSTAGRAM.handle}
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Recent Student Wins — WinQuest-parity carousel: white cards with a gold top
-// edge, an emoji icon, the win as a bold brand-coloured headline, the student
-// name line and a muted detail line, on a scroll-snap rail with arrows.
-function StudentWinsCarousel() {
-  const rail = useRef(null);
-  const page = (dir) => rail.current?.scrollBy({ left: dir * rail.current.clientWidth * 0.85, behavior: 'smooth' });
-  const Arrow = ({ dir, side, Icon, label }) => (
-    <button type="button" onClick={() => page(dir)} aria-label={label}
-      className={`absolute top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg ring-1 ring-black/5 transition hover:bg-[#D4AF37] hover:text-[#0B1220] md:flex ${side}`}>
-      <Icon className="h-5 w-5" />
-    </button>
-  );
-  return (
-    <section className="py-14 bg-[#FAFBFE]">
-      <div className="container-wide">
-        <SectionHead>Recent Student Wins</SectionHead>
-        <p className="-mt-6 mb-9 text-center text-slate-500">Real, verified results from Indiatutors students this year 🇮🇳🏆</p>
-        <div className="relative">
-          <Arrow dir={-1} side="-left-3" Icon={ChevronLeft} label="Previous wins" />
-          <div ref={rail} className="flex gap-4 overflow-x-auto scroll-smooth snap-x pb-2 scrollbar-hide sm:gap-5">
-            {STUDENT_WINS.map(w => (
-              <div key={w.title} className="flex-shrink-0 snap-start w-[80%] sm:w-[290px] rounded-2xl border-t-[3px] border-[#D4AF37] bg-white p-5 shadow-[0_4px_18px_rgba(6,30,67,.08)] ring-1 ring-[#E7E7EF] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <span className="block text-2xl">{w.icon}</span>
-                <h3 className="mt-2 font-heading text-[17px] font-extrabold leading-snug text-brand-700">{w.title}</h3>
-                <p className="mt-2 text-sm font-bold text-slate-900">{w.name}</p>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-slate-500">{w.detail}</p>
-              </div>
-            ))}
-          </div>
-          <Arrow dir={1} side="-right-3" Icon={ChevronRight} label="Next wins" />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// Student Achievements — WinQuest-parity photo carousel: large portrait photo
-// cards on a scroll-snap rail with prev/next arrows (same pattern as the
-// teachers carousel). Photos are placeholders until real ones are provided.
-function AchievementsCarousel() {
-  const rail = useRef(null);
-  const page = (dir) => rail.current?.scrollBy({ left: dir * rail.current.clientWidth * 0.85, behavior: 'smooth' });
-  const Arrow = ({ dir, side, Icon, label }) => (
-    <button type="button" onClick={() => page(dir)} aria-label={label}
-      className={`absolute top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg ring-1 ring-black/5 transition hover:bg-[#D4AF37] hover:text-[#0B1220] md:flex ${side}`}>
-      <Icon className="h-5 w-5" />
-    </button>
-  );
-  return (
-    <section className="py-14 bg-white">
-      <div className="container-wide">
-        <SectionHead>Student Achievements</SectionHead>
-        <p className="-mt-6 mb-9 text-center text-slate-500">Making an Impact: 🏆 Student Achievements That Shine | 🌱 Your Growth. Our Mission.</p>
-        <div className="relative">
-          <Arrow dir={-1} side="-left-3" Icon={ChevronLeft} label="Previous achievements" />
-          <div ref={rail} className="flex gap-4 overflow-x-auto scroll-smooth snap-x pb-2 scrollbar-hide sm:gap-6">
-            {ACHIEVEMENT_PHOTOS.map((src, i) => (
-              <figure key={src} className="group flex-shrink-0 snap-start w-[72%] sm:w-[340px] overflow-hidden rounded-2xl border border-[#E7E7EF] bg-white shadow-[0_4px_18px_rgba(6,30,67,.10)] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <img src={src} alt={`Student achievement ${i + 1}`} loading="lazy" className="aspect-[3/4] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
-              </figure>
-            ))}
-          </div>
-          <Arrow dir={1} side="-right-3" Icon={ChevronRight} label="Next achievements" />
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // YouTube facade for the buy-card Videos panel: shows the channel thumbnail
 // with a play button; clicking swaps to an inline privacy-friendly autoplay
@@ -676,113 +528,9 @@ export default function CourseDetailPage() {
         </div>
       </section>
 
-      {/* MEET OUR TEACHERS — WinQuest order: right after Student Reviews */}
-      <TeachersCarousel />
-
-      {/* RECENT STUDENT WINS — WinQuest order: right after Meet our Teachers */}
-      <StudentWinsCarousel />
-
-      {/* STUDENT ACHIEVEMENTS — WinQuest order: right after Recent Student Wins.
-          Photo carousel (WinQuest-parity); placeholder photos until real
-          Indiatutors student photos are provided. */}
-      <AchievementsCarousel />
-
-      {/* WHAT OUR PARENTS SAY ABOUT US — WinQuest-parity spotlight cards */}
-      <section className="py-14 bg-[#FAFBFE]">
-        <div className="container-wide">
-          <SectionHead>What Our Parents Say About Us</SectionHead>
-          <p className="-mt-6 mb-9 text-center text-slate-500">👨‍👩‍👧 Real Results. Real Parent Voices. 🏆 Futures Built with Care</p>
-          <div className="flex gap-5 overflow-x-auto snap-x pb-2 scrollbar-hide">
-            {PARENTS.map(p => (
-              <figure key={p.name} className="relative flex-shrink-0 snap-start w-[86%] sm:w-[46%] lg:w-[31.5%] rounded-2xl bg-white border border-[#E7E7EF] p-6 shadow-[0_4px_18px_rgba(6,30,67,.08)]">
-                <figcaption className="flex items-center gap-3">
-                  <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-600 to-brand-800 font-heading text-lg font-bold text-white ring-2 ring-[#D4AF37] ring-offset-2">{p.init}</span>
-                  <span>
-                    <strong className="block font-heading text-slate-900">{p.name}</strong>
-                    <span className="block text-xs text-slate-500">{p.role}</span>
-                  </span>
-                </figcaption>
-                <div className="mt-3 text-[#D4AF37]" aria-label="5/5">★★★★★</div>
-                <blockquote className="mt-2 rounded-xl border-l-4 border-[#D4AF37] bg-[#FAFBFE] p-4 text-sm italic leading-relaxed text-slate-600">{p.quote}</blockquote>
-              </figure>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* WHAT FAMILIES SAY — WinQuest-parity notes rail */}
-      <section className="py-14 bg-white">
-        <div className="container-wide">
-          <SectionHead>What Families Say</SectionHead>
-          <p className="-mt-6 mb-9 text-center text-slate-500">In their own words — recent notes from Indiatutors parents &amp; students 💙</p>
-          <div className="flex gap-4 overflow-x-auto snap-x pb-2 scrollbar-hide">
-            {FAMILY_NOTES.map(f => (
-              <figure key={f.name} className="flex-shrink-0 snap-start w-[80%] sm:w-[340px] rounded-2xl border border-[#E7E7EF] bg-white p-6 shadow-sm">
-                <div className="text-[#D4AF37]" aria-label="5/5">★ ★ ★ ★ ★</div>
-                <blockquote className="mt-3 border-l-2 border-slate-200 pl-4 text-sm italic leading-relaxed text-slate-600">“{f.quote}”</blockquote>
-                <figcaption className="mt-3 pl-4 text-xs font-semibold text-slate-500">— {f.name}</figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* WHATSAPP TESTIMONIALS */}
-      <section className="py-14 bg-white">
-        <div className="container-wide">
-          <SectionHead>WhatsApp Testimonials</SectionHead>
-          <p className="text-center text-slate-500 -mt-6 mb-9">Real voices from our WhatsApp community 💚📚</p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {WHATSAPP_TESTIMONIALS.map(w => (
-              <div key={w.name + w.time} className="rounded-2xl bg-[#ECE5DD] p-4">
-                <div className="relative rounded-xl rounded-tl-sm bg-white p-3 shadow-sm">
-                  <span className="absolute -left-1.5 top-0 h-3 w-3 bg-white [clip-path:polygon(100%_0,0_0,100%_100%)]" aria-hidden="true" />
-                  <div className="flex items-center gap-2">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#25D366] text-xs font-bold text-white">{w.init}</span>
-                    <strong className="text-[13px] text-[#075E54]">{w.name}</strong>
-                  </div>
-                  <p className="mt-1.5 text-sm leading-relaxed text-slate-700">{w.text}</p>
-                  <div className="mt-1 flex items-center justify-end gap-1 text-[11px] text-slate-400">
-                    {w.time}
-                    <svg viewBox="0 0 18 18" className="h-3.5 w-3.5 text-[#34B7F1]" fill="currentColor" aria-label="read"><path d="M17.4 5.5l-1-.9-6.9 8-1.3-1.2-1 .9 2.3 2.4zM12.6 5.5l-1-.9-6.9 8L2 10.3l-1 1L4 14.5z"/></svg>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 text-center">
-            <a href="https://wa.me/919330811581" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-6 py-2.5 text-sm font-bold text-white hover:brightness-105">
-              <MessageCircle className="h-4 w-4" /> Chat with us on WhatsApp
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* LATEST NEWS AND RESOURCES — WinQuest-parity (replaces From Our Blog;
-          the Demo of Our Classes section was removed, matching WinQuest). */}
-      <section className="py-14 bg-[#FAFBFE]">
-        <div className="container-wide">
-          <SectionHead>Latest News and Resources</SectionHead>
-          <p className="-mt-6 mb-9 text-center text-sm font-semibold text-slate-600">📰 Learning Updates <span className="text-slate-300">|</span> 📘 Tips <span className="text-slate-300">|</span> 🎓 Resources <span className="text-slate-300">|</span> 💻 Online Courses</p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {BLOG_POSTS.map(b => (
-              <Link key={b.title} to="/blog" className="group rounded-[14px] bg-white border border-[#E7E7EF] overflow-hidden flex flex-col shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                <span className="block h-[190px] overflow-hidden">
-                  <img src={b.img} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
-                </span>
-                <span className="p-5 flex flex-col flex-1">
-                  <span className="text-xs font-bold text-brand-600">{b.date}</span>
-                  <span className="mt-1.5 font-heading font-bold leading-snug text-slate-900">{b.title}</span>
-                  <span className="mt-2 text-sm leading-relaxed text-slate-500">{b.excerpt}</span>
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* INSTAGRAM FEED */}
-      <InstagramFeed />
+      {/* SHARED SOCIAL-PROOF BLOCK — teachers, wins, achievements, parents,
+          families, WhatsApp, news, Instagram (also rendered on /courses). */}
+      <SocialProofSections />
 
       {/* FREE WORKSHOPS — last content section (user-requested order) */}
       <section className="py-14 bg-[#FAFBFE]">
