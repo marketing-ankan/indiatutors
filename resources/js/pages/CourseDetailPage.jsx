@@ -13,7 +13,7 @@ import {
   TRUST_POINTS, WHY_CHOOSE, ACADEMIC_REQUIREMENTS, overviewFor,
   COURSE_FAQS, CHANNEL_VIDEOS, YOUTUBE_CHANNEL_URL, ABOUT_STATS, ABOUT_STEPS,
 } from '../data/courseDetail.js';
-import { imageFor } from '../data/courseImages.js';
+import { imageFor, heroImageFor } from '../data/courseImages.js';
 
 // Course detail — a 1:1 rebuild of the live /product/{slug} template:
 // breadcrumb hero, a main column (title + pills + tabbed sections) and a sticky
@@ -436,15 +436,15 @@ export default function CourseDetailPage() {
           Boxed like WinQuest: max-w 1800px centred (side margins appear ≥1800px)
           and the hero height scales 431px@1300 → 457px@1920 via clamp. */}
       <section className="relative mx-auto max-w-[1800px] overflow-hidden text-white" style={{ background: 'linear-gradient(115deg,#0B1220 0%,#152a63 58%,#1E3A8A 100%)' }}>
-        {imageFor(course) && (
+        {heroImageFor(course) && (
           <>
             {/* Mobile: photo on top (full width) */}
-            <img src={imageFor(course)} alt={course.name} className="h-52 w-full object-cover sm:h-64 lg:hidden" style={{ objectPosition: '50% 30%' }} />
+            <img src={heroImageFor(course)} alt={course.name} className="h-52 w-full object-cover sm:h-64 lg:hidden" style={{ objectPosition: '50% 30%' }} />
             {/* Desktop: photo bleeds off the right with a gold diagonal band */}
             {/* Desktop: gold diagonal band + photo — exact WinQuest geometry
                 (image 55% / gold 56.2%, clip 120px top slant flush at bottom). */}
             <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[56.2%] lg:block" aria-hidden="true" style={{ background: '#D4AF37', clipPath: 'polygon(120px 0, 100% 0, 100% 100%, 0 100%)' }} />
-            <img src={imageFor(course)} alt="" aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[55%] object-cover lg:block" style={{ clipPath: 'polygon(120px 0, 100% 0, 100% 100%, 0 100%)', objectPosition: '50% 30%' }} />
+            <img src={heroImageFor(course)} alt="" aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[55%] object-cover lg:block" style={{ clipPath: 'polygon(120px 0, 100% 0, 100% 100%, 0 100%)', objectPosition: '50% 30%' }} />
           </>
         )}
         <div className="relative container-wide flex items-center py-10 lg:min-h-[clamp(431px,376px_+_4.2vw,457px)] lg:py-12">
