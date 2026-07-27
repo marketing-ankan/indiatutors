@@ -36,36 +36,16 @@ export const CATALOG_NAV = [
       "to": "/courses/english-grade-1-7"
      },
      {
-      "label": "📖 English Grade 11-12",
-      "to": "/courses/english-grade-11-12"
-     },
-     {
       "label": "📖 English Grade 8",
       "to": "/courses/english-grade-8"
-     },
-     {
-      "label": "📖 English Grade 9-10",
-      "to": "/courses/english-grade-9-10"
-     },
-     {
-      "label": "📐 Integrated Math I/II/III",
-      "to": "/courses/integrated-math-i-ii-iii"
      },
      {
       "label": "📐 Mathematics Grade 1-7",
       "to": "/courses/mathematics-grade-1-7"
      },
      {
-      "label": "📐 Mathematics Grade 11-12",
-      "to": "/courses/mathematics-grade-11-12"
-     },
-     {
       "label": "📐 Mathematics Grade 8",
       "to": "/courses/mathematics-grade-8"
-     },
-     {
-      "label": "📐 Mathematics Grade 9-10",
-      "to": "/courses/mathematics-grade-9-10"
      },
      {
       "label": "🔤 Phonics, Numbers & Language Development",
@@ -80,24 +60,20 @@ export const CATALOG_NAV = [
       "to": "/courses/science-grade-8"
      },
      {
-      "label": "🔬 Science Grade 9-10",
-      "to": "/courses/science-grade-9-10"
-     },
-     {
       "label": "🌍 Social Studies Grade 1-7",
       "to": "/courses/social-studies-grade-1-7"
-     },
-     {
-      "label": "🌍 Social Studies Grade 11-12",
-      "to": "/courses/social-studies-grade-11-12"
      },
      {
       "label": "🌍 Social Studies Grade 8",
       "to": "/courses/social-studies-grade-8"
      },
      {
-      "label": "🌍 Social Studies Grade 9-10",
-      "to": "/courses/social-studies-grade-9-10"
+      "label": "📐 Vedic Maths (Advanced)",
+      "to": "/courses/vedic-maths-advanced"
+     },
+     {
+      "label": "📐 Vedic Maths (Grade 3-6)",
+      "to": "/courses/vedic-maths-grade-3-6"
      }
     ]
    },
@@ -176,6 +152,18 @@ export const CATALOG_NAV = [
      {
       "label": "📐 Pre-Calculus",
       "to": "/courses/pre-calculus"
+     },
+     {
+      "label": "🔬 Science Grade 9-10",
+      "to": "/courses/science-grade-9-10"
+     },
+     {
+      "label": "🌍 Social Studies Grade 11-12",
+      "to": "/courses/social-studies-grade-11-12"
+     },
+     {
+      "label": "🌍 Social Studies Grade 9-10",
+      "to": "/courses/social-studies-grade-9-10"
      }
     ]
    },
