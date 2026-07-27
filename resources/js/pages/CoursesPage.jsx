@@ -158,10 +158,25 @@ export default function CoursesPage() {
 
         <div className="grid lg:grid-cols-[260px_1fr] gap-6 items-start">
           {/* SIDEBAR */}
-          <aside className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-4 space-y-4 lg:sticky lg:top-24">
+          {/* Sticky sidebar with its OWN scrollbar — taller-than-viewport
+              category lists scroll inside the box (overscroll-contain keeps
+              the wheel from chaining into the page scroll). */}
+          <aside className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-4 space-y-4 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:overscroll-contain">
             <input type="search" defaultValue={search} placeholder="Search courses…"
               onKeyDown={e=>{ if(e.key==='Enter') setParam('search', e.currentTarget.value); }}
               className="w-full rounded-md ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"/>
+            {/* By Board — same links as the nav dropdown's board pages */}
+            <div>
+              <h3 className="font-bold text-sm mb-2">🎓 By Board</h3>
+              <ul className="space-y-0.5">
+                {[['🏫 CBSE','/board/cbse'],['📚 ICSE / ISC','/board/icse'],['🌍 IGCSE / Cambridge','/board/igcse'],['📍 State Boards','/board/state-boards'],['📖 NCERT','/board/ncert']].map(([label,to]) => (
+                  <li key={to}>
+                    <Link to={to} className="block w-full rounded px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-50">{label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
             <div>
               <h3 className="font-bold text-sm mb-2">Browse Categories</h3>
               <ul className="space-y-0.5">
