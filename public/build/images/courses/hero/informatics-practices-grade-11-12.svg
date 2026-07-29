@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B1220"/><stop offset="100%" stop-color="#1E40AF"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="82%" cy="14%" r="52%">
+      <stop offset="0%" stop-color="#D4AF37" stop-opacity=".34"/>
+      <stop offset="100%" stop-color="#D4AF37" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg)"/>
+  <rect width="1200" height="800" fill="url(#glow)"/>
+  <g transform="translate(805.3,240.0) scale(1.333)" opacity=".95">
+    
+    <rect x="40" y="46" width="160" height="148" rx="10" fill="none" stroke="#fff" stroke-width="5" opacity=".9"/>
+    <line x1="40" y1="84" x2="200" y2="84" stroke="#fff" stroke-width="5" opacity=".9"/>
+    <line x1="93"  y1="84" x2="93"  y2="194" stroke="#fff" stroke-width="3" opacity=".45"/>
+    <line x1="146" y1="84" x2="146" y2="194" stroke="#fff" stroke-width="3" opacity=".45"/>
+    <line x1="40" y1="120" x2="200" y2="120" stroke="#fff" stroke-width="3" opacity=".45"/>
+    <line x1="40" y1="157" x2="200" y2="157" stroke="#fff" stroke-width="3" opacity=".45"/>
+    <rect x="99" y="126" width="41" height="25" fill="#D4AF37" opacity=".9"/>
+    <rect x="152" y="163" width="42" height="25" fill="#fff" opacity=".55"/>
+  </g>
+  <g transform="translate(74.7,338.7)">
+    <text x="0" y="0" font-family="Segoe UI,Arial,sans-serif" font-size="25.3"
+      fill="#D4AF37" letter-spacing="3.20" font-weight="600">CLASSES 11–12 · CBSE 065</text>
+    <text x="0" y="77.3" font-family="Segoe UI,Arial,sans-serif"
+      font-size="66.7" fill="#ffffff" font-weight="700">Informatics Practices</text>
+    <rect x="0" y="106.7" width="98.7" height="8.0" rx="3" fill="#D4AF37"/>
+    <text x="0" y="165.3" font-family="Segoe UI,Arial,sans-serif"
+      font-size="25.3" fill="#c7d2e4" letter-spacing="1.47">Indiatutors Online</text>
+  </g>
+</svg>

@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\CurriculumPdfController;
 use App\Http\Controllers\SitemapController;
 use App\Support\SeoMeta;
 use Illuminate\Http\Request;
@@ -7,6 +8,13 @@ use Illuminate\Support\Str;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 Route::get('/robots.txt', [SitemapController::class, 'robots']);
+
+// Designed curriculum PDF, generated server-side (see CurriculumPdfController).
+// Rate-limited because each render costs real CPU.
+Route::get('/curriculum/{slug}.pdf', [CurriculumPdfController::class, 'show'])
+    ->where('slug', '[a-z0-9-]+')
+    ->middleware('throttle:30,1')
+    ->name('curriculum.pdf');
 
 // --- 301 redirect map: old WordPress/WooCommerce URLs → new URLs ---
 // Ready for the real-domain cutover; harmless on staging. URLs the two sites

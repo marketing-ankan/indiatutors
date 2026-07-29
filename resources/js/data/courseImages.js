@@ -100,6 +100,16 @@ export const COURSE_IMAGES = {
   "history-grade-11-12": "/build/images/courses/history-grade-11-12.jpg",
   "political-science-grade-11-12": "/build/images/courses/political-science-grade-11-12.jpg",
   "geography-grade-11-12": "/build/images/courses/geography-grade-11-12.jpg",
+  "accountancy-grade-11-12": "/build/images/courses/accountancy-grade-11-12.svg",
+  "business-studies-grade-11-12": "/build/images/courses/business-studies-grade-11-12.svg",
+  "applied-mathematics-grade-11-12": "/build/images/courses/applied-mathematics-grade-11-12.svg",
+  "computer-science-grade-11-12": "/build/images/courses/computer-science-grade-11-12.svg",
+  "informatics-practices-grade-11-12": "/build/images/courses/informatics-practices-grade-11-12.svg",
+  "jee-main": "/build/images/courses/jee-main.svg",
+  "jee-advanced": "/build/images/courses/jee-advanced.svg",
+  "neet-ug": "/build/images/courses/neet-ug.svg",
+  "cuet-ug": "/build/images/courses/cuet-ug.svg",
+  "olympiad-preparation": "/build/images/courses/olympiad-preparation.svg",
 };
 
 // Prefer a DB image_url if present, else our self-hosted copy, else null.
@@ -202,6 +212,16 @@ export const HERO_IMAGES = {
   "history-grade-11-12": "/build/images/courses/hero/history-grade-11-12.jpg",
   "political-science-grade-11-12": "/build/images/courses/hero/political-science-grade-11-12.jpg",
   "geography-grade-11-12": "/build/images/courses/hero/geography-grade-11-12.jpg",
+  "accountancy-grade-11-12": "/build/images/courses/hero/accountancy-grade-11-12.svg",
+  "business-studies-grade-11-12": "/build/images/courses/hero/business-studies-grade-11-12.svg",
+  "applied-mathematics-grade-11-12": "/build/images/courses/hero/applied-mathematics-grade-11-12.svg",
+  "computer-science-grade-11-12": "/build/images/courses/hero/computer-science-grade-11-12.svg",
+  "informatics-practices-grade-11-12": "/build/images/courses/hero/informatics-practices-grade-11-12.svg",
+  "jee-main": "/build/images/courses/hero/jee-main.svg",
+  "jee-advanced": "/build/images/courses/hero/jee-advanced.svg",
+  "neet-ug": "/build/images/courses/hero/neet-ug.svg",
+  "cuet-ug": "/build/images/courses/hero/cuet-ug.svg",
+  "olympiad-preparation": "/build/images/courses/hero/olympiad-preparation.svg",
 };
 
 export const heroImageFor = (course) => (course && (HERO_IMAGES[course.slug] || COURSE_IMAGES[course.slug] || course.image_url)) || null;

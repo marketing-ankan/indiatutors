@@ -163,6 +163,24 @@ Verified mechanically before merging: **zero** topics carried over from the old 
 
 Also fixed in this pass: 12 homepage card descriptions that were HTML-strip artifacts with the spaces eaten (`For Parents:This program`, `MoreCertificates of Completion`, `(6–8 months)Level 2 →`), 5 feature lists that still read "Expert AP mentors" or advertised "Trinity / ABRSM / RSL aligned", and the duplicated course name "Western Dance Dance" → "Western Dance" (slug left alone for URL stability).
 
+### Curriculum PDF, security pass & generated course art ✅ (2026-07-29)
+
+**Designed curriculum PDF.** `/download-curriculum` printed the whole web page — site header, marketing band and footer all appeared, level cards split across pages leaving ~40% blank gaps, and there was no print stylesheet anywhere in the project. Two fixes:
+- A proper `@media print` block in `app.css` (levels are `break-inside: avoid`, headings `break-after: avoid`, single-column topics, A4 portrait). Scratch went 6 pages → 2. Header/Footer/MarketplaceBand now carry `print:hidden`.
+- The real deliverable: **`GET /curriculum/{slug}.pdf`** generated server-side by **mPDF** (`CurriculumPdfController` + `resources/views/pdf/curriculum.blade.php`) — cover page, running header/footer, and true "Page 3 of 4" numbering, which browser print cannot do because Chrome does not implement CSS `@page` margin boxes. Output is deterministic rather than varying with each visitor's print dialog.
+- mPDF was chosen over dompdf specifically because the Hindi and Sanskrit curricula contain Devanagari conjuncts and matras (क्ष, त्र, ज्ञ, का/कि/की); verified the generated PDFs embed FreeSerif alongside DejaVu and map matras as separate codepoints — dompdf has no Indic shaping and would have produced garbage. Browsershot/Puppeteer was ruled out: the server has no Node.
+- `vendor/mpdf` ships ~87 MB of fonts. **`scripts/trim-mpdf-fonts.php`** prunes it to the families reachable from the languages the catalogue teaches (94 MB → 26 MB, 67.5 MB freed), is wired into composer's `post-install-cmd`/`post-update-cmd` so it survives a reinstall, is idempotent, and refuses to run if the keep-set resolves to fewer than 10 files. All 110 courses re-rendered clean after the trim. The controller also falls back to a plain render if a font is ever missing, rather than 500ing.
+
+**Security pass — `composer audit` now reports zero advisories** (was 7).
+- `guzzlehttp/guzzle` 7.13.2 → 7.15.2 (4 advisories). Pre-existing production dependency pulled in by Laravel, not by mPDF.
+- `laravel/framework` v11.54 → **v12.64** (3 advisories, incl. a high-severity CRLF injection in the default email rule). Gated on the test suite; all 41 tests green before and after, and every route re-checked.
+- Exposure at the time was limited — nothing used signed URLs and nothing sent mail — but the CRLF issue becomes live the moment messaging is wired up, so it was worth fixing now rather than later.
+- Fixed a stale test (`CategorySlugSeederTest`) left behind by the India-localisation pass: it still asserted the removed `ap-biology`/`algebra`/`math-sat-psat` slugs. It now also asserts the retired US categories do **not** come back.
+
+**Generated course art.** The 10 courses added in the localisation passes had no photography. Rather than fake stock photos, each got a branded illustration (navy→blue brand gradient, gold accent, a distinct subject motif — ledger, bar chart, curve, code brackets, data grid, atom, gear, DNA, campus, medal):
+- **SVG** for card and hero (37 kB for all 20 files, crisp at any size), wired into `courseImages.js`
+- **One PNG at 1200×630** per course for `og:image`/JSON-LD, since WhatsApp and Facebook do not render SVG. A flat-colour variant is used for the raster because the gradient version cost 415 kB as PNG versus 25 kB flat — and flat reads better at thumbnail size anyway. `image_url` in `courses.json` points at these, which is also the first self-hosted `image_url` in the catalogue (the other 72 still hotlink the old WordPress uploads and will break at cutover).
+
 ⚠️ **Open items** — NTSE and KVPY links were removed rather than rebuilt: both appear to have been discontinued/merged and this could not be verified in-session, so confirm status before advertising either. SAT/ACT were cut per product decision even though Indian students do sit them for overseas admissions; if study-abroad prep is wanted later, add it as an explicitly separate "Study Abroad" category, never inside the school-syllabus tree. The 10 new courses without photos fall back to the gradient tile — client photography still needed. Homepage testimonials remain placeholder marketing copy and should be replaced with real ones before go-live.
 
 ---

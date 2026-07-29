@@ -68,7 +68,7 @@ export default function Footer() {
   });
 
   return (
-    <footer className="bg-slate-900 text-slate-300">
+    <footer className="bg-slate-900 text-slate-300 print:hidden">
       <div className="container-wide py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] gap-10">
         {/* BRAND + CONTACT + NEWSLETTER */}
         <div>

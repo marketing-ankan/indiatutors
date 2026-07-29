@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B1220"/><stop offset="100%" stop-color="#1E40AF"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="82%" cy="14%" r="52%">
+      <stop offset="0%" stop-color="#D4AF37" stop-opacity=".34"/>
+      <stop offset="100%" stop-color="#D4AF37" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="900" height="600" fill="url(#bg)"/>
+  <rect width="900" height="600" fill="url(#glow)"/>
+  <g transform="translate(604.0,180.0) scale(1.000)" opacity=".95">
+    
+    <rect x="46" y="34" width="148" height="172" rx="8" fill="none" stroke="#fff" stroke-width="5" opacity=".92"/>
+    <line x1="46" y1="74" x2="194" y2="74" stroke="#fff" stroke-width="5" opacity=".92"/>
+    <line x1="120" y1="74" x2="120" y2="206" stroke="#fff" stroke-width="4" opacity=".55"/>
+    <line x1="60" y1="100" x2="106" y2="100" stroke="#D4AF37" stroke-width="6" stroke-linecap="round"/>
+    <line x1="60" y1="126" x2="106" y2="126" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+    <line x1="60" y1="152" x2="96"  y2="152" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+    <line x1="134" y1="100" x2="180" y2="100" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+    <line x1="134" y1="126" x2="180" y2="126" stroke="#D4AF37" stroke-width="6" stroke-linecap="round"/>
+    <line x1="134" y1="152" x2="168" y2="152" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".6"/>
+    <text x="120" y="196" font-family="Georgia,serif" font-size="34" fill="#D4AF37" text-anchor="middle" font-weight="bold">₹</text>
+  </g>
+  <g transform="translate(56.0,254.0)">
+    <text x="0" y="0" font-family="Segoe UI,Arial,sans-serif" font-size="19.0"
+      fill="#D4AF37" letter-spacing="2.40" font-weight="600">CLASSES 11–12 · COMMERCE</text>
+    <text x="0" y="58.0" font-family="Segoe UI,Arial,sans-serif"
+      font-size="50.0" fill="#ffffff" font-weight="700">Accountancy</text>
+    <rect x="0" y="80.0" width="74.0" height="6.0" rx="3" fill="#D4AF37"/>
+    <text x="0" y="124.0" font-family="Segoe UI,Arial,sans-serif"
+      font-size="19.0" fill="#c7d2e4" letter-spacing="1.10">Indiatutors Online</text>
+  </g>
+</svg>
