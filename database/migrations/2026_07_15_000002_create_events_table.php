@@ -41,8 +41,8 @@ return new class extends Migration {
                 'created_at' => $now, 'updated_at' => $now,
             ],
             [
-                'title' => 'PSAT/SAT English Bootcamp', 'slug' => 'psat-sat-english-bootcamp', 'icon' => '📘', 'category' => 'Competitive Exams',
-                'description' => 'Focused reading and writing practice for the PSAT/SAT English section — timed sections, strategy walkthroughs and detailed review in live, interactive Zoom sessions.',
+                'title' => 'NEET Biology Crash Session', 'slug' => 'neet-biology-crash-session', 'icon' => '🧬', 'category' => 'Competitive Exams',
+                'description' => 'High-yield NCERT Biology revision for NEET aspirants — diagram-based questions, assertion-reason drills and timed practice in live, interactive Zoom sessions.',
                 'starts_at' => '2026-07-29 08:00:00', 'ends_at' => '2026-08-30 17:00:00', 'mode' => 'Online',
                 'batch_size' => '10–15 students', 'session_duration' => '1 hour per session',
                 'schedule_note' => 'Dates are communicated and organised based on the number of registrations received.',
@@ -50,8 +50,8 @@ return new class extends Migration {
                 'created_at' => $now, 'updated_at' => $now,
             ],
             [
-                'title' => 'Digital PSAT-10 / NMSQT SAT Math Workshop', 'slug' => 'digital-psat-nmsqt-sat-math-workshop', 'icon' => '📐', 'category' => 'Competitive Exams',
-                'description' => 'Live walkthroughs of the trickiest Digital SAT / PSAT-10 / NMSQT math problems — adaptive-test strategy, calculator policy and timed practice with an expert mentor.',
+                'title' => 'JEE Main Maths Problem-Solving Workshop', 'slug' => 'jee-main-maths-problem-solving-workshop', 'icon' => '📐', 'category' => 'Competitive Exams',
+                'description' => 'Live walkthroughs of the trickiest JEE Main maths problems — calculus and coordinate-geometry shortcuts, previous-year patterns and timed practice with an expert mentor.',
                 'starts_at' => '2026-07-29 08:00:00', 'ends_at' => '2026-08-30 17:00:00', 'mode' => 'Online',
                 'batch_size' => '10–15 students', 'session_duration' => '1 hour per session',
                 'schedule_note' => 'Dates are communicated and organised based on the number of registrations received.',

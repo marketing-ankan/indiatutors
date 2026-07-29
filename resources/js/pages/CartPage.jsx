@@ -10,8 +10,8 @@ import { cart, useCart, cartItemOf, inrFmt } from '../lib/cart.js';
 // left, "Cart totals" panel right). Quantities are locked to 1 per course,
 // exactly like the live store (sold individually).
 
-// The four products the live empty-cart cross-sell shows ("New in store").
-const CROSS_SELL_SLUGS = ['digital-sat-psat-math', 'art-and-craft', 'act', 'nmsqt'];
+// The four products the empty-cart cross-sell shows ("New in store").
+const CROSS_SELL_SLUGS = ['art-and-craft', 'abacus', 'vedic-maths-grade-3-6', 'python'];
 
 function CrossSell() {
   const { data } = useQuery({ queryKey: ['courses', { per_page: 200 }], queryFn: () => fetchCourses({ per_page: 200 }) });

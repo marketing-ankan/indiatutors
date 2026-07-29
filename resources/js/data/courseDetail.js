@@ -272,10 +272,8 @@ const RATE_ALIASES = {
   'pythonprogrammingforbeginners': 'Python',
   'artificialintelligencemachinelearning': 'AI & ML',
   'roboticscomputationalthinking': 'Robotics',
-  'algebraifoundation': 'Algebra I',
   'chessstrategymindsports': 'Chess',
   'violinviolalessonsforbeginners': 'Violin',
-  'satpsatmathmastery': 'Math SAT/PSAT',
 };
 function rateRowFor(name) {
   if (!name) return null;

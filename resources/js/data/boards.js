@@ -39,26 +39,17 @@ export const BOARDS = [
 export const BOARD_BY_SLUG = Object.fromEntries(BOARDS.map(b => [b.slug, b]));
 
 // The academic PARENT category slugs whose courses a board page surfaces.
-export const ACADEMIC_CATEGORIES = ['academics-elementary-middle-school', 'academics-high-school'];
+export const ACADEMIC_CATEGORIES = ['academics-primary-middle-classes-1-8', 'academics-secondary-senior-secondary-classes-9-12'];
 
 // Grouping parents (not subjects) — excluded when we build the subject chips.
 export const ACADEMIC_PARENTS = new Set([
-  'academics', 'academics-elementary-middle-school', 'academics-high-school',
+  'academics', 'academics-primary-middle-classes-1-8', 'academics-secondary-senior-secondary-classes-9-12',
 ]);
-
-// US-curriculum subject subcategories. Indian boards (CBSE/ICSE/State/NCERT) hide
-// these; IGCSE (international scope) keeps them. Kept as slugs so it survives any
-// catalog edit that re-slugs a course.
-export const US_SUBCATS = new Set(['algebra', 'geometry', 'calculus', 'honors', 'essay-writing']);
-
-// US-curriculum courses that wear an Indian subject category (e.g. Integrated Math
-// sits under "mathematics") — excluded from Indian boards by explicit slug.
-export const US_SLUGS = new Set(['integrated-math-i-ii-iii', 'algebra-i-foundation']);
 
 // Preferred display order for the subject chips (unlisted subjects sort after).
 export const SUBJECT_ORDER = [
   'english', 'mathematics', 'science', 'physics', 'chemistry', 'biology',
-  'social-studies', 'economics', 'vedic-maths', 'abacus', 'phonics',
-  // international / advanced (IGCSE)
-  'algebra', 'geometry', 'calculus', 'honors', 'essay-writing',
+  'social-science', 'history', 'geography', 'political-science',
+  'accountancy', 'business-studies', 'economics', 'computer-science',
+  'vedic-maths', 'abacus', 'phonics',
 ];

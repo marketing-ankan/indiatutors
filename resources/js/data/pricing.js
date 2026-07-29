@@ -1,7 +1,7 @@
 // Pricing engine data — ported from the live site (ITO_PP config on /plans-pricing/),
 // then reconciled against the official "IN Plan and Pricing" PDF (Jul 2026):
-// Java 850/1200/1500, AWS 900/900/1200, and ₹600 group rates for the AP courses
-// and competitive exams listed on the PDF's group sheet.
+// Java 850/1200/1500, AWS 900/900/1200, and ₹600 group rates for the academic
+// and competitive-exam subjects listed on the PDF's group sheet.
 // Rates are per-class, per level [Beginner, Intermediate, Advanced]; *G = group-class rates.
 export const PRICING = {
   "discount": "40",
@@ -1214,7 +1214,7 @@ export const PRICING = {
       ]
     },
     {
-      "name": "Western Dance Dance",
+      "name": "Western Dance",
       "cat": "Dance",
       "inr": [
         600,
@@ -1503,7 +1503,7 @@ export const PRICING = {
     },
     {
       "name": "Phonics, Numbers & Language Development",
-      "cat": "Academics — Elementary & Middle School",
+      "cat": "Academics — Primary & Middle (Classes 1-8)",
       "inr": [
         600
       ],
@@ -1515,7 +1515,7 @@ export const PRICING = {
     },
     {
       "name": "Mathematics Grade 1-7",
-      "cat": "Academics — Elementary & Middle School",
+      "cat": "Academics — Primary & Middle (Classes 1-8)",
       "inr": [
         600
       ],
@@ -1527,7 +1527,7 @@ export const PRICING = {
     },
     {
       "name": "Mathematics Grade 8",
-      "cat": "Academics — Elementary & Middle School",
+      "cat": "Academics — Primary & Middle (Classes 1-8)",
       "inr": [
         750
       ],
@@ -1539,7 +1539,7 @@ export const PRICING = {
     },
     {
       "name": "Vedic Maths (Grade 3-6)",
-      "cat": "Academics — Elementary & Middle School",
+      "cat": "Academics — Primary & Middle (Classes 1-8)",
       "inr": [
         600
       ],
@@ -1551,7 +1551,7 @@ export const PRICING = {
     },
     {
       "name": "Vedic Maths (Advanced)",
-      "cat": "Academics — Elementary & Middle School",
+      "cat": "Academics — Primary & Middle (Classes 1-8)",
       "inr": [
         1000
       ],
@@ -1563,7 +1563,7 @@ export const PRICING = {
     },
     {
       "name": "English Grade 1-7",
-      "cat": "Academics — Elementary & Middle School",
+      "cat": "Academics — Primary & Middle (Classes 1-8)",
       "inr": [
         600
       ],
@@ -1575,7 +1575,7 @@ export const PRICING = {
     },
     {
       "name": "English Grade 8",
-      "cat": "Academics — Elementary & Middle School",
+      "cat": "Academics — Primary & Middle (Classes 1-8)",
       "inr": [
         750
       ],
@@ -1587,7 +1587,7 @@ export const PRICING = {
     },
     {
       "name": "Science Grade 1-7",
-      "cat": "Academics — Elementary & Middle School",
+      "cat": "Academics — Primary & Middle (Classes 1-8)",
       "inr": [
         600
       ],
@@ -1599,7 +1599,7 @@ export const PRICING = {
     },
     {
       "name": "Science Grade 8",
-      "cat": "Academics — Elementary & Middle School",
+      "cat": "Academics — Primary & Middle (Classes 1-8)",
       "inr": [
         750
       ],
@@ -1610,8 +1610,8 @@ export const PRICING = {
       "usdG": null
     },
     {
-      "name": "Social Studies Grade 1-7",
-      "cat": "Academics — Elementary & Middle School",
+      "name": "Social Science Grade 1-7",
+      "cat": "Academics — Primary & Middle (Classes 1-8)",
       "inr": [
         600
       ],
@@ -1622,8 +1622,8 @@ export const PRICING = {
       "usdG": null
     },
     {
-      "name": "Social Studies Grade 8",
-      "cat": "Academics — Elementary & Middle School",
+      "name": "Social Science Grade 8",
+      "cat": "Academics — Primary & Middle (Classes 1-8)",
       "inr": [
         750
       ],
@@ -1635,7 +1635,7 @@ export const PRICING = {
     },
     {
       "name": "Abacus",
-      "cat": "Academics — Elementary & Middle School",
+      "cat": "Academics — Primary & Middle (Classes 1-8)",
       "inr": [
         600
       ],
@@ -1647,7 +1647,7 @@ export const PRICING = {
     },
     {
       "name": "Mathematics Grade 9-10",
-      "cat": "Academics — High School",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
         1000
       ],
@@ -1659,7 +1659,7 @@ export const PRICING = {
     },
     {
       "name": "Mathematics Grade 11-12",
-      "cat": "Academics — High School",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
         1200
       ],
@@ -1671,7 +1671,7 @@ export const PRICING = {
     },
     {
       "name": "English Grade 9-10",
-      "cat": "Academics — High School",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
         1000
       ],
@@ -1683,7 +1683,7 @@ export const PRICING = {
     },
     {
       "name": "English Grade 11-12",
-      "cat": "Academics — High School",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
         1200
       ],
@@ -1695,7 +1695,7 @@ export const PRICING = {
     },
     {
       "name": "Science Grade 9-10",
-      "cat": "Academics — High School",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
         1000
       ],
@@ -1707,7 +1707,7 @@ export const PRICING = {
     },
     {
       "name": "Physics Grade 11-12",
-      "cat": "Academics — High School",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
         1200
       ],
@@ -1719,7 +1719,7 @@ export const PRICING = {
     },
     {
       "name": "Chemistry Grade 11-12",
-      "cat": "Academics — High School",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
         1200
       ],
@@ -1731,7 +1731,7 @@ export const PRICING = {
     },
     {
       "name": "Biology Grade 11-12",
-      "cat": "Academics — High School",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
         1200
       ],
@@ -1742,8 +1742,8 @@ export const PRICING = {
       "usdG": null
     },
     {
-      "name": "Social Studies Grade 9-10",
-      "cat": "Academics — High School",
+      "name": "Social Science Grade 9-10",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
         1000
       ],
@@ -1754,92 +1754,8 @@ export const PRICING = {
       "usdG": null
     },
     {
-      "name": "Social Studies Grade 11-12",
-      "cat": "Academics — High School",
-      "inr": [
-        1200
-      ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "Integrated Math I/II/III",
-      "cat": "Academics — High School",
-      "inr": [
-        1200
-      ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "Algebra I",
-      "cat": "Academics — High School",
-      "inr": [
-        1200
-      ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "Algebra II",
-      "cat": "Academics — High School",
-      "inr": [
-        1200
-      ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "Geometry",
-      "cat": "Academics — High School",
-      "inr": [
-        1200
-      ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "Pre-Calculus",
-      "cat": "Academics — High School",
-      "inr": [
-        1200
-      ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "Calculus",
-      "cat": "Academics — High School",
-      "inr": [
-        1200
-      ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
       "name": "Essay Writing",
-      "cat": "Academics — High School",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
         1000
       ],
@@ -1851,7 +1767,7 @@ export const PRICING = {
     },
     {
       "name": "Economics",
-      "cat": "Academics — High School",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
         1200
       ],
@@ -1862,242 +1778,10 @@ export const PRICING = {
       "usdG": null
     },
     {
-      "name": "Honors Chemistry",
-      "cat": "Academics — High School",
-      "inr": [
-        1000
-      ],
-      "usd": [
-        15
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "Honors Biology",
-      "cat": "Academics — High School",
-      "inr": [
-        1000
-      ],
-      "usd": [
-        15
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "Honors Physics",
-      "cat": "Academics — High School",
-      "inr": [
-        1000
-      ],
-      "usd": [
-        15
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "AP Physics 1/2",
-      "cat": "AP Courses",
+      "name": "History Grade 11-12",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
         1200
-      ],
-      "usd": [
-        18
-      ],
-      "inrG": [
-        600
-      ],
-      "usdG": null
-    },
-    {
-      "name": "AP Physics C",
-      "cat": "AP Courses",
-      "inr": [
-        1500
-      ],
-      "usd": [
-        20
-      ],
-      "inrG": [
-        600
-      ],
-      "usdG": null
-    },
-    {
-      "name": "AP Physics C Mechanics",
-      "cat": "AP Courses",
-      "inr": [
-        1500
-      ],
-      "usd": [
-        20
-      ],
-      "inrG": [
-        600
-      ],
-      "usdG": null
-    },
-    {
-      "name": "AP Chemistry",
-      "cat": "AP Courses",
-      "inr": [
-        1200
-      ],
-      "usd": [
-        18
-      ],
-      "inrG": [
-        600
-      ],
-      "usdG": null
-    },
-    {
-      "name": "AP Biology",
-      "cat": "AP Courses",
-      "inr": [
-        1200
-      ],
-      "usd": [
-        18
-      ],
-      "inrG": [
-        600
-      ],
-      "usdG": null
-    },
-    {
-      "name": "AP Pre-Calculus",
-      "cat": "AP Courses",
-      "inr": [
-        1200
-      ],
-      "usd": [
-        18
-      ],
-      "inrG": [
-        600
-      ],
-      "usdG": null
-    },
-    {
-      "name": "AP Calculus AB",
-      "cat": "AP Courses",
-      "inr": [
-        1500
-      ],
-      "usd": [
-        20
-      ],
-      "inrG": [
-        600
-      ],
-      "usdG": null
-    },
-    {
-      "name": "AP Calculus BC",
-      "cat": "AP Courses",
-      "inr": [
-        1500
-      ],
-      "usd": [
-        20
-      ],
-      "inrG": [
-        600
-      ],
-      "usdG": null
-    },
-    {
-      "name": "AP English Language",
-      "cat": "AP Courses",
-      "inr": [
-        1200
-      ],
-      "usd": [
-        18
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "AP Spanish",
-      "cat": "AP Courses",
-      "inr": [
-        1000
-      ],
-      "usd": [
-        15
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "AP French",
-      "cat": "AP Courses",
-      "inr": [
-        1000
-      ],
-      "usd": [
-        15
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "AP Computer Science",
-      "cat": "AP Courses",
-      "inr": [
-        1000
-      ],
-      "usd": [
-        15
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "AP Computer Science Principles",
-      "cat": "AP Courses",
-      "inr": [
-        1000
-      ],
-      "usd": [
-        15
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "AP US History",
-      "cat": "AP Courses",
-      "inr": [
-        1000
-      ],
-      "usd": [
-        15
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "AP European History",
-      "cat": "AP Courses",
-      "inr": [
-        1000
-      ],
-      "usd": [
-        15
-      ],
-      "inrG": null,
-      "usdG": null
-    },
-    {
-      "name": "AP Statistics",
-      "cat": "AP Courses",
-      "inr": [
-        1500
       ],
       "usd": [
         20
@@ -2106,105 +1790,87 @@ export const PRICING = {
       "usdG": null
     },
     {
-      "name": "AP Music Theory",
-      "cat": "AP Courses",
+      "name": "Political Science Grade 11-12",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
-        1000
+        1200
       ],
       "usd": [
-        15
+        20
       ],
       "inrG": null,
       "usdG": null
     },
     {
-      "name": "AP Micro Economics",
-      "cat": "AP Courses",
+      "name": "Geography Grade 11-12",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
-        1000
+        1200
       ],
       "usd": [
-        15
+        20
       ],
       "inrG": null,
       "usdG": null
     },
     {
-      "name": "AP Macro Economics",
-      "cat": "AP Courses",
+      "name": "Accountancy Grade 11-12",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
-        1000
+        1200
       ],
       "usd": [
-        15
+        20
       ],
       "inrG": null,
       "usdG": null
     },
     {
-      "name": "English SAT/PSAT",
-      "cat": "Standardized Tests",
+      "name": "Business Studies Grade 11-12",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
         1200
       ],
       "usd": [
-        18
+        20
       ],
-      "inrG": [
-        600
-      ],
-      "usdG": null
-    },
-    {
-      "name": "Math SAT/PSAT",
-      "cat": "Standardized Tests",
-      "inr": [
-        1200
-      ],
-      "usd": [
-        18
-      ],
-      "inrG": [
-        600
-      ],
-      "usdG": null
-    },
-    {
-      "name": "Digital SAT/PSAT Math",
-      "cat": "Standardized Tests",
-      "inr": [
-        1200
-      ],
-      "usd": null,
       "inrG": null,
       "usdG": null
     },
     {
-      "name": "NMSQT",
-      "cat": "Standardized Tests",
+      "name": "Applied Mathematics Grade 11-12",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
         1200
       ],
       "usd": [
-        18
+        20
       ],
-      "inrG": [
-        600
-      ],
+      "inrG": null,
       "usdG": null
     },
     {
-      "name": "ACT",
-      "cat": "Standardized Tests",
+      "name": "Computer Science Grade 11-12",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
       "inr": [
         1200
       ],
       "usd": [
-        18
+        20
       ],
-      "inrG": [
-        600
+      "inrG": null,
+      "usdG": null
+    },
+    {
+      "name": "Informatics Practices Grade 11-12",
+      "cat": "Academics — Secondary & Senior Secondary (Classes 9-12)",
+      "inr": [
+        1200
       ],
+      "usd": [
+        20
+      ],
+      "inrG": null,
       "usdG": null
     }
   ],

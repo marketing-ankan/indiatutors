@@ -31,18 +31,48 @@ foreach ([
 ] as $from => $to) {
     Route::redirect('/'.$from, $to, 301);
 }
-// AP courses were removed (India-localisation): old AP course URLs 301 to
-// /courses. The constraint means only /courses/ap-* hits this — every other
+// Courses dropped in the India-localisation pass: the US College Board tests and
+// the US high-school maths/"Honors" pathway, neither of which maps to any Indian
+// board syllabus. Their old URLs 301 to /courses rather than 404.
+$retiredUS = [
+    'sat-psat-math-mastery', 'digital-sat-psat-math', 'english-sat-psat',
+    'math-sat-psat', 'nmsqt', 'act',
+    'integrated-math-i-ii-iii', 'algebra-i', 'algebra-ii', 'algebra-i-foundation',
+    'geometry', 'pre-calculus', 'calculus',
+    'honors-chemistry', 'honors-biology', 'honors-physics',
+];
+$retiredPattern = 'ap-.+|'.implode('|', $retiredUS);
+// Courses renamed in the same pass — "Social Studies" is not an Indian subject
+// (CBSE says Social Science, CISCE says History, Civics and Geography), and the
+// Classes 11-12 one split into the three separately-examined subjects.
+$renamedCourses = [
+    'social-studies-grade-1-7'  => 'social-science-grade-1-7',
+    'social-studies-grade-8'    => 'social-science-grade-8',
+    'social-studies-grade-9-10' => 'social-science-grade-9-10',
+];
+$courseTarget = function (string $slug) use ($retiredUS, $renamedCourses) {
+    if (Str::startsWith($slug, 'ap-') || in_array($slug, $retiredUS, true)) return '/courses';
+    if (isset($renamedCourses[$slug])) return '/courses/'.$renamedCourses[$slug];
+    if ($slug === 'social-studies-grade-11-12') return '/courses?category=academics-secondary-senior-secondary-classes-9-12';
+    return '/courses/'.$slug;
+};
+// The constraint means only retired/renamed slugs hit this — every other
 // /courses/{slug} still falls through to the SPA catch-all below.
-Route::get('/courses/{slug}', fn () => redirect('/courses', 301))->where('slug', 'ap-.+');
-Route::get('/product/{slug}', fn (string $slug) => Str::startsWith($slug, 'ap-')
-    ? redirect('/courses', 301)
-    : redirect('/courses/'.$slug, 301));
+$movedPattern = $retiredPattern.'|social-studies-grade-.+';
+Route::get('/courses/{slug}', fn (string $slug) => redirect($courseTarget($slug), 301))->where('slug', $movedPattern);
+Route::get('/product/{slug}', fn (string $slug) => redirect($courseTarget($slug), 301));
+
+// Categories renamed to the Indian bands in the same pass.
+$renamedCategories = [
+    'academics-elementary-middle-school' => 'academics-primary-middle-classes-1-8',
+    'academics-high-school'              => 'academics-secondary-senior-secondary-classes-9-12',
+    'social-studies'                     => 'social-science',
+];
 // WP category URLs nest parents (/product-category/dance/kathak/); the last
 // segment is the category slug our archive filters on.
-Route::get('/product-category/{path}', function (string $path) {
+Route::get('/product-category/{path}', function (string $path) use ($renamedCategories) {
     $slug = collect(explode('/', trim($path, '/')))->last();
-    return redirect('/courses?category='.$slug, 301);
+    return redirect('/courses?category='.($renamedCategories[$slug] ?? $slug), 301);
 })->where('path', '.*');
 
 // Serve the React app for all other routes (React Router handles client-side

@@ -1,55 +1,139 @@
 {
-  "_note": "Course videos are hosted on Bunny.net Stream only — never YouTube (unlisted still leaks the id). video_id holds the Bunny GUID; replace the placeholders below with real GUIDs from your Bunny library. Lessons play once BUNNY_STREAM_* are configured.",
-  "courses": [
+ "_note": "Course videos are hosted on Bunny.net Stream only — never YouTube (unlisted still leaks the id). video_id holds the Bunny GUID; replace the placeholders below with real GUIDs from your Bunny library. Lessons play once BUNNY_STREAM_* are configured.",
+ "courses": [
+  {
+   "slug": "python-for-kids-self-paced",
+   "title": "Python for Kids — Self-Paced",
+   "subtitle": "Code your first games and projects, at your own pace.",
+   "description": "A complete beginner-friendly Python track for ages 10+. Learn variables, loops, functions and build real mini-projects — watch anytime, rewatch as often as you like, and practise between lessons.",
+   "price": 1499,
+   "level": "Beginner",
+   "category": "IT Technologies",
+   "position": 0,
+   "lessons": [
     {
-      "slug": "python-for-kids-self-paced",
-      "title": "Python for Kids — Self-Paced",
-      "subtitle": "Code your first games and projects, at your own pace.",
-      "description": "A complete beginner-friendly Python track for ages 10+. Learn variables, loops, functions and build real mini-projects — watch anytime, rewatch as often as you like, and practise between lessons.",
-      "price": 1499,
-      "level": "Beginner",
-      "category": "IT Technologies",
-      "position": 0,
-      "lessons": [
-        { "title": "Welcome & what you'll build", "provider": "bunny", "video_id": "BUNNY-GUID-python-01", "duration_seconds": 240, "is_preview": true },
-        { "title": "Installing Python & your first program", "provider": "bunny", "video_id": "BUNNY-GUID-python-02", "duration_seconds": 900, "is_preview": true },
-        { "title": "Variables & data types", "provider": "bunny", "video_id": "BUNNY-GUID-python-03", "duration_seconds": 1080, "is_preview": false },
-        { "title": "Loops: repeat things automatically", "provider": "bunny", "video_id": "BUNNY-GUID-python-04", "duration_seconds": 1200, "is_preview": false },
-        { "title": "Functions & building a number game", "provider": "bunny", "video_id": "BUNNY-GUID-python-05", "duration_seconds": 1500, "is_preview": false }
-      ]
+     "title": "Welcome & what you'll build",
+     "provider": "bunny",
+     "video_id": "BUNNY-GUID-python-01",
+     "duration_seconds": 240,
+     "is_preview": true
     },
     {
-      "slug": "arts-painting-fundamentals-video",
-      "title": "Arts & Painting Fundamentals (Video)",
-      "subtitle": "Sketching, colour theory and your first paintings.",
-      "description": "Self-paced painting fundamentals for young artists — pencil control, shading, colour mixing and three guided paintings you can complete at home.",
-      "price": 999,
-      "level": "Beginner",
-      "category": "Creative Skills",
-      "position": 1,
-      "lessons": [
-        { "title": "Course intro & materials", "provider": "bunny", "video_id": "BUNNY-GUID-arts-01", "duration_seconds": 300, "is_preview": true },
-        { "title": "Pencil control & basic shapes", "provider": "bunny", "video_id": "BUNNY-GUID-arts-02", "duration_seconds": 900, "is_preview": false },
-        { "title": "Shading & light", "provider": "bunny", "video_id": "BUNNY-GUID-arts-03", "duration_seconds": 1100, "is_preview": false },
-        { "title": "Colour theory & mixing", "provider": "bunny", "video_id": "BUNNY-GUID-arts-04", "duration_seconds": 1300, "is_preview": false }
-      ]
+     "title": "Installing Python & your first program",
+     "provider": "bunny",
+     "video_id": "BUNNY-GUID-python-02",
+     "duration_seconds": 900,
+     "is_preview": true
     },
     {
-      "slug": "digital-sat-math-video",
-      "title": "Digital SAT Math — Self-Paced",
-      "subtitle": "Concept videos + strategy for the Digital SAT Math section.",
-      "description": "Every Digital SAT Math topic broken into short, focused videos with worked examples and timing strategy — study on your schedule and revisit the tricky bits before test day.",
-      "price": 2499,
-      "level": "Advanced",
-      "category": "Study Abroad",
-      "position": 2,
-      "lessons": [
-        { "title": "How the Digital SAT Math works", "provider": "bunny", "video_id": "BUNNY-GUID-sat-01", "duration_seconds": 420, "is_preview": true },
-        { "title": "Heart of Algebra", "provider": "bunny", "video_id": "BUNNY-GUID-sat-02", "duration_seconds": 1500, "is_preview": false },
-        { "title": "Problem Solving & Data Analysis", "provider": "bunny", "video_id": "BUNNY-GUID-sat-03", "duration_seconds": 1600, "is_preview": false },
-        { "title": "Passport to Advanced Math", "provider": "bunny", "video_id": "BUNNY-GUID-sat-04", "duration_seconds": 1700, "is_preview": false },
-        { "title": "Full-section timing strategy", "provider": "bunny", "video_id": "BUNNY-GUID-sat-05", "duration_seconds": 1200, "is_preview": false }
-      ]
+     "title": "Variables & data types",
+     "provider": "bunny",
+     "video_id": "BUNNY-GUID-python-03",
+     "duration_seconds": 1080,
+     "is_preview": false
+    },
+    {
+     "title": "Loops: repeat things automatically",
+     "provider": "bunny",
+     "video_id": "BUNNY-GUID-python-04",
+     "duration_seconds": 1200,
+     "is_preview": false
+    },
+    {
+     "title": "Functions & building a number game",
+     "provider": "bunny",
+     "video_id": "BUNNY-GUID-python-05",
+     "duration_seconds": 1500,
+     "is_preview": false
     }
-  ]
+   ]
+  },
+  {
+   "slug": "arts-painting-fundamentals-video",
+   "title": "Arts & Painting Fundamentals (Video)",
+   "subtitle": "Sketching, colour theory and your first paintings.",
+   "description": "Self-paced painting fundamentals for young artists — pencil control, shading, colour mixing and three guided paintings you can complete at home.",
+   "price": 999,
+   "level": "Beginner",
+   "category": "Creative Skills",
+   "position": 1,
+   "lessons": [
+    {
+     "title": "Course intro & materials",
+     "provider": "bunny",
+     "video_id": "BUNNY-GUID-arts-01",
+     "duration_seconds": 300,
+     "is_preview": true
+    },
+    {
+     "title": "Pencil control & basic shapes",
+     "provider": "bunny",
+     "video_id": "BUNNY-GUID-arts-02",
+     "duration_seconds": 900,
+     "is_preview": false
+    },
+    {
+     "title": "Shading & light",
+     "provider": "bunny",
+     "video_id": "BUNNY-GUID-arts-03",
+     "duration_seconds": 1100,
+     "is_preview": false
+    },
+    {
+     "title": "Colour theory & mixing",
+     "provider": "bunny",
+     "video_id": "BUNNY-GUID-arts-04",
+     "duration_seconds": 1300,
+     "is_preview": false
+    }
+   ]
+  },
+  {
+   "slug": "ncert-class-10-maths-video",
+   "title": "NCERT Class 10 Maths — Self-Paced",
+   "subtitle": "Every Class 10 Maths chapter, worked example by worked example.",
+   "description": "The full CBSE Class 10 Mathematics syllabus broken into short, focused videos with NCERT-style worked examples and board-paper practice — study on your schedule and revisit the tricky chapters before the boards.",
+   "price": 2499,
+   "level": "Intermediate",
+   "category": "Academics",
+   "position": 2,
+   "lessons": [
+    {
+     "title": "Real Numbers and Polynomials",
+     "provider": "bunny",
+     "video_id": "BUNNY-GUID-x-maths-01",
+     "duration_seconds": 420,
+     "is_preview": true
+    },
+    {
+     "title": "Pair of Linear Equations in Two Variables",
+     "provider": "bunny",
+     "video_id": "BUNNY-GUID-x-maths-02",
+     "duration_seconds": 1500,
+     "is_preview": false
+    },
+    {
+     "title": "Quadratic Equations and Arithmetic Progressions",
+     "provider": "bunny",
+     "video_id": "BUNNY-GUID-x-maths-03",
+     "duration_seconds": 1600,
+     "is_preview": false
+    },
+    {
+     "title": "Triangles, Coordinate Geometry and Circles",
+     "provider": "bunny",
+     "video_id": "BUNNY-GUID-x-maths-04",
+     "duration_seconds": 1700,
+     "is_preview": false
+    },
+    {
+     "title": "Trigonometry, Mensuration, Statistics and Probability",
+     "provider": "bunny",
+     "video_id": "BUNNY-GUID-x-maths-05",
+     "duration_seconds": 1800,
+     "is_preview": false
+    }
+   ]
+  }
+ ]
 }

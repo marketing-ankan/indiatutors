@@ -14,7 +14,7 @@ export const CATALOG_NAV = [
   "mega": [
    {
     "label": "🎓 By Board",
-    "to": "/courses?category=academics-high-school",
+    "to": "/courses?category=academics-secondary-senior-secondary-classes-9-12",
     "items": [
      { "label": "🏫 CBSE", "to": "/board/cbse" },
      { "label": "📚 ICSE / ISC", "to": "/board/icse" },
@@ -24,8 +24,8 @@ export const CATALOG_NAV = [
     ]
    },
    {
-    "label": "📘 Academics — Elementary & Middle School",
-    "to": "/courses?category=academics-elementary-middle-school",
+    "label": "📘 Academics — Primary & Middle (Classes 1-8)",
+    "to": "/courses?category=academics-primary-middle-classes-1-8",
     "items": [
      {
       "label": "🧮 Abacus",
@@ -60,12 +60,12 @@ export const CATALOG_NAV = [
       "to": "/courses/science-grade-8"
      },
      {
-      "label": "🌍 Social Studies Grade 1-7",
-      "to": "/courses/social-studies-grade-1-7"
+      "label": "🌍 Social Science Grade 1-7",
+      "to": "/courses/social-science-grade-1-7"
      },
      {
-      "label": "🌍 Social Studies Grade 8",
-      "to": "/courses/social-studies-grade-8"
+      "label": "🌍 Social Science Grade 8",
+      "to": "/courses/social-science-grade-8"
      },
      {
       "label": "📐 Vedic Maths (Advanced)",
@@ -78,24 +78,12 @@ export const CATALOG_NAV = [
     ]
    },
    {
-    "label": "📘 Academics — High School",
-    "to": "/courses?category=academics-high-school",
+    "label": "📘 Academics — Secondary & Senior Secondary (Classes 9-12)",
+    "to": "/courses?category=academics-secondary-senior-secondary-classes-9-12",
     "items": [
-     {
-      "label": "📐 Algebra I",
-      "to": "/courses/algebra-i"
-     },
-     {
-      "label": "📐 Algebra II",
-      "to": "/courses/algebra-ii"
-     },
      {
       "label": "🧬 Biology Grade 11-12",
       "to": "/courses/biology-grade-11-12"
-     },
-     {
-      "label": "📐 Calculus",
-      "to": "/courses/calculus"
      },
      {
       "label": "🧪 Chemistry Grade 11-12",
@@ -114,30 +102,6 @@ export const CATALOG_NAV = [
       "to": "/courses/english-grade-9-10"
      },
      {
-      "label": "📝 Essay Writing",
-      "to": "/courses/essay-writing"
-     },
-     {
-      "label": "📐 Geometry",
-      "to": "/courses/geometry"
-     },
-     {
-      "label": "🧬 Honors Biology",
-      "to": "/courses/honors-biology"
-     },
-     {
-      "label": "🧪 Honors Chemistry",
-      "to": "/courses/honors-chemistry"
-     },
-     {
-      "label": "⚛️ Honors Physics",
-      "to": "/courses/honors-physics"
-     },
-     {
-      "label": "📐 Integrated Math I/II/III",
-      "to": "/courses/integrated-math-i-ii-iii"
-     },
-     {
       "label": "📐 Mathematics Grade 11-12",
       "to": "/courses/mathematics-grade-11-12"
      },
@@ -150,20 +114,44 @@ export const CATALOG_NAV = [
       "to": "/courses/physics-grade-11-12"
      },
      {
-      "label": "📐 Pre-Calculus",
-      "to": "/courses/pre-calculus"
-     },
-     {
       "label": "🔬 Science Grade 9-10",
       "to": "/courses/science-grade-9-10"
      },
      {
-      "label": "🌍 Social Studies Grade 11-12",
-      "to": "/courses/social-studies-grade-11-12"
+      "label": "🌍 Social Science Grade 9-10",
+      "to": "/courses/social-science-grade-9-10"
      },
      {
-      "label": "🌍 Social Studies Grade 9-10",
-      "to": "/courses/social-studies-grade-9-10"
+      "label": "📜 History Grade 11-12",
+      "to": "/courses/history-grade-11-12"
+     },
+     {
+      "label": "🏛️ Political Science Grade 11-12",
+      "to": "/courses/political-science-grade-11-12"
+     },
+     {
+      "label": "🗺️ Geography Grade 11-12",
+      "to": "/courses/geography-grade-11-12"
+     },
+     {
+      "label": "📒 Accountancy Grade 11-12",
+      "to": "/courses/accountancy-grade-11-12"
+     },
+     {
+      "label": "💼 Business Studies Grade 11-12",
+      "to": "/courses/business-studies-grade-11-12"
+     },
+     {
+      "label": "📐 Applied Mathematics Grade 11-12",
+      "to": "/courses/applied-mathematics-grade-11-12"
+     },
+     {
+      "label": "💻 Computer Science Grade 11-12",
+      "to": "/courses/computer-science-grade-11-12"
+     },
+     {
+      "label": "📊 Informatics Practices Grade 11-12",
+      "to": "/courses/informatics-practices-grade-11-12"
      }
     ]
    },
@@ -171,14 +159,11 @@ export const CATALOG_NAV = [
     "label": "🏆 Competitive Exams",
     "to": "/competitive-exams",
     "items": [
-     { "label": "⚡ JEE Main", "to": "/book-demo?subject=JEE Main" },
-     { "label": "⚡ JEE Advanced", "to": "/book-demo?subject=JEE Advanced" },
-     { "label": "🧬 NEET", "to": "/book-demo?subject=NEET" },
-     { "label": "📝 CUET", "to": "/book-demo?subject=CUET" },
-     { "label": "🏅 Olympiads", "to": "/book-demo?subject=Olympiads" },
-     { "label": "📊 NTSE", "to": "/book-demo?subject=NTSE" },
-     { "label": "🌎 SAT / Digital SAT (study abroad)", "to": "/courses/digital-sat-psat-math" },
-     { "label": "📝 ACT (study abroad)", "to": "/courses/act" },
+     { "label": "⚡ JEE Main", "to": "/courses/jee-main" },
+     { "label": "⚡ JEE Advanced", "to": "/courses/jee-advanced" },
+     { "label": "🧬 NEET (UG)", "to": "/courses/neet-ug" },
+     { "label": "📝 CUET (UG)", "to": "/courses/cuet-ug" },
+     { "label": "🏅 Olympiads (IMO / NSO / IEO)", "to": "/courses/olympiad-preparation" },
      { "label": "🌐 IELTS / TOEFL (study abroad)", "to": "/book-demo?subject=IELTS / TOEFL" }
     ]
    },
@@ -453,7 +438,7 @@ export const CATALOG_NAV = [
       "to": "/courses/kuchipudi-dance"
      },
      {
-      "label": "💃 Western Dance Dance",
+      "label": "💃 Western Dance",
       "to": "/courses/western-dance-dance"
      },
      {
@@ -481,6 +466,10 @@ export const CATALOG_NAV = [
      {
       "label": "🗣️ Public Speaking",
       "to": "/courses/public-speaking"
+     },
+     {
+      "label": "📝 Essay Writing",
+      "to": "/courses/essay-writing"
      },
      {
       "label": "🔤 Spelling Competition",
@@ -512,7 +501,7 @@ export const CATALOG_NAV = [
   "items": [
    { "label": "🐍 Python for Kids", "to": "/video-courses/python-for-kids-self-paced" },
    { "label": "🎨 Arts & Painting Fundamentals", "to": "/video-courses/arts-painting-fundamentals-video" },
-   { "label": "🧮 Digital SAT Math", "to": "/video-courses/digital-sat-math-video" }
+   { "label": "🧮 NCERT Class 10 Maths", "to": "/video-courses/ncert-class-10-maths-video" }
   ],
   "footer": [
    { "label": "🎬 All video courses →", "to": "/video-courses" }
@@ -675,12 +664,12 @@ export const CATALOG_NAV = [
     "to": "/courses?search=Python"
    },
    {
-    "label": "📝 Math SAT/PSAT",
-    "to": "/courses?search=Math%20SAT%2FPSAT"
+    "label": "🧮 Abacus",
+    "to": "/courses?search=Abacus"
    },
    {
-    "label": "📘 English SAT/PSAT",
-    "to": "/courses?search=English%20SAT%2FPSAT"
+    "label": "📐 Vedic Maths",
+    "to": "/courses?search=Vedic%20Maths"
    },
    {
     "label": "🦾 Robotics",
@@ -752,24 +741,24 @@ export const CATALOG_NAV = [
   "mega": null,
   "items": [
    {
-    "label": "⚡ JEE Main & Advanced",
-    "to": "/book-demo?subject=JEE Main %26 Advanced"
+    "label": "⚡ JEE Main",
+    "to": "/courses/jee-main"
    },
    {
-    "label": "🧬 NEET",
-    "to": "/book-demo?subject=NEET"
+    "label": "⚡ JEE Advanced",
+    "to": "/courses/jee-advanced"
    },
    {
-    "label": "📝 CUET",
-    "to": "/book-demo?subject=CUET"
+    "label": "🧬 NEET (UG)",
+    "to": "/courses/neet-ug"
    },
    {
-    "label": "🏆 Olympiads",
-    "to": "/book-demo?subject=Olympiads"
+    "label": "📝 CUET (UG)",
+    "to": "/courses/cuet-ug"
    },
    {
-    "label": "🌎 SAT / ACT (study abroad)",
-    "to": "/courses?category=standardized-tests"
+    "label": "🏆 Olympiads (IMO / NSO / IEO)",
+    "to": "/courses/olympiad-preparation"
    },
    {
     "label": "🌐 IELTS / TOEFL",

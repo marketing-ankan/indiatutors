@@ -44,7 +44,7 @@ const LANDINGS = {
     cards: [
       { ic:'🎨', name:'Art & Painting', desc:'Colour theory, sketching and creative self-expression, lesson by lesson.', price:200, was:350, to:'/courses/arts-painting' },
       { ic:'✂️', name:'Art & Craft', desc:'Hands-on craft projects that build imagination and fine motor skills.', price:200, was:350, to:'/courses/art-and-craft' },
-      { ic:'📐', name:'Digital SAT/PSAT Math', desc:'Concept videos, strategy and practice sets for the Digital SAT/PSAT Math.', price:1200, was:2000, to:'/courses/digital-sat-psat-math' },
+      { ic:'📐', name:'Vedic Maths', desc:'Mental-calculation shortcuts, lesson by lesson, at your own pace.', price:600, was:1000, to:'/courses/vedic-maths-grade-3-6' },
     ],
   },
   'events-workshops': {
@@ -61,8 +61,8 @@ const LANDINGS = {
       { ic:'🧩', name:"Rubik's Cube", to:'/courses/rubiks-cube', upcoming:true },
       { ic:'🐱', name:'Scratch', to:'/courses/scratch', upcoming:true },
       { ic:'🐍', name:'Python', to:'/courses/python', upcoming:true },
-      { ic:'📝', name:'Math SAT/PSAT', to:'/courses/math-sat-psat', upcoming:true },
-      { ic:'📘', name:'English SAT/PSAT', to:'/courses/english-sat-psat', upcoming:true },
+      { ic:'🏅', name:'Maths Olympiad (IMO)', to:'/courses/olympiad-preparation', upcoming:true },
+      { ic:'🧮', name:'Abacus', to:'/courses/abacus', upcoming:true },
       { ic:'🦾', name:'Robotics', to:'/courses/robotics', upcoming:true },
       { ic:'🗣️', name:'Public Speaking', to:'/courses/public-speaking', upcoming:true },
     ],
@@ -70,14 +70,14 @@ const LANDINGS = {
   'competitive-exams': {
     eyebrow: '🏅 Exam prep',
     title: 'Competitive Exams',
-    tagline: 'Focused, strategy-led coaching for standardised tests — built around the latest exam patterns and timed practice.',
+    tagline: "Focused, strategy-led coaching for India's entrance exams — built around the current exam patterns, NCERT fundamentals and timed practice.",
     section: 'Exam Coaching',
     cards: [
-      { ic:'📐', name:'Digital SAT/PSAT Math', desc:'Adaptive Digital SAT/PSAT Math strategy and practice.', price:1200, was:2000, to:'/courses/digital-sat-psat-math' },
-      { ic:'📐', name:'Math SAT/PSAT', desc:'SAT/PSAT Math concepts, shortcuts and full-length practice.', price:1200, was:2000, to:'/courses/math-sat-psat' },
-      { ic:'📘', name:'English SAT/PSAT', desc:'Reading, writing and language mastery for the SAT/PSAT.', price:1200, was:2000, to:'/courses/english-sat-psat' },
-      { ic:'🎓', name:'NMSQT', desc:'Targeted preparation for the National Merit qualifying test.', price:1200, was:2000, to:'/courses/nmsqt' },
-      { ic:'📝', name:'ACT', desc:'Complete ACT coaching across all four sections.', price:1200, was:2000, to:'/courses/act' },
+      { ic:'⚡', name:'JEE Main', desc:'Physics, Chemistry and Maths built up from the NCERT, with timed mocks.', price:1500, was:2500, to:'/courses/jee-main' },
+      { ic:'🎯', name:'JEE Advanced', desc:'Advanced problem-solving and paper technique for the IIT entrance.', price:1800, was:3000, to:'/courses/jee-advanced' },
+      { ic:'🧬', name:'NEET (UG)', desc:'Botany, Zoology, Physics and Chemistry with line-by-line NCERT mastery.', price:1500, was:2500, to:'/courses/neet-ug' },
+      { ic:'📝', name:'CUET (UG)', desc:'General Test, language section and your chosen domain subjects.', price:1200, was:2000, to:'/courses/cuet-ug' },
+      { ic:'🏅', name:'Olympiads (IMO / NSO / IEO)', desc:'Reasoning, subject depth and the Achievers section, Classes 1-10.', price:900, was:1500, to:'/courses/olympiad-preparation' },
     ],
   },
   'skill-programmes': {

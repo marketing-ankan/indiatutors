@@ -136,6 +136,37 @@ User triage of the gap report: instruments store, SAT/Vedic calculators and CA/D
 
 ---
 
+## India-localisation of the catalog ✅ (2026-07-28)
+
+The catalog was inherited from the US-facing sister site, so it carried subjects that have no counterpart anywhere in Indian schooling. Verified against the official CBSE 2025-26 curriculum documents and the CISCE ICSE/ISC regulations — the strings "Social Studies", "Algebra I/II", "Pre-Calculus", "Integrated Math", "Honors", "Elementary/Middle/High School" appear **zero times** in all four.
+
+**Removed (16 courses)** — US College Board tests (SAT/PSAT Math Mastery, Digital SAT/PSAT Math, English SAT/PSAT, Math SAT/PSAT, NMSQT, ACT) and the US high-school maths pathway (Integrated Math I/II/III, Algebra I, Algebra II, Algebra I Foundation, Geometry, Pre-Calculus, Calculus, Honors Chemistry/Biology/Physics). In India algebra, geometry and calculus are *units inside Mathematics*, never separate subjects, and "Honors" is a US GPA-weighting label no Indian board uses. Also purged the leftover **AP Courses** branch (20 dead links still rendering on the homepage and Plans page after the courses themselves were pruned) and the whole **Standardized Tests** branch. All old URLs 301 to `/courses`.
+
+**Renamed** — `Social Studies` → `Social Science` (CBSE's actual name; ICSE calls it "History, Civics and Geography"); the two category bands → **Academics — Primary & Middle (Classes 1-8)** and **Academics — Secondary & Senior Secondary (Classes 9-12)**. "Elementary" was not just un-Indian: under the RTE Act it means Classes 1–8, so using it for Classes 1–5 was actively wrong. Old course and category URLs 301 to the new slugs.
+
+**Added (13 courses, curricula authored from the official syllabi — not copied from WinQuest)**
+- Classes 11-12 humanities, replacing the bogus single "Social Studies Grade 11-12": **History** (027), **Political Science** (028), **Geography** (029, incl. the Practical Work paper)
+- Commerce stream, previously absent entirely: **Accountancy** (055), **Business Studies** (054), **Applied Mathematics** (241 — the Commerce maths track, no US equivalent)
+- Computing: **Computer Science** (083, Python) and **Informatics Practices** (065, Pandas/Matplotlib) — two distinct, mutually-exclusive CBSE subjects
+- Competitive exams as real course pages rather than book-a-demo links: **JEE Main**, **JEE Advanced**, **NEET (UG)**, **CUET (UG)**, **Olympiad Preparation (IMO/NSO/IEO)**
+- Each academic course ships a CBSE curriculum plus an **ISC (CISCE)** variant reflecting the genuinely different CISCE syllabus (e.g. ISC Computer Science is Java-based, ISC calls Accountancy "Accounts")
+
+**Also** — Essay Writing moved from Academics to Creative Skills (a skill, not an Indian board subject); the `/competitive-exams` landing page rebuilt around Indian exams; the "Digital SAT Math" video course replaced with "NCERT Class 10 Maths"; 32 orphaned course images deleted; board-page subject chips deduped across the two bands.
+
+### Hobby & skill curricula ✅ (2026-07-29)
+
+The second pass. **71 courses** — the 55 that had no curriculum at all, plus **16 that turned out to be raw WinQuest scrapes** and failed the same "author it ourselves" rule: Saxophone was one "level" of 88 fragments, Guitar opened with an "About the Curriculum" level that was just links to abrsm.org / trinitycollege.com / rslawards.com, and topics included `Prerequisites:`, `None`, `Requirements:` and `Stable Internet Connection`.
+
+All 71 were re-authored against the real graded traditions — Prayag Sangit Samiti / Gandharva Mahavidyalaya for Hindustani and Carnatic music, the Trinity/ABRSM grade *shape* for Western instruments (named in prose only, never linked), CEFR A1–B2 for foreign languages, script-first progressions for Indian languages, and CFOP/FIDE for mind sports. Every course is now 5–6 levels × 6–8 topics, each topic a full sentence with a real `age` and `duration`.
+
+Verified mechanically before merging: **zero** topics carried over from the old scrapes, zero URLs, zero cross-tradition terminology leakage (no adavu/araimandi in Kathak, no bansuri terms in Western flute, no varisai in Hindustani), and 0% topic overlap between every deliberately-paired course (Python vs Python for Beginners, AI&ML vs its school-age version, Robotics vs Computational Thinking, Chess vs Chess Strategy, Piano vs Keyboard). Catalogue now: **110 courses, 633 levels, 4,708 topics, 0 empty.**
+
+Also fixed in this pass: 12 homepage card descriptions that were HTML-strip artifacts with the spaces eaten (`For Parents:This program`, `MoreCertificates of Completion`, `(6–8 months)Level 2 →`), 5 feature lists that still read "Expert AP mentors" or advertised "Trinity / ABRSM / RSL aligned", and the duplicated course name "Western Dance Dance" → "Western Dance" (slug left alone for URL stability).
+
+⚠️ **Open items** — NTSE and KVPY links were removed rather than rebuilt: both appear to have been discontinued/merged and this could not be verified in-session, so confirm status before advertising either. SAT/ACT were cut per product decision even though Indian students do sit them for overseas admissions; if study-abroad prep is wanted later, add it as an explicitly separate "Study Abroad" category, never inside the school-syllabus tree. The 10 new courses without photos fall back to the gradient tile — client photography still needed. Homepage testimonials remain placeholder marketing copy and should be replaced with real ones before go-live.
+
+---
+
 ## Reference — source data model (from WP export)
 - **Courses** (`product`, WooCommerce simple): meta `_ito_subtitle`, `_ito_age`, `_ito_pills`, `_ito_tier_labels`/`_ito_tier_o2o`/`_ito_tier_group`, `_ito_curriculum`, `_regular_price`/`_sale_price`
 - **Tutors** (`ito_tutor`): full_name, tagline, qualification, teaching_mode, city/state/localities, fee_hourly, fee_trial, verified, languages, experience_years

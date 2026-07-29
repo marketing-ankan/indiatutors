@@ -95,7 +95,7 @@ export default function AboutPage() {
           <p className="text-slate-700 leading-relaxed text-[1.04rem]">We serve students across India and internationally — in the USA, Canada, Australia, Singapore, and the United Kingdom. Our online tutors are available across all time zones. Our home tutors are available in major Indian cities including Kolkata, Delhi, Mumbai, Bangalore, Chennai, Hyderabad, and Pune.</p>
 
           <SectionH2>Subject Categories</SectionH2>
-          <p className="text-slate-700 leading-relaxed text-[1.04rem]">Academics (CBSE, ICSE, IB, IGCSE, State Board) · AP Courses · SAT / PSAT / ACT · JEE / NEET Prep · Music (Piano, Violin, Guitar, Tabla, Vocal) · Dance (Bharatnatyam, Kathak, Bollywood, Contemporary) · IT & Coding (Python, AI/ML, Robotics, Java, Web Dev) · Languages (Spanish, French, German, Hindi, Sanskrit) · Chess · Yoga · Creative Arts</p>
+          <p className="text-slate-700 leading-relaxed text-[1.04rem]">Academics (CBSE, ICSE/ISC, IB, IGCSE, State Boards) · Commerce &amp; Computer Science · JEE / NEET / CUET Prep · Olympiads · Music (Piano, Violin, Guitar, Tabla, Vocal) · Dance (Bharatnatyam, Kathak, Bollywood, Contemporary) · IT & Coding (Python, AI/ML, Robotics, Java, Web Dev) · Languages (Spanish, French, German, Hindi, Sanskrit) · Chess · Yoga · Creative Arts</p>
 
           <SectionH2>Contact Us</SectionH2>
           <div className="space-y-2 text-slate-700">

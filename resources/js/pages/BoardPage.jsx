@@ -4,19 +4,19 @@ import { useQuery } from '@tanstack/react-query';
 import { CheckCircle2 } from 'lucide-react';
 import { fetchCourses, inr } from '../lib/api.js';
 import {
-  BOARD_BY_SLUG, ACADEMIC_CATEGORIES, ACADEMIC_PARENTS,
-  US_SUBCATS, US_SLUGS, SUBJECT_ORDER,
+  BOARD_BY_SLUG, ACADEMIC_CATEGORIES, ACADEMIC_PARENTS, SUBJECT_ORDER,
 } from '../data/boards.js';
 
 // Board landing page (/board/{slug}) — CBSE / ICSE / IGCSE / State Boards /
 // NCERT. Surfaces the academic courses that belong to the chosen board's
-// syllabus, filterable by subject chip. Indian boards (scope 'indian') hide
-// US-curriculum courses (Honors, Pre-Calculus/Calculus, Algebra, Geometry,
-// Integrated Math, Essay Writing); IGCSE ('international') keeps them.
+// syllabus, filterable by subject chip.
 
 // A course's subject subcategories (drop the grouping parents like "Academics").
 const subjectsOf = (c) => (c.categories || []).filter((cat) => !ACADEMIC_PARENTS.has(cat.slug));
-const rank = (slug) => { const i = SUBJECT_ORDER.indexOf(slug); return i === -1 ? 99 : i; };
+// The seeder disambiguates a subject name that appears under both academic bands
+// by suffixing the parent id (english -> english-8), so rank on the base slug.
+const baseSlug = (slug) => String(slug).replace(/-\d+$/, '');
+const rank = (slug) => { const i = SUBJECT_ORDER.indexOf(baseSlug(slug)); return i === -1 ? 99 : i; };
 // Order a course by its best (lowest-ranked) subject, then by starting grade so
 // the grid reads English 1-7 → 8 → 9-10 → 11-12 (not the alphabetical 1-7, 11-12, 8…).
 const subjRank = (c) => Math.min(999, ...subjectsOf(c).map((cat) => rank(cat.slug)));
@@ -54,26 +54,30 @@ export default function BoardPage() {
 
   const all = data?.data ?? [];
 
-  // Academic courses that belong on this board — US-curriculum removed on Indian boards.
+  // Academic courses that belong on this board.
   const academic = useMemo(() => {
-    let list = all.filter(c => (c.categories || []).some(cat => ACADEMIC_CATEGORIES.includes(cat.slug)));
-    if (board && board.scope !== 'international') {
-      list = list.filter(c => !US_SLUGS.has(c.slug) && !subjectsOf(c).some(cat => US_SUBCATS.has(cat.slug)));
-    }
+    const list = all.filter(c => (c.categories || []).some(cat => ACADEMIC_CATEGORIES.includes(cat.slug)));
     // Align the grid with the subject chips: group by subject order, then grade.
     return [...list].sort((a, b) =>
       subjRank(a) - subjRank(b) || gradeOf(a.name) - gradeOf(b.name) || a.name.localeCompare(b.name));
-  }, [all, board]);
+  }, [all]);
 
   // Subject chips built from the visible courses (Mathematics, Science, …).
+  // A subject taught in both bands is two categories (english + english-8), so
+  // group by base slug — otherwise the chip row repeats "English", "Mathematics"…
   const subjects = useMemo(() => {
     const m = new Map();
-    for (const c of academic) for (const cat of subjectsOf(c)) if (!m.has(cat.slug)) m.set(cat.slug, cat.name);
-    return [...m.entries()].map(([s, name]) => ({ slug: s, name }))
+    for (const c of academic) for (const cat of subjectsOf(c)) {
+      const key = baseSlug(cat.slug);
+      if (!m.has(key)) m.set(key, cat.name);
+    }
+    return [...m.entries()].map(([slug, name]) => ({ slug, name }))
       .sort((a, b) => rank(a.slug) - rank(b.slug) || a.name.localeCompare(b.name));
   }, [academic]);
 
-  const shown = subject ? academic.filter(c => subjectsOf(c).some(cat => cat.slug === subject)) : academic;
+  const shown = subject
+    ? academic.filter(c => subjectsOf(c).some(cat => baseSlug(cat.slug) === subject))
+    : academic;
 
   if (!board) return (
     <div className="container-wide py-20 text-center">

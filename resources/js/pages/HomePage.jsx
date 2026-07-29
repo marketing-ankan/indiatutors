@@ -321,7 +321,7 @@ export default function HomePage() {
             <p className="mt-5 text-base sm:text-lg text-white/90 max-w-lg leading-relaxed">Live 1-on-1 classes, group sessions, and self-paced video courses across Academics, Coding, Music, Dance, Languages & more — taught by India's top tutors.</p>
             <form onSubmit={e => { e.preventDefault(); if (q.trim()) nav(`/courses?search=${encodeURIComponent(q.trim())}`); }} role="search" aria-label="Search courses" className="mt-7 flex max-w-lg rounded-lg bg-white/95 overflow-hidden focus-within:ring-2 focus-within:ring-white/60">
               <span className="pl-4 self-center text-slate-400" aria-hidden="true"><Search className="h-4 w-4" /></span>
-              <input value={q} onChange={e => setQ(e.target.value)} type="search" placeholder="Search for a subject, e.g. Python, Violin, SAT Math…" className="flex-1 bg-transparent text-slate-900 px-3 py-3 text-sm placeholder-slate-400 focus:outline-none min-w-0" />
+              <input value={q} onChange={e => setQ(e.target.value)} type="search" placeholder="Search for a subject, e.g. Python, Violin, JEE Maths…" className="flex-1 bg-transparent text-slate-900 px-3 py-3 text-sm placeholder-slate-400 focus:outline-none min-w-0" />
               <button type="submit" className="bg-brand-600 hover:bg-brand-500 px-5 text-sm font-bold">Search</button>
             </form>
             <div className="mt-5 flex flex-wrap gap-3">

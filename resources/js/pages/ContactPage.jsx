@@ -49,7 +49,7 @@ export default function ContactPage() {
                 <div><label className={lbl}>Email *</label><input required type="email" value={form.email} onChange={set('email')} className={inp}/></div>
                 <div><label className={lbl}>WhatsApp / Phone *</label><input required value={form.phone} onChange={set('phone')} className={inp}/></div>
               </div>
-              <div><label className={lbl}>Subject / Interest</label><input placeholder="e.g. Class 8 Maths, Piano, SAT" value={form.subject} onChange={set('subject')} className={inp}/></div>
+              <div><label className={lbl}>Subject / Interest</label><input placeholder="e.g. Class 8 Maths, Piano, NEET" value={form.subject} onChange={set('subject')} className={inp}/></div>
               <div><label className={lbl}>Message *</label><textarea required rows={5} value={form.message} onChange={set('message')} className={inp}/></div>
               {mutation.isError && <div className="rounded-md bg-red-50 text-red-700 text-sm p-3">Something went wrong — please try again.</div>}
               <button disabled={mutation.isPending} className="rounded-lg bg-brand-600 text-white px-6 py-3 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">

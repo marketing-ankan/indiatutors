@@ -79,11 +79,12 @@ class CourseSeeder extends Seeder {
                     $path2 = $path2 ? "$path2 > $part" : $part;
                     if (!isset($categoryCache[$path2])) {
                         // Match the live WordPress slugs exactly: sanitize_title turns
-                        // "/" into "-" (Math SAT/PSAT -> math-sat-psat), and child
+                        // "/" into "-" (Vocal Music > Carnatic -> carnatic), and child
                         // slugs carry no parent suffix. Fall back to a -{parentId}
                         // suffix only on a genuine collision (same subject name under
-                        // two parents, e.g. Elementary > English vs High School > English —
-                        // slug is unique so the second create must pre-resolve it).
+                        // two parents, e.g. Primary & Middle > English vs Secondary &
+                        // Senior Secondary > English — slug is unique so the second
+                        // create must pre-resolve it).
                         $desired = Str::slug(str_replace('/', '-', $part));
                         $cat = Category::where('name', $part)->where('parent_id', $parentId)->first();
                         if (!$cat) {
@@ -108,7 +109,7 @@ class CourseSeeder extends Seeder {
 
         // Drop categories that ended up empty (no courses and no children).
         // Loop so a parent whose children were all just pruned (e.g. the removed
-        // "AP Courses" branch) also clears in the same run — bottom-up to stable.
+        // "Standardized Tests" branch) also clears in the same run — bottom-up to stable.
         do { $gone = Category::doesntHave('courses')->doesntHave('children')->delete(); } while ($gone > 0);
 
         $this->command->info("Imported/updated ".count($sourceSlugs)." courses (pruned $pruned stale). Categories: ".Category::count());
