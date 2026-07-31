@@ -117,7 +117,14 @@ export const COURSE_IMAGES = {
 // the old WP uploads for many courses, which (a) isn't the WinQuest look the
 // product pages standardise on and (b) breaks at domain cutover. image_url is
 // only the fallback for the few slugs without an imported photo.
-export const imageFor = (course) => (course && (COURSE_IMAGES[course.slug] || course.image_url)) || null;
+// Cache-busting: the map paths are stable, so a replaced photo would otherwise
+// keep its URL and browsers would show the stale copy until a hard refresh.
+// ASSET_V is a content hash of public/images written before each build; API
+// image_url values are versioned server-side (Course::getImageUrlAttribute).
+import { ASSET_V } from './assetVersion.js';
+const v = (p) => (p && p.startsWith('/build/') ? `${p}?v=${ASSET_V}` : p);
+
+export const imageFor = (course) => (course && (v(COURSE_IMAGES[course.slug]) || course.image_url)) || null;
 
 // WinQuest hero-banner photos (distinct from the buy-card og:image) —
 // extracted per product page and self-hosted. heroImageFor() falls back to
@@ -224,4 +231,4 @@ export const HERO_IMAGES = {
   "olympiad-preparation": "/build/images/courses/hero/olympiad-preparation.jpg",
 };
 
-export const heroImageFor = (course) => (course && (HERO_IMAGES[course.slug] || COURSE_IMAGES[course.slug] || course.image_url)) || null;
+export const heroImageFor = (course) => (course && (v(HERO_IMAGES[course.slug]) || v(COURSE_IMAGES[course.slug]) || course.image_url)) || null;
