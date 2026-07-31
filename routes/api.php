@@ -138,6 +138,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/video-courses',                    [VideoCourseController::class, 'store']);
         Route::patch('/video-courses/{videoCourse}',     [VideoCourseController::class, 'update']);
         Route::delete('/video-courses/{videoCourse}',    [VideoCourseController::class, 'destroy']);
+        // Mints a presigned PUT; the browser uploads straight to R2 from there.
+        Route::post('/video-courses/{videoCourse}/upload-url',              [VideoCourseController::class, 'uploadUrl']);
         Route::get('/video-courses/{videoCourse}/lessons',                 [VideoCourseController::class, 'lessons']);
         Route::post('/video-courses/{videoCourse}/lessons',                [VideoCourseController::class, 'storeLesson']);
         Route::patch('/video-courses/{videoCourse}/lessons/{lesson}',      [VideoCourseController::class, 'updateLesson']);

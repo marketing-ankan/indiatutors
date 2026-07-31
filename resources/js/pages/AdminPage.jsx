@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ShieldAlert, ChevronDown, ChevronUp, UserCheck, GraduationCap, Check, X } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import { fetchAdminDemoRequests, fetchDemoTutors, assignDemo, convertDemo, fetchAdminTeachers, approveTeacher, fetchAdminProposals, decideProposal, fetchAdminAnalytics, fetchAdminExamUpdates, createExamUpdate, updateExamUpdate, deleteExamUpdate, fetchAdminOrders, updateAdminOrder, fetchAdminEvents, createAdminEvent, updateAdminEvent, deleteAdminEvent } from '../lib/api.js';
-import { fetchAdminVideoCourses, createAdminVideoCourse, updateAdminVideoCourse, deleteAdminVideoCourse, fetchAdminLessons, createAdminLesson, updateAdminLesson, deleteAdminLesson } from '../lib/api.js';
+import { fetchAdminVideoCourses, createAdminVideoCourse, updateAdminVideoCourse, deleteAdminVideoCourse, fetchAdminLessons, createAdminLesson, updateAdminLesson, deleteAdminLesson, requestUploadUrl, uploadToR2 } from '../lib/api.js';
 
 const STATUSES = ['', 'new', 'scheduled', 'converted', 'closed'];
 const badge = { new:'bg-amber-50 text-amber-700', scheduled:'bg-blue-50 text-blue-700', converted:'bg-green-50 text-green-700', closed:'bg-slate-100 text-slate-600' };
@@ -75,6 +75,67 @@ const LESSON_BLANK = { title:'', provider:'r2', video_id:'', duration_seconds:0,
 // the uploaded MP4; the other two take the host's own id.
 const VIDEO_ID_HINT = { r2:'key e.g. python-for-kids/1.mp4', bunny:'Bunny GUID', youtube:'YouTube id' };
 
+// Reads a video file's duration in the browser so the admin doesn't have to
+// count seconds by hand. Resolves 0 rather than rejecting — a missing duration
+// is cosmetic and must never block the upload.
+const readDuration = file => new Promise(resolve => {
+  const url = URL.createObjectURL(file);
+  const probe = document.createElement('video');
+  probe.preload = 'metadata';
+  const done = v => { URL.revokeObjectURL(url); resolve(v); };
+  probe.onloadedmetadata = () => done(Math.round(probe.duration) || 0);
+  probe.onerror = () => done(0);
+  probe.src = url;
+});
+
+// Picks a lesson video and sends it straight from the browser to R2 using a
+// presigned PUT from our API. The bytes never touch the app server: shared
+// hosting would reject a 300 MB POST outright, and routing video through it
+// would undo the whole point of R2's free egress.
+function VideoUploader({ courseId, onUploaded }) {
+  const [pct, setPct] = useState(null);
+  const [error, setError] = useState('');
+  const [done, setDone] = useState('');
+
+  const pick = async e => {
+    const file = e.target.files?.[0];
+    e.target.value = '';           // let the same file be re-picked after a failure
+    if (!file) return;
+    setError(''); setDone(''); setPct(0);
+    try {
+      const duration = await readDuration(file);
+      const { key, upload_url } = await requestUploadUrl({
+        courseId, filename: file.name, contentType: file.type || 'video/mp4',
+      });
+      await uploadToR2({ uploadUrl: upload_url, file, onProgress: setPct });
+      setDone(key);
+      onUploaded({ key, duration });
+    } catch (err) {
+      setError(
+        err?.response?.data?.message ||
+        (err?.response ? `Upload rejected by R2 (${err.response.status}). Check the token has Object Write and the bucket allows CORS from this domain.`
+                       : 'Upload failed — check your connection and try again.')
+      );
+    } finally { setPct(null); }
+  };
+
+  return (
+    <div className="w-full basis-full">
+      <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-bold text-white hover:bg-slate-900">
+        <input type="file" accept="video/mp4,video/webm" onChange={pick} className="hidden" disabled={pct !== null} />
+        {pct !== null ? `Uploading… ${pct}%` : 'Upload video file'}
+      </label>
+      {pct !== null && (
+        <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+          <div className="h-full bg-brand-600 transition-[width]" style={{ width: `${pct}%` }} />
+        </div>
+      )}
+      {done && <p className="mt-1 text-[10px] text-green-700">Uploaded → <span className="font-mono">{done}</span></p>}
+      {error && <p className="mt-1 text-[10px] text-red-600">{error}</p>}
+    </div>
+  );
+}
+
 // The transcript is what the study assistant answers from — no transcript, no
 // assistant on that lesson. Saving a new one clears the cached AI summary so it
 // regenerates from the current text instead of serving a stale recap.
@@ -129,6 +190,10 @@ function LessonsManager({ course }) {
         ))}
       </div>
       <form onSubmit={e=>{e.preventDefault(); add.mutate(nl);}} className="mt-2 flex flex-wrap items-center gap-2">
+        {/* Upload first: it fills in the key and duration, so the admin only
+            types a title. Pasting a key by hand still works for Bunny/YouTube. */}
+        <VideoUploader courseId={course.id}
+          onUploaded={({ key, duration }) => setNl(s => ({ ...s, provider:'r2', video_id:key, duration_seconds: duration || s.duration_seconds }))} />
         <input required value={nl.title} onChange={e=>setNl(s=>({...s,title:e.target.value}))} placeholder="Lesson title" className={inp+' flex-1 min-w-[140px]'} />
         <select value={nl.provider} onChange={e=>setNl(s=>({...s,provider:e.target.value}))} className={inp}><option value="r2">R2 (secure)</option><option value="bunny">Bunny (secure)</option><option value="youtube">YouTube (public only)</option></select>
         <input required value={nl.video_id} onChange={e=>setNl(s=>({...s,video_id:e.target.value}))} placeholder={VIDEO_ID_HINT[nl.provider]} className={inp+(nl.provider==='r2'?' w-56':' w-32')} />

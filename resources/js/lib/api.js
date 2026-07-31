@@ -165,6 +165,14 @@ export const fetchAdminVideoCourses = async () => { const { data } = await api.g
 export const createAdminVideoCourse = async (p) => { const { data } = await api.post('/admin/video-courses', p); return data; };
 export const updateAdminVideoCourse = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/video-courses/${id}`, p); return data; };
 export const deleteAdminVideoCourse = async (id) => { const { data } = await api.delete(`/admin/video-courses/${id}`); return data; };
+export const requestUploadUrl       = async ({ courseId, filename, contentType }) => { const { data } = await api.post(`/admin/video-courses/${courseId}/upload-url`, { filename, content_type: contentType }); return data; };
+// Deliberately a bare axios call, not the shared `api` client: that one attaches
+// our bearer token to every request, and it must never be sent to Cloudflare.
+export const uploadToR2             = async ({ uploadUrl, file, onProgress }) =>
+  axios.put(uploadUrl, file, {
+    headers: { 'Content-Type': file.type },
+    onUploadProgress: e => onProgress?.(e.total ? Math.round((e.loaded / e.total) * 100) : 0),
+  });
 export const fetchAdminLessons      = async (courseId) => { const { data } = await api.get(`/admin/video-courses/${courseId}/lessons`); return data.data; };
 export const createAdminLesson      = async ({ courseId, ...p }) => { const { data } = await api.post(`/admin/video-courses/${courseId}/lessons`, p); return data; };
 export const updateAdminLesson      = async ({ courseId, id, ...p }) => { const { data } = await api.patch(`/admin/video-courses/${courseId}/lessons/${id}`, p); return data; };
