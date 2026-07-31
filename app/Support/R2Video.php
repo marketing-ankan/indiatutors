@@ -37,6 +37,25 @@ class R2Video {
      * isn't configured.
      */
     public static function signedUrl(string $key, int $ttlSeconds = 14400): ?string {
+        return self::presign('GET', $key, $ttlSeconds);
+    }
+
+    /**
+     * A short-lived signed PUT so the Staff Console can upload a lesson video
+     * straight to R2. The bytes never pass through the app server — shared
+     * hosting would refuse a 300 MB POST on upload_max_filesize alone, and
+     * proxying would put video on the one link we deliberately keep out of the
+     * delivery path. 2h window: a long upload on a slow Indian connection must
+     * not expire mid-transfer.
+     *
+     * Requires the R2 API token to have Object Read *and Write* — read-only is
+     * enough for playback but a PUT signed by it will 403.
+     */
+    public static function signedPutUrl(string $key, int $ttlSeconds = 7200): ?string {
+        return self::presign('PUT', $key, $ttlSeconds);
+    }
+
+    private static function presign(string $method, string $key, int $ttlSeconds): ?string {
         if (!self::enabled()) return null;
         $c = config('services.r2');
 
@@ -75,7 +94,7 @@ class R2Video {
         // The trailing "\n" on the host header closes the canonical-headers block;
         // implode's separator then supplies the blank line SigV4 expects after it.
         $canonicalRequest = implode("\n", [
-            'GET',
+            $method,
             $canonicalUri,
             $canonicalQuery,
             "host:{$host}\n",

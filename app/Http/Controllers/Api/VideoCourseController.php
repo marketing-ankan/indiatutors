@@ -4,6 +4,7 @@ use App\Http\Controllers\Controller;
 use App\Models\VideoCourse;
 use App\Models\VideoLesson;
 use App\Support\CourseAi;
+use App\Support\R2Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -110,6 +111,37 @@ class VideoCourseController extends Controller {
         }
 
         return response()->json(['summary' => $lesson->ai_summary]);
+    }
+
+    /**
+     * Mint a direct-to-R2 upload URL for the Staff Console (admin only).
+     *
+     * The browser PUTs the file straight to R2 with this URL — the app server
+     * signs and steps aside, so a 300 MB lesson never touches shared hosting.
+     * We return the object key too: that's what gets stored on the lesson.
+     */
+    public function uploadUrl(Request $request, VideoCourse $videoCourse) {
+        if (!R2Video::enabled()) {
+            return response()->json(['message' => 'R2 is not configured — set the R2_* keys before uploading.'], 409);
+        }
+
+        $data = $request->validate([
+            'filename'     => 'required|string|max:190',
+            'content_type' => 'required|string|in:video/mp4,video/webm',
+        ]);
+
+        // Build the key ourselves rather than trusting the filename: keeps
+        // traversal and odd characters out of the bucket, keeps it readable for
+        // debugging, and the random suffix stops a re-upload of the same
+        // filename silently overwriting a lesson that's already selling.
+        $ext  = strtolower(pathinfo($data['filename'], PATHINFO_EXTENSION)) === 'webm' ? 'webm' : 'mp4';
+        $base = Str::slug(pathinfo($data['filename'], PATHINFO_FILENAME)) ?: 'lesson';
+        $key  = $videoCourse->slug . '/' . Str::limit($base, 60, '') . '-' . Str::lower(Str::random(6)) . '.' . $ext;
+
+        return response()->json([
+            'key'        => $key,
+            'upload_url' => R2Video::signedPutUrl($key),
+        ]);
     }
 
     /** Shared gate for the assistant endpoints: free preview, or an entitled buyer. */
