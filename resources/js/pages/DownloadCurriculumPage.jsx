@@ -13,40 +13,72 @@ import { fetchCourses, fetchCourse, submitContact } from '../lib/api.js';
 const inputCls = 'w-full rounded-xl border-[1.5px] border-[#e6e8f0] px-4 py-3 text-[0.95rem] focus:border-brand-600 focus:outline-none';
 
 function CurriculumView({ course }) {
+  const levels = course.curriculum ?? [];
+  const topicCount = levels.reduce((n, l) => n + (l.topics?.length ?? 0), 0);
+  const totalHours = levels.reduce((n, l) => n + (parseInt(l.duration) || 0), 0);
+
+  // One DOM, two typesettings: the screen keeps the card look, while the
+  // `cur-*` classes let the print stylesheet lay the same content out as a
+  // document (see @media print in app.css) instead of printing the web page.
   return (
-    <div className="mt-8 print:mt-0" id="curriculum-print">
+    <div className="cur-doc mt-8 print:mt-0" id="curriculum-print">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 print:hidden">
         <h2 className="font-heading text-2xl font-extrabold text-[#0B1220]">{course.name} — Full Curriculum</h2>
-        <button type="button" onClick={() => window.print()}
-          className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-700">
-          <Printer className="h-4 w-4" /> Print / Save as PDF
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Primary action is the designed PDF built server-side (cover page,
+              running footer, real page numbers) — not a browser print. */}
+          <a href={`/curriculum/${course.slug}.pdf`}
+            className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-700">
+            <Download className="h-4 w-4" /> Download PDF
+          </a>
+          <button type="button" onClick={() => window.print()}
+            className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-bold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50">
+            <Printer className="h-4 w-4" /> Print
+          </button>
+        </div>
       </div>
-      <div className="hidden print:block">
-        <h1 className="text-2xl font-extrabold">{course.name} — Curriculum · Indiatutors Online</h1>
-        {course.subtitle && <p className="text-sm text-slate-600">{course.subtitle}</p>}
-      </div>
-      <div className="space-y-4">
-        {(course.curriculum ?? []).map((level, i) => (
-          <div key={i} className="overflow-hidden rounded-2xl bg-white ring-1 ring-slate-100 print:ring-0 print:border print:border-slate-300">
-            <div className="flex flex-wrap items-center gap-3 border-b border-slate-100 bg-slate-50 px-5 py-3">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white">{i + 1}</span>
-              <h4 className="font-bold text-slate-900">{level.title}</h4>
-              <div className="ml-auto flex items-center gap-3 text-xs text-slate-500">
+
+      {/* Document masthead — print only. */}
+      <header className="cur-masthead hidden">
+        <div className="cur-brand">Indiatutors Online</div>
+        <h1 className="cur-title">{course.name}</h1>
+        {course.subtitle && <p className="cur-subtitle">{course.subtitle}</p>}
+        <p className="cur-meta">
+          <span>Full curriculum</span>
+          <span>{levels.length} levels</span>
+          <span>{topicCount} topics</span>
+          {totalHours > 0 && <span>approx. {totalHours} hours</span>}
+        </p>
+      </header>
+
+      <div className="cur-levels space-y-4">
+        {levels.map((level, i) => (
+          <section key={i} className="cur-level overflow-hidden rounded-2xl bg-white ring-1 ring-slate-100">
+            <div className="cur-level-head flex flex-wrap items-center gap-3 border-b border-slate-100 bg-slate-50 px-5 py-3">
+              <span className="cur-level-no flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white">{i + 1}</span>
+              <h4 className="cur-level-title font-bold text-slate-900">{level.title}</h4>
+              <div className="cur-level-meta ml-auto flex items-center gap-3 text-xs text-slate-500">
                 {level.age && <span className="inline-flex items-center gap-1"><Baby className="h-3.5 w-3.5" />{level.age}</span>}
                 {level.duration && <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{level.duration}</span>}
               </div>
             </div>
             {level.topics?.length > 0 && (
-              <ul className="grid gap-x-6 gap-y-2 p-5 sm:grid-cols-2 print:grid-cols-1">
+              <ul className="cur-topics grid gap-x-6 gap-y-2 p-5 sm:grid-cols-2">
                 {level.topics.map((t, j) => (
                   <li key={j} className="flex items-start gap-2 text-sm text-slate-600"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />{t}</li>
                 ))}
               </ul>
             )}
-          </div>
+          </section>
         ))}
       </div>
+
+      {/* Closing note — print only; the screen version below carries the CTA. */}
+      <div className="cur-endnote hidden">
+        <strong>The exact pace and level are personalised after your free demo class.</strong>{' '}
+        Indiatutors Online · indiatutorsonline.com · +91 93308 11581 · connect@indiatutorsonline.com
+      </div>
+
       <p className="mt-6 text-sm text-slate-500 print:hidden">
         The exact pace and level are personalised after your free demo class.{' '}
         <Link to={`/book-demo?course=${course.slug}`} className="font-semibold text-brand-600">Book a free demo →</Link>

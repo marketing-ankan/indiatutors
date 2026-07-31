@@ -21,3 +21,186 @@
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
 }
+
+/* ==========================================================================
+   PRINT / SAVE-AS-PDF  —  /download-curriculum
+   The curriculum download is a real deliverable a parent keeps, so it is
+   typeset as a document rather than printed as a screenshot of the web page.
+   Deliberately outside @layer so these rules beat Tailwind utilities without
+   needing !important on every line.
+   ========================================================================== */
+@media print {
+  @page {
+    size: A4 portrait;
+    /* Generous top margin so Chrome's own header (if the user leaves
+       "Headers and footers" ticked) does not collide with our masthead. */
+    margin: 14mm 14mm 16mm;
+  }
+
+  /* Reset the page shell: no site chrome, no shadows, no rounded cards. */
+  html, body { background: #fff !important; }
+  body {
+    font-size: 10.5pt;
+    line-height: 1.45;
+    color: #1a1a1a;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Site chrome never prints — Header, Footer and MarketplaceBand each carry
+     print:hidden. (Targeting the bare `header` tag here would also hit our own
+     .cur-masthead, so the components opt out explicitly instead.) */
+  .print\:hidden { display: none !important; }
+
+  /* Neutralise the page shell so the document starts at the paper margin
+     rather than inheriting the site's tinted, padded layout. Note
+     print-color-adjust:exact above means background tints WOULD otherwise
+     print, so they are cleared explicitly rather than left to the browser. */
+  .cur-doc, .cur-doc * { box-shadow: none !important; }
+  .cur-doc { background: #fff !important; margin: 0 !important; }
+  /* .container-wide is an ancestor of .cur-doc, not a child. */
+  body .container-wide {
+    padding-inline: 0 !important;
+    padding-block: 0 !important;
+    max-width: none !important;
+  }
+  main, main > div { background: #fff !important; }
+
+  /* --- Masthead (first page only) --------------------------------------- */
+  .cur-masthead {
+    display: block !important;
+    border-bottom: 2.5pt solid #1E40AF;
+    padding-bottom: 8pt;
+    margin-bottom: 14pt;
+  }
+  .cur-brand {
+    font-size: 8.5pt;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #1E40AF;
+  }
+  .cur-title {
+    font-size: 20pt;
+    font-weight: 800;
+    line-height: 1.15;
+    color: #0B1220;
+    margin-top: 3pt;
+  }
+  .cur-subtitle {
+    font-size: 10pt;
+    color: #475569;
+    margin-top: 3pt;
+  }
+  .cur-meta {
+    font-size: 8.5pt;
+    color: #475569;
+    margin-top: 7pt;
+  }
+  .cur-meta span + span::before { content: '  ·  '; color: #94a3b8; }
+
+  /* --- Level blocks ------------------------------------------------------ */
+  .cur-levels { display: block !important; }
+
+  /* THE fix for the blank-gap defect: a level is an atom. Chrome will move a
+     whole level to the next page rather than orphan its header. If a level is
+     genuinely taller than one page Chrome degrades to splitting it, which is
+     correct — better than a forced overflow. */
+  .cur-level {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin: 0 0 12pt;
+    padding: 0;
+    border: none !important;
+    border-radius: 0 !important;
+    background: none !important;
+  }
+  .cur-level:last-child { margin-bottom: 0; }
+
+  /* Never leave a level heading stranded at the foot of a page. */
+  .cur-level-head {
+    break-after: avoid;
+    page-break-after: avoid;
+    break-inside: avoid;
+    display: flex !important;
+    align-items: baseline;
+    gap: 7pt;
+    background: none !important;
+    border: none !important;
+    border-bottom: .75pt solid #cbd5e1 !important;
+    padding: 0 0 4pt !important;
+    margin-bottom: 6pt;
+  }
+  .cur-level-no {
+    flex: 0 0 auto;
+    width: 15pt; height: 15pt;
+    border-radius: 999px;
+    background: #1E40AF !important;
+    color: #fff !important;
+    font-size: 8.5pt;
+    font-weight: 700;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+  .cur-level-title {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #0B1220;
+    margin: 0;
+    flex: 1 1 auto;
+  }
+  .cur-level-meta {
+    flex: 0 0 auto;
+    font-size: 8.5pt;
+    color: #64748b;
+    white-space: nowrap;
+  }
+
+  /* --- Topics ------------------------------------------------------------ */
+  /* Single column: topics are full sentences (~100 chars); two columns on A4
+     would wrap every one of them into a ragged three-line block. */
+  .cur-topics {
+    display: block !important;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    columns: 1 !important;
+  }
+  .cur-topics li {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    position: relative;
+    padding-left: 13pt;
+    margin-bottom: 3.5pt;
+    font-size: 10pt;
+    color: #27303f;
+  }
+  /* A printed tick beats a coloured SVG: it always renders, costs no ink and
+     survives greyscale. The lucide icons are hidden below. */
+  .cur-topics li::before {
+    content: '';
+    position: absolute;
+    left: 3pt;
+    top: 4.2pt;
+    width: 3.4pt; height: 3.4pt;
+    border-radius: 999px;
+    background: #1E40AF !important;
+  }
+  .cur-topics li svg { display: none !important; }
+
+  /* --- Closing note ------------------------------------------------------ */
+  .cur-endnote {
+    display: block !important;
+    break-inside: avoid;
+    margin-top: 14pt;
+    padding-top: 7pt;
+    border-top: .75pt solid #cbd5e1;
+    font-size: 8.5pt;
+    color: #475569;
+  }
+  .cur-endnote strong { color: #0B1220; }
+
+  /* Links print as plain text — a printed URL in blue underline is noise. */
+  a { color: inherit !important; text-decoration: none !important; }
+}

@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\VideoCourse;
 use App\Models\VideoLesson;
+use App\Support\CourseAi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -35,8 +36,12 @@ class VideoCourseController extends Controller {
                     'title'      => $l->title,
                     'duration'   => $l->duration_seconds,
                     'is_preview' => $l->is_preview,
-                    'unlocked'   => $unlocked,
-                    'playback'   => $l->playbackUrl($unlocked),
+                    'unlocked'      => $unlocked,
+                    'playback'      => $l->playbackUrl($unlocked),
+                    'playback_kind' => $l->playbackKind(),
+                    // Whether this lesson can host the study assistant. Never
+                    // ship the transcript itself — it's the paid content.
+                    'has_ai'        => $unlocked && CourseAi::enabledForLesson($l->transcript),
                 ];
             }),
         ]);
@@ -55,11 +60,68 @@ class VideoCourseController extends Controller {
         abort_unless($lesson->video_course_id === $videoCourse->id, 404);
         $unlocked = $lesson->is_preview || $videoCourse->ownedBy($request->user('sanctum'));
         if (!$unlocked) return response()->json(['message' => 'Purchase this course to watch this lesson.'], 403);
-        return response()->json(['playback' => $lesson->playbackUrl(true)]);
+        return response()->json([
+            'playback'      => $lesson->playbackUrl(true),
+            'playback_kind' => $lesson->playbackKind(),
+        ]);
+    }
+
+    /**
+     * Study assistant: answer a question about one lesson. Same gate as
+     * playback — buyers and free previews only — so the transcript can't be
+     * mined by asking questions instead of watching.
+     */
+    public function ask(Request $request, VideoCourse $videoCourse, VideoLesson $lesson) {
+        abort_unless($lesson->video_course_id === $videoCourse->id, 404);
+        if (!$this->lessonUnlocked($request, $videoCourse, $lesson)) {
+            return response()->json(['message' => 'Purchase this course to use the study assistant.'], 403);
+        }
+        if (!CourseAi::enabledForLesson($lesson->transcript)) {
+            return response()->json(['message' => 'The study assistant isn\'t available for this lesson yet.'], 404);
+        }
+
+        $data = $request->validate(['question' => 'required|string|min:3|max:500']);
+        $answer = CourseAi::answer($lesson->transcript, $lesson->title, $data['question']);
+
+        return $answer === null
+            ? response()->json(['message' => 'The assistant is unavailable right now — please try again in a moment.'], 503)
+            : response()->json(['answer' => $answer]);
+    }
+
+    /**
+     * Study assistant: a recap of the lesson. Generated once and stored, so the
+     * cost is one call per lesson for its lifetime rather than one per viewer.
+     */
+    public function summary(Request $request, VideoCourse $videoCourse, VideoLesson $lesson) {
+        abort_unless($lesson->video_course_id === $videoCourse->id, 404);
+        if (!$this->lessonUnlocked($request, $videoCourse, $lesson)) {
+            return response()->json(['message' => 'Purchase this course to use the study assistant.'], 403);
+        }
+        if (!CourseAi::enabledForLesson($lesson->transcript)) {
+            return response()->json(['message' => 'No summary for this lesson yet.'], 404);
+        }
+
+        if (!$lesson->ai_summary) {
+            $generated = CourseAi::summarize($lesson->transcript, $lesson->title);
+            if ($generated === null) {
+                return response()->json(['message' => 'The assistant is unavailable right now — please try again in a moment.'], 503);
+            }
+            $lesson->forceFill(['ai_summary' => $generated])->save();
+        }
+
+        return response()->json(['summary' => $lesson->ai_summary]);
+    }
+
+    /** Shared gate for the assistant endpoints: free preview, or an entitled buyer. */
+    private function lessonUnlocked(Request $request, VideoCourse $course, VideoLesson $lesson): bool {
+        return $lesson->is_preview || $course->ownedBy($request->user('sanctum'));
     }
 
     private function cardPayload(VideoCourse $c): array {
         return [
+            // Needed client-side to address the per-lesson playback and study
+            // assistant endpoints, which bind the course by id.
+            'id'          => $c->id,
             'slug'        => $c->slug,
             'title'       => $c->title,
             'subtitle'    => $c->subtitle,
@@ -99,9 +161,10 @@ class VideoCourseController extends Controller {
     public function storeLesson(Request $request, VideoCourse $videoCourse) {
         $data = $request->validate([
             'title'            => 'required|string|max:190',
-            'provider'         => 'required|in:bunny,youtube',
+            'provider'         => 'required|in:bunny,youtube,r2',
             'video_id'         => 'required|string|max:120',
             'duration_seconds' => 'nullable|integer|min:0',
+            'transcript'       => 'nullable|string|max:200000',
             'is_preview'       => 'nullable|boolean',
             'position'         => 'nullable|integer',
         ]);
@@ -111,14 +174,21 @@ class VideoCourseController extends Controller {
 
     public function updateLesson(Request $request, VideoCourse $videoCourse, VideoLesson $lesson) {
         abort_unless($lesson->video_course_id === $videoCourse->id, 404);
-        $lesson->update($request->validate([
+        $data = $request->validate([
             'title'            => 'sometimes|required|string|max:190',
-            'provider'         => 'sometimes|required|in:bunny,youtube',
+            'provider'         => 'sometimes|required|in:bunny,youtube,r2',
             'video_id'         => 'sometimes|required|string|max:120',
             'duration_seconds' => 'nullable|integer|min:0',
+            'transcript'       => 'nullable|string|max:200000',
             'is_preview'       => 'nullable|boolean',
             'position'         => 'nullable|integer',
-        ]));
+        ]);
+        // A changed transcript invalidates the cached recap — drop it so the next
+        // reader regenerates from the current text rather than the old lesson.
+        if (array_key_exists('transcript', $data) && $data['transcript'] !== $lesson->transcript) {
+            $data['ai_summary'] = null;
+        }
+        $lesson->update($data);
         return response()->json($lesson->fresh());
     }
 

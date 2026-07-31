@@ -1,3 +1,18 @@
+# Long-cache the fingerprinted build assets. Safe because their URLs change
+# when content changes: Vite hashes JS/CSS filenames, and images carry a
+# ?v=<content-hash> query (see scripts/asset-version.mjs and the Course model).
+<IfModule mod_expires.c>
+    ExpiresActive On
+    <FilesMatch "\.(js|css|jpg|jpeg|png|webp|svg|gif|woff2?)$">
+        ExpiresDefault "access plus 1 year"
+    </FilesMatch>
+</IfModule>
+<IfModule mod_headers.c>
+    <FilesMatch "\.(js|css|jpg|jpeg|png|webp|svg|gif|woff2?)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

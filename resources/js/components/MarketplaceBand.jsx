@@ -11,7 +11,7 @@ export default function MarketplaceBand() {
   if (HIDDEN.some(p => pathname === p || pathname.startsWith(p + '/'))) return null;
 
   return (
-    <section className="bg-gradient-to-br from-[#0B1220] to-brand-800 text-white py-16">
+    <section className="bg-gradient-to-br from-[#0B1220] to-brand-800 text-white py-16 print:hidden">
       <div className="container-wide text-center">
         <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">India's Most Trusted Online Tutor Marketplace</h2>
         <p className="mt-3 text-slate-300 max-w-2xl mx-auto">Connect with expert tutors for academics, music, coding, languages &amp; more. First demo class is always free — no credit card needed.</p>

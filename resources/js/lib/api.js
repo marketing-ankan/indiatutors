@@ -159,6 +159,8 @@ export const fetchVideoCourses      = async () => { const { data } = await api.g
 export const fetchVideoCourse       = async (slug) => { const { data } = await api.get(`/video-courses/${slug}`); return data; };
 export const fetchLessonPlayback    = async ({ courseId, lessonId }) => { const { data } = await api.post(`/video-courses/${courseId}/lessons/${lessonId}/playback`); return data; };
 export const fetchMyVideoCourses    = async () => { const { data } = await api.get('/my/video-courses'); return data.data; };
+export const fetchLessonSummary     = async ({ courseId, lessonId }) => { const { data } = await api.get(`/video-courses/${courseId}/lessons/${lessonId}/summary`); return data.summary; };
+export const askLesson              = async ({ courseId, lessonId, question }) => { const { data } = await api.post(`/video-courses/${courseId}/lessons/${lessonId}/ask`, { question }); return data.answer; };
 export const fetchAdminVideoCourses = async () => { const { data } = await api.get('/admin/video-courses'); return data.data; };
 export const createAdminVideoCourse = async (p) => { const { data } = await api.post('/admin/video-courses', p); return data; };
 export const updateAdminVideoCourse = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/video-courses/${id}`, p); return data; };

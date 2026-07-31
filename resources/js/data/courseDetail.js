@@ -314,3 +314,15 @@ export function buildPriceMatrix(base, slug, name) {
   }
   return { matrix, plans: Object.keys(matrix), levels: LEVELS };
 }
+
+// --- cache-busting -----------------------------------------------------------
+// These arrays carry stable /build/images/... paths, so a replaced photo would
+// keep its URL and browsers would show the stale cached copy until a hard
+// refresh. Version them with the image-library content hash (written by
+// scripts/asset-version.mjs before each build). Course images get the same
+// treatment via courseImages.js and the Course model's image_url accessor.
+import { ASSET_V } from './assetVersion.js';
+const _v = (p) => (typeof p === 'string' && p.startsWith('/build/') ? `${p}?v=${ASSET_V}` : p);
+TEACHERS.forEach((t) => { t.img = _v(t.img); });
+ACHIEVEMENT_PHOTOS.forEach((p, i, a) => { a[i] = _v(p); });
+BLOG_POSTS.forEach((b) => { b.img = _v(b.img); });

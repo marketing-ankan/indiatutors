@@ -138,7 +138,7 @@ export default function Header() {
   const onSearch = e => { e.preventDefault(); if(sq.trim()) { nav(`/courses?search=${encodeURIComponent(sq.trim())}`); setShowSearch(false); setSq(''); }};
 
   return (
-    <header className="sticky top-0 z-40 bg-white shadow-sm [overflow-x:clip]">
+    <header className="sticky top-0 z-40 bg-white shadow-sm [overflow-x:clip] print:hidden">
       <div className="bg-slate-900 text-slate-300 text-xs">
         <div className="container-wide flex items-center justify-between py-2">
           <div className="flex flex-wrap items-center gap-4">

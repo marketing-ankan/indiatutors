@@ -100,6 +100,16 @@ export const COURSE_IMAGES = {
   "history-grade-11-12": "/build/images/courses/history-grade-11-12.jpg",
   "political-science-grade-11-12": "/build/images/courses/political-science-grade-11-12.jpg",
   "geography-grade-11-12": "/build/images/courses/geography-grade-11-12.jpg",
+  "accountancy-grade-11-12": "/build/images/courses/accountancy-grade-11-12.jpg",
+  "business-studies-grade-11-12": "/build/images/courses/business-studies-grade-11-12.jpg",
+  "applied-mathematics-grade-11-12": "/build/images/courses/applied-mathematics-grade-11-12.jpg",
+  "computer-science-grade-11-12": "/build/images/courses/computer-science-grade-11-12.jpg",
+  "informatics-practices-grade-11-12": "/build/images/courses/informatics-practices-grade-11-12.jpg",
+  "jee-main": "/build/images/courses/jee-main.jpg",
+  "jee-advanced": "/build/images/courses/jee-advanced.jpg",
+  "neet-ug": "/build/images/courses/neet-ug.jpg",
+  "cuet-ug": "/build/images/courses/cuet-ug.jpg",
+  "olympiad-preparation": "/build/images/courses/olympiad-preparation.jpg",
 };
 
 // Prefer a DB image_url if present, else our self-hosted copy, else null.
@@ -107,7 +117,14 @@ export const COURSE_IMAGES = {
 // the old WP uploads for many courses, which (a) isn't the WinQuest look the
 // product pages standardise on and (b) breaks at domain cutover. image_url is
 // only the fallback for the few slugs without an imported photo.
-export const imageFor = (course) => (course && (COURSE_IMAGES[course.slug] || course.image_url)) || null;
+// Cache-busting: the map paths are stable, so a replaced photo would otherwise
+// keep its URL and browsers would show the stale copy until a hard refresh.
+// ASSET_V is a content hash of public/images written before each build; API
+// image_url values are versioned server-side (Course::getImageUrlAttribute).
+import { ASSET_V } from './assetVersion.js';
+const v = (p) => (p && p.startsWith('/build/') ? `${p}?v=${ASSET_V}` : p);
+
+export const imageFor = (course) => (course && (v(COURSE_IMAGES[course.slug]) || course.image_url)) || null;
 
 // WinQuest hero-banner photos (distinct from the buy-card og:image) —
 // extracted per product page and self-hosted. heroImageFor() falls back to
@@ -202,6 +219,16 @@ export const HERO_IMAGES = {
   "history-grade-11-12": "/build/images/courses/hero/history-grade-11-12.jpg",
   "political-science-grade-11-12": "/build/images/courses/hero/political-science-grade-11-12.jpg",
   "geography-grade-11-12": "/build/images/courses/hero/geography-grade-11-12.jpg",
+  "accountancy-grade-11-12": "/build/images/courses/hero/accountancy-grade-11-12.jpg",
+  "business-studies-grade-11-12": "/build/images/courses/hero/business-studies-grade-11-12.jpg",
+  "applied-mathematics-grade-11-12": "/build/images/courses/hero/applied-mathematics-grade-11-12.jpg",
+  "computer-science-grade-11-12": "/build/images/courses/hero/computer-science-grade-11-12.jpg",
+  "informatics-practices-grade-11-12": "/build/images/courses/hero/informatics-practices-grade-11-12.jpg",
+  "jee-main": "/build/images/courses/hero/jee-main.jpg",
+  "jee-advanced": "/build/images/courses/hero/jee-advanced.jpg",
+  "neet-ug": "/build/images/courses/hero/neet-ug.jpg",
+  "cuet-ug": "/build/images/courses/hero/cuet-ug.jpg",
+  "olympiad-preparation": "/build/images/courses/hero/olympiad-preparation.jpg",
 };
 
-export const heroImageFor = (course) => (course && (HERO_IMAGES[course.slug] || COURSE_IMAGES[course.slug] || course.image_url)) || null;
+export const heroImageFor = (course) => (course && (v(HERO_IMAGES[course.slug]) || v(COURSE_IMAGES[course.slug]) || course.image_url)) || null;

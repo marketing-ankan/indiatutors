@@ -12593,7 +12593,7 @@
   "description": "",
   "regular_price": 1200,
   "sale_price": null,
-  "image_url": "",
+  "image_url": "/build/images/courses/accountancy-grade-11-12.jpg",
   "is_featured": false,
   "position": 0,
   "category_chains": [
@@ -12772,7 +12772,7 @@
   "description": "",
   "regular_price": 1200,
   "sale_price": null,
-  "image_url": "",
+  "image_url": "/build/images/courses/business-studies-grade-11-12.jpg",
   "is_featured": false,
   "position": 0,
   "category_chains": [
@@ -12882,7 +12882,7 @@
   "description": "",
   "regular_price": 1200,
   "sale_price": null,
-  "image_url": "",
+  "image_url": "/build/images/courses/applied-mathematics-grade-11-12.jpg",
   "is_featured": false,
   "position": 0,
   "category_chains": [
@@ -13062,7 +13062,7 @@
   "description": "",
   "regular_price": 1200,
   "sale_price": null,
-  "image_url": "",
+  "image_url": "/build/images/courses/computer-science-grade-11-12.jpg",
   "is_featured": false,
   "position": 0,
   "category_chains": [
@@ -13175,7 +13175,7 @@
   "description": "",
   "regular_price": 1200,
   "sale_price": null,
-  "image_url": "",
+  "image_url": "/build/images/courses/informatics-practices-grade-11-12.jpg",
   "is_featured": false,
   "position": 0,
   "category_chains": [
@@ -13307,7 +13307,7 @@
   "description": "",
   "regular_price": 1500,
   "sale_price": null,
-  "image_url": "",
+  "image_url": "/build/images/courses/jee-main.jpg",
   "is_featured": true,
   "position": 0,
   "category_chains": [
@@ -13421,7 +13421,7 @@
   "description": "",
   "regular_price": 1800,
   "sale_price": null,
-  "image_url": "",
+  "image_url": "/build/images/courses/jee-advanced.jpg",
   "is_featured": false,
   "position": 0,
   "category_chains": [
@@ -13550,7 +13550,7 @@
   "description": "",
   "regular_price": 1500,
   "sale_price": null,
-  "image_url": "",
+  "image_url": "/build/images/courses/neet-ug.jpg",
   "is_featured": true,
   "position": 0,
   "category_chains": [
@@ -13661,7 +13661,7 @@
   "description": "",
   "regular_price": 1200,
   "sale_price": null,
-  "image_url": "",
+  "image_url": "/build/images/courses/cuet-ug.jpg",
   "is_featured": false,
   "position": 0,
   "category_chains": [
@@ -13773,7 +13773,7 @@
   "description": "",
   "regular_price": 900,
   "sale_price": null,
-  "image_url": "",
+  "image_url": "/build/images/courses/olympiad-preparation.jpg",
   "is_featured": false,
   "position": 0,
   "category_chains": [

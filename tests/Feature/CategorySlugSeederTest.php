@@ -10,24 +10,31 @@ class CategorySlugSeederTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_seeder_produces_the_live_wordpress_slugs(): void
+    public function test_seeder_produces_clean_category_slugs(): void
     {
         $this->seed(CourseSeeder::class);
 
-        // Child categories carry clean WP slugs — no parent-id suffixes.
-        foreach (['abacus', 'ai-ml', 'ap-biology', 'algebra', 'animation'] as $slug) {
+        // Child categories carry clean slugs — no parent-id suffixes.
+        foreach (['abacus', 'ai-ml', 'animation', 'accountancy', 'political-science'] as $slug) {
             $this->assertNotNull(Category::where('slug', $slug)->first(), "missing clean slug: $slug");
         }
         $this->assertNull(Category::where('slug', 'like', 'ai-ml-%')->first(), 'old suffixed slug survived');
 
-        // WP turns "/" into "-": Math SAT/PSAT -> math-sat-psat.
-        foreach (['math-sat-psat', 'english-sat-psat', 'digital-sat-psat-math'] as $slug) {
-            $this->assertNotNull(Category::where('slug', $slug)->first(), "missing slash-derived slug: $slug");
+        // Ampersands and punctuation are dropped rather than left as separators.
+        foreach (['roblox-minecraft', 'arts-painting', 'academics-primary-middle-classes-1-8'] as $slug) {
+            $this->assertNotNull(Category::where('slug', $slug)->first(), "missing punctuation-derived slug: $slug");
+        }
+
+        // The US-curriculum branches were removed in the India-localisation pass
+        // and must not come back through the seeder.
+        foreach (['ap-biology', 'algebra', 'honors', 'math-sat-psat', 'standardized-tests', 'social-studies'] as $slug) {
+            $this->assertNull(Category::where('slug', $slug)->first(), "retired US category reappeared: $slug");
         }
 
         // Full taxonomy present and slugs unique.
-        $this->assertSame(112, Category::count());
-        $this->assertSame(112, Category::distinct('slug')->count('slug'));
+        $count = Category::count();
+        $this->assertSame($count, Category::distinct('slug')->count('slug'), 'duplicate category slugs');
+        $this->assertGreaterThan(100, $count);
     }
 
     public function test_reseeding_fixes_old_suffixed_slugs_in_place(): void
