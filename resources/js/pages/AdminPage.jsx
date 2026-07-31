@@ -70,13 +70,40 @@ export default function AdminPage() {
 }
 
 const VC_BLANK = { title:'', subtitle:'', description:'', price:0, level:'Beginner', category:'', is_published:true };
-const LESSON_BLANK = { title:'', provider:'bunny', video_id:'', duration_seconds:0, is_preview:false };
+const LESSON_BLANK = { title:'', provider:'r2', video_id:'', duration_seconds:0, is_preview:false };
+// What to type into the video_id box, per provider. R2 takes the object key of
+// the uploaded MP4; the other two take the host's own id.
+const VIDEO_ID_HINT = { r2:'key e.g. python-for-kids/1.mp4', bunny:'Bunny GUID', youtube:'YouTube id' };
+
+// The transcript is what the study assistant answers from — no transcript, no
+// assistant on that lesson. Saving a new one clears the cached AI summary so it
+// regenerates from the current text instead of serving a stale recap.
+function TranscriptEditor({ lesson, onSave, inp }) {
+  const [text, setText] = useState(lesson.transcript || '');
+  const dirty = text !== (lesson.transcript || '');
+  return (
+    <div className="mt-2 w-full basis-full">
+      <textarea value={text} onChange={e=>setText(e.target.value)} rows={6}
+        placeholder="Paste the lesson transcript here. The study assistant answers only from this text."
+        className={inp+' w-full font-mono leading-relaxed'} />
+      <div className="mt-1 flex items-center gap-3">
+        <button type="button" disabled={!dirty || onSave.isPending}
+          onClick={()=>onSave.mutate({ id: lesson.id, transcript: text })}
+          className="rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700 disabled:opacity-50">
+          Save transcript
+        </button>
+        <span className="text-[10px] text-slate-500">{text.length.toLocaleString()} characters</span>
+      </div>
+    </div>
+  );
+}
 
 function LessonsManager({ course }) {
   const qc = useQueryClient();
   const { data: lessons = [] } = useQuery({ queryKey:['admin-lessons', course.id], queryFn:()=>fetchAdminLessons(course.id) });
   const invalidate = () => { qc.invalidateQueries({ queryKey:['admin-lessons', course.id] }); qc.invalidateQueries({ queryKey:['admin-videos'] }); };
   const [nl, setNl] = useState({ ...LESSON_BLANK });
+  const [openTranscript, setOpenTranscript] = useState(null);
   const add = useMutation({ mutationFn: p => createAdminLesson({ courseId: course.id, ...p }), onSuccess: () => { invalidate(); setNl({ ...LESSON_BLANK }); } });
   const patch = useMutation({ mutationFn: ({ id, ...p }) => updateAdminLesson({ courseId: course.id, id, ...p }), onSuccess: invalidate });
   const del = useMutation({ mutationFn: id => deleteAdminLesson({ courseId: course.id, id }), onSuccess: invalidate });
@@ -93,14 +120,18 @@ function LessonsManager({ course }) {
             {l.is_preview ? <span className="rounded bg-green-50 px-1.5 py-0.5 text-[10px] font-bold text-green-700">FREE</span>
               : <button onClick={()=>patch.mutate({ id:l.id, is_preview:true })} className="text-[10px] font-semibold text-brand-600">make preview</button>}
             {l.is_preview && <button onClick={()=>patch.mutate({ id:l.id, is_preview:false })} className="text-[10px] font-semibold text-slate-500">make paid</button>}
+            <button onClick={()=>setOpenTranscript(t => t===l.id ? null : l.id)} className="text-[10px] font-semibold text-brand-600">
+              {l.transcript ? 'transcript ✓' : 'add transcript'}
+            </button>
             <button onClick={()=>{ if(confirm('Delete lesson?')) del.mutate(l.id); }} className="ml-auto text-[10px] font-bold text-slate-500 hover:text-red-600">Delete</button>
+            {openTranscript === l.id && <TranscriptEditor lesson={l} onSave={patch} inp={inp} />}
           </div>
         ))}
       </div>
       <form onSubmit={e=>{e.preventDefault(); add.mutate(nl);}} className="mt-2 flex flex-wrap items-center gap-2">
         <input required value={nl.title} onChange={e=>setNl(s=>({...s,title:e.target.value}))} placeholder="Lesson title" className={inp+' flex-1 min-w-[140px]'} />
-        <select value={nl.provider} onChange={e=>setNl(s=>({...s,provider:e.target.value}))} className={inp}><option value="bunny">Bunny (secure)</option><option value="youtube">YouTube (public only)</option></select>
-        <input required value={nl.video_id} onChange={e=>setNl(s=>({...s,video_id:e.target.value}))} placeholder={nl.provider==='bunny'?'Bunny GUID':'YouTube id'} className={inp+' w-32'} />
+        <select value={nl.provider} onChange={e=>setNl(s=>({...s,provider:e.target.value}))} className={inp}><option value="r2">R2 (secure)</option><option value="bunny">Bunny (secure)</option><option value="youtube">YouTube (public only)</option></select>
+        <input required value={nl.video_id} onChange={e=>setNl(s=>({...s,video_id:e.target.value}))} placeholder={VIDEO_ID_HINT[nl.provider]} className={inp+(nl.provider==='r2'?' w-56':' w-32')} />
         <input type="number" min="0" value={nl.duration_seconds} onChange={e=>setNl(s=>({...s,duration_seconds:Number(e.target.value)}))} placeholder="sec" className={inp+' w-16'} />
         <label className="flex items-center gap-1 text-xs text-slate-600"><input type="checkbox" checked={nl.is_preview} onChange={e=>setNl(s=>({...s,is_preview:e.target.checked}))} className="accent-brand-600" />preview</label>
         <button type="submit" disabled={add.isPending} className="rounded-lg bg-brand-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-brand-700 disabled:opacity-60">+ Add</button>

@@ -51,6 +51,10 @@ Route::get('/events/{slug}',     [EventController::class, 'show'])->name('api.ev
 Route::get('/video-courses',         [VideoCourseController::class, 'index']);
 Route::get('/video-courses/{slug}',  [VideoCourseController::class, 'show'])->name('api.video.show');
 Route::post('/video-courses/{videoCourse}/lessons/{lesson}/playback', [VideoCourseController::class, 'playback'])->middleware('throttle:60,1');
+// Study assistant. Tighter throttle than playback — each ask costs an API call,
+// so this is the cost ceiling as much as it is abuse protection.
+Route::post('/video-courses/{videoCourse}/lessons/{lesson}/ask',     [VideoCourseController::class, 'ask'])->middleware('throttle:10,1');
+Route::get('/video-courses/{videoCourse}/lessons/{lesson}/summary',  [VideoCourseController::class, 'summary'])->middleware('throttle:20,1');
 
 Route::post('/demo-requests',    [DemoRequestController::class, 'store']);
 Route::post('/contact',          [ContactController::class, 'store']);

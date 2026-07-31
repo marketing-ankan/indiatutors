@@ -5,6 +5,8 @@ import { PlayCircle, Lock, CheckCircle2, ShoppingCart } from 'lucide-react';
 import { fetchVideoCourse } from '../lib/api.js';
 import { cart, videoCartItem, useCart } from '../lib/cart.js';
 import { useAuth } from '../lib/auth.jsx';
+import LessonPlayer from '../components/LessonPlayer.jsx';
+import LessonAssistant from '../components/LessonAssistant.jsx';
 
 // Video course detail — the gated playlist. Free-preview and owned lessons play
 // in the embedded player; locked lessons show a padlock and a buy prompt. Buying
@@ -54,24 +56,34 @@ export default function VideoCourseDetailPage() {
       <div className="container-wide grid grid-cols-1 items-start gap-8 pb-16 lg:grid-cols-[minmax(0,1fr)_360px]">
         {/* PLAYER + PLAYLIST */}
         <div>
-          <div className="overflow-hidden rounded-2xl bg-black shadow-lg">
-            <div className="aspect-video">
-              {active?.playback ? (
-                <iframe key={active.id} title={active.title} src={active.playback} className="h-full w-full" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen loading="lazy" />
-              ) : active?.unlocked ? (
-                <div className="flex h-full w-full flex-col items-center justify-center gap-3 px-6 text-center text-white/80">
-                  <PlayCircle className="h-10 w-10" />
-                  <p className="text-sm">This lesson's video is being prepared — it will play here once the secure video host is connected.</p>
-                </div>
-              ) : (
-                <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-white/80">
-                  <Lock className="h-10 w-10" />
-                  <p className="text-sm">Buy this course to watch the full playlist.</p>
-                </div>
-              )}
+          {active?.playback && active.playback_kind === 'video' ? (
+            // R2 serves a bare presigned MP4, so we supply the controls: speed,
+            // ±10s and keyboard shortcuts. iframe providers keep their own.
+            <LessonPlayer src={active.playback} title={active.title} lessonId={active.id} />
+          ) : (
+            <div className="overflow-hidden rounded-2xl bg-black shadow-lg">
+              <div className="aspect-video">
+                {active?.playback ? (
+                  <iframe key={active.id} title={active.title} src={active.playback} className="h-full w-full" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowFullScreen loading="lazy" />
+                ) : active?.unlocked ? (
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-3 px-6 text-center text-white/80">
+                    <PlayCircle className="h-10 w-10" />
+                    <p className="text-sm">This lesson's video is being prepared — it will play here once the secure video host is connected.</p>
+                  </div>
+                ) : (
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-white/80">
+                    <Lock className="h-10 w-10" />
+                    <p className="text-sm">Buy this course to watch the full playlist.</p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
           {active && <h2 className="font-heading mt-4 text-xl font-extrabold text-[#0B1220]">{active.title}</h2>}
+
+          {active?.has_ai && (
+            <LessonAssistant courseId={course.id} lessonId={active.id} lessonTitle={active.title} />
+          )}
 
           <div className="mt-6">
             <h3 className="font-heading mb-1 text-lg font-extrabold text-[#0B1220]">Course content</h3>
