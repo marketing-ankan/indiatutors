@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { X, Heart } from 'lucide-react';
 import { cart, wishlist, useWishlist, inrFmt } from '../lib/cart.js';
+import { imageFor } from '../data/courseImages.js';
 
 // Wishlist — the live header links a ♥ wishlist page; items persist locally
 // and can be moved to the cart.
@@ -21,8 +22,8 @@ export default function WishlistPage() {
           {items.map(i => (
             <div key={i.slug} className="flex items-center gap-4 py-4">
               <Link to={`/courses/${i.slug}`} className="block h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-[#F3F6FC]">
-                {i.image_url
-                  ? <img src={i.image_url} alt="" className="h-full w-full object-cover" loading="lazy" />
+                {imageFor(i)
+                  ? <img src={imageFor(i)} alt="" className="h-full w-full object-cover" loading="lazy" />
                   : <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1E40AF] to-[#1E3A8A] font-heading font-bold text-white/90">{i.name[0]}</span>}
               </Link>
               <div className="min-w-0 flex-1">

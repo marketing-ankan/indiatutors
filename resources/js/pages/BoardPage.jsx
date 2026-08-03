@@ -6,6 +6,7 @@ import { fetchCourses, inr } from '../lib/api.js';
 import {
   BOARD_BY_SLUG, ACADEMIC_CATEGORIES, ACADEMIC_PARENTS, SUBJECT_ORDER,
 } from '../data/boards.js';
+import { imageFor } from '../data/courseImages.js';
 
 // Board landing page (/board/{slug}) — CBSE / ICSE / IGCSE / State Boards /
 // NCERT. Surfaces the academic courses that belong to the chosen board's
@@ -26,8 +27,8 @@ function CourseCard({ c }) {
   return (
     <Link to={`/courses/${c.slug}`} className="group flex flex-col overflow-hidden rounded-[14px] border border-[#E7E7EF] bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
       <div className="h-[130px] overflow-hidden bg-[#F3F6FC]">
-        {c.image_url
-          ? <img src={c.image_url} alt={c.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+        {imageFor(c)
+          ? <img src={imageFor(c)} alt={c.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
           : <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1E40AF] to-[#1E3A8A] font-heading text-3xl font-bold text-white/90">{c.name[0]}</span>}
       </div>
       <div className="flex flex-1 flex-col p-4">

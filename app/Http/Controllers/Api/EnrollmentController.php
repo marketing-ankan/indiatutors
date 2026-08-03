@@ -12,10 +12,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class EnrollmentController extends Controller {
-    /** A signed-in parent's enrollments (across all their students). */
+    /** A signed-in learner's enrollments — a guardian's children, or a student's own. */
     public function myIndex(Request $request) {
         return EnrollmentResource::collection(
-            $request->user()->enrollments()
+            $this->enrollmentsFor($request->user())
                 ->with(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug'])
                 ->latest()->get()
         );
@@ -57,7 +57,7 @@ class EnrollmentController extends Controller {
 
     /** Upcoming scheduled classes across all the parent's enrollments (Phase 6). */
     public function upcomingClasses(Request $request) {
-        $enrollmentIds = $request->user()->enrollments()->pluck('enrollments.id');
+        $enrollmentIds = $this->enrollmentsFor($request->user())->pluck('enrollments.id');
         $classes = \App\Models\ClassLog::whereIn('enrollment_id', $enrollmentIds)
             ->where('status', 'scheduled')
             ->whereDate('held_on', '>=', now()->toDateString())
@@ -100,9 +100,9 @@ class EnrollmentController extends Controller {
     public function downloadMaterial(Request $request, ClassMaterial $material) {
         $enrollment = $material->enrollment;
         $user = $request->user();
-        $isParent  = $enrollment->student && $enrollment->student->user_id === $user->id;
+        $isLearner = $this->ownsStudent($enrollment->student, $user);
         $isTeacher = $user->isTeacher() && $user->tutor && $enrollment->tutor_id === $user->tutor->id;
-        abort_unless($isParent || $isTeacher || $user->isAdmin(), 403, 'Not your material.');
+        abort_unless($isLearner || $isTeacher || $user->isAdmin(), 403, 'Not your material.');
         abort_unless($material->path && Storage::disk('local')->exists($material->path), 404, 'No file attached.');
 
         return Storage::disk('local')->download($material->path, $material->original_name ?? 'material');
@@ -110,8 +110,27 @@ class EnrollmentController extends Controller {
 
     private function authorizeParent(Request $request, Enrollment $enrollment): void {
         abort_unless(
-            $enrollment->student && $enrollment->student->user_id === $request->user()->id,
+            $this->ownsStudent($enrollment->student, $request->user()),
             403, 'This enrollment does not belong to your account.'
         );
+    }
+
+    /**
+     * A student profile is reachable by the guardian who owns it and by the
+     * student's own account, when one has been linked. The explicit null check
+     * keeps an unlinked profile (account_user_id = null) from ever matching.
+     */
+    private function ownsStudent($student, $user): bool {
+        if (!$student) return false;
+        if ($student->user_id === $user->id) return true;
+
+        return $student->account_user_id !== null && $student->account_user_id === $user->id;
+    }
+
+    /** Enrollments visible to a learner: a guardian's children's, or a student's own. */
+    private function enrollmentsFor($user) {
+        return $user->isStudent() && $user->studentProfile
+            ? Enrollment::where('student_id', $user->studentProfile->id)
+            : $user->enrollments();
     }
 }

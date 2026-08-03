@@ -1,16 +1,29 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-o8tWVAi6.css",
+    "file": "assets/app-CavRCMG3.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
+  "resources/js/components/admin/AdminConsole.jsx": {
+    "file": "assets/AdminConsole-Lv9IQ3i2.js",
+    "name": "AdminConsole",
+    "src": "resources/js/components/admin/AdminConsole.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/main.jsx"
+    ]
+  },
   "resources/js/main.jsx": {
-    "file": "assets/main-D52mKjF6.js",
+    "file": "assets/main-C2BVrMtK.js",
     "name": "main",
     "src": "resources/js/main.jsx",
     "isEntry": true,
+    "dynamicImports": [
+      "resources/js/components/admin/AdminConsole.jsx",
+      "resources/js/components/admin/AdminConsole.jsx"
+    ],
     "css": [
-      "assets/app-o8tWVAi6.css"
+      "assets/app-CavRCMG3.css"
     ]
   }
 }

@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\TeacherApplication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -74,7 +75,12 @@ class TeacherApplicationController extends Controller
         $data = $request->validate([
             'status' => ['required', 'in:pending,reviewing,approved,rejected'],
         ]);
+        $before = $teacherApplication->status;
         $teacherApplication->update($data);
+        AuditLog::record('teacher_status', 'teacher_application', $teacherApplication->id, $teacherApplication->name, [
+            'from' => $before, 'to' => $data['status'],
+        ]);
+
         return response()->json($teacherApplication);
     }
 

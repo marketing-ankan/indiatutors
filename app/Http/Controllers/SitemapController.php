@@ -20,7 +20,9 @@ class SitemapController extends Controller {
         $add($base . '/', null, 'daily', '1.0');
         foreach (['courses' => '0.9', 'find-tutors' => '0.9', 'plans' => '0.7', 'about' => '0.5',
                   'contact' => '0.4', 'book-demo' => '0.7', 'become-a-teacher' => '0.5',
-                  'refer-earn' => '0.4', 'blog' => '0.6', 'privacy' => '0.2', 'terms' => '0.2', 'refund' => '0.2'] as $p => $pr) {
+                  'refer-earn' => '0.4', 'blog' => '0.6',
+                  'terms-conditions' => '0.2', 'payment-refund-policy' => '0.2',
+                  'refer-earn-policy' => '0.2', 'privacy-policy' => '0.2'] as $p => $pr) {
             $add("$base/$p", null, 'monthly', $pr);
         }
 

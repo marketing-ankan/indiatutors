@@ -26,10 +26,14 @@ foreach ([
     'refer-and-earn'         => '/refer-earn',
     'plans-pricing'          => '/plans',
     'plans-and-pricing'      => '/plans',
-    'privacy-policy'         => '/privacy',
-    'terms-of-service'       => '/terms',
-    'refund-policy'          => '/refund',
-    'refund_returns'         => '/refund',
+    // Policy pages: /privacy-policy keeps its WordPress URL (it is now a real
+    // page), the other legacy spellings 301 onto the four canonical policies.
+    'terms-of-service'       => '/terms-conditions',
+    'refund-policy'          => '/payment-refund-policy',
+    'refund_returns'         => '/payment-refund-policy',
+    'privacy'                => '/privacy-policy',
+    'terms'                  => '/terms-conditions',
+    'refund'                 => '/payment-refund-policy',
     'my-account'             => '/login',
     'hello-world'            => '/blog/hello-world',
     'sample-page'            => '/',

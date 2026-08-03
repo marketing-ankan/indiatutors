@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { fetchCourses, submitContact, inr } from '../lib/api.js';
+import { imageFor } from '../data/courseImages.js';
 
 // Mirrors the live /refer-and-earn page: hero + reward card, 3 steps,
 // 4 why-cards, "Refer a family" form, popular courses, T&C, FAQ, CTA band.
@@ -9,7 +10,7 @@ import { fetchCourses, submitContact, inr } from '../lib/api.js';
 const STEPS = [
   { n:'1', icon:'📣', t:'Refer a friend or relative', d:'As an existing student or parent, introduce your friends, relatives or acquaintances to our live online classes.' },
   { n:'2', icon:'✅', t:'They enrol successfully', d:'Once your referred family joins a programme and completes the first payment, you become eligible for rewards.' },
-  { n:'3', icon:'🎉', t:'Earn free classes!', d:'Get 2 free 1-on-1 classes and 2 free group classes for every successful referral.' },
+  { n:'3', icon:'🎉', t:'Earn free classes!', d:'Get 2 free 1-on-1 classes OR 2 free group classes for every successful referral — your choice.' },
 ];
 
 const WHY = [
@@ -124,9 +125,9 @@ export default function ReferEarnPage() {
           </div>
           <div className="hidden lg:block relative">
             <div className="grid grid-cols-2 gap-3">
-              <img src="https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-25-768x576.jpg" alt="Live online class" className="col-span-2 h-44 w-full object-cover rounded-2xl shadow-2xl"/>
-              <img src="https://indiatutorsonline.com/wp-content/uploads/2026/05/Graphics-Design-768x576.jpg" alt="Graphics design class" className="h-32 w-full object-cover rounded-2xl shadow-2xl"/>
-              <img src="https://indiatutorsonline.com/wp-content/uploads/2026/05/Hindi-768x576.jpg" alt="Hindi class" className="h-32 w-full object-cover rounded-2xl shadow-2xl"/>
+              <img src="/build/images/home/live-class.jpg" alt="Live online class" className="col-span-2 h-44 w-full object-cover rounded-2xl shadow-2xl"/>
+              <img src="/build/images/home/graphics-design.jpg" alt="Graphics design class" className="h-32 w-full object-cover rounded-2xl shadow-2xl"/>
+              <img src="/build/images/home/hindi.jpg" alt="Hindi class" className="h-32 w-full object-cover rounded-2xl shadow-2xl"/>
             </div>
             <span className="absolute -bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-[#D4AF37] text-[#0B1220] px-4 py-1.5 text-xs font-extrabold shadow-lg">🎓 Learn together</span>
           </div>
@@ -143,6 +144,7 @@ export default function ReferEarnPage() {
               </div>
               <ul className="space-y-2 text-sm">
                 <li>🧑‍🏫 <strong>2 free 1-on-1 classes</strong> per referral</li>
+                <li className="text-xs font-bold text-slate-400 tracking-widest">— OR —</li>
                 <li>👥 <strong>2 free group classes</strong> per referral</li>
                 <li>♾️ <strong>Unlimited referrals</strong> — the more you refer, the more you earn</li>
               </ul>
@@ -203,7 +205,7 @@ export default function ReferEarnPage() {
             {courses.map(c => (
               <Link key={c.id} to={`/courses/${c.slug}`} className="group rounded-xl bg-white ring-1 ring-slate-100 shadow-sm overflow-hidden hover:shadow-md transition">
                 <div className="h-24 bg-slate-100 overflow-hidden">
-                  {c.image_url && <img src={c.image_url} alt={c.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy"/>}
+                  {imageFor(c) && <img src={imageFor(c)} alt={c.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy"/>}
                 </div>
                 <div className="p-2.5">
                   <p className="text-xs font-semibold text-slate-800 line-clamp-2 min-h-[2rem]">{c.name}</p>
@@ -224,6 +226,10 @@ export default function ReferEarnPage() {
               <li key={t} className="text-sm leading-relaxed"><strong className="text-slate-900">{t}</strong> <span className="text-slate-600">{d}</span></li>
             ))}
           </ul>
+          <p className="mt-6 text-center text-sm text-slate-600">
+            The full rules — including fair use, expiry and disqualification — are in our{' '}
+            <Link to="/refer-earn-policy" className="font-semibold text-brand-600 hover:underline">Refer &amp; Earn Policy</Link>.
+          </p>
         </div>
       </section>
 

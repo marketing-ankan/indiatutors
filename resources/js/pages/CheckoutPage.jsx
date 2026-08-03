@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { placeOrder, verifyPayment } from '../lib/api.js';
 import { cart, useCart, inrFmt } from '../lib/cart.js';
+import { imageFor } from '../data/courseImages.js';
 
 // Checkout — mirrors the live WooCommerce Blocks checkout: Contact
 // information + Billing address + Payment options on the left, an Order
@@ -181,7 +182,7 @@ export default function CheckoutPage() {
           {items.map(i => (
             <div key={i.slug} className="flex items-center gap-3 border-b border-slate-50 py-3">
               <span className="block h-12 w-14 shrink-0 overflow-hidden rounded-md bg-[#F3F6FC]">
-                {i.image_url && <img src={i.image_url} alt="" className="h-full w-full object-cover" loading="lazy" />}
+                {imageFor(i) && <img src={imageFor(i)} alt="" className="h-full w-full object-cover" loading="lazy" />}
               </span>
               <span className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800">{i.name}</span>
               <span className="text-sm font-bold">{inrFmt(i.price)}</span>

@@ -8,4 +8,6 @@ class Order extends Model {
     protected $casts = ['total' => 'float'];
 
     public function items(): HasMany { return $this->hasMany(OrderItem::class); }
+    // Nullable: checkout is open to guests, so an order need not have an account.
+    public function user() { return $this->belongsTo(User::class); }
 }

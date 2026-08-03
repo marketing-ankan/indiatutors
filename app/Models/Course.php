@@ -8,6 +8,8 @@ class Course extends Model {
     protected $casts = ['pills'=>'array','curriculum'=>'array','curriculum_variants'=>'array','regular_price'=>'decimal:2','sale_price'=>'decimal:2','is_featured'=>'boolean','is_published'=>'boolean'];
 
     public function categories(): BelongsToMany { return $this->belongsToMany(Category::class); }
+    public function reviews() { return $this->hasMany(Review::class); }
+    public function approvedReviews() { return $this->hasMany(Review::class)->where('status', 'approved'); }
     public function scopePublished($q) { return $q->where('is_published', true); }
     public function scopeFeatured($q) { return $q->where('is_featured', true); }
     public function getEffectivePriceAttribute(): float { return (float)($this->sale_price ?: $this->regular_price); }

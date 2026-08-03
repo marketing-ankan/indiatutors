@@ -1,5 +1,10 @@
 <?php
+use App\Http\Controllers\Api\AdminAuditController;
 use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\AdminCourseController;
+use App\Http\Controllers\Api\AdminSettingController;
+use App\Http\Controllers\Api\AdminStudentController;
+use App\Http\Controllers\Api\AdminTeacherController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\EnrollmentController;
@@ -15,6 +20,7 @@ use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PortfolioController;
+use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\TeacherApplicationController;
 use App\Http\Controllers\Api\TeacherController;
@@ -27,6 +33,9 @@ Route::get('/categories/{slug}', [CategoryController::class, 'show']);
 
 Route::get('/courses',           [CourseController::class, 'index']);
 Route::get('/courses/{slug}',    [CourseController::class, 'show'])->name('api.courses.show');
+// Two segments, so these never shadow /courses/{slug} above.
+Route::get('/courses/{course:slug}/reviews',  [ReviewController::class, 'index']);
+Route::post('/courses/{course:slug}/reviews', [ReviewController::class, 'store'])->middleware('throttle:5,1');
 
 Route::get('/tutors',            [TutorController::class, 'index']);
 Route::get('/tutors/filters',    [TutorController::class, 'filters']);
@@ -68,8 +77,11 @@ Route::post('/auth/login',       [AuthController::class, 'login'])->middleware('
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me',       [AuthController::class, 'me']);
+    Route::put('/auth/me',       [AuthController::class, 'updateMe']);
+    Route::post('/auth/password',[AuthController::class, 'changePassword'])->middleware('throttle:10,1');
     Route::post('/auth/logout',  [AuthController::class, 'logout']);
     Route::get('/my/video-courses', [VideoCourseController::class, 'myCourses']);
+    Route::get('/my/orders',        [OrderController::class, 'myIndex']);
 
     Route::apiResource('students', StudentController::class)->except(['show']);
 
@@ -120,16 +132,29 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // --- Admin (staff): match tutors, schedule, convert demo -> enrollment ---
     Route::middleware(\App\Http\Middleware\EnsureAdmin::class)->prefix('admin')->group(function () {
+        Route::get('/overview',                          [AdminController::class, 'overview']);
         Route::get('/demo-requests',                     [AdminController::class, 'demoRequests']);
         Route::get('/demo-requests/{demoRequest}/tutors',[AdminController::class, 'suggestTutors']);
         Route::patch('/demo-requests/{demoRequest}',     [AdminController::class, 'assignDemo']);
+        Route::delete('/demo-requests/{demoRequest}',    [AdminController::class, 'destroyDemoRequest']);
         Route::post('/demo-requests/{demoRequest}/convert',[AdminController::class, 'convert']);
         Route::get('/teacher-applications',                        [TeacherApplicationController::class, 'adminIndex']);
         Route::patch('/teacher-applications/{teacherApplication}', [TeacherApplicationController::class, 'updateStatus']);
         Route::get('/teacher-applications/{teacherApplication}/cv',[TeacherApplicationController::class, 'downloadCv']);
+        Route::get('/users',                             [AdminController::class, 'users']);
+        Route::post('/users',                            [AdminController::class, 'storeUser'])->middleware('throttle:20,1');
+        Route::post('/users/student',                    [AdminController::class, 'storeStudentAccount'])->middleware('throttle:20,1');
+        Route::patch('/users/{user}',                    [AdminController::class, 'updateUser']);
+        Route::delete('/users/{user}',                   [AdminController::class, 'destroyUser']);
+        Route::get('/users/{user}/dashboard',            [AdminController::class, 'userDashboard']);
+        Route::patch('/users/{user}/role',               [AdminController::class, 'updateUserRole']);
+        Route::post('/users/{user}/password',            [AdminController::class, 'resetUserPassword'])->middleware('throttle:10,1');
+        Route::get('/students',                          [AdminStudentController::class, 'index']);
+        Route::patch('/students/{student}',              [AdminStudentController::class, 'update']);
         Route::get('/enrollments',                       [AdminController::class, 'enrollments']);
         Route::get('/orders',                            [AdminController::class, 'orders']);
         Route::patch('/orders/{order}',                  [AdminController::class, 'updateOrder']);
+        Route::delete('/orders/{order}',                 [AdminController::class, 'destroyOrder']);
         Route::get('/events',                            [EventController::class, 'adminIndex']);
         Route::post('/events',                           [EventController::class, 'store']);
         Route::patch('/events/{event}',                  [EventController::class, 'update']);
@@ -146,6 +171,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/video-courses/{videoCourse}/lessons/{lesson}',     [VideoCourseController::class, 'destroyLesson']);
         Route::get('/teachers',                          [AdminController::class, 'teachers']);
         Route::patch('/teachers/{teacherProfile}',       [AdminController::class, 'approveTeacher']);
+        // One merged queue over teacher_profiles + unclaimed teacher_applications.
+        Route::get('/teachers-console',                  [AdminTeacherController::class, 'index']);
+        Route::patch('/teachers/{teacherProfile}/listing',[AdminTeacherController::class, 'toggleListing']);
+        Route::get('/reviews',                           [ReviewController::class, 'adminIndex']);
+        Route::post('/reviews',                          [ReviewController::class, 'adminStore']);
+        Route::patch('/reviews/{review}',                [ReviewController::class, 'update']);
+        Route::delete('/reviews/{review}',               [ReviewController::class, 'destroy']);
+        Route::get('/courses',                           [AdminCourseController::class, 'index']);
+        Route::post('/courses',                          [AdminCourseController::class, 'store']);
+        Route::patch('/courses/{course}',                [AdminCourseController::class, 'update']);
+        Route::delete('/courses/{course}',               [AdminCourseController::class, 'destroy']);
+        Route::get('/audit',                             [AdminAuditController::class, 'index']);
+        Route::get('/settings',                          [AdminSettingController::class, 'index']);
+        Route::put('/settings',                          [AdminSettingController::class, 'update']);
         Route::get('/proposals',                         [AdminController::class, 'proposals']);
         Route::patch('/proposals/{proposal}',            [AdminController::class, 'decideProposal']);
         Route::get('/analytics',                         [AdminController::class, 'analytics']);

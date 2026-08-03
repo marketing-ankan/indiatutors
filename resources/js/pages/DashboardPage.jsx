@@ -1,9 +1,14 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, lazy, Suspense } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { LogOut, Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap, Briefcase, Save, Users, BookOpen, NotebookPen, ChevronDown, ChevronUp, ListChecks, FolderOpen, Link2, Download, Lightbulb, Calendar, Award, Megaphone, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap, Briefcase, Save, Users, BookOpen, NotebookPen, ChevronDown, ChevronUp, ListChecks, FolderOpen, Link2, Download, Lightbulb, Calendar, Award, Megaphone, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
+import DashboardHero from '../components/dashboard/DashboardHero.jsx';
+
+// Split out: only admins ever render it, and it is a large chunk to hand to
+// every other visitor.
+const AdminConsole = lazy(() => import('../components/admin/AdminConsole.jsx'));
 import {
   fetchStudents, createStudent, deleteStudent,
   fetchKyc, uploadKyc, deleteKyc, fetchMyDemoRequests, fetchMyEnrollments,
@@ -14,63 +19,167 @@ import {
   fetchMyProposals, submitProposal, fetchMyEnrollmentDetail,
   requestReschedule, fetchTeacherReschedules, decideReschedule,
   fetchTeacherCalendar, fetchPortfolio, addPortfolioItem, deletePortfolioItem, downloadPortfolioItem,
-  fetchExamUpdates, fetchUpcomingClasses,
+  fetchExamUpdates, fetchUpcomingClasses, fetchMyVideoCourses,
 } from '../lib/api.js';
 
 const inp = "w-full rounded-md ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
-const roleLabel = { parent:'Parent', student:'Student', teacher:'Teacher', admin:'Admin' };
+
+/**
+ * /dashboard is role-aware. Before this it rendered the parent view for
+ * everybody except teachers — so an admin's own dashboard offered to add their
+ * children and upload their Aadhaar, and a student saw a page about managing
+ * other students.
+ *
+ * Each role now gets a view built from the cards that role can actually act on.
+ * An admin lands on the staff console (the same component /admin renders), so
+ * there is one console to maintain rather than two.
+ */
+const VIEW_BY_ROLE = {
+  admin:   AdminDashboard,
+  teacher: TeacherDashboard,
+  student: StudentDashboard,
+  parent:  ParentDashboard,
+};
 
 export default function DashboardPage() {
-  const { user, isAuthed, isLoading, logout } = useAuth();
+  const { user, isAuthed, isLoading } = useAuth();
 
   if (isLoading) return <div className="mx-auto max-w-5xl px-4 py-20 text-slate-500">Loading your dashboard…</div>;
   if (!isAuthed) return <Navigate to="/login" replace />;
 
-  return (
-    <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
-      <div className="flex items-start justify-between gap-4 mb-8">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-brand-600 mb-1">My Account</p>
-          <h1 className="text-3xl font-extrabold tracking-tight">Hi, {user.name.split(' ')[0]} 👋</h1>
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-500">
-            <span className="inline-flex items-center rounded-full bg-brand-50 text-brand-700 px-2.5 py-0.5 text-xs font-semibold">{roleLabel[user.role]||user.role}</span>
-            <span>{user.email}</span>{user.phone && <span>· {user.phone}</span>}
-          </div>
-        </div>
-        <button onClick={()=>logout()} className="inline-flex items-center gap-1.5 rounded-md ring-1 ring-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-          <LogOut className="h-4 w-4"/> Sign out
-        </button>
-      </div>
+  const View = VIEW_BY_ROLE[user.role] ?? ParentDashboard;
+  // The console needs the width; the other three read better narrow.
+  const width = user.role === 'admin'
+    ? 'max-w-[1600px]'
+    : 'max-w-5xl';
 
-      {user.role === 'teacher' ? (
-        <div className="space-y-6">
-          <div className="grid lg:grid-cols-2 gap-6">
-            <TeacherProfileCard />
-            <KycCard />
-          </div>
-          <TeacherClassroom />
-          <TeacherCalendarCard />
-          <div className="grid lg:grid-cols-2 gap-6">
-            <TeacherReschedulesCard />
-            <TeacherProposalsCard />
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="grid lg:grid-cols-2 gap-6">
-            <RequestsCard />
-            <EnrollmentsCard />
-          </div>
-          <div className="grid lg:grid-cols-2 gap-6 mt-6">
-            <UpcomingClassesCard />
-            <ExamUpdatesCard />
-          </div>
-          <div className="grid lg:grid-cols-2 gap-6 mt-6">
-            <StudentsCard />
-            <KycCard />
-          </div>
-        </>
-      )}
+  return (
+    <div className={`mx-auto w-full ${width} px-4 sm:px-6 lg:px-8 py-10`}>
+      <DashboardHero />
+      <div className="mt-6">
+        <View />
+      </div>
+    </div>
+  );
+}
+
+function AdminDashboard() {
+  return (
+    <Suspense fallback={<p className="py-10 text-center text-slate-400">Loading console…</p>}>
+      <AdminConsole />
+    </Suspense>
+  );
+}
+
+function TeacherDashboard() {
+  return (
+    <div className="space-y-6">
+      <div className="grid lg:grid-cols-2 gap-6">
+        <TeacherProfileCard />
+        <KycCard />
+      </div>
+      <TeacherClassroom />
+      <TeacherCalendarCard />
+      <div className="grid lg:grid-cols-2 gap-6">
+        <TeacherReschedulesCard />
+        <TeacherProposalsCard />
+      </div>
+    </div>
+  );
+}
+
+function ParentDashboard() {
+  return (
+    <>
+      <MyCoursesCard />
+      <div className="grid lg:grid-cols-2 gap-6 mt-6">
+        <RequestsCard />
+        <EnrollmentsCard />
+      </div>
+      <div className="grid lg:grid-cols-2 gap-6 mt-6">
+        <UpcomingClassesCard />
+        <ExamUpdatesCard />
+      </div>
+      <div className="grid lg:grid-cols-2 gap-6 mt-6">
+        <StudentsCard />
+        <KycCard />
+      </div>
+    </>
+  );
+}
+
+/**
+ * A student sees their own learning and nothing about running an account:
+ * no "my students" (adding children is a guardian's job), no KYC (we verify
+ * the adult), no demo-booking card (a demo is booked by whoever pays).
+ */
+function StudentDashboard() {
+  const { user } = useAuth();
+  const profile = user.student_profile;
+
+  return (
+    <>
+      <MyCoursesCard />
+      <div className="grid lg:grid-cols-2 gap-6 mt-6">
+        <EnrollmentsCard />
+        <UpcomingClassesCard />
+      </div>
+      <div className="mt-6">
+        <ExamUpdatesCard />
+      </div>
+      <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6 mt-6">
+        <h2 className="text-lg font-bold flex items-center gap-2 mb-1"><Award className="h-5 w-5 text-brand-600"/>My portfolio</h2>
+        {profile ? (
+          <>
+            <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-slate-500 mb-2">
+              <span>Your achievements, certificates and milestones — added by you and your teachers.</span>
+              <span className="rounded bg-brand-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-brand-700">{profile.code}</span>
+            </p>
+            <PortfolioPanel studentId={profile.id} />
+          </>
+        ) : (
+          // No invented data: an account with no linked profile genuinely has
+          // no classes to show, and the fix is an action someone else takes.
+          <p className="text-sm text-slate-500">
+            Your account isn't linked to a student profile yet, so there's nothing to show here.
+            Ask your parent or our team to link it — then your classes, materials and portfolio appear on this page.
+          </p>
+        )}
+      </section>
+    </>
+  );
+}
+
+// Purchased video courses, surfaced on the dashboard so a buyer lands on their
+// library right after signing in. Hidden entirely when they own nothing — an
+// empty "you have no courses" card on every parent's dashboard is just noise;
+// /my-courses carries the empty state for people who go looking.
+function MyCoursesCard() {
+  const { data: courses = [], isLoading } = useQuery({ queryKey:['my-video-courses'], queryFn: fetchMyVideoCourses });
+  if (isLoading || !courses.length) return null;
+
+  return (
+    <div className="rounded-xl bg-white ring-1 ring-slate-100 p-5">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="flex items-center gap-2 font-bold text-slate-800"><BookOpen className="h-4 w-4 text-brand-600" /> My Courses</h2>
+        <Link to="/my-courses" className="text-xs font-bold text-brand-600 hover:underline">View all</Link>
+      </div>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {courses.slice(0, 3).map(c => (
+          // min-w-0: a grid item defaults to min-width:auto, so without it the flex
+          // row refuses to shrink and the title's truncate never engages.
+          <Link key={c.slug} to={`/video-courses/${c.slug}`}
+            className="flex min-w-0 items-center gap-3 rounded-lg ring-1 ring-slate-100 p-2.5 hover:bg-slate-50">
+            <div className="h-10 w-16 shrink-0 overflow-hidden rounded bg-slate-100">
+              {c.thumbnail && <img src={c.thumbnail} alt="" className="h-full w-full object-cover" loading="lazy" />}
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-slate-800">{c.title}</p>
+              <p className="text-xs text-slate-500">{c.lesson_count} lessons</p>
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

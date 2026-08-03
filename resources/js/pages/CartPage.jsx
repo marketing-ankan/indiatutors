@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import { fetchCourses } from '../lib/api.js';
 import { cart, useCart, cartItemOf, inrFmt } from '../lib/cart.js';
+import { imageFor } from '../data/courseImages.js';
 
 // Cart — mirrors the live WooCommerce Blocks cart: an empty state with the
 // "New in store" cross-sell grid, and a filled two-column layout (items list
@@ -25,8 +26,8 @@ function CrossSell() {
         {picks.map(c => (
           <div key={c.slug} className="group flex flex-col overflow-hidden rounded-[14px] border border-[#E7E7EF] bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
             <Link to={`/courses/${c.slug}`} className="block h-[150px] overflow-hidden bg-[#F3F6FC]">
-              {c.image_url
-                ? <img src={c.image_url} alt={c.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+              {imageFor(c)
+                ? <img src={imageFor(c)} alt={c.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
                 : <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1E40AF] to-[#1E3A8A] font-heading text-3xl font-bold text-white/90">{c.name[0]}</span>}
             </Link>
             <div className="flex flex-1 flex-col p-4">
@@ -88,8 +89,8 @@ export default function CartPage() {
           {items.map(i => (
             <div key={i.slug} className="flex items-center gap-4 py-4">
               <Link to={`/courses/${i.slug}`} className="block h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-[#F3F6FC]">
-                {i.image_url
-                  ? <img src={i.image_url} alt="" className="h-full w-full object-cover" loading="lazy" />
+                {imageFor(i)
+                  ? <img src={imageFor(i)} alt="" className="h-full w-full object-cover" loading="lazy" />
                   : <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1E40AF] to-[#1E3A8A] font-heading font-bold text-white/90">{i.name[0]}</span>}
               </Link>
               <div className="min-w-0 flex-1">
