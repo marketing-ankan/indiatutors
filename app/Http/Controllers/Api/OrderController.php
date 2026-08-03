@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AdminOrderResource;
 use App\Models\Course;
 use App\Models\Order;
 use App\Models\VideoCourse;
@@ -108,6 +109,18 @@ class OrderController extends Controller {
             'order'    => self::orderPayload($order),
             'razorpay' => $razorpay,
         ], 201);
+    }
+
+    /**
+     * The signed-in buyer's own orders. Checkout is open to guests, so this
+     * only ever returns the ones placed while signed in (orders.user_id) — a
+     * guest order made with the same email deliberately does not appear, since
+     * an unverified email match is not proof of ownership.
+     */
+    public function myIndex(Request $request) {
+        return AdminOrderResource::collection(
+            $request->user()->orders()->with('items')->latest()->get()
+        );
     }
 
     /** Confirm a Razorpay checkout callback and mark the order paid. */

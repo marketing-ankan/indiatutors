@@ -40,9 +40,9 @@ const Stars = ({ className = '' }) => (
 
 // ---------------------------------------------------------------- HERO ------
 const HERO_SLIDES = [
-  { src: 'https://indiatutorsonline.com/wp-content/themes/indiatutorsonline-theme/hero-carousel-images/CarouselImage1.webp', alt: 'AI and ML live classes' },
-  { src: 'https://indiatutorsonline.com/wp-content/themes/indiatutorsonline-theme/hero-carousel-images/CarouselImage2.webp', alt: 'Python coding classes' },
-  { src: 'https://indiatutorsonline.com/wp-content/themes/indiatutorsonline-theme/hero-carousel-images/CarouselImage3.webp', alt: 'Robotics classes for kids' },
+  { src: '/build/images/home/carousel-1.webp', alt: 'AI and ML live classes' },
+  { src: '/build/images/home/carousel-2.webp', alt: 'Python coding classes' },
+  { src: '/build/images/home/carousel-3.webp', alt: 'Robotics classes for kids' },
 ];
 
 function HeroSlider() {

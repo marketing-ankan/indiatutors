@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { inr } from '../lib/api.js';
+import { imageFor } from '../data/courseImages.js';
 
 export default function CourseCard({ course }) {
   const fallback = `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240"><rect width="400" height="240" fill="#1e3a8a"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" font-family="Inter,sans-serif" font-size="14" fill="white">${(course.name||'').slice(0,30)}</text></svg>`)}`;
@@ -17,7 +18,7 @@ export default function CourseCard({ course }) {
   return (
     <Link to={`/courses/${course.slug}`} className="group block rounded-xl bg-white shadow-sm ring-1 ring-slate-100 overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
       <div className="relative aspect-[5/3] bg-slate-100 overflow-hidden">
-        <img src={course.image_url||fallback} alt={course.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" onError={e=>{e.currentTarget.src=fallback}} loading="lazy"/>
+        <img src={imageFor(course)||fallback} alt={course.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" onError={e=>{e.currentTarget.src=fallback}} loading="lazy"/>
         {course.age && <span className="absolute top-2 left-2 rounded-full bg-white/90 backdrop-blur px-2 py-0.5 text-[11px] font-semibold text-slate-700 shadow-sm">{course.age}</span>}
         {off > 0 && <span className="absolute top-2 right-2 rounded-full bg-red-500 text-white px-2 py-0.5 text-[11px] font-bold shadow-sm">{off}% OFF</span>}
       </div>

@@ -14,6 +14,9 @@ class UserResource extends JsonResource {
             'phone_country_code' => $this->phone_country_code,
             'students_count'     => $this->when(isset($this->students_count), $this->students_count),
             'teacher_profile'    => $this->whenLoaded('teacherProfile'),
+            'student_profile'    => $this->whenLoaded('studentProfile', fn () => $this->studentProfile
+                ? $this->studentProfile->only(['id', 'code', 'name', 'grade', 'board', 'subjects'])
+                : null),
             'created_at'         => optional($this->created_at)->toDateString(),
         ];
     }

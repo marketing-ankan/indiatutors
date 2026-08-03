@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { MapPin, Phone, Mail, Star } from 'lucide-react';
 import { fetchCourses, inr } from '../lib/api.js';
+import { imageFor } from '../data/courseImages.js';
 
 // Mirrors the live /about-us page (ito-about): navy/gold hero + collage,
 // floating stat cards, content + sticky facts aside, course grid, CTA band.
@@ -30,9 +31,9 @@ const FACTS = [
 ];
 
 const COLLAGE = [
-  'https://indiatutorsonline.com/wp-content/uploads/2026/05/Chess-1024x768.jpg',
-  'https://indiatutorsonline.com/wp-content/uploads/2026/05/Carnatic-3-1024x768.jpg',
-  'https://indiatutorsonline.com/wp-content/uploads/2026/05/App-Developement-8-1024x768.jpg',
+  '/build/images/home/chess.jpg',
+  '/build/images/home/carnatic.jpg',
+  '/build/images/home/app-development.jpg',
 ];
 
 function SectionH2({ children }) {
@@ -106,7 +107,7 @@ export default function AboutPage() {
         </div>
 
         <aside className="lg:sticky lg:top-24 space-y-4">
-          <img src="https://indiatutorsonline.com/wp-content/uploads/2026/04/Algebra1Carousel.webp" alt="" className="w-full h-48 object-cover rounded-2xl shadow-xl"/>
+          <img src="/build/images/home/algebra-carousel.webp" alt="" className="w-full h-48 object-cover rounded-2xl shadow-xl"/>
           <div className="rounded-2xl ring-1 ring-slate-200 bg-[#F4F7FE] p-6">
             <h3 className="font-extrabold text-slate-900 mb-3">Why families choose us</h3>
             <ul className="space-y-2 text-sm text-slate-700 mb-5">
@@ -126,7 +127,7 @@ export default function AboutPage() {
           {courses.map(c => (
             <Link key={c.id} to={`/courses/${c.slug}`} className="group rounded-xl bg-white ring-1 ring-slate-100 shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
               <div className="h-28 bg-slate-100 overflow-hidden">
-                {c.image_url && <img src={c.image_url} alt={c.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy"/>}
+                {imageFor(c) && <img src={imageFor(c)} alt={c.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy"/>}
               </div>
               <div className="p-3">
                 <p className="text-xs font-semibold text-slate-800 line-clamp-2 min-h-[2rem]">{c.name}</p>

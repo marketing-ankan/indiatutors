@@ -53,10 +53,13 @@ export default function BookDemoPage() {
       grade: s?.grade || f.grade, board: s?.board || f.board, subject: s?.subjects || f.subject }));
   };
 
-  // Record which flow was requested so the staff console sees it.
+  // Record which flow was requested so the staff console can filter by it. The
+  // message prefix stays for the rows that predate the `type` column and for
+  // anyone reading the enquiry text on its own.
   const mutation = useMutation({
     mutationFn: () => submitDemoRequest({
       ...form,
+      type: typeKey,
       message: typeKey === 'demo' ? form.message : `[${bookingType.heading}] ${form.message}`.trim(),
     }),
     onSuccess: ()=>{ setOk(true); setForm(empty); },

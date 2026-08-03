@@ -60,8 +60,16 @@ class SeoMeta {
             'login'             => ['title' => 'Login — ' . self::SITE, 'robots' => 'noindex, follow'],
             'dashboard'         => ['title' => 'Dashboard — ' . self::SITE, 'robots' => 'noindex, nofollow'],
             'admin'             => ['title' => 'Staff Console — ' . self::SITE, 'robots' => 'noindex, nofollow'],
+            'account'           => ['title' => 'Account & Orders — ' . self::SITE, 'robots' => 'noindex, nofollow'],
+            'my-courses'        => ['title' => 'My Courses — ' . self::SITE, 'robots' => 'noindex, nofollow'],
             // Live-parity quirk: WP titles the posts index with the site name twice.
             'blog'              => ['title' => self::SITE . ' — ' . self::SITE . ' — Live Online Tutoring & Verified Home Tutors Across India', 'description' => 'Practical advice on tutoring, study skills and helping your child learn.'],
+            // The four policy pages. Legacy spellings below them 301 here, but
+            // keep their entries so a direct hit still resolves a sane title.
+            'terms-conditions'  => ['title' => 'Terms & Conditions — ' . self::SITE, 'description' => 'The terms that govern your use of Indiatutors Online — enrolment, scheduling, conduct, intellectual property and liability.'],
+            'payment-refund-policy' => ['title' => 'Payment & Refund Terms — ' . self::SITE, 'description' => 'How we charge for classes and when refunds and credits are issued — free demo, unused classes, late cancellations and video courses.'],
+            'refer-earn-policy' => ['title' => 'Refer & Earn Policy — ' . self::SITE, 'description' => 'The rules of our referral programme — who can refer, what you earn, when rewards are credited and how long they last.'],
+            'privacy-policy'    => ['title' => 'Privacy Policy — ' . self::SITE, 'description' => 'What personal data Indiatutors Online collects, how we use and protect it, and your rights under the DPDP Act 2023.'],
             'privacy'           => ['title' => 'Privacy Policy — ' . self::SITE],
             'terms'             => ['title' => 'Terms of Service — ' . self::SITE],
             'refund'            => ['title' => 'Refund & Cancellation Policy — ' . self::SITE],

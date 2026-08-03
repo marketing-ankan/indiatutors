@@ -24,6 +24,9 @@ class DemoRequestController extends Controller {
             'marketing_consent'  => 'nullable|boolean',
             'course_id'          => 'nullable|integer|exists:courses,id',
             'student_id'         => 'nullable|integer|exists:students,id',
+            // Which of the five booking flows this came from, so the console can
+            // filter by it instead of pattern-matching the message text.
+            'type'               => 'nullable|in:' . implode(',', DemoRequest::TYPES),
         ]);
 
         // If the request carries a valid bearer token, link it to that account.

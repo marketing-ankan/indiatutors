@@ -2,7 +2,15 @@
 // The WP theme server-renders every card with fixed ratings/copy, so this file
 // mirrors that data verbatim to keep the React homepage pixel-identical.
 
+import { imageFor } from './courseImages.js';
+import { ASSET_V } from './assetVersion.js';
+
 const UP = 'https://indiatutorsonline.com/wp-content/uploads/';
+
+// Homepage tutor portraits, self-hosted from the live theme's media library.
+// Kept under teachers/home/ so they don't collide with the tutor-directory
+// portraits in teachers/, which are different crops of a different roster.
+const teacherImg = slug => `/build/images/teachers/home/${slug}.png?v=${ASSET_V}`;
 
 // Card description templates ({T} = course title, exactly as the live theme prints them)
 export const D = [
@@ -184,7 +192,12 @@ export const IMG = {
   'spelling-competition': null,
 };
 
-export const imgUrl = slug => (IMG[slug] ? UP + IMG[slug] : null);
+// Self-hosted photo first, WP hotlink only as the fallback — same precedence the
+// product pages use (see courseImages.js). IMG only covers courses that existed on
+// the old WP site, so the 18 India-localisation additions (JEE, NEET, CUET,
+// Olympiad, the Class 11-12 commerce/CS subjects…) had no entry and rendered as
+// empty grey cards; every one of them does have a self-hosted photo on disk.
+export const imgUrl = slug => imageFor({ slug, image_url: IMG[slug] ? UP + IMG[slug] : null });
 
 // Card tuple: [title, slug, rating, reviews, descIdx, featIdx, priceNow, priceWas, subFilter]
 const COURSE_PANELS_RAW = {
@@ -463,14 +476,14 @@ export const POPULAR_SUBJECTS = [
 ];
 
 export const TEACHERS = [
-  { name: 'Vijayalakshmi', subj: 'Vocal Music · Carnatic Vocals · Hindustani Vocals', exp: 'Online', slug: 'vijayalakshmi', img: UP + '2026/05/Untitled-design-70-760x1024-2-150x150.png' },
-  { name: 'Vipul', subj: 'Computer Science · Python Programming · Java', exp: 'Online', slug: 'vipul', img: UP + '2026/05/Untitled-design-71-760x1024-2-150x150.png' },
-  { name: 'Shamim', subj: 'Violin · Music Theory · Piano', exp: 'Online', slug: 'shamim', img: UP + '2026/05/Untitled-design-62-760x1024-2-150x150.png' },
-  { name: 'Surajit', subj: 'Drums · Percussion', exp: '9+ yrs · Online', slug: 'surajit', img: UP + '2026/05/Untitled-design-69-760x1024-2-150x150.png' },
-  { name: 'Prashasti', subj: 'Piano', exp: 'Online', slug: 'prashasti', img: UP + '2026/05/Untitled-design-67-760x1024-1-150x150.png' },
-  { name: 'Rahul', subj: 'Python Programming · AI & Machine Learning · Web Development', exp: '5+ yrs · Online', slug: 'rahul', img: UP + '2026/05/Untitled-design-68-760x1024-1-150x150.png' },
-  { name: 'Nisitha', subj: 'Spanish Language', exp: '7+ yrs · Online', slug: 'nisitha', img: UP + '2026/05/Untitled-design-66-760x1024-1-150x150.png' },
-  { name: 'Pinki', subj: 'Yoga · Naturopathy · Wellness', exp: '20+ yrs · Online', slug: 'pinki', img: UP + '2026/05/Untitled-design-61-760x1024-1-150x150.png' },
+  { name: 'Vijayalakshmi', subj: 'Vocal Music · Carnatic Vocals · Hindustani Vocals', exp: 'Online', slug: 'vijayalakshmi', img: teacherImg('vijayalakshmi') },
+  { name: 'Vipul', subj: 'Computer Science · Python Programming · Java', exp: 'Online', slug: 'vipul', img: teacherImg('vipul') },
+  { name: 'Shamim', subj: 'Violin · Music Theory · Piano', exp: 'Online', slug: 'shamim', img: teacherImg('shamim') },
+  { name: 'Surajit', subj: 'Drums · Percussion', exp: '9+ yrs · Online', slug: 'surajit', img: teacherImg('surajit') },
+  { name: 'Prashasti', subj: 'Piano', exp: 'Online', slug: 'prashasti', img: teacherImg('prashasti') },
+  { name: 'Rahul', subj: 'Python Programming · AI & Machine Learning · Web Development', exp: '5+ yrs · Online', slug: 'rahul', img: teacherImg('rahul') },
+  { name: 'Nisitha', subj: 'Spanish Language', exp: '7+ yrs · Online', slug: 'nisitha', img: teacherImg('nisitha') },
+  { name: 'Pinki', subj: 'Yoga · Naturopathy · Wellness', exp: '20+ yrs · Online', slug: 'pinki', img: teacherImg('pinki') },
 ];
 
 export const TESTIMONIALS = [

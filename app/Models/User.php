@@ -45,10 +45,14 @@ class User extends Authenticatable
     public function kycDocuments() { return $this->hasMany(KycDocument::class); }
     public function demoRequests() { return $this->hasMany(DemoRequest::class); }
     public function enrollments() { return $this->hasManyThrough(Enrollment::class, Student::class); }
+    public function orders() { return $this->hasMany(Order::class); }
+    /** The student profile this account IS, as opposed to the ones it owns. */
+    public function studentProfile() { return $this->hasOne(Student::class, 'account_user_id'); }
 
     // Role helpers
     public function hasRole(string $role): bool { return $this->role === $role; }
     public function isParent(): bool { return $this->role === 'parent'; }
+    public function isStudent(): bool { return $this->role === 'student'; }
     public function isTeacher(): bool { return $this->role === 'teacher'; }
     public function isAdmin(): bool { return $this->role === 'admin'; }
 }

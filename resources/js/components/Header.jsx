@@ -151,7 +151,7 @@ export default function Header() {
       <div className="border-b border-slate-100">
         <div className="container-wide flex items-center justify-between py-3">
           <Link to="/" className="flex items-center gap-2 flex-shrink-0">
-            <img src="https://indiatutorsonline.com/wp-content/uploads/2026/04/IndTutorBlackLogo.png" alt="Indiatutors Online" className="h-9 w-auto"
+            <img src="/build/images/site/logo.png" alt="Indiatutors Online" className="h-9 w-auto"
               onError={e=>{ e.currentTarget.style.display='none'; e.currentTarget.nextSibling.style.display='flex'; }}/>
             <span className="text-xl font-extrabold tracking-tight" style={{display:'none'}}>Indiatutors <span className="text-brand-600">Online</span></span>
           </Link>

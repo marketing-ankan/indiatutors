@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Facebook, Instagram, Youtube, Linkedin, Twitter, MessageCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, Facebook, Instagram, Youtube, Linkedin, Twitter, MessageCircle, ChevronRight } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { submitContact } from '../lib/api.js';
+import { LEGAL_NAV } from '../data/legal.js';
 
 // Footer ported from the live site: brand block (tagline, socials, contact,
 // newsletter) + Quick Links · Our Courses · Learn & Discover · Support.
@@ -31,8 +32,10 @@ const LEARN_DISCOVER = [
 const SUPPORT = [
   ['🎓 Student Login', '/login'], ['👩‍🏫 Teacher Login', '/login'],
   ['❓ FAQ', '/faqs'], ['🆘 Help Centre', '/contact'],
-  ['🔒 Privacy Policy', '/privacy'], ['📜 Terms of Service', '/terms'], ['💰 Refund Policy', '/refund'],
 ];
+// The four policies live in their own chevron list (sister-site parity) rather
+// than mixed into Support — LEGAL_NAV is derived from legal.js so the labels and
+// paths can't drift from the documents themselves.
 const SOCIALS = [
   [MessageCircle, 'https://wa.me/919330811581', 'WhatsApp'],
   [Facebook, 'https://www.facebook.com/indiatutorsonline', 'Facebook'],
@@ -111,6 +114,16 @@ export default function Footer() {
           <ul className="mt-2 space-y-2 text-sm">
             <li><a href="/sitemap.xml" className="hover:text-white">🗺️ Sitemap</a></li>
           </ul>
+          <h4 className="text-white font-bold mt-7 mb-4 text-xs uppercase tracking-widest">Policies</h4>
+          <ul className="space-y-2 text-sm">
+            {LEGAL_NAV.map(([label, href]) => (
+              <li key={href}>
+                <Link to={href} className="flex items-center gap-1.5 hover:text-white">
+                  <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-500"/>{label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 
@@ -136,10 +149,11 @@ export default function Footer() {
       <div className="border-t border-slate-800">
         <div className="container-wide py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
           <span>© {new Date().getFullYear()} Indiatutors Online. All rights reserved. Made with ❤️ in India.</span>
-          <div className="flex gap-4">
-            <Link to="/privacy" className="hover:text-slate-300">Privacy</Link>
-            <Link to="/terms" className="hover:text-slate-300">Terms</Link>
-            <Link to="/refund" className="hover:text-slate-300">Refund</Link>
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
+            <Link to="/terms-conditions" className="hover:text-slate-300">Terms</Link>
+            <Link to="/payment-refund-policy" className="hover:text-slate-300">Payment & Refund</Link>
+            <Link to="/refer-earn-policy" className="hover:text-slate-300">Refer & Earn</Link>
+            <Link to="/privacy-policy" className="hover:text-slate-300">Privacy</Link>
           </div>
         </div>
       </div>

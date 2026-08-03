@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   CheckCircle2, Video, Users, Calendar, Clock, Baby, Star, Heart, Download,
   Phone, Mail, Play, ShoppingCart, ChevronRight, Youtube,
 } from 'lucide-react';
-import { fetchCourse, fetchCourses, fetchSocialYoutube, inr } from '../lib/api.js';
+import { fetchCourse, fetchCourses, fetchSocialYoutube, fetchCourseReviews, submitCourseReview, inr } from '../lib/api.js';
 import { cart, wishlist, useWishlist, cartItemOf } from '../lib/cart.js';
 import {
   buildPriceMatrix, CARD_FEATURES, WORKSHOPS,
@@ -24,9 +24,10 @@ import SocialProofSections from '../components/SocialProofSections.jsx';
 
 const TABS = ['About Indiatutors Online', 'Why Choose', 'Overview', "What You'll Learn", 'Curriculum', 'Requirements', 'Reviews', 'FAQ'];
 
-// Deterministic per-course social proof — stable rating + enrolled count per slug.
+// Deterministic enrolled count per slug. The matching ratingOf() was removed
+// when reviews became real — the rating now comes from moderated reviews, and
+// no score is shown for a course that has none.
 const seed = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
-const ratingOf = (slug) => (46 + (seed(slug + 'r') % 5)) / 10;   // 4.6 – 5.0
 const enrolledOf = (slug) => 180 + (seed(slug + 'e') % 720);      // 180 – 899
 
 const SectionHead = ({ children }) => (
@@ -179,19 +180,31 @@ function BuyCard({ course }) {
 }
 
 // ---------------------------------------------------------- REVIEW FORM ------
-function ReviewForm() {
+// This form used to set a "submitted for moderation" flag and throw the review
+// away. It now really submits: the review is stored as pending and appears on
+// this page once a staff member approves it in the console.
+function ReviewForm({ slug }) {
+  const qc = useQueryClient();
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
-  const [sent, setSent] = useState(false);
+  const [form, setForm] = useState({ author_name: '', author_email: '', body: '' });
+  const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
 
-  if (sent) return <div className="rounded-2xl bg-green-50 ring-1 ring-green-100 p-6 text-center text-green-800 font-semibold">Thanks! Your review has been submitted for moderation.</div>;
+  const send = useMutation({
+    mutationFn: () => submitCourseReview({
+      slug, ...form, rating, author_email: form.author_email || null,
+    }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['course-reviews', slug] }),
+  });
+
+  if (send.isSuccess) return <div className="rounded-2xl bg-green-50 ring-1 ring-green-100 p-6 text-center text-green-800 font-semibold">Thanks! Your review has been submitted for moderation.</div>;
 
   return (
     <div className="rounded-2xl bg-white ring-1 ring-slate-100 p-6 max-w-2xl mx-auto">
       <h3 className="font-heading font-bold text-lg mb-4">Write a Review</h3>
-      <form onSubmit={e => { e.preventDefault(); setSent(true); }} className="space-y-4">
+      <form onSubmit={e => { e.preventDefault(); if (rating) send.mutate(); }} className="space-y-4">
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1">Your Rating</label>
+          <label className="block text-sm font-semibold text-slate-700 mb-1">Your Rating*</label>
           <div className="flex gap-1">
             {[1, 2, 3, 4, 5].map(i => (
               <button key={i} type="button" onClick={() => setRating(i)} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(0)} aria-label={`${i} star`}>
@@ -203,20 +216,52 @@ function ReviewForm() {
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Your Name*</label>
-            <input required className="w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="e.g. Samesh Sharma" />
+            <input required value={form.author_name} onChange={set('author_name')} maxLength={120} className="w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="e.g. Samesh Sharma" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">Email (not published)</label>
-            <input type="email" className="w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="you@example.com" />
+            <input type="email" value={form.author_email} onChange={set('author_email')} className="w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="you@example.com" />
           </div>
         </div>
         <div>
           <label className="block text-sm font-semibold text-slate-700 mb-1">Your Review*</label>
-          <textarea required rows={4} className="w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="Share your experience with this course" />
+          <textarea required rows={4} value={form.body} onChange={set('body')} maxLength={2000} className="w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" placeholder="Share your experience with this course" />
         </div>
-        <button type="submit" className="rounded-lg bg-brand-600 text-white px-6 py-2.5 text-sm font-bold hover:bg-brand-700">Submit Review</button>
+        {send.isError && <p className="text-sm text-red-600">{send.error?.response?.data?.message || 'Could not submit — please check the fields and try again.'}</p>}
+        <button type="submit" disabled={!rating || send.isPending} className="rounded-lg bg-brand-600 text-white px-6 py-2.5 text-sm font-bold hover:bg-brand-700 disabled:opacity-50">
+          {send.isPending ? 'Submitting…' : 'Submit Review'}
+        </button>
       </form>
     </div>
+  );
+}
+
+/** Approved reviews, newest first. Nothing is shown until one exists. */
+function ReviewList({ reviews }) {
+  if (!reviews.length) {
+    return (
+      <div className="mx-auto mb-8 max-w-4xl rounded-2xl border border-[#E7E7EF] px-6 py-10 text-center">
+        <span className="mb-2 block text-2xl text-[#D4AF37]">☆</span>
+        <p className="text-slate-500">No reviews yet — be the first to share your experience with this course!</p>
+      </div>
+    );
+  }
+
+  return (
+    <ul className="mx-auto mb-8 grid max-w-4xl gap-4 sm:grid-cols-2">
+      {reviews.map(r => (
+        <li key={r.id} className="rounded-2xl border border-[#E7E7EF] bg-white p-5">
+          <div className="flex items-center justify-between gap-2">
+            <span className="font-bold text-slate-800">{r.author_name}</span>
+            <span className="whitespace-nowrap text-amber-500" aria-label={`${r.rating} out of 5`}>
+              {'★'.repeat(r.rating)}<span className="text-slate-300">{'★'.repeat(5 - r.rating)}</span>
+            </span>
+          </div>
+          {r.body && <p className="mt-2 text-sm leading-relaxed text-slate-600">{r.body}</p>}
+          <p className="mt-2 text-xs text-slate-400">{r.created_at}</p>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -251,6 +296,7 @@ export default function CourseDetailPage() {
   const [openCourseFaq, setOpenCourseFaq] = useState(0); // FAQ tab accordion (-1 = all closed)
   const { data: course, isLoading, isError } = useQuery({ queryKey: ['course', slug], queryFn: () => fetchCourse(slug) });
   const { data: coursesResp } = useQuery({ queryKey: ['courses', { per_page: 200 }], queryFn: () => fetchCourses({ per_page: 200 }) });
+  const { data: reviews } = useQuery({ queryKey: ['course-reviews', slug], queryFn: () => fetchCourseReviews(slug) });
 
   if (isLoading) return <div className="container-wide py-20 text-slate-500">Loading course…</div>;
   if (isError || !course) return <div className="container-wide py-20 text-center"><h1 className="text-2xl font-bold">Course not found</h1><Link to="/courses" className="text-brand-600 mt-4 inline-block">← Back to courses</Link></div>;
@@ -269,7 +315,10 @@ export default function CourseDetailPage() {
   const totalHours = activeUnits.reduce((s, u) => s + (parseInt(u.duration) || 0), 0);
   const gradeLabel = (course.name.match(/Grade\s[\d\-–]+(?:-\d+)?/) || [])[0] || null;
   const tabLabel = i => i === 1 ? `Why Choose Online ${course.name} Classes` : TABS[i];
-  const rating = ratingOf(course.slug);
+  // Real, moderated reviews only. Until a course has one, no score is shown at
+  // all — a number nobody gave us is worse than no number.
+  const ratingCount = reviews?.summary?.rating_count ?? 0;
+  const rating = ratingCount ? Number(reviews.summary.rating_avg) : null;
   const enrolled = enrolledOf(course.slug);
 
   // Related "Other Courses": same-category siblings only (like WooCommerce
@@ -309,7 +358,7 @@ export default function CourseDetailPage() {
             {(course.subtitle || course.short_description) && <p className="mt-3 max-w-md leading-relaxed text-slate-300">{course.subtitle || course.short_description}</p>}
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="rounded-full bg-[#D4AF37] px-3.5 py-1.5 text-xs font-bold text-[#0B1220]">Bestseller</span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20"><Star className="h-3.5 w-3.5 fill-[#D4AF37] text-[#D4AF37]" />{rating.toFixed(1)}/5</span>
+              {rating !== null && <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20"><Star className="h-3.5 w-3.5 fill-[#D4AF37] text-[#D4AF37]" />{rating.toFixed(1)}/5 · {ratingCount} review{ratingCount === 1 ? '' : 's'}</span>}
               <span className="rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20">{enrolled}+ enrolled</span>
               <span className="rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white ring-1 ring-white/20">1:1 Personalised Session</span>
             </div>
@@ -476,7 +525,9 @@ export default function CourseDetailPage() {
             )}
             {tab === 6 && (
               <div className="rounded-r-2xl border-l-4 border-brand-600 bg-slate-50 p-5 ring-1 ring-slate-100">
-                <h4 className="font-bold text-slate-900">{rating.toFixed(1)} / 5 ★ · {enrolled}+ students enrolled</h4>
+                <h4 className="font-bold text-slate-900">
+                  {rating !== null ? `${rating.toFixed(1)} / 5 ★ · ` : ''}{enrolled}+ students enrolled
+                </h4>
                 <p className="mt-1 text-sm text-slate-600">Parents consistently rate our mentors for personalised attention, clear concepts and steady progress. Book a free demo to experience a class first-hand.</p>
               </div>
             )}
@@ -520,11 +571,8 @@ export default function CourseDetailPage() {
       <section className="py-14 bg-white">
         <div className="container-wide">
           <SectionHead>Student Reviews</SectionHead>
-          <div className="mx-auto mb-8 max-w-4xl rounded-2xl border border-[#E7E7EF] px-6 py-10 text-center">
-            <span className="mb-2 block text-2xl text-[#D4AF37]">☆</span>
-            <p className="text-slate-500">No reviews yet — be the first to share your experience with this course!</p>
-          </div>
-          <ReviewForm />
+          <ReviewList reviews={reviews?.data ?? []} />
+          <ReviewForm slug={course.slug} />
         </div>
       </section>
 

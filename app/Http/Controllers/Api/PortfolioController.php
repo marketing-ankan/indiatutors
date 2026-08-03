@@ -83,12 +83,15 @@ class PortfolioController extends Controller {
         ];
     }
 
-    /** Owner parent, a teacher assigned to any of the student's enrollments, or admin. */
+    /** Owner parent, the student themselves, an assigned teacher, or admin. */
     private function authorizeStudent(Request $request, Student $student): void {
         $user = $request->user();
         $isParent  = $student->user_id === $user->id;
+        // The student's own linked account. Explicit null check so an unlinked
+        // profile never matches.
+        $isSelf    = $student->account_user_id !== null && $student->account_user_id === $user->id;
         $isTeacher = $user->isTeacher() && $user->tutor
             && $student->enrollments()->where('tutor_id', $user->tutor->id)->exists();
-        abort_unless($isParent || $isTeacher || $user->isAdmin(), 403, 'Not your student.');
+        abort_unless($isParent || $isSelf || $isTeacher || $user->isAdmin(), 403, 'Not your student.');
     }
 }

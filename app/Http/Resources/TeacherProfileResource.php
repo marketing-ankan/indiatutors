@@ -19,6 +19,7 @@ class TeacherProfileResource extends JsonResource {
             'availability'     => $this->availability ?? ['days' => [], 'slots' => ''],
             'bio'              => $this->bio,
             'status'           => $this->status,
+            'user_id'          => $this->user_id,
             'teacher'          => $this->whenLoaded('user', fn () => $this->user ? $this->user->only(['name', 'email']) : null),
             'updated_at'       => optional($this->updated_at)->toDateString(),
         ];

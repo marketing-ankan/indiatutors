@@ -129,7 +129,7 @@ export const updateExamUpdate = async (id, p) => { const { data } = await api.pa
 export const deleteExamUpdate = async (id) => { await api.delete(`/admin/exam-updates/${id}`); };
 
 // Admin (staff)
-export const fetchAdminDemoRequests = async (status='') => { const { data } = await api.get('/admin/demo-requests', { params:{ status } }); return data; };
+export const fetchAdminDemoRequests = async (p={}) => { const { data } = await api.get('/admin/demo-requests', { params: typeof p === 'string' ? { status: p } : p }); return data; };
 export const fetchAdminTeachers = async (status='') => { const { data } = await api.get('/admin/teachers', { params:{ status } }); return data; };
 export const approveTeacher     = async (id, status) => { const { data } = await api.patch(`/admin/teachers/${id}`, { status }); return data.data; };
 export const fetchDemoTutors  = async (id) => { const { data } = await api.get(`/admin/demo-requests/${id}/tutors`); return data.data; };
@@ -145,7 +145,9 @@ export const submitDemoRequest   = async (p) => { const { data } = await api.pos
 export const submitContact       = async (p) => { const { data } = await api.post('/contact', p); return data; };
 export const placeOrder          = async (p) => { const { data } = await api.post('/orders', p); return data; };
 export const verifyPayment       = async (p) => { const { data } = await api.post('/orders/verify', p); return data; };
-export const fetchAdminOrders    = async (status='') => { const { data } = await api.get('/admin/orders', { params: status ? { status } : {} }); return data; };
+// Paginated admin lists all return {data, links, meta} — read meta.last_page,
+// not last_page.
+export const fetchAdminOrders    = async (p={}) => { const { data } = await api.get('/admin/orders', { params:p }); return data; };
 export const updateAdminOrder    = async ({ id, status }) => { const { data } = await api.patch(`/admin/orders/${id}`, { status }); return data; };
 export const fetchEvents        = async () => { const { data } = await api.get('/events'); return data.data; };
 export const fetchSocialYoutube   = async () => { const { data } = await api.get('/social/youtube'); return data.data; };
@@ -165,6 +167,9 @@ export const fetchAdminVideoCourses = async () => { const { data } = await api.g
 export const createAdminVideoCourse = async (p) => { const { data } = await api.post('/admin/video-courses', p); return data; };
 export const updateAdminVideoCourse = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/video-courses/${id}`, p); return data; };
 export const deleteAdminVideoCourse = async (id) => { const { data } = await api.delete(`/admin/video-courses/${id}`); return data; };
+export const fetchAdminUsers        = async (params={}) => { const { data } = await api.get('/admin/users', { params }); return data; };
+export const updateUserRole         = async ({ id, role }) => { const { data } = await api.patch(`/admin/users/${id}/role`, { role }); return data.data; };
+export const resetUserPassword      = async ({ id, password }) => { const { data } = await api.post(`/admin/users/${id}/password`, { password }); return data.message; };
 export const requestUploadUrl       = async ({ courseId, filename, contentType }) => { const { data } = await api.post(`/admin/video-courses/${courseId}/upload-url`, { filename, content_type: contentType }); return data; };
 // Deliberately a bare axios call, not the shared `api` client: that one attaches
 // our bearer token to every request, and it must never be sent to Cloudflare.
@@ -173,6 +178,49 @@ export const uploadToR2             = async ({ uploadUrl, file, onProgress }) =>
     headers: { 'Content-Type': file.type },
     onUploadProgress: e => onProgress?.(e.total ? Math.round((e.loaded / e.total) * 100) : 0),
   });
+// Account self-service (Account & Orders page)
+export const updateMe         = async (p) => { const { data } = await api.put('/auth/me', p); return data.data; };
+export const changeMyPassword = async (p) => { const { data } = await api.post('/auth/password', p); return data.message; };
+export const fetchMyOrders    = async () => { const { data } = await api.get('/my/orders'); return data.data; };
+
+// Public course reviews
+export const fetchCourseReviews = async (slug) => { const { data } = await api.get(`/courses/${slug}/reviews`); return data; };
+export const submitCourseReview = async ({ slug, ...p }) => { const { data } = await api.post(`/courses/${slug}/reviews`, p); return data; };
+
+// Admin console
+export const fetchAdminOverview    = async () => { const { data } = await api.get('/admin/overview'); return data.data; };
+export const fetchAdminTeacherRows = async (p={}) => { const { data } = await api.get('/admin/teachers-console', { params:p }); return data; };
+export const toggleTeacherListing  = async ({ id, is_listed }) => { const { data } = await api.patch(`/admin/teachers/${id}/listing`, { is_listed }); return data.data; };
+export const updateTeacherApplication = async ({ id, status }) => { const { data } = await api.patch(`/admin/teacher-applications/${id}`, { status }); return data; };
+export const teacherApplicationCvUrl  = (id) => `${baseURL}/admin/teacher-applications/${id}/cv`;
+export const downloadTeacherCv     = async (id, filename) => {
+  const res = await api.get(`/admin/teacher-applications/${id}/cv`, { responseType: 'blob' });
+  const url = URL.createObjectURL(res.data);
+  const a = Object.assign(document.createElement('a'), { href: url, download: filename || 'cv' });
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+};
+export const fetchAdminStudents    = async (p={}) => { const { data } = await api.get('/admin/students', { params:p }); return data; };
+export const updateAdminStudent    = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/students/${id}`, p); return data.data; };
+export const deleteAdminDemo       = async (id) => { await api.delete(`/admin/demo-requests/${id}`); };
+export const deleteAdminOrder      = async (id) => { const { data } = await api.delete(`/admin/orders/${id}`); return data; };
+export const createAdminUser       = async (p) => { const { data } = await api.post('/admin/users', p); return data.data; };
+export const createStudentAccount  = async (p) => { const { data } = await api.post('/admin/users/student', p); return data.data; };
+export const updateAdminUser       = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/users/${id}`, p); return data.data; };
+export const deleteAdminUser       = async ({ id, confirm=false }) => { const { data } = await api.delete(`/admin/users/${id}`, { data: { confirm } }); return data; };
+export const fetchUserDashboard    = async (id) => { const { data } = await api.get(`/admin/users/${id}/dashboard`); return data.data; };
+export const fetchAdminReviews     = async (p={}) => { const { data } = await api.get('/admin/reviews', { params:p }); return data; };
+export const createAdminReview     = async (p) => { const { data } = await api.post('/admin/reviews', p); return data.data; };
+export const updateAdminReview     = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/reviews/${id}`, p); return data.data; };
+export const deleteAdminReview     = async (id) => { await api.delete(`/admin/reviews/${id}`); };
+export const fetchAdminCourses     = async (p={}) => { const { data } = await api.get('/admin/courses', { params:p }); return data; };
+export const createAdminCourse     = async (p) => { const { data } = await api.post('/admin/courses', p); return data.data; };
+export const updateAdminCourse     = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/courses/${id}`, p); return data.data; };
+export const deleteAdminCourse     = async (id) => { const { data } = await api.delete(`/admin/courses/${id}`); return data; };
+export const fetchAdminAudit       = async (p={}) => { const { data } = await api.get('/admin/audit', { params:p }); return data; };
+export const fetchAdminSettings    = async () => { const { data } = await api.get('/admin/settings'); return data.data; };
+export const saveAdminSettings     = async (p) => { const { data } = await api.put('/admin/settings', p); return data.data; };
+
 export const fetchAdminLessons      = async (courseId) => { const { data } = await api.get(`/admin/video-courses/${courseId}/lessons`); return data.data; };
 export const createAdminLesson      = async ({ courseId, ...p }) => { const { data } = await api.post(`/admin/video-courses/${courseId}/lessons`, p); return data; };
 export const updateAdminLesson      = async ({ courseId, id, ...p }) => { const { data } = await api.patch(`/admin/video-courses/${courseId}/lessons/${id}`, p); return data; };

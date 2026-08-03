@@ -31,6 +31,8 @@ import CheckoutPage from './pages/CheckoutPage.jsx';
 import WishlistPage from './pages/WishlistPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
+import MyCoursesPage from './pages/MyCoursesPage.jsx';
+import AccountPage from './pages/AccountPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
@@ -66,6 +68,13 @@ export default function App() {
         <Route path="/blog/:slug" element={<BlogPostPage />} />
         <Route path="/refer-earn" element={<ReferEarnPage />} />
         <Route path="/become-a-teacher" element={<BecomeTeacherPage />} />
+        {/* Policies — canonical paths mirror the sister site's four legal pages */}
+        <Route path="/terms-conditions" element={<LegalPage doc="terms" />} />
+        <Route path="/payment-refund-policy" element={<LegalPage doc="refund" />} />
+        <Route path="/refer-earn-policy" element={<LegalPage doc="referEarn" />} />
+        <Route path="/privacy-policy" element={<LegalPage doc="privacy" />} />
+        {/* Older policy paths this build shipped with — kept so in-flight links and
+            bookmarks still render; web.php 301s them on a hard load. */}
         <Route path="/privacy" element={<LegalPage doc="privacy" />} />
         <Route path="/terms" element={<LegalPage doc="terms" />} />
         <Route path="/refund" element={<LegalPage doc="refund" />} />
@@ -78,6 +87,8 @@ export default function App() {
         <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/my-courses" element={<MyCoursesPage />} />
+        <Route path="/account" element={<AccountPage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

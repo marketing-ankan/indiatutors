@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Calendar, Clock, Users, Globe, CheckCircle2 } from 'lucide-react';
-import { fetchEvent, submitContact } from '../lib/api.js';
+import { fetchEvent, submitDemoRequest } from '../lib/api.js';
 
 // Event detail (WinQuest-approved feature, modelled on their Eventin pages):
 // date-range hero with a live countdown, description, details grid, a register
@@ -33,14 +33,20 @@ function Countdown({ to }) {
 
 const gcalDate = d => new Date(d).toISOString().replace(/[-:]|\.\d{3}/g, '');
 
+// Registrations are recorded as workshop bookings, not contact messages. As
+// contact messages they were indistinguishable from a general enquiry, so the
+// console could never say how many people had signed up for an event. That is
+// also why the phone number is now required: it is how batch dates get
+// confirmed.
 function RegisterForm({ event }) {
   const [f, setF] = useState({ name: '', email: '', phone: '' });
   const set = k => e => setF(s => ({ ...s, [k]: e.target.value }));
   const send = useMutation({
-    mutationFn: () => submitContact({
-      name: f.name, email: f.email, phone: f.phone || undefined,
-      subject: `Event registration: ${event.title}`,
-      message: `Registered interest for the event "${event.title}" (${event.slug}).`,
+    mutationFn: () => submitDemoRequest({
+      name: f.name, email: f.email, phone: f.phone,
+      type: 'workshop',
+      subject: event.title,
+      message: `Registered for the event "${event.title}" (${event.slug}).`,
     }),
   });
   if (send.isSuccess) return (
@@ -53,7 +59,7 @@ function RegisterForm({ event }) {
     <form onSubmit={e => { e.preventDefault(); send.mutate(); }} className="space-y-3.5">
       <input required value={f.name} onChange={set('name')} placeholder="Your Name *" aria-label="Your name" className={inp} />
       <input required type="email" value={f.email} onChange={set('email')} placeholder="Email *" aria-label="Email" className={inp} />
-      <input type="tel" value={f.phone} onChange={set('phone')} placeholder="WhatsApp / Phone" aria-label="Phone" className={inp} />
+      <input required type="tel" value={f.phone} onChange={set('phone')} placeholder="WhatsApp / Phone *" aria-label="Phone" className={inp} />
       <button type="submit" disabled={send.isPending}
         className="w-full rounded-full bg-brand-600 py-3.5 font-extrabold tracking-wide text-white shadow-[0_10px_24px_rgba(30,64,175,.32)] transition hover:bg-[#0B1220] disabled:opacity-60">
         {send.isPending ? 'Registering…' : 'Register — it’s free'}

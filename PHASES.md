@@ -191,6 +191,30 @@ Also fixed in this pass: 12 homepage card descriptions that were HTML-strip arti
 
 ⚠️ **Open items** — NTSE and KVPY links were removed rather than rebuilt: both appear to have been discontinued/merged and this could not be verified in-session, so confirm status before advertising either. SAT/ACT were cut per product decision even though Indian students do sit them for overseas admissions; if study-abroad prep is wanted later, add it as an explicitly separate "Study Abroad" category, never inside the school-syllabus tree. The 10 new courses without photos fall back to the gradient tile — client photography still needed. Homepage testimonials remain placeholder marketing copy and should be replaced with real ones before go-live.
 
+### Role-split dashboards & the Admin Console ✅ (2026-08-03)
+
+`/dashboard` rendered the **same parent-shaped page for parents, students and admins** — only teachers branched. An admin's own dashboard offered to add their children and upload their Aadhaar; a student saw a page about managing other students. Each role now gets its own view behind one shared, role-tinted hero:
+
+| Role | Lands on |
+|---|---|
+| **admin** | the Admin Console (the same component `/admin` renders — one console, two entry points) |
+| **teacher** | profile, KYC, classroom, calendar, reschedules, proposals — unchanged |
+| **parent** | demo requests, enrolments, upcoming classes, exam updates, students, KYC |
+| **student** | their own enrolments, upcoming classes, exam updates and portfolio. No "my students", no KYC, no demo-booking card |
+
+**The console** is modelled on WinQuest's — pill tabs deep-linked by hash (`#ac-orders` etc.), count badges on every tab, stat tiles and a live "needs attention" queue — but in IndiaTutors' own navy palette, and honest about what this platform actually has:
+- **Teachers** merges `teacher_profiles` with `teacher_applications` that have no matching account, de-duplicated by email, each row carrying `kind` so it only offers actions it can perform. Until now the public "Become a Teacher" submissions had **no UI at all**. The reference's "Active" maps to `tutors.is_published` and is labelled **Listed**, because that is what it does.
+- **Users** gains create / edit / delete, plus "create student account (linked to a parent)". Creating an admin needs an explicit confirmation; no password is ever generated; deleting a guardian warns that `students.user_id` cascades. **"View dash" is a read-only, server-composed snapshot — never impersonation**, since minting a token for another account has no policy layer to constrain it. Every open is logged.
+- **Orders** refuses to delete a `paid` order: video entitlements point at it with `nullOnDelete`, so deleting one would leave the buyer's access alive with nothing behind it. Cancel instead.
+
+**Four new tables.** `reviews` (real course reviews — the review form on `/courses/{slug}` previously only *pretended* to submit, and the star rating was a hash of the slug; both are now real, and **no rating renders at all until a course has an approved review**), `audit_logs` (who changed what — role changes previously left no record of who made them), `settings` (key/value, first user the Google review URL), plus `students.code` (`STU-100514`, stored not derived) and `students.account_user_id` (a student's own login, distinct from the guardian who owns the profile).
+
+**Also fixed in this pass:** `AccountSettingsCard`/`MyOrdersCard` were committed but imported nowhere and called three `api.js` helpers that did not exist; `AuthController::updateMe`/`changePassword` existed with **no routes**. All now wired into a new `/account` page. Event sign-ups moved from `contact_messages` to real workshop bookings (`demo_requests.type`), so the console can finally count them — the phone field became required as a result. The console is `React.lazy`'d: despite everything added, `main.js` **shrank 937 kB → 907 kB**.
+
+Verified end-to-end: 76 tests / 301 assertions green (was 41/131); migrations run clean on a throwaway DB; approving a review in the console makes it appear on the public course page; all four role dashboards checked in-browser; zero horizontal overflow across all 12 console tabs at 360 / 768 / 1024 / 1440 / 1920 / 2560.
+
+⚠️ **Deliberate divergence from WP parity** — `PARITY-AUDIT.md` already marks `/dashboard` as intentionally different from the live WordPress site. This deepens that: the console is modelled on the sister site's admin, not on anything indiatutorsonline.com currently serves. The audit log starts empty and only fills from this release; historical actions cannot be reconstructed. Event sign-ups made *before* this release remain in `contact_messages` and are not shown in Bookings.
+
 ---
 
 ## Reference — source data model (from WP export)
