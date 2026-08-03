@@ -568,9 +568,23 @@ class AdminController extends Controller {
         return response()->json(['data' => [
             'user' => [
                 'id' => $user->id, 'name' => $user->name, 'email' => $user->email,
-                'phone' => $user->phone, 'role' => $user->role,
+                'phone' => $user->phone ? trim(($user->phone_country_code ?: '') . ' ' . $user->phone) : null,
+                'role' => $user->role,
                 'joined' => optional($user->created_at)->toDateString(),
+                // No last_login column exists, so the honest proxy for "is this
+                // account actually in use" is whether it holds a live token.
+                'has_active_session' => $user->tokens()->exists(),
+                'email_verified'     => $user->email_verified_at !== null,
             ],
+            // Identity documents the account has uploaded. File contents stay
+            // private — this is the list, not a download.
+            'kyc' => $user->kycDocuments()->latest()->get()
+                ->map(fn ($d) => [
+                    'id' => $d->id, 'type' => $d->type, 'status' => $d->status,
+                    'original_name' => $d->original_name,
+                    'uploaded' => optional($d->created_at)->toDateString(),
+                ]),
+            'notifications_count' => $user->appNotifications()->count(),
             'student_profile' => $user->studentProfile
                 ? ['id' => $user->studentProfile->id, 'code' => $user->studentProfile->code, 'name' => $user->studentProfile->name]
                 : null,

@@ -47,6 +47,34 @@ export default function UserDashDrawer({ userId, onClose }) {
 
           {data && (
             <>
+              {/* The account itself, so the drawer is worth opening even for
+                  someone who has not done anything yet. */}
+              <Section title="Account">
+                <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                  <Field label="Role" value={<span className="capitalize">{data.user.role}</span>} />
+                  <Field label="Joined" value={day(data.user.joined)} />
+                  <Field label="Phone" value={data.user.phone} />
+                  <Field label="Email" value={data.user.email} />
+                  <Field label="Email verified" value={data.user.email_verified ? 'Yes' : 'Not verified'} />
+                  <Field label="Signed in somewhere" value={data.user.has_active_session ? 'Yes' : 'No active session'} />
+                  <Field label="Notifications" value={`${data.notifications_count} sent`} />
+                </dl>
+              </Section>
+
+              <Section title={`KYC documents (${data.kyc.length})`} empty={!data.kyc.length && 'Nothing uploaded.'}>
+                <ul className="space-y-1.5">
+                  {data.kyc.map(d => (
+                    <li key={d.id} className="flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm ring-1 ring-slate-100">
+                      <span className="min-w-0 truncate">
+                        <span className="font-semibold capitalize text-slate-800">{d.type}</span>
+                        <span className="text-slate-500"> · {d.original_name}</span>
+                      </span>
+                      <StatusBadge status={d.status} />
+                    </li>
+                  ))}
+                </ul>
+              </Section>
+
               {data.student_profile && (
                 <Section title="Their student profile">
                   <p className="text-sm text-slate-700">
@@ -108,20 +136,25 @@ export default function UserDashDrawer({ userId, onClose }) {
                 </ul>
               </Section>
 
-              {data.video_courses.length > 0 && (
-                <Section title="Video courses owned">
-                  <ul className="space-y-1 text-sm text-slate-700">
-                    {data.video_courses.map(c => <li key={c.slug}>{c.title}</li>)}
-                  </ul>
-                </Section>
-              )}
+              <Section title={`Video courses owned (${data.video_courses.length})`}
+                empty={!data.video_courses.length && 'None bought.'}>
+                <ul className="space-y-1 text-sm text-slate-700">
+                  {data.video_courses.map(c => <li key={c.slug}>{c.title}</li>)}
+                </ul>
+              </Section>
 
-              {data.teacher_profile && (
+              {/* Only meaningful for a teacher — but if they are one and have no
+                  profile, that absence is exactly what staff need to see. */}
+              {(data.teacher_profile || data.user.role === 'teacher') && (
                 <Section title="Teacher profile">
-                  <p className="flex items-center gap-2 text-sm text-slate-700">
-                    <StatusBadge status={data.teacher_profile.status} />
-                    {data.teacher_profile.headline || <span className="text-slate-400">No headline yet</span>}
-                  </p>
+                  {data.teacher_profile ? (
+                    <p className="flex items-center gap-2 text-sm text-slate-700">
+                      <StatusBadge status={data.teacher_profile.status} />
+                      {data.teacher_profile.headline || <span className="text-slate-400">No headline yet</span>}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-slate-400">Not filled in yet.</p>
+                  )}
                 </Section>
               )}
             </>
@@ -138,5 +171,14 @@ function Section({ title, children, empty }) {
       <h4 className="mb-2 text-xs font-bold uppercase tracking-widest text-slate-400">{title}</h4>
       {empty ? <p className="text-sm text-slate-400">{empty}</p> : children}
     </section>
+  );
+}
+
+function Field({ label, value }) {
+  return (
+    <div className="min-w-0">
+      <dt className="text-xs font-semibold text-slate-500">{label}</dt>
+      <dd className="truncate text-slate-800">{value || <span className="text-slate-400">—</span>}</dd>
+    </div>
   );
 }
