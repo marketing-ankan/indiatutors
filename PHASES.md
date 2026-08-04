@@ -217,6 +217,38 @@ Verified end-to-end: 76 tests / 301 assertions green (was 41/131); migrations ru
 
 ---
 
+## Physical / home tuition — matching data capture ✅ (2026-08-03)
+
+**Why this exists.** A separate app will assign teachers to students for in-person classes. This site is the system of record it reads: what a teacher can do and where, what a family needs and where. So the job was not "a form" — it was capturing the specific fields a geographic match can actually be computed from, and exposing them as a stable contract. Full field dictionary: **`docs/MATCHING-DATA-CONTRACT.md`**.
+
+**What breaks a physical match that never mattered online:** can the teacher *repeatedly* get there, do the hours actually intersect, and would this family accept this person in their home. Three things followed from that:
+
+- **`teaching_offerings`, one row per subject × class range × boards × fee** — replaces the comma-separated `subjects` string. A CSV cannot say *"Physics for 11–12 CBSE, but Maths only up to Class 8"*, so it sends that teacher a Class 12 Maths lead and burns both the lead and the relationship. Fees live here too, because Class 12 Physics is never priced like Class 3 Maths.
+- **`teaching_availability_slots` — real `(weekday, start, end)` rows.** The old profile stored `"5-8pm weekdays"`, which nothing can intersect with a family's preferred times; availability could only be read by a human on a phone call. Plus `_exceptions` for single dates, because matching on the weekly pattern alone books teachers who are not there.
+- **Coordinates, with their precision recorded.** A radius is a circle and a circle needs a centre. No maps API and no bill: the browser's own geolocation gives an exact fix from a "use my current location" button, the bundled `pincodes` table gives a ~1 km centroid otherwise, and unknown pincodes average from the 3-digit postal sorting district. Every coordinate carries `geo_source` so a ~15 km guess is never mistaken for a doorstep. `php artisan pincodes:import` loads the official directory over the ~200 bundled anchors.
+
+**Six tables** — `pincodes`, `physical_teaching_profiles`, `teaching_offerings`, `teaching_availability_slots` + `_exceptions`, `tuition_requirements`. The teacher profile carries **two nullable owners** (`user_id`, `teacher_application_id`): the public apply form captures it before an account exists, and approval hands the *same row* to their account rather than copying it, so the two can never drift.
+
+**Both front doors write the same rows** through one `PhysicalProfileWriter` — /become-a-teacher (rebuilt around the shared components) and the dashboard's four-step wizard. The family side is `tuition_requirements`, one row per open request (two children, or Maths now and Science in June, are two different matches), captured signed-out on /physical-classes and signed-in from the parent dashboard.
+
+**The export** is `/api/matching/v1/*`, gated by `MATCHING_API_KEY` in an `X-Matching-Key` header. **Unset ⇒ the whole prefix 503s** — it is home addresses on both sides and must never be open by default. Flat and pre-resolved (coordinates computed, grades as ordinals, availability as ranges), stable `teacher:{id}` ids, `updated_since` + a `meta.checkpoint` read from the *last row in the page* rather than "now", so a record written mid-page is re-read rather than skipped. One write-back only: which teacher was assigned.
+
+**No matching lives here — by instruction and by design.** A first pass shipped a reference matcher and an admin "Find matches" preview; the founder confirmed matching and suggesting belong in the **leads-management software**, so it was removed rather than left as a second opinion. `TutorMatcher` and `Geo` are deleted, along with the candidate endpoint and its UI. The admin PATCH deliberately **cannot** set `matched_profile_id` — only the key-authed export write-back can, so there is exactly one system that decides an assignment.
+
+What the console does instead is *triage*: read the whole request before calling the family, note/hold/close it, and — on the teacher side — a **Ready?** column flagging the three things without which a record is unusable downstream (coordinates, ≥1 subject, some availability). A teacher stuck at 40% complete is invisible to the leads software however good they are; that is a phone call, not a mystery to discover later.
+
+Verified: 94 tests / 391 assertions green; the full guest → requirement → publish → export path driven through the real UI; zero horizontal overflow at 360 / 375 / 390 / 414 / 640 / 768 / 1024 / 1280 / 1440 / 1920 / 2560 on all four touched pages (one pre-existing 8px overflow in the teacher calendar header fixed on the way).
+
+**Two bugs the removal pass surfaced, both fixed.**
+1. 🔒 The guest `POST /api/tuition-requirements` accepted a `student_id` and only ownership-checked it on the *signed-in* branch. `exists:students,id` proves an id is real, not that it is yours — so a stranger could bind their lead to any child's profile, and the export dereferences that FK (`student_code`, and the child's name whenever `learner_name` is blank), carrying another family's details out to the leads software inside an attacker-created record. Now `unset` for guests, matching `DemoRequestController`'s long-standing guard. Regression test added.
+2. An unmatched `/api/*` path fell through to the SPA catch-all and answered **200 with HTML**, so a typo'd or deleted endpoint looked like a success and JSON clients failed later somewhere unrelated. `routes/web.php` now 404s API paths.
+
+Found by an adversarial audit of the removal (four independent lenses → a skeptic per finding; 37 raised, 36 refuted, 1 confirmed — the guest IDOR). The same pass also stripped the last matching-shaped code that had no caller left: `TeachingOffering::coversGrade/coversBoard` and `Availability::overlapMinutes`, both of which compared a teacher against a student and now belong solely to the leads software.
+
+⬜ **Left:** set `MATCHING_API_KEY` on the server and hand it to the leads software; load the official pincode CSV before launch (the bundled anchors are ~1 km centroids); police-verification is staff-set from the console with no workflow behind it yet. ⚠️ Two **pre-existing** matchers elsewhere are untouched and still live: `AdminController::suggestTutors()` (online demo→enrolment flow, Phase 4) and the public tutor search on `/physical-classes` — say the word if either should also move to the leads software.
+
+---
+
 ## Reference — source data model (from WP export)
 - **Courses** (`product`, WooCommerce simple): meta `_ito_subtitle`, `_ito_age`, `_ito_pills`, `_ito_tier_labels`/`_ito_tier_o2o`/`_ito_tier_group`, `_ito_curriculum`, `_regular_price`/`_sale_price`
 - **Tutors** (`ito_tutor`): full_name, tagline, qualification, teaching_mode, city/state/localities, fee_hourly, fee_trial, verified, languages, experience_years

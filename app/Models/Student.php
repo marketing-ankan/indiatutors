@@ -19,6 +19,7 @@ class Student extends Model {
     public function account() { return $this->belongsTo(User::class, 'account_user_id'); }
     public function enrollments() { return $this->hasMany(Enrollment::class); }
     public function portfolioItems() { return $this->hasMany(PortfolioItem::class)->latest('awarded_on')->latest('id'); }
+    public function tuitionRequirements() { return $this->hasMany(TuitionRequirement::class)->latest('id'); }
 
     public function getSubjectsCountAttribute(): int {
         return count(array_filter(array_map('trim', explode(',', (string) $this->subjects))));

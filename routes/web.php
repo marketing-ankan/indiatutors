@@ -89,6 +89,12 @@ Route::get('/product-category/{path}', function (string $path) use ($renamedCate
 
 // Serve the React app for all other routes (React Router handles client-side
 // routing); inject per-route SEO meta so crawlers get a real title/description.
+//
+// `api/*` is excluded. Without that, an unmatched API path falls through to
+// here and answers 200 with the SPA's HTML — so a typo'd endpoint or a route
+// that has been removed looks like a success to the caller, and a JSON client
+// fails later, somewhere unrelated, trying to parse a page.
 Route::get('/{any?}', function (Request $request) {
+    abort_if($request->is('api/*'), 404);
     return view('app', ['meta' => SeoMeta::for($request)]);
 })->where('any', '.*');

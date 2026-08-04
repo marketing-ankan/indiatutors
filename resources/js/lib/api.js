@@ -221,6 +221,32 @@ export const fetchAdminAudit       = async (p={}) => { const { data } = await ap
 export const fetchAdminSettings    = async () => { const { data } = await api.get('/admin/settings'); return data.data; };
 export const saveAdminSettings     = async (p) => { const { data } = await api.put('/admin/settings', p); return data.data; };
 
+// --- Physical / home tuition -------------------------------------------------
+// Address autofill (public — the apply and enquiry forms run signed-out).
+export const lookupPincode = async (pin) => { const { data } = await api.get(`/pincodes/${pin}`); return data; };
+
+// Teacher's own physical profile. Saved whole-document: the wizard is one
+// screen to the teacher, so it is one request to the server.
+export const fetchPhysicalProfile  = async () => { const { data } = await api.get('/teacher/physical-profile'); return data.data; };
+export const savePhysicalProfile   = async (payload) => { const { data } = await api.put('/teacher/physical-profile', payload); return data.data; };
+export const setPhysicalStatus     = async (status) => { const { data } = await api.patch('/teacher/physical-profile/status', { status }); return data.data; };
+
+// Family requirements. The POST works signed-out too (guest lead capture).
+export const fetchTuitionRequirements = async () => { const { data } = await api.get('/tuition-requirements'); return data.data; };
+export const createTuitionRequirement = async (p) => { const { data } = await api.post('/tuition-requirements', p); return data; };
+export const updateTuitionRequirement = async ({ id, ...p }) => { const { data } = await api.put(`/tuition-requirements/${id}`, p); return data.data; };
+export const closeTuitionRequirement  = async (id) => { const { data } = await api.patch(`/tuition-requirements/${id}/close`); return data.data; };
+export const deleteTuitionRequirement = async (id) => { await api.delete(`/tuition-requirements/${id}`); };
+
+// Admin console — the two physical queues (read + triage only; assignment is
+// the leads-management software's, via the /api/matching/v1 write-back).
+export const fetchAdminPhysicalProfiles = async (p={}) => { const { data } = await api.get('/admin/physical/profiles', { params:p }); return data; };
+export const fetchAdminPhysicalProfile  = async (id) => { const { data } = await api.get(`/admin/physical/profiles/${id}`); return data.data; };
+export const updateAdminPhysicalProfile = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/physical/profiles/${id}`, p); return data.data; };
+export const fetchAdminRequirements     = async (p={}) => { const { data } = await api.get('/admin/physical/requirements', { params:p }); return data; };
+export const fetchAdminRequirement      = async (id) => { const { data } = await api.get(`/admin/physical/requirements/${id}`); return data.data; };
+export const updateAdminRequirement     = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/physical/requirements/${id}`, p); return data.data; };
+
 export const fetchAdminLessons      = async (courseId) => { const { data } = await api.get(`/admin/video-courses/${courseId}/lessons`); return data.data; };
 export const createAdminLesson      = async ({ courseId, ...p }) => { const { data } = await api.post(`/admin/video-courses/${courseId}/lessons`, p); return data; };
 export const updateAdminLesson      = async ({ courseId, id, ...p }) => { const { data } = await api.patch(`/admin/video-courses/${courseId}/lessons/${id}`, p); return data; };

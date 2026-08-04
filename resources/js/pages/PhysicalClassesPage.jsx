@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { MapPin, BadgeCheck, GraduationCap, Home, Search } from 'lucide-react';
-import { fetchTutors, fetchTutorFilters } from '../lib/api.js';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { MapPin, BadgeCheck, GraduationCap, Home, Search, PartyPopper, ClipboardList } from 'lucide-react';
+import { fetchTutors, fetchTutorFilters, createTuitionRequirement } from '../lib/api.js';
 import { GRADE_BANDS } from '../data/grades.js';
+import RequirementForm, { EMPTY_REQUIREMENT, cleanRequirement } from '../components/physical/RequirementForm.jsx';
+import { errText } from '../components/admin/AdminUI.jsx';
 
 // Physical Classes / Home Tuition (handwritten note #5). Location-first: a
 // student enters pincode + subject + grade → home-capable tutors serving that
@@ -116,7 +118,7 @@ export default function PhysicalClassesPage() {
 
         {noPinMatch && (
           <p className="mb-5 rounded-xl bg-amber-50 px-5 py-3 text-sm text-amber-800 ring-1 ring-amber-100">
-            No tutor lists <strong>{applied.pincode}</strong> yet — here are home tutors matching your subject &amp; class. <Link to={`/book-demo?pincode=${applied.pincode}`} className="font-semibold underline">Tell us your area</Link> and we'll find one for you.
+            No tutor lists <strong>{applied.pincode}</strong> yet — here are home tutors matching your subject &amp; class. <a href="#request" className="font-semibold underline">Post your requirement</a> and we'll find one who can reach you.
           </p>
         )}
 
@@ -128,11 +130,72 @@ export default function PhysicalClassesPage() {
           <div className="rounded-2xl bg-white p-10 text-center ring-1 ring-slate-100">
             <GraduationCap className="mx-auto h-10 w-10 text-slate-300" />
             <p className="mt-3 font-semibold text-slate-700">No home tutors match yet.</p>
-            <p className="mt-1 text-sm text-slate-500">Tell us your pincode, subject and class and we'll match a verified home tutor for you.</p>
-            <Link to="/book-demo" className="mt-5 inline-flex rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-brand-700">Book a Free Demo</Link>
+            <p className="mt-1 text-sm text-slate-500">Tell us exactly what you need and where — we match on real distance, so you'll get a tutor who can actually keep turning up.</p>
+            <a href="#request" className="mt-5 inline-flex rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-brand-700">Post your requirement</a>
           </div>
         ) : null}
       </div>
+
+      <RequirementSection defaults={applied} />
     </div>
+  );
+}
+
+/**
+ * The directory above answers "who is already listed near me". This answers the
+ * commoner case — nobody listed serves that pincode yet — by capturing what the
+ * family needs so a tutor can be assigned to them. It is the student half of
+ * the matching data, and it works signed-out on purpose: a family looking for a
+ * tutor should not have to register first.
+ */
+function RequirementSection({ defaults }) {
+  const [form, setForm] = useState({ ...EMPTY_REQUIREMENT, pincode: defaults.pincode || '' });
+  const [done, setDone] = useState(null);
+
+  const submit = useMutation({
+    mutationFn: () => createTuitionRequirement(cleanRequirement(form)),
+    onSuccess: (res) => {
+      setDone(res?.message || 'Requirement received — our team will call you back.');
+      window.scrollTo({ top: document.getElementById('request')?.offsetTop ?? 0, behavior: 'smooth' });
+    },
+  });
+
+  return (
+    <section id="request" className="scroll-mt-24 py-14" style={{ background: 'linear-gradient(180deg,#F3F6FC,#eef2fb)' }}>
+      <div className="container-wide max-w-3xl">
+        <div className="mb-7 text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-600/10 px-3.5 py-1.5 text-[0.82rem] font-bold text-brand-700">
+            <ClipboardList className="h-3.5 w-3.5" /> Tell us what you need
+          </span>
+          <h2 className="mt-3 font-heading text-2xl font-extrabold text-[#0B1220] sm:text-3xl">Post your home-tuition requirement</h2>
+          <p className="mx-auto mt-2 max-w-xl text-slate-500">
+            Takes two minutes. We match on subject, class, board, your timings and how far a tutor really has to travel —
+            then a coordinator calls you with the shortlist.
+          </p>
+        </div>
+
+        {done ? (
+          <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-200 sm:p-10">
+            <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-600">
+              <PartyPopper className="h-7 w-7" />
+            </span>
+            <h3 className="mt-4 font-heading text-2xl font-extrabold text-[#0B1220]">Got it!</h3>
+            <p className="mx-auto mt-2 max-w-md leading-relaxed text-slate-600">{done}</p>
+            <button onClick={() => { setDone(null); setForm({ ...EMPTY_REQUIREMENT }); }}
+              className="mt-5 text-sm font-semibold text-brand-600 hover:underline">Post another requirement</button>
+          </div>
+        ) : (
+          <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 sm:p-7">
+            <RequirementForm value={form} onChange={setForm}
+              submitting={submit.isPending}
+              error={submit.isError ? errText(submit.error) : null}
+              onSubmit={() => submit.mutate()} />
+            <p className="mt-4 text-xs text-slate-400">
+              Your address is used only to find tutors who can reach you. It is never shown publicly.
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
