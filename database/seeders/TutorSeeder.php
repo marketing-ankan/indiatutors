@@ -1,10 +1,19 @@
 <?php
 namespace Database\Seeders;
 use App\Models\Tutor;
+use App\Support\SeedFingerprint;
 use Illuminate\Database\Seeder;
 
 class TutorSeeder extends Seeder {
     public function run(): void {
+        // The tutor data is inline, so the seeder file IS the source: if it has
+        // not changed and the directory is populated, there is nothing to do.
+        $fp = SeedFingerprint::for('tutors', [__FILE__]);
+        if ($fp->isCurrent() && Tutor::exists()) {
+            $this->command?->info('TutorSeeder: unchanged — skipped ('.Tutor::count().' tutors already seeded).');
+            return;
+        }
+
         $tutors = [
             [
                 'name' => 'Angeline',
@@ -293,6 +302,7 @@ class TutorSeeder extends Seeder {
             Tutor::updateOrCreate(['slug' => $data['slug']], $data);
         }
 
+        $fp->stamp();
         $this->command->info('Seeded '.count($tutors).' tutors (with home-tuition pincodes + grades).');
     }
 }

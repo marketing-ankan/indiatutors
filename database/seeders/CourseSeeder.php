@@ -2,6 +2,7 @@
 namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Course;
+use App\Support\SeedFingerprint;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
@@ -10,6 +11,19 @@ use Illuminate\Support\Str;
 class CourseSeeder extends Seeder {
     public function run(): void {
         $path = __DIR__.'/data/courses.json';
+
+        // The expensive one: 134 courses, 112 categories and every curriculum
+        // row, rewritten on every deploy even when courses.json has not moved.
+        // That is the work most likely to be getting the cron job killed before
+        // it copies the new front-end build to the web root. Skip when the
+        // source is byte-identical AND the catalogue is actually present — a
+        // matching fingerprint over an empty table means the DB was wiped.
+        $fp = SeedFingerprint::for('courses', [$path, __FILE__]);
+        if ($fp->isCurrent() && Course::exists()) {
+            $this->command?->info('CourseSeeder: courses.json unchanged — skipped ('.Course::count().' courses already seeded).');
+            return;
+        }
+
         if (!file_exists($path)) {
             $this->command->error("Course data not found: $path — skipping seeder.");
             return;
@@ -112,6 +126,7 @@ class CourseSeeder extends Seeder {
         // "Standardized Tests" branch) also clears in the same run — bottom-up to stable.
         do { $gone = Category::doesntHave('courses')->doesntHave('children')->delete(); } while ($gone > 0);
 
+        $fp->stamp();   // only after a full successful pass
         $this->command->info("Imported/updated ".count($sourceSlugs)." courses (pruned $pruned stale). Categories: ".Category::count());
     }
 }

@@ -98,7 +98,13 @@ class CourseController extends Controller {
             if (!\Illuminate\Support\Facades\Cache::add('courses:curriculum-heal-check', 1, now()->addHours(6))) return;
             $sentinel = Course::where('slug', 'mathematics-grade-8')->first();
             if ($sentinel && count($sentinel->curriculum ?? []) === 0) {
-                \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\CourseSeeder', '--force' => true]);
+                // bypass(): this is a REPAIR, not an import. courses.json is
+                // byte-identical to the last run — that is exactly the case the
+                // fingerprint gate skips — but the DB has drifted and only a
+                // re-seed fixes it. Without this the heal silently does nothing.
+                \App\Support\SeedFingerprint::bypass(fn () =>
+                    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\CourseSeeder', '--force' => true]),
+                );
             }
         } catch (\Throwable $e) {
             // Self-heal must never take the page down; retry after the lock expires.
