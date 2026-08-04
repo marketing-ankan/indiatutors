@@ -70,14 +70,20 @@ Route::post('/video-courses/{videoCourse}/lessons/{lesson}/playback', [VideoCour
 Route::post('/video-courses/{videoCourse}/lessons/{lesson}/ask',     [VideoCourseController::class, 'ask'])->middleware('throttle:10,1');
 Route::get('/video-courses/{videoCourse}/lessons/{lesson}/summary',  [VideoCourseController::class, 'summary'])->middleware('throttle:20,1');
 
-// Address autofill for the physical-tuition forms. Public: both forms run
-// before anyone has an account, and a pincode is not private data.
-Route::get('/pincodes/search',   [PincodeController::class, 'search'])->middleware('throttle:60,1');
-Route::get('/pincodes/{pincode}',[PincodeController::class, 'show'])->middleware('throttle:60,1');
+// Public physical-tuition endpoints. EnsurePhysicalSchema guards every route
+// that touches these tables: this host has a documented habit of killing the
+// deploy's `migrate` step, and without the guard those deploys leave the whole
+// module 500ing against tables that were never created.
+Route::middleware(\App\Http\Middleware\EnsurePhysicalSchema::class)->group(function () {
+    // Address autofill. Public: both forms run before anyone has an account,
+    // and a pincode is not private data.
+    Route::get('/pincodes/search',   [PincodeController::class, 'search'])->middleware('throttle:60,1');
+    Route::get('/pincodes/{pincode}',[PincodeController::class, 'show'])->middleware('throttle:60,1');
 
-// "Find me a home tutor" — guests may post; a signed-in parent gets the richer
-// version from the dashboard (see the auth group below).
-Route::post('/tuition-requirements', [TuitionRequirementController::class, 'store'])->middleware('throttle:10,1');
+    // "Find me a home tutor" — guests may post; a signed-in parent gets the
+    // richer version from the dashboard (see the auth group below).
+    Route::post('/tuition-requirements', [TuitionRequirementController::class, 'store'])->middleware('throttle:10,1');
+});
 
 Route::post('/demo-requests',    [DemoRequestController::class, 'store']);
 Route::post('/contact',          [ContactController::class, 'store']);
@@ -125,15 +131,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/notifications/{id}/read',     [NotificationController::class, 'markRead']);
 
     // Physical / home tuition — the teacher's operating record and the family's
-    // open requirements. Both feed the external matching app (see /matching/v1).
-    Route::get('/teacher/physical-profile',        [PhysicalProfileController::class, 'show']);
-    Route::put('/teacher/physical-profile',        [PhysicalProfileController::class, 'update']);
-    Route::patch('/teacher/physical-profile/status',[PhysicalProfileController::class, 'setStatus']);
+    // open requirements. Both feed the external leads software (see /matching/v1).
+    Route::middleware(\App\Http\Middleware\EnsurePhysicalSchema::class)->group(function () {
+        Route::get('/teacher/physical-profile',        [PhysicalProfileController::class, 'show']);
+        Route::put('/teacher/physical-profile',        [PhysicalProfileController::class, 'update']);
+        Route::patch('/teacher/physical-profile/status',[PhysicalProfileController::class, 'setStatus']);
 
-    Route::get('/tuition-requirements',              [TuitionRequirementController::class, 'index']);
-    Route::put('/tuition-requirements/{requirement}',[TuitionRequirementController::class, 'update']);
-    Route::patch('/tuition-requirements/{requirement}/close', [TuitionRequirementController::class, 'close']);
-    Route::delete('/tuition-requirements/{requirement}',      [TuitionRequirementController::class, 'destroy']);
+        Route::get('/tuition-requirements',              [TuitionRequirementController::class, 'index']);
+        Route::put('/tuition-requirements/{requirement}',[TuitionRequirementController::class, 'update']);
+        Route::patch('/tuition-requirements/{requirement}/close', [TuitionRequirementController::class, 'close']);
+        Route::delete('/tuition-requirements/{requirement}',      [TuitionRequirementController::class, 'destroy']);
+    });
 
     // Teacher portal (own profile + classroom)
     Route::get('/teacher/profile',  [TeacherController::class, 'showMine']);
@@ -208,12 +216,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/courses/{course}',                [AdminCourseController::class, 'update']);
         Route::delete('/courses/{course}',               [AdminCourseController::class, 'destroy']);
         // Physical / home tuition queues
-        Route::get('/physical/profiles',                     [AdminPhysicalController::class, 'profiles']);
-        Route::get('/physical/profiles/{profile}',           [AdminPhysicalController::class, 'profile']);
-        Route::patch('/physical/profiles/{profile}',         [AdminPhysicalController::class, 'updateProfile']);
-        Route::get('/physical/requirements',                 [AdminPhysicalController::class, 'requirements']);
-        Route::get('/physical/requirements/{requirement}',   [AdminPhysicalController::class, 'requirement']);
-        Route::patch('/physical/requirements/{requirement}', [AdminPhysicalController::class, 'updateRequirement']);
+        Route::middleware(\App\Http\Middleware\EnsurePhysicalSchema::class)->group(function () {
+            Route::get('/physical/profiles',                     [AdminPhysicalController::class, 'profiles']);
+            Route::get('/physical/profiles/{profile}',           [AdminPhysicalController::class, 'profile']);
+            Route::patch('/physical/profiles/{profile}',         [AdminPhysicalController::class, 'updateProfile']);
+            Route::get('/physical/requirements',                 [AdminPhysicalController::class, 'requirements']);
+            Route::get('/physical/requirements/{requirement}',   [AdminPhysicalController::class, 'requirement']);
+            Route::patch('/physical/requirements/{requirement}', [AdminPhysicalController::class, 'updateRequirement']);
+        });
 
         Route::get('/audit',                             [AdminAuditController::class, 'index']);
         Route::get('/settings',                          [AdminSettingController::class, 'index']);
@@ -244,7 +254,11 @@ Route::middleware('auth:sanctum')->group(function () {
  * consumer. Contract: docs/MATCHING-DATA-CONTRACT.md
  */
 Route::prefix('matching/v1')
-    ->middleware([\App\Http\Middleware\EnsureMatchingClient::class, 'throttle:120,1'])
+    ->middleware([
+        \App\Http\Middleware\EnsureMatchingClient::class,
+        \App\Http\Middleware\EnsurePhysicalSchema::class,
+        'throttle:120,1',
+    ])
     ->group(function () {
         Route::get('/reference',                  [MatchingExportController::class, 'reference']);
         Route::get('/teachers',                   [MatchingExportController::class, 'teachers']);
