@@ -117,3 +117,16 @@ echo "[$(date '+%Y-%m-%d %H:%M:%S')] build integrity checked"
 rm -rf "$DOCROOT/images" 2>/dev/null || true
 cp -r "$LARAVEL_DIR/public/images" "$DOCROOT/images" 2>/dev/null || true
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] course images synced"
+
+# --- pincode reference data (physical / home tuition) -------------------
+# APPENDED, never inserted: see the note above — this script git-pulls itself
+# mid-run, so every earlier byte has to stay identical.
+#
+# Without this the `pincodes` table is empty on the server, and the home-tuition
+# address forms have no coordinates to place a teacher's service radius against.
+# Idempotent (upsert keyed on pincode) and it skips any row an official
+# `pincodes:import` has already loaded, so re-running never downgrades real data
+# to the bundled anchors. Best-effort like the seeders above: a failure here must
+# never take the front-end down with it.
+php artisan db:seed --class=PincodeSeeder --force || true
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] pincode anchors seeded"

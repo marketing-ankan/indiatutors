@@ -13,4 +13,12 @@ class TeacherApplication extends Model {
         'availability'   => 'array',
         'teaches_online' => 'boolean',
     ];
+
+    /**
+     * The physical-tuition record captured with this application. It is the same
+     * row the teacher later edits from their dashboard — approving an
+     * application just points it at their user_id, so nothing is copied and the
+     * two can never drift apart.
+     */
+    public function physicalProfile() { return $this->hasOne(PhysicalTeachingProfile::class); }
 }

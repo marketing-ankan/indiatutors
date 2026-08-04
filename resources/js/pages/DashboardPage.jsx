@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap, Briefcase, Save, Users, BookOpen, NotebookPen, ChevronDown, ChevronUp, ListChecks, FolderOpen, Link2, Download, Lightbulb, Calendar, Award, Megaphone, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import DashboardHero from '../components/dashboard/DashboardHero.jsx';
+import PhysicalProfileCard from '../components/physical/PhysicalProfileCard.jsx';
+import TuitionRequirementsCard from '../components/physical/TuitionRequirementsCard.jsx';
 
 // Split out: only admins ever render it, and it is a large chunk to hand to
 // every other visitor.
@@ -78,6 +80,10 @@ function TeacherDashboard() {
         <TeacherProfileCard />
         <KycCard />
       </div>
+      {/* Full width: it is a four-step form with a grid in it, and squeezing it
+          into a half-column column makes the availability grid scroll sideways
+          on a laptop. */}
+      <PhysicalProfileCard />
       <TeacherClassroom />
       <TeacherCalendarCard />
       <div className="grid lg:grid-cols-2 gap-6">
@@ -99,6 +105,9 @@ function ParentDashboard() {
       <div className="grid lg:grid-cols-2 gap-6 mt-6">
         <UpcomingClassesCard />
         <ExamUpdatesCard />
+      </div>
+      <div className="mt-6">
+        <TuitionRequirementsCard />
       </div>
       <div className="grid lg:grid-cols-2 gap-6 mt-6">
         <StudentsCard />
@@ -422,11 +431,13 @@ function TeacherCalendarCard() {
 
   return (
     <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
-      <div className="flex items-center justify-between mb-1">
+      {/* flex-wrap + a narrower month label: at 360px the fixed 9rem label and
+          the two arrows pushed the card 8px past the viewport. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 mb-1">
         <h2 className="text-lg font-bold flex items-center gap-2"><Calendar className="h-5 w-5 text-brand-600"/>Class calendar</h2>
         <div className="flex items-center gap-1">
           <button onClick={()=>shift(-1)} className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500" aria-label="Previous month"><ChevronLeft className="h-4 w-4"/></button>
-          <span className="text-sm font-bold text-slate-700 min-w-[9rem] text-center">{monthLabel}</span>
+          <span className="text-sm font-bold text-slate-700 min-w-[7.5rem] sm:min-w-[9rem] text-center">{monthLabel}</span>
           <button onClick={()=>shift(1)} className="p-1.5 rounded-md hover:bg-slate-100 text-slate-500" aria-label="Next month"><ChevronRight className="h-4 w-4"/></button>
         </div>
       </div>

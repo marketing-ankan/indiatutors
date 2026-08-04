@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutGrid, GraduationCap, Users, CalendarClock, ReceiptText, Star,
-  BookOpen, UserCog, ScrollText, CalendarDays, Video, Megaphone, Wrench, TrendingUp,
+  BookOpen, UserCog, ScrollText, CalendarDays, Video, Megaphone, Wrench, TrendingUp, Home,
 } from 'lucide-react';
 import { fetchAdminOverview } from '../../lib/api.js';
 import OverviewTab from './OverviewTab.jsx';
@@ -14,6 +14,7 @@ import ReviewsTab from './ReviewsTab.jsx';
 import CoursesTab from './CoursesTab.jsx';
 import UsersTab from './UsersTab.jsx';
 import AuditTab from './AuditTab.jsx';
+import PhysicalTab from './PhysicalTab.jsx';
 import { EventsTab, VideoCoursesTab, ContentTab, AnalyticsTab } from './LegacyTabs.jsx';
 
 // The console. Tabs are addressed by hash (#ac-orders) so a tab can be linked,
@@ -25,6 +26,9 @@ const TABS = [
   { key: 'teachers', label: 'Teachers',  Icon: GraduationCap,  Panel: TeachersTab,  count: 'teachers' },
   { key: 'students', label: 'Students',  Icon: Users,          Panel: StudentsTab,  count: 'students' },
   { key: 'bookings', label: 'Bookings',  Icon: CalendarClock,  Panel: BookingsTab,  count: 'bookings' },
+  // Home tuition is its own queue: it is matched on geography and timings, not
+  // converted from a booking, and both sides of it live in different tables.
+  { key: 'physical', label: 'Home tuition', Icon: Home,        Panel: PhysicalTab },
   { key: 'orders',   label: 'Orders',    Icon: ReceiptText,    Panel: OrdersTab,    count: 'orders' },
   { key: 'reviews',  label: 'Reviews',   Icon: Star,           Panel: ReviewsTab,   count: 'reviews' },
   { key: 'courses',  label: 'Courses',   Icon: BookOpen,       Panel: CoursesTab,   count: 'courses' },

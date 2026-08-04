@@ -87,4 +87,19 @@ return [
         'token' => env('INSTAGRAM_ACCESS_TOKEN'),
     ],
 
+    // Pincode -> district / state autofill for the physical-tuition address
+    // forms. The bundled `pincodes` table answers first; this switch controls
+    // whether an unknown pincode may fall through to India Post's open
+    // endpoint (no key, no quota published). Turn it off to stay offline.
+    'pincode' => [
+        'lookup_api' => (bool) env('PINCODE_LOOKUP_API', true),
+    ],
+
+    // The external teacher-assignment app reads /api/matching/v1/* with this
+    // key in an X-Matching-Key header. Unset = the whole export refuses to
+    // answer; it is never open by default.
+    'matching' => [
+        'key' => env('MATCHING_API_KEY'),
+    ],
+
 ];

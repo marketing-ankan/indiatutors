@@ -18,8 +18,13 @@ use App\Http\Controllers\Api\ExamUpdateController;
 use App\Http\Controllers\Api\VideoCourseController;
 use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\AdminPhysicalController;
+use App\Http\Controllers\Api\MatchingExportController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\PhysicalProfileController;
+use App\Http\Controllers\Api\PincodeController;
 use App\Http\Controllers\Api\PortfolioController;
+use App\Http\Controllers\Api\TuitionRequirementController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\TeacherApplicationController;
@@ -65,6 +70,15 @@ Route::post('/video-courses/{videoCourse}/lessons/{lesson}/playback', [VideoCour
 Route::post('/video-courses/{videoCourse}/lessons/{lesson}/ask',     [VideoCourseController::class, 'ask'])->middleware('throttle:10,1');
 Route::get('/video-courses/{videoCourse}/lessons/{lesson}/summary',  [VideoCourseController::class, 'summary'])->middleware('throttle:20,1');
 
+// Address autofill for the physical-tuition forms. Public: both forms run
+// before anyone has an account, and a pincode is not private data.
+Route::get('/pincodes/search',   [PincodeController::class, 'search'])->middleware('throttle:60,1');
+Route::get('/pincodes/{pincode}',[PincodeController::class, 'show'])->middleware('throttle:60,1');
+
+// "Find me a home tutor" — guests may post; a signed-in parent gets the richer
+// version from the dashboard (see the auth group below).
+Route::post('/tuition-requirements', [TuitionRequirementController::class, 'store'])->middleware('throttle:10,1');
+
 Route::post('/demo-requests',    [DemoRequestController::class, 'store']);
 Route::post('/contact',          [ContactController::class, 'store']);
 Route::post('/teacher-applications', [TeacherApplicationController::class, 'store'])->middleware('throttle:6,1');
@@ -109,6 +123,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/notifications',                 [NotificationController::class, 'index']);
     Route::patch('/notifications/read-all',      [NotificationController::class, 'markAllRead']);
     Route::patch('/notifications/{id}/read',     [NotificationController::class, 'markRead']);
+
+    // Physical / home tuition — the teacher's operating record and the family's
+    // open requirements. Both feed the external matching app (see /matching/v1).
+    Route::get('/teacher/physical-profile',        [PhysicalProfileController::class, 'show']);
+    Route::put('/teacher/physical-profile',        [PhysicalProfileController::class, 'update']);
+    Route::patch('/teacher/physical-profile/status',[PhysicalProfileController::class, 'setStatus']);
+
+    Route::get('/tuition-requirements',              [TuitionRequirementController::class, 'index']);
+    Route::put('/tuition-requirements/{requirement}',[TuitionRequirementController::class, 'update']);
+    Route::patch('/tuition-requirements/{requirement}/close', [TuitionRequirementController::class, 'close']);
+    Route::delete('/tuition-requirements/{requirement}',      [TuitionRequirementController::class, 'destroy']);
 
     // Teacher portal (own profile + classroom)
     Route::get('/teacher/profile',  [TeacherController::class, 'showMine']);
@@ -182,6 +207,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/courses',                          [AdminCourseController::class, 'store']);
         Route::patch('/courses/{course}',                [AdminCourseController::class, 'update']);
         Route::delete('/courses/{course}',               [AdminCourseController::class, 'destroy']);
+        // Physical / home tuition queues
+        Route::get('/physical/profiles',                     [AdminPhysicalController::class, 'profiles']);
+        Route::get('/physical/profiles/{profile}',           [AdminPhysicalController::class, 'profile']);
+        Route::patch('/physical/profiles/{profile}',         [AdminPhysicalController::class, 'updateProfile']);
+        Route::get('/physical/requirements',                 [AdminPhysicalController::class, 'requirements']);
+        Route::get('/physical/requirements/{requirement}',   [AdminPhysicalController::class, 'requirement']);
+        Route::patch('/physical/requirements/{requirement}', [AdminPhysicalController::class, 'updateRequirement']);
+
         Route::get('/audit',                             [AdminAuditController::class, 'index']);
         Route::get('/settings',                          [AdminSettingController::class, 'index']);
         Route::put('/settings',                          [AdminSettingController::class, 'update']);
@@ -194,3 +227,29 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/exam-updates/{examUpdate}',      [ExamUpdateController::class, 'destroy']);
     });
 });
+
+/*
+ * --- Matching export (machine-to-machine) ------------------------------------
+ *
+ * The read model the separate teacher-assignment app consumes: every published
+ * physical-tuition teacher and every open student requirement, flattened and
+ * pre-resolved (coordinates, grade ordinals, availability ranges).
+ *
+ * Outside the Sanctum group on purpose — the caller is a server, not a user
+ * session — and gated by a static key in X-Matching-Key. With MATCHING_API_KEY
+ * unset the whole prefix 503s: this data is home addresses on both sides, and
+ * it must never be reachable by default.
+ *
+ * Versioned in the path so the schema can change without breaking a deployed
+ * consumer. Contract: docs/MATCHING-DATA-CONTRACT.md
+ */
+Route::prefix('matching/v1')
+    ->middleware([\App\Http\Middleware\EnsureMatchingClient::class, 'throttle:120,1'])
+    ->group(function () {
+        Route::get('/reference',                  [MatchingExportController::class, 'reference']);
+        Route::get('/teachers',                   [MatchingExportController::class, 'teachers']);
+        Route::get('/teachers/{profile}',         [MatchingExportController::class, 'teacher']);
+        Route::get('/requirements',               [MatchingExportController::class, 'requirements']);
+        Route::get('/requirements/{requirement}', [MatchingExportController::class, 'requirement']);
+        Route::patch('/requirements/{requirement}',[MatchingExportController::class, 'updateRequirement']);
+    });

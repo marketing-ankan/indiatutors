@@ -9,6 +9,7 @@ class DatabaseSeeder extends Seeder {
             TutorSeeder::class,
             PostSeeder::class,
             AdminSeeder::class,
+            PincodeSeeder::class,
         ]);
     }
 }

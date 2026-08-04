@@ -48,6 +48,9 @@ class User extends Authenticatable
     public function orders() { return $this->hasMany(Order::class); }
     /** The student profile this account IS, as opposed to the ones it owns. */
     public function studentProfile() { return $this->hasOne(Student::class, 'account_user_id'); }
+    /** Home-tuition operating record — address, radius, offerings, availability. */
+    public function physicalProfile() { return $this->hasOne(PhysicalTeachingProfile::class); }
+    public function tuitionRequirements() { return $this->hasMany(TuitionRequirement::class); }
 
     // Role helpers
     public function hasRole(string $role): bool { return $this->role === $role; }
