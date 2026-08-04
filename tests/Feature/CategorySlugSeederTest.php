@@ -2,6 +2,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Support\SeedFingerprint;
 use Database\Seeders\CourseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -48,11 +49,43 @@ class CategorySlugSeederTest extends TestCase
         $courseCount = $cat->courses()->count();
         $this->assertGreaterThan(0, $courseCount);
 
-        $this->seed(CourseSeeder::class);
+        // A REPAIR re-seed. courses.json has not changed, so the fingerprint
+        // gate would skip an import — drift is invisible to a content hash.
+        // Repair callers say so explicitly; see SeedFingerprint::bypass.
+        SeedFingerprint::bypass(fn () => $this->seed(CourseSeeder::class));
 
         $fixed = Category::find($id);
         $this->assertNotNull($fixed, 'category row was replaced instead of updated');
         $this->assertSame('ai-ml', $fixed->slug);
         $this->assertSame($courseCount, $fixed->courses()->count(), 'course links lost during reseed');
+    }
+
+    /**
+     * The other half of that bargain: an ordinary re-run must NOT redo the work.
+     * Rewriting 134 courses on every deploy is what gets the cron job killed
+     * before it copies the new front-end build to the web root.
+     */
+    public function test_an_unchanged_reseed_is_skipped(): void
+    {
+        $this->seed(CourseSeeder::class);
+        $before = Category::where('slug', 'ai-ml')->firstOrFail();
+        $before->update(['slug' => 'ai-ml-touched']);
+
+        $this->seed(CourseSeeder::class);   // no bypass — should be a no-op
+
+        $this->assertSame('ai-ml-touched', Category::find($before->id)->slug,
+            'The fingerprint gate did not skip an unchanged re-seed.');
+    }
+
+    /** A wiped catalogue must re-seed even though the fingerprint still matches. */
+    public function test_an_empty_catalogue_reseeds_despite_a_matching_fingerprint(): void
+    {
+        $this->seed(CourseSeeder::class);
+        \App\Models\Course::query()->delete();
+
+        $this->seed(CourseSeeder::class);
+
+        $this->assertGreaterThan(0, \App\Models\Course::count(),
+            'An emptied catalogue was left empty by the fingerprint gate.');
     }
 }

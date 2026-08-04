@@ -96,5 +96,13 @@ Route::get('/product-category/{path}', function (string $path) use ($renamedCate
 // fails later, somewhere unrelated, trying to parse a page.
 Route::get('/{any?}', function (Request $request) {
     abort_if($request->is('api/*'), 404);
+
+    // This is the request that is about to tell the browser which JS bundle to
+    // load, so it is the right place to make sure that bundle is actually
+    // present in the web root. See DocrootBuild: the deploy is regularly killed
+    // before it copies the build across, and without this the site is blank
+    // until the next cron cycle notices. Cheap and non-throwing.
+    \App\Support\DocrootBuild::ensure();
+
     return view('app', ['meta' => SeoMeta::for($request)]);
 })->where('any', '.*');

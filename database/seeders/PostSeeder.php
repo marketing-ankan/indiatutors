@@ -1,10 +1,17 @@
 <?php
 namespace Database\Seeders;
 use App\Models\Post;
+use App\Support\SeedFingerprint;
 use Illuminate\Database\Seeder;
 
 class PostSeeder extends Seeder {
     public function run(): void {
+        $fp = SeedFingerprint::for('posts', [__FILE__]);
+        if ($fp->isCurrent() && Post::exists()) {
+            $this->command?->info('PostSeeder: unchanged — skipped.');
+            return;
+        }
+
         // Live parity: indiatutorsonline.com has exactly one post — the WP
         // default "Hello world!" (April 16, 2026). Its permalink is top-level
         // (/hello-world/), which the SPA resolves via the 404 post fallback.
@@ -28,6 +35,7 @@ class PostSeeder extends Seeder {
         foreach ($posts as $data) {
             Post::updateOrCreate(['slug' => $data['slug']], $data + ['is_published' => true]);
         }
+        $fp->stamp();
         $this->command->info('Seeded '.count($posts)." blog post(s) (pruned {$pruned} stale).");
     }
 }

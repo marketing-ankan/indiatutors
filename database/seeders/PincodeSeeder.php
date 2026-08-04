@@ -25,7 +25,15 @@ class PincodeSeeder extends Seeder
 {
     public function run(): void
     {
-        $rows = json_decode(file_get_contents(__DIR__ . '/data/pincodes.json'), true);
+        $path = __DIR__ . '/data/pincodes.json';
+
+        $fp = \App\Support\SeedFingerprint::for('pincodes', [$path, __FILE__]);
+        if ($fp->isCurrent() && \App\Models\Pincode::exists()) {
+            $this->command?->info('PincodeSeeder: unchanged — skipped.');
+            return;
+        }
+
+        $rows = json_decode(file_get_contents($path), true);
         $now  = now();
 
         $payload = array_map(fn ($r) => [
@@ -50,6 +58,7 @@ class PincodeSeeder extends Seeder
             DB::table('pincodes')->upsert($chunk, ['pincode'], ['district', 'state', 'latitude', 'longitude', 'localities', 'source', 'updated_at']);
         }
 
+        $fp->stamp();
         $this->command?->info('Seeded ' . count($payload) . ' anchor pincodes.');
     }
 }
