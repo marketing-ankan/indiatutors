@@ -132,7 +132,6 @@ export const deleteExamUpdate = async (id) => { await api.delete(`/admin/exam-up
 export const fetchAdminDemoRequests = async (p={}) => { const { data } = await api.get('/admin/demo-requests', { params: typeof p === 'string' ? { status: p } : p }); return data; };
 export const fetchAdminTeachers = async (status='') => { const { data } = await api.get('/admin/teachers', { params:{ status } }); return data; };
 export const approveTeacher     = async (id, status) => { const { data } = await api.patch(`/admin/teachers/${id}`, { status }); return data.data; };
-export const fetchDemoTutors  = async (id) => { const { data } = await api.get(`/admin/demo-requests/${id}/tutors`); return data.data; };
 export const assignDemo       = async (id, payload) => { const { data } = await api.patch(`/admin/demo-requests/${id}`, payload); return data.data; };
 export const convertDemo      = async (id, payload) => { const { data } = await api.post(`/admin/demo-requests/${id}/convert`, payload); return data.data; };
 export const fetchAdminEnrollments = async () => { const { data } = await api.get('/admin/enrollments'); return data; };

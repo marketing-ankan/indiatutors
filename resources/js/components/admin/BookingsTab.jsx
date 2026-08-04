@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Trash2, UserCheck, GraduationCap } from 'lucide-react';
 import {
-  fetchAdminDemoRequests, fetchDemoTutors, assignDemo, convertDemo, deleteAdminDemo,
+  fetchAdminDemoRequests, fetchTutors, assignDemo, convertDemo, deleteAdminDemo,
 } from '../../lib/api.js';
 import {
   AdminTable, Chips, SearchBox, Pager, StatusBadge, Modal, ConfirmDialog,
@@ -134,11 +134,33 @@ export default function BookingsTab() {
   );
 }
 
-/** Assign a tutor, schedule, and convert to an enrolment — the original flow. */
+/**
+ * Assign a tutor, schedule, and convert to an enrolment — the original flow.
+ *
+ * The dropdown used to be a shortlist this app ranked by the booking's subject
+ * and city. That was matching, and matching happens in the leads-management
+ * software, so the picker now lists every published tutor unranked, in name
+ * order, with a search box. Recording WHO was assigned stays here: the
+ * enrolment, classroom and class-log chain all hang off it.
+ */
 function BookingDetails({ booking, onClose, onChanged }) {
   const [tutorId, setTutorId] = useState(booking.assigned_tutor?.id ? String(booking.assigned_tutor.id) : '');
   const [plan, setPlan] = useState('');
-  const { data: tutors = [] } = useQuery({ queryKey: ['demo-tutors', booking.id], queryFn: () => fetchDemoTutors(booking.id) });
+  const [tutorQuery, setTutorQuery] = useState('');
+
+  // Fetched once and filtered in the browser: /api/tutors already returns the
+  // whole published roster to every public visitor, so the console doing the
+  // same is not a new cost. Move to the endpoint's `search` param if the roster
+  // ever outgrows a single response.
+  const { data: tutors = [] } = useQuery({
+    queryKey: ['tutors', 'all-by-name'],
+    queryFn: () => fetchTutors({ sort: 'name' }),
+  });
+
+  const q = tutorQuery.trim().toLowerCase();
+  const shown = q
+    ? tutors.filter(t => `${t.name} ${(t.subjects || []).join(' ')} ${t.city ?? ''}`.toLowerCase().includes(q))
+    : tutors;
 
   const assign  = useMutation({ mutationFn: () => assignDemo(booking.id, { assigned_tutor_id: tutorId || null, status: 'scheduled' }), onSuccess: onChanged });
   const convert = useMutation({ mutationFn: () => convertDemo(booking.id, { tutor_id: tutorId || null, plan: plan || null }), onSuccess: onChanged });
@@ -164,11 +186,19 @@ function BookingDetails({ booking, onClose, onChanged }) {
       )}
 
       <div className="mt-5 border-t border-slate-100 pt-4">
-        <label className="mb-1 block text-xs font-semibold text-slate-700">Assign a tutor (matched by subject and city)</label>
+        <label className="mb-1 block text-xs font-semibold text-slate-700">Record the assigned tutor</label>
+        <input value={tutorQuery} onChange={e => setTutorQuery(e.target.value)}
+          placeholder="Search by name, subject or city…" className={inp + ' mb-2'} />
         <select value={tutorId} onChange={e => setTutorId(e.target.value)} className={inp}>
           <option value="">— Select tutor —</option>
-          {tutors.map(t => <option key={t.id} value={t.id}>{t.name} · {(t.subjects || []).slice(0, 2).join(', ')} · {t.city}</option>)}
+          {shown.map(t => <option key={t.id} value={t.id}>{t.name} · {(t.subjects || []).slice(0, 2).join(', ')} · {t.city}</option>)}
         </select>
+        {q && shown.length === 0 && (
+          <p className="mt-1 text-xs text-slate-500">No tutor matches “{tutorQuery}”.</p>
+        )}
+        <p className="mt-1 text-[11px] text-slate-400">
+          Listed alphabetically, not ranked — who to assign is decided in the leads-management software.
+        </p>
 
         <div className="mt-3 flex flex-wrap items-end gap-2">
           <button disabled={assign.isPending} onClick={() => assign.mutate()} className={btnGhost + ' px-3 py-2 text-sm'}>

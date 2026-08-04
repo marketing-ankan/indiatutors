@@ -7,7 +7,6 @@ use App\Http\Resources\CourseProposalResource;
 use App\Http\Resources\DemoRequestResource;
 use App\Http\Resources\EnrollmentResource;
 use App\Http\Resources\TeacherProfileResource;
-use App\Http\Resources\TutorResource;
 use App\Models\AppNotification;
 use App\Models\AuditLog;
 use App\Models\ClassLog;
@@ -110,16 +109,16 @@ class AdminController extends Controller {
         $query->whereBetween('created_at', [$start, (clone $start)->endOfMonth()]);
     }
 
-    /** Tutors that match a demo's subject + city (fallback to any if none). */
-    public function suggestTutors(DemoRequest $demoRequest) {
-        $q = Tutor::published();
-        if ($demoRequest->subject) $q->where('subjects', 'like', '%' . $demoRequest->subject . '%');
-        if ($demoRequest->city)    $q->where('city', $demoRequest->city);
-        $matches = $q->limit(8)->get();
-        if ($matches->isEmpty()) $matches = Tutor::published()->limit(8)->get();
-        return TutorResource::collection($matches);
-    }
-
+    /**
+     * No suggestTutors() here any more.
+     *
+     * It ranked tutors against a booking's subject and city and handed staff a
+     * shortlist — which is matching, and matching belongs to the leads-
+     * management software. The console keeps `assignDemo` below, because
+     * recording WHO was assigned is what the enrolment, classroom and
+     * class-log chain hangs off; it just no longer offers an opinion about who
+     * that should be. The picker now lists every published tutor, unranked.
+     */
     public function assignDemo(Request $request, DemoRequest $demoRequest) {
         $data = $request->validate([
             'assigned_tutor_id' => 'nullable|integer|exists:tutors,id',

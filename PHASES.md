@@ -245,7 +245,9 @@ Verified: 94 tests / 391 assertions green; the full guest → requirement → pu
 
 Found by an adversarial audit of the removal (four independent lenses → a skeptic per finding; 37 raised, 36 refuted, 1 confirmed — the guest IDOR). The same pass also stripped the last matching-shaped code that had no caller left: `TeachingOffering::coversGrade/coversBoard` and `Availability::overlapMinutes`, both of which compared a teacher against a student and now belong solely to the leads software.
 
-⬜ **Left:** set `MATCHING_API_KEY` on the server and hand it to the leads software; load the official pincode CSV before launch (the bundled anchors are ~1 km centroids); police-verification is staff-set from the console with no workflow behind it yet. ⚠️ Two **pre-existing** matchers elsewhere are untouched and still live: `AdminController::suggestTutors()` (online demo→enrolment flow, Phase 4) and the public tutor search on `/physical-classes` — say the word if either should also move to the leads software.
+**`suggestTutors` removed too (2026-08-04).** The Phase-4 demo→enrolment flow ranked tutors by a booking's subject and city and handed staff a shortlist — the same thing under another name, so it went as well. What stayed is `assignDemo`/`convert`: **recording** who was assigned is what the enrolment → classroom → curriculum → class-log chain hangs off, and removing that would break Phases 4–6. The console's dropdown is now every published tutor, alphabetical and unranked, with a search box and a line saying where the decision is actually made. Net effect: this codebase can record a match but can no longer form an opinion about one.
+
+⬜ **Left:** set `MATCHING_API_KEY` on the server and hand it to the leads software; load the official pincode CSV before launch (the bundled anchors are ~1 km centroids); police-verification is staff-set from the console with no workflow behind it yet. The public tutor search on `/physical-classes` stays — a visitor filtering the directory themselves is browse, not lead matching — say the word if that should go too.
 
 ---
 
