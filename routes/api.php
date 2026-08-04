@@ -167,7 +167,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(\App\Http\Middleware\EnsureAdmin::class)->prefix('admin')->group(function () {
         Route::get('/overview',                          [AdminController::class, 'overview']);
         Route::get('/demo-requests',                     [AdminController::class, 'demoRequests']);
-        Route::get('/demo-requests/{demoRequest}/tutors',[AdminController::class, 'suggestTutors']);
         Route::patch('/demo-requests/{demoRequest}',     [AdminController::class, 'assignDemo']);
         Route::delete('/demo-requests/{demoRequest}',    [AdminController::class, 'destroyDemoRequest']);
         Route::post('/demo-requests/{demoRequest}/convert',[AdminController::class, 'convert']);
