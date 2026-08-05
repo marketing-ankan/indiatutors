@@ -265,7 +265,15 @@ Found by an adversarial audit of the removal (four independent lenses → a skep
 
 ⬜ **Fix 3, still needed — reorder the script.** Copy the build and rebuild caches FIRST, DB work last, so a kill costs nothing visible. Blocked by the append-only rule (the script git-pulls itself mid-run), which a tiny stable `deploy/run.sh` launcher would retire for good: pull, then `exec` the real script as a fresh process. **Needs one cron-command change in hPanel — no SSH.**
 
-⚠️ **Fix 1 is not yet proven on the server.** The deploy body only runs when there is a new commit to pull, and the fingerprints are only stored *after* a seeder completes — so the first post-fix deploy still did the full work. Watch `manifest.webmanifest`: the day its Last-Modified moves off 15 July, the script has reached its end for the first time and Fix 1 is working. (Compare case-insensitively — the server varies the header casing, which produced one false positive.)
+**Fix 1 shipped inert, and had to be rescued (commit 4518f93).** The gate only starts saving work *after* a seeder completes and stamps — but `CourseSeeder` is exactly what keeps being killed. It never finished, never stamped, the gate never engaged: a fix that could not activate, by construction. Confirmed on the server after a fresh push — the pull landed (PHASES.md updated in the checkout) while `build/assets/main-*.js` still carried the previous day's mtime, so the body never reached its `cp`; and no migrations were pending that run, which rules out `migrate` and leaves the seeders.
+- The escape: the database does not need seeding at all — it has served the correct catalogue for weeks, so the seeder is *redundant*, not pending. `SeedFingerprint::adopt()` lets a caller that can PROVE the data matches the source stamp on the seeder's behalf; `CourseController` does so on a product-page view, behind the same 6h lock as the curriculum heal. The proof is exact — every slug in `courses.json` present AND the sentinel's curriculum non-empty — because stamping a half-seeded database would tell every future deploy to stop repairing it. Both refusal cases are tested.
+
+**Verification traps, both hit for real — save the next person the hour:**
+1. The server varies HTTP header casing (`Last-Modified` vs `last-modified`). A case-sensitive diff reported "fixed" when nothing had changed. Always `grep -i`.
+2. The deploy body only runs when there is a **new commit to pull** (`BEFORE==AFTER → exit 0`). A deploy-script or seeder fix therefore cannot be tested by watching idle cron cycles — it needs a push. A docs-only commit is the clean experiment: no bundle change, so no blank-page risk.
+3. Fetching `/laravel/**/*.php` over HTTP returns an EMPTY 200 — Apache executes the file rather than showing source, and a class file prints nothing. Only non-PHP files (`.md`, `.sh`, `.json`) work as "did the pull land" markers.
+
+**Progress marker:** `manifest.webmanifest` Last-Modified is stuck at 15 Jul 2026. The day it moves, the script has reached its tail for the first time and Fix 1 is finally doing its job.
 
 ---
 
