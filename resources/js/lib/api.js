@@ -220,6 +220,20 @@ export const fetchAdminAudit       = async (p={}) => { const { data } = await ap
 export const fetchAdminSettings    = async () => { const { data } = await api.get('/admin/settings'); return data.data; };
 export const saveAdminSettings     = async (p) => { const { data } = await api.put('/admin/settings', p); return data.data; };
 
+// --- Support -----------------------------------------------------------------
+// The customer's half of the inbox. The public /contact form (submitContact
+// above) opens a ticket in the same queue.
+export const fetchSupportTickets = async () => { const { data } = await api.get('/support/tickets'); return data.data; };
+export const openSupportTicket   = async (p) => { const { data } = await api.post('/support/tickets', p); return data; };
+export const replySupportTicket  = async ({ id, message }) => { const { data } = await api.post(`/support/tickets/${id}/messages`, { message }); return data.data; };
+export const closeSupportTicket  = async (id) => { const { data } = await api.patch(`/support/tickets/${id}/close`); return data.data; };
+
+// Staff side of the same queue.
+export const fetchAdminSupport       = async (p={}) => { const { data } = await api.get('/admin/support', { params:p }); return data; };
+export const fetchAdminSupportTicket = async (id) => { const { data } = await api.get(`/admin/support/${id}`); return data.data; };
+export const replyAdminSupport       = async ({ id, message }) => { const { data } = await api.post(`/admin/support/${id}/messages`, { message }); return data.data; };
+export const updateAdminSupport      = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/support/${id}`, p); return data.data; };
+
 // --- Physical / home tuition -------------------------------------------------
 // Address autofill (public — the apply and enquiry forms run signed-out).
 export const lookupPincode = async (pin) => { const { data } = await api.get(`/pincodes/${pin}`); return data; };

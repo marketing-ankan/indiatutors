@@ -58,7 +58,7 @@ class AdminPhysicalController extends Controller
             'updated_at'    => $p->updated_at?->toIso8601String(),
         ]);
 
-        return $page;
+        return $this->paginated($page, $page->items());
     }
 
     public function profile(PhysicalTeachingProfile $profile)
@@ -123,7 +123,7 @@ class AdminPhysicalController extends Controller
             'created_at'  => $r->created_at?->toIso8601String(),
         ]);
 
-        return $page;
+        return $this->paginated($page, $page->items());
     }
 
     public function requirement(TuitionRequirement $requirement)

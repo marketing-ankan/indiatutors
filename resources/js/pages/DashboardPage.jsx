@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap, Briefcase, Save, Users, BookOpen, NotebookPen, ChevronDown, ChevronUp, ListChecks, FolderOpen, Link2, Download, Lightbulb, Calendar, Award, Megaphone, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import DashboardHero from '../components/dashboard/DashboardHero.jsx';
+import SupportCard from '../components/dashboard/SupportCard.jsx';
 import PhysicalProfileCard from '../components/physical/PhysicalProfileCard.jsx';
 import TuitionRequirementsCard from '../components/physical/TuitionRequirementsCard.jsx';
 
@@ -114,6 +115,9 @@ function ParentDashboard() {
         <StudentsCard />
         <KycCard />
       </div>
+      <div className="mt-6">
+        <SupportCard />
+      </div>
     </>
   );
 }
@@ -153,9 +157,13 @@ function StudentDashboard() {
           <p className="text-sm text-slate-500">
             Your account isn't linked to a student profile yet, so there's nothing to show here.
             Ask your parent or our team to link it — then your classes, materials and portfolio appear on this page.
+            {' '}You can also ask us below and we'll sort it out.
           </p>
         )}
       </section>
+      <div className="mt-6">
+        <SupportCard />
+      </div>
     </>
   );
 }
