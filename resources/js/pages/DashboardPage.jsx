@@ -97,6 +97,7 @@ function TeacherDashboard() {
 function ParentDashboard() {
   return (
     <>
+      <GettingStartedCard />
       <MyCoursesCard />
       <div className="grid lg:grid-cols-2 gap-6 mt-6">
         <RequestsCard />
@@ -156,6 +157,77 @@ function StudentDashboard() {
         )}
       </section>
     </>
+  );
+}
+
+/**
+ * What a new parent should do next.
+ *
+ * Signing up gets you six cards that are all empty, in an order that reads
+ * backwards: bookings and enrolments first, "add your child" fifth. But nothing
+ * else works until a child exists, and the page never says so — it just shows
+ * six variations of "nothing here yet".
+ *
+ * So: three steps, the first unfinished one called out, and the card removes
+ * itself the moment they are done. Deliberately not a dismissible tour — it is
+ * derived from real state, so it cannot claim a step is incomplete when it
+ * isn't, and it cannot linger once the account is running.
+ */
+function GettingStartedCard() {
+  const { data: students = [], isLoading: ls } = useQuery({ queryKey: ['students'], queryFn: fetchStudents });
+  const { data: requests = [], isLoading: lr } = useQuery({ queryKey: ['my-demo-requests'], queryFn: fetchMyDemoRequests });
+  const { data: enrolments = [], isLoading: le } = useQuery({ queryKey: ['my-enrollments'], queryFn: fetchMyEnrollments });
+
+  // Say nothing until we know — a flash of "you have no children" while the
+  // request is in flight is worse than a moment of blank space.
+  if (ls || lr || le) return null;
+  if (enrolments.length) return null;   // up and running; the cards speak for themselves
+
+  const steps = [
+    { done: students.length > 0, title: 'Add your child',
+      body: 'Their class, board and subjects — everything else is matched against this.',
+      cta: 'Add a student', href: '#students' },
+    { done: requests.length > 0, title: 'Book a free demo',
+      body: 'Meet a teacher first. No card, no commitment.',
+      cta: 'Book a free demo', href: '/book-demo' },
+    { done: false, title: 'Start classes',
+      body: 'After the demo we set up the schedule, and your classes, homework and progress appear here.',
+      cta: null, href: null },
+  ];
+  const next = steps.findIndex(s => !s.done);
+
+  return (
+    <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+      <h2 className="flex items-center gap-2 text-lg font-bold"><Lightbulb className="h-5 w-5 text-brand-600" />Getting started</h2>
+      <p className="mb-4 mt-0.5 text-xs text-slate-500">Three steps and you're set up.</p>
+
+      <ol className="space-y-2">
+        {steps.map((s, i) => {
+          const isNext = i === next;
+          return (
+            <li key={s.title}
+              className={`flex items-start gap-3 rounded-xl p-3 ring-1 ${
+                isNext ? 'bg-brand-50/60 ring-brand-200' : 'ring-slate-100'}`}>
+              <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                s.done ? 'bg-green-100 text-green-700' : isNext ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                {s.done ? '✓' : i + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className={`text-sm font-bold ${s.done ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{s.title}</p>
+                {!s.done && <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{s.body}</p>}
+              </div>
+              {isNext && s.cta && (
+                s.href.startsWith('#') ? (
+                  <a href={s.href} className="shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700">{s.cta}</a>
+                ) : (
+                  <Link to={s.href} className="shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700">{s.cta}</Link>
+                )
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </section>
   );
 }
 
@@ -761,11 +833,33 @@ function ParentEnrollmentDetail({ id }) {
       <div>
         <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1.5">Class history</h4>
         {d.classes?.length ? (
-          <ul className="space-y-1">
+          <ul className="space-y-1.5">
             {d.classes.map(l => (
-              <li key={l.id} className="flex items-center justify-between gap-2 text-sm">
-                <span className="text-slate-700 truncate">{l.topic}</span>
-                <span className="flex items-center gap-2 shrink-0 text-xs text-slate-500">{l.held_on}<span className={`rounded-full px-2 py-0.5 font-semibold ${logStatus[l.status]||'bg-slate-100'}`}>{l.status}</span></span>
+              /* Homework and the teacher's notes were being fetched and thrown
+                 away — the API has always returned them, but only the topic,
+                 date and status were rendered. Teachers write "Exercise 4.2,
+                 due next class" into the class log and neither the parent nor
+                 the student could read it. */
+              <li key={l.id} className="text-sm">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="min-w-0 flex-1 truncate text-slate-700">{l.topic}</span>
+                  <span className="flex shrink-0 items-center gap-2 text-xs text-slate-500">
+                    {l.held_on}
+                    <span className={`rounded-full px-2 py-0.5 font-semibold ${logStatus[l.status]||'bg-slate-100'}`}>{l.status}</span>
+                  </span>
+                </div>
+                {l.homework && (
+                  <p className="mt-1 flex items-start gap-1.5 rounded-md bg-amber-50 px-2.5 py-1.5 text-xs text-amber-900 ring-1 ring-amber-100">
+                    <NotebookPen className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                    <span><span className="font-bold">Homework:</span> {l.homework}</span>
+                  </p>
+                )}
+                {l.notes && (
+                  <p className="mt-1 flex items-start gap-1.5 px-2.5 text-xs leading-relaxed text-slate-500">
+                    <Lightbulb className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400" />
+                    <span><span className="font-semibold text-slate-600">Teacher's note:</span> {l.notes}</span>
+                  </p>
+                )}
               </li>
             ))}
           </ul>
@@ -921,7 +1015,9 @@ function StudentsCard() {
   const set = k => e => setForm({...form,[k]:e.target.value});
 
   return (
-    <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
+    // id + scroll-mt so "Add a student" in Getting started lands here with the
+    // heading clear of the sticky header rather than under it.
+    <section id="students" className="scroll-mt-24 rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
       <h2 className="text-lg font-bold flex items-center gap-2 mb-4"><UserPlus className="h-5 w-5 text-brand-600"/>My students</h2>
 
       {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : students.length ? (
