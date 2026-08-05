@@ -83,6 +83,31 @@ class SeedFingerprint
     }
 
     /**
+     * Claim the data is ALREADY seeded, without running the seeder.
+     *
+     * This exists to break a deadlock. The gate only starts saving work after a
+     * seeder finishes once and stamps — but on this host the deploy is being
+     * killed *inside* that seeder, so it never finishes, never stamps, and the
+     * gate never engages. It would have stayed stuck forever.
+     *
+     * The way out is that the live database is already correct — it has been
+     * serving the right catalogue for weeks; the seeder is redundant, not
+     * pending. So a caller that can PROVE the data matches the source may stamp
+     * on the seeder's behalf, and the next deploy skips it.
+     *
+     * $verify must be an exact check, not a heuristic: stamping a half-seeded
+     * database would tell every future deploy not to finish the job.
+     */
+    public function adopt(callable $verify): bool
+    {
+        if (!$this->available() || $this->isCurrent()) return false;
+        if (!$verify()) return false;
+
+        $this->stamp();
+        return true;
+    }
+
+    /**
      * The settings table is created by a migration, and on this host migrations
      * are not guaranteed to have run. No table means no gate: seed every time,
      * which is the safe direction to fail in.

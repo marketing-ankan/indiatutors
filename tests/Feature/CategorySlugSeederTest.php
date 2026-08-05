@@ -77,6 +77,52 @@ class CategorySlugSeederTest extends TestCase
             'The fingerprint gate did not skip an unchanged re-seed.');
     }
 
+    /**
+     * The deadlock-breaker: a correct catalogue can adopt the fingerprint
+     * without the seeder ever running, so a deploy that keeps dying inside
+     * CourseSeeder can still be told to stop trying.
+     */
+    public function test_a_correct_catalogue_can_adopt_the_fingerprint_without_seeding(): void
+    {
+        $this->seed(CourseSeeder::class);            // get the data in place…
+        \App\Models\Setting::query()->delete();      // …then forget it was ever stamped
+
+        $fp = SeedFingerprint::for('courses', [
+            database_path('seeders/data/courses.json'),
+            database_path('seeders/CourseSeeder.php'),
+        ]);
+        $this->assertFalse($fp->isCurrent());
+
+        $this->assertTrue($fp->adopt(fn () => true));
+        $this->assertTrue($fp->isCurrent(), 'adopt() did not stamp a verified catalogue.');
+    }
+
+    /** …but it must refuse when the verifier says the data is not actually right. */
+    public function test_adopt_refuses_when_verification_fails(): void
+    {
+        $fp = SeedFingerprint::for('courses', [database_path('seeders/data/courses.json')]);
+
+        $this->assertFalse($fp->adopt(fn () => false));
+        $this->assertFalse($fp->isCurrent(), 'adopt() stamped despite a failed check.');
+    }
+
+    /** The real verifier must reject a half-seeded catalogue. */
+    public function test_the_controllers_verifier_rejects_a_partial_catalogue(): void
+    {
+        $this->seed(CourseSeeder::class);
+        \App\Models\Setting::query()->delete();
+        \App\Models\Course::query()->limit(1)->delete();   // one course missing
+
+        $this->getJson('/api/courses/' . \App\Models\Course::first()->slug)->assertOk();
+
+        $fp = SeedFingerprint::for('courses', [
+            database_path('seeders/data/courses.json'),
+            database_path('seeders/CourseSeeder.php'),
+        ]);
+        $this->assertFalse($fp->isCurrent(),
+            'A partial catalogue was stamped as complete — future deploys would never repair it.');
+    }
+
     /** A wiped catalogue must re-seed even though the fingerprint still matches. */
     public function test_an_empty_catalogue_reseeds_despite_a_matching_fingerprint(): void
     {
