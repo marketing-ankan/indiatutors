@@ -4,7 +4,9 @@ use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AdminCourseController;
 use App\Http\Controllers\Api\AdminSettingController;
 use App\Http\Controllers\Api\AdminStudentController;
+use App\Http\Controllers\Api\AdminSupportController;
 use App\Http\Controllers\Api\AdminTeacherController;
+use App\Http\Controllers\Api\SupportController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\EnrollmentController;
@@ -86,7 +88,10 @@ Route::middleware(\App\Http\Middleware\EnsurePhysicalSchema::class)->group(funct
 });
 
 Route::post('/demo-requests',    [DemoRequestController::class, 'store']);
-Route::post('/contact',          [ContactController::class, 'store']);
+// Guarded too: this is the lead-capture path for seven public forms, and it now
+// writes a support ticket. A missing table here loses an enquiry.
+Route::post('/contact',          [ContactController::class, 'store'])
+    ->middleware(\App\Http\Middleware\EnsureSupportSchema::class);
 Route::post('/teacher-applications', [TeacherApplicationController::class, 'store'])->middleware('throttle:6,1');
 Route::post('/orders',           [OrderController::class, 'store'])->middleware('throttle:10,1');
 Route::post('/orders/verify',    [OrderController::class, 'verify'])->middleware('throttle:20,1');
@@ -126,6 +131,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/exam-updates',                  [ExamUpdateController::class, 'index']);
 
     // In-app notifications (Phase 8)
+    // Support threads — the customer's half of the inbox.
+    Route::middleware(\App\Http\Middleware\EnsureSupportSchema::class)->group(function () {
+        Route::get('/support/tickets',                    [SupportController::class, 'index']);
+        Route::post('/support/tickets',                   [SupportController::class, 'store'])->middleware('throttle:20,1');
+        Route::post('/support/tickets/{ticket}/messages', [SupportController::class, 'reply'])->middleware('throttle:30,1');
+        Route::patch('/support/tickets/{ticket}/close',   [SupportController::class, 'close']);
+    });
+
     Route::get('/notifications',                 [NotificationController::class, 'index']);
     Route::patch('/notifications/read-all',      [NotificationController::class, 'markAllRead']);
     Route::patch('/notifications/{id}/read',     [NotificationController::class, 'markRead']);
@@ -222,6 +235,14 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/physical/requirements',                 [AdminPhysicalController::class, 'requirements']);
             Route::get('/physical/requirements/{requirement}',   [AdminPhysicalController::class, 'requirement']);
             Route::patch('/physical/requirements/{requirement}', [AdminPhysicalController::class, 'updateRequirement']);
+        });
+
+        // The inbox: public enquiries and in-account support, one queue.
+        Route::middleware(\App\Http\Middleware\EnsureSupportSchema::class)->group(function () {
+            Route::get('/support',                    [AdminSupportController::class, 'index']);
+            Route::get('/support/{ticket}',           [AdminSupportController::class, 'show']);
+            Route::post('/support/{ticket}/messages', [AdminSupportController::class, 'reply']);
+            Route::patch('/support/{ticket}',         [AdminSupportController::class, 'update']);
         });
 
         Route::get('/audit',                             [AdminAuditController::class, 'index']);

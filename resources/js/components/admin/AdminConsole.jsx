@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutGrid, GraduationCap, Users, CalendarClock, ReceiptText, Star,
-  BookOpen, UserCog, ScrollText, CalendarDays, Video, Megaphone, Wrench, TrendingUp, Home,
+  BookOpen, UserCog, ScrollText, CalendarDays, Video, Megaphone, Wrench, TrendingUp, Home, LifeBuoy,
 } from 'lucide-react';
 import { fetchAdminOverview } from '../../lib/api.js';
 import OverviewTab from './OverviewTab.jsx';
@@ -15,6 +15,7 @@ import CoursesTab from './CoursesTab.jsx';
 import UsersTab from './UsersTab.jsx';
 import AuditTab from './AuditTab.jsx';
 import PhysicalTab from './PhysicalTab.jsx';
+import SupportTab from './SupportTab.jsx';
 import { EventsTab, VideoCoursesTab, ContentTab, AnalyticsTab } from './LegacyTabs.jsx';
 
 // The console. Tabs are addressed by hash (#ac-orders) so a tab can be linked,
@@ -30,6 +31,9 @@ const TABS = [
   // converted from a booking, and both sides of it live in different tables.
   { key: 'physical', label: 'Home tuition', Icon: Home,        Panel: PhysicalTab },
   { key: 'orders',   label: 'Orders',    Icon: ReceiptText,    Panel: OrdersTab,    count: 'orders' },
+  // Every website enquiry form used to write to a table nothing read. They all
+  // land here now, with in-account support threads.
+  { key: 'support',  label: 'Support',   Icon: LifeBuoy,       Panel: SupportTab },
   { key: 'reviews',  label: 'Reviews',   Icon: Star,           Panel: ReviewsTab,   count: 'reviews' },
   { key: 'courses',  label: 'Courses',   Icon: BookOpen,       Panel: CoursesTab,   count: 'courses' },
   { key: 'users',    label: 'Users',     Icon: UserCog,        Panel: UsersTab,     count: 'users' },
