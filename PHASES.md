@@ -251,6 +251,24 @@ Found by an adversarial audit of the removal (four independent lenses → a skep
 
 ---
 
+## Deploy reliability — the white-screen window ⬜ (two of three fixes shipped 2026-08-04)
+
+**The symptom, measured.** Every push that changed a frontend file blanked the live site for **3.5, 4.9 and ~4 minutes** on three consecutive deploys. Not an error page — the served HTML asked for `main-<newhash>.js` while the web root still held the previous build, so the bundle 404'd and the SPA painted nothing. It always recovered on its own, because the pre-gate self-heal (b7ea9c6) re-copies the build at the top of every cron cycle. It just recovered slowly, in public.
+
+**The cause.** The cron deploy rewrites 134 courses, 112 categories and every curriculum row on *every* push, whether or not `courses.json` moved. Shared hosting caps how long that job may run and kills it partway — and the step that copies the new build to the web root sits *after* that work. Proof without SSH: `sw.js` (written in the pre-gate block) updates on every deploy, while `manifest.webmanifest` (written in the tail) has not moved since **15 July**. The script reliably finishes its opening block and has not reached its own end in three weeks.
+
+**Fix 1 — `SeedFingerprint`.** Each seeder gates on a CONTENT hash of its inputs, stored in `settings`. Content, not mtime: git does not preserve mtimes, so an mtime fingerprint would look changed on every pull and skip nothing. CourseSeeder drops **4.7s → 0.9s** when nothing changed, and 0.9s of that is Laravel booting.
+- ⚠️ This nearly caused a worse bug than it fixed. These seeders do two jobs — **import** the catalogue and **repair** drifted data — and a content hash cannot tell them apart, because the source file is identical either way. Gating both would have silently disabled the `CourseController` curriculum self-heal, which exists *because* this deploy step dies. Repair callers now say so: `SeedFingerprint::bypass()`, or `SEED_FORCE=1` from the CLI. `CategorySlugSeederTest` caught it, and now pins both directions plus "a wiped catalogue re-seeds even though the hash matches".
+
+**Fix 2 — `DocrootBuild`.** The request that renders the SPA shell is, by definition, the request about to reference a bundle that may not be there. It now checks and merge-copies the build across, once, behind a cache lock: minutes of white screen become one ~250ms request, with no cron and no SSH. Merge rather than replace, so the web root is never momentarily without a build — safe because Vite names carry a content hash and can only be added; `manifest.json` is written last so the pointer never lands before what it points at. The PWA files the dead tail owns ride along.
+- Guarded hard: it acts only when `dirname(base_path())` really is the Hostinger split layout, identified by the patched `index.php` the installer writes. On a dev box that path is the whole XAMPP htdocs root. Tested both ways — including against the installer's own `sed`, so the marker cannot drift out of sync and turn the fix into a silent no-op — and end-to-end against a replica of the real layout.
+
+⬜ **Fix 3, still needed — reorder the script.** Copy the build and rebuild caches FIRST, DB work last, so a kill costs nothing visible. Blocked by the append-only rule (the script git-pulls itself mid-run), which a tiny stable `deploy/run.sh` launcher would retire for good: pull, then `exec` the real script as a fresh process. **Needs one cron-command change in hPanel — no SSH.**
+
+⚠️ **Fix 1 is not yet proven on the server.** The deploy body only runs when there is a new commit to pull, and the fingerprints are only stored *after* a seeder completes — so the first post-fix deploy still did the full work. Watch `manifest.webmanifest`: the day its Last-Modified moves off 15 July, the script has reached its end for the first time and Fix 1 is working. (Compare case-insensitively — the server varies the header casing, which produced one false positive.)
+
+---
+
 ## Reference — source data model (from WP export)
 - **Courses** (`product`, WooCommerce simple): meta `_ito_subtitle`, `_ito_age`, `_ito_pills`, `_ito_tier_labels`/`_ito_tier_o2o`/`_ito_tier_group`, `_ito_curriculum`, `_regular_price`/`_sale_price`
 - **Tutors** (`ito_tutor`): full_name, tagline, qualification, teaching_mode, city/state/localities, fee_hourly, fee_trial, verified, languages, experience_years
