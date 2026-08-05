@@ -79,7 +79,6 @@ class CourseController extends Controller {
 
     public function show(string $slug) {
         $this->selfHealCurriculum();
-        $this->adoptCatalogueFingerprint();
         $course = Course::where('slug',$slug)->published()->with('categories')->firstOrFail();
         return (new CourseResource($course))->additional(['route' => 'api.courses.show']);
     }
@@ -112,48 +111,4 @@ class CourseController extends Controller {
         }
     }
 
-    /**
-     * Tell the deploy it can stop re-importing a catalogue that is already correct.
-     *
-     * CourseSeeder rewrites 134 courses, 112 categories and every curriculum row
-     * on every deploy, and that is what gets the cron job killed before it copies
-     * the new front-end build to the web root — the blank-page bug.
-     * SeedFingerprint was meant to skip that work once the seeder had run and
-     * stamped, but the seeder is exactly what keeps being killed: it never
-     * finishes, never stamps, and the gate never engages. A deadlock.
-     *
-     * The database, though, is already right — it has served the correct
-     * catalogue for weeks. So verify that exactly (every slug in courses.json is
-     * present, and the sentinel really has its curriculum) and stamp on the
-     * seeder's behalf. The next deploy then skips straight past it.
-     *
-     * Exact check, never a count or a heuristic: stamping a partially-seeded
-     * database would instruct every future deploy not to finish the job.
-     */
-    private function adoptCatalogueFingerprint(): void {
-        try {
-            if (!\Illuminate\Support\Facades\Cache::add('courses:fp-adopt-check', 1, now()->addHours(6))) return;
-
-            $json = database_path('seeders/data/courses.json');
-            // Same key and same files, in the same order, as CourseSeeder — the
-            // hash is over contents, so how the path is spelled does not matter.
-            $fp = \App\Support\SeedFingerprint::for('courses', [$json, database_path('seeders/CourseSeeder.php')]);
-
-            $fp->adopt(function () use ($json) {
-                $source = json_decode((string) @file_get_contents($json), true);
-                if (!is_array($source) || !$source) return false;
-
-                $slugs = array_values(array_filter(array_column($source, 'slug')));
-                if (count($slugs) === 0) return false;
-                if (Course::whereIn('slug', $slugs)->count() !== count($slugs)) return false;
-
-                // Curriculum lives inside the same import, so a course row alone
-                // does not prove the import finished.
-                $sentinel = Course::where('slug', 'mathematics-grade-8')->first();
-                return $sentinel && count($sentinel->curriculum ?? []) > 0;
-            });
-        } catch (\Throwable $e) {
-            // Never break a product page over a deploy optimisation.
-        }
-    }
 }
