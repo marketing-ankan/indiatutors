@@ -127,4 +127,18 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Bootstrap admin
+    |--------------------------------------------------------------------------
+    | Read by AdminSeeder. These MUST flow through config, not env() in the
+    | seeder: the deploy runs config:cache, and under a cached config Laravel
+    | never loads .env, so env() in a seeder returns null on every production
+    | run. That is why the live site sat with no admin account while the same
+    | seeder worked locally — the values below are baked into the cache at
+    | deploy time, which is the only channel that survives it.
+    */
+    'admin_email'    => env('ADMIN_EMAIL', 'admin@indiatutorsonline.com'),
+    'admin_password' => env('ADMIN_PASSWORD'),
+
 ];
