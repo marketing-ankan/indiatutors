@@ -92,16 +92,34 @@ if [ "$NEED_ASSETS" = "1" ]; then
   rm -rf "$DOCROOT/icons"  && cp -r "$LARAVEL_DIR/public/icons"  "$DOCROOT/icons"  2>/dev/null || true
   rm -rf "$DOCROOT/images" && cp -r "$LARAVEL_DIR/public/images" "$DOCROOT/images" 2>/dev/null || true
 
-  # robots.txt is served by a Laravel route (the sitemap URL is dynamic); a
-  # static file at the web root would shadow it.
-  rm -f "$DOCROOT/robots.txt"
+  # robots.txt MUST be a static file at the web root. The original assumption —
+  # a Laravel route serves it, a static file would shadow it — turned out to be
+  # backwards on this host: the hws front layer answers /robots.txt from disk
+  # (or 404s) without ever consulting the app, so the route at web.php:10 never
+  # receives the request and the deploy's rm -f here guaranteed the 404.
+  # Discovered 2026-08-07 when the live site had no robots.txt at all.
+  # public/robots.txt names the sitemap on the real domain, statically —
+  # acceptable now the domain is final.
+  cp -f "$LARAVEL_DIR/public/robots.txt" "$DOCROOT/robots.txt" 2>/dev/null || true
 
   # Caches, against the new code. route:cache fails on closure routes, and this
   # app has them — clearing is the correct fallback, not an error.
-  artisan 60 config:cache || true
-  artisan 60 view:clear   || true
-  artisan 60 route:clear  || true
-  artisan 60 route:cache  || artisan 60 route:clear || true
+  #
+  # Skipped when DEPLOY_DOCROOT is set, i.e. a local test run. config:cache bakes
+  # the CURRENT env into bootstrap/cache/config.php, and a cached config beats
+  # every later env var — so exercising this script locally against a scratch
+  # database silently redirected every subsequent artisan command, and the dev
+  # server, to that scratch database. It cost two separate debugging detours
+  # before the cause was spotted. A test harness must not rewrite the developer's
+  # cached config.
+  if [ -z "${DEPLOY_DOCROOT:-}" ]; then
+    artisan 60 config:cache || true
+    artisan 60 view:clear   || true
+    artisan 60 route:clear  || true
+    artisan 60 route:cache  || artisan 60 route:clear || true
+  else
+    log "assets: skipping cache rebuild (local test run)"
+  fi
 
   # Verify before claiming success, so a partial copy retries next cycle rather
   # than being marked done.
