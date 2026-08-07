@@ -18,6 +18,37 @@ Legend: ⬜ not started · 🔨 in progress · ✅ done (owner-confirmed) · �
 
 ---
 
+## Build sequence — and why this order
+
+Agreed 2026-08-07. The order is not the order the page is written in, for one reason:
+
+> **A ranking is worthless on the day it ships.** With zero reviews and zero recorded conversions it
+> ranks nothing. So the parts that *collect* the signals must ship first and start accruing data while
+> the rest is being built. By the time the ranking exists it has months of history to rank on.
+
+**Stage 1 — the demo lifecycle** (C3, B3) ← *start here*
+Everything downstream keys off two facts this stage establishes: **did the demo actually happen**, and
+**which teacher did the student choose**. Reviews gate on the first; conversion rate and ranking need
+both. Today's four statuses (new/scheduled/converted/closed) cannot express "completed but not
+converted", so a review gate and an honest conversion rate are both impossible until this lands.
+
+**Stage 2 — collect the two signals** (D1 reviews, D2 conversion)
+Shipped early precisely because they need *time*, not because they're urgent. Every demo that happens
+from this point forward becomes ranking data.
+
+**Stage 3 — rank and surface it** (D3 + D3a, D5, B1, B2, A2)
+Now there is something to rank. The suggestion engine already exists (`TeacherMatcher`); this stage
+adds the ranking term and turns the staff-only shortlist into the student-facing one.
+
+**Stage 4 — coordination and media** (C1 + C1a, C2, C4, A1, A3, A4, D4)
+The human workflow around the demo, and the profile media that makes a profile worth viewing.
+A1 stays last in this stage because it is blocked on R2 keys regardless.
+
+**Stage 5 — independent tracks** (E student offering, F AI tutor player)
+Neither blocks the flywheel; both can run in parallel or later. F is effectively its own project.
+
+---
+
 ## The core loop
 
 ```
@@ -53,8 +84,11 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
   demo, from their own details (subject, grade, location) against teacher details.
   *Engine exists: `App\Support\TeacherMatcher` (distance + subject), currently staff-only.*
 - ⬜ **B2. Teacher list → profile view → select.** The browse/compare step before booking.
-- ⬜ **B3. Demo booking is the lead.** Selecting a teacher and booking creates the lead record.
+- 🔨 **B3. Demo booking is the lead.** Selecting a teacher and booking creates the lead record.
   *Exists as `DemoRequest`; needs the chosen teacher attached at booking time.*
+  **Stage 1 — in progress.** The teacher a *student chose* and the tutor *staff assigned* are two
+  different facts and must be two different columns, or the conversion metric silently credits the
+  wrong person whenever a coordinator reassigns.
 
 ## C. Demo scheduling & coordination
 
@@ -63,8 +97,12 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
   only through the coordinator? (The matching export is key-gated precisely because these are home
   addresses and phone numbers — the same care applies here.)
 - ⬜ **C2. Coordinator flow for physical demos.** demo → visit → coordinate → confirmation → time slot → final.
-- ⬜ **C3. Demo state machine.** selected → contacted → time-confirmed → scheduled → completed / no-show.
+- 🔨 **C3. Demo state machine.** selected → contacted → time-confirmed → scheduled → completed / no-show.
   *Today `DemoRequest.status` is only new/scheduled/converted/closed — too coarse for this.*
+  **Stage 1 — in progress.** The pivotal missing state is **completed**: without it there is no honest
+  answer to "did this demo happen?", so D1's review gate and D2's conversion denominator are both
+  unbuildable. `converted` is not a substitute — a demo that happened and did *not* convert is exactly
+  the case the ranking must be able to see.
 - ⬜ **C4. Class schedule after a successful demo.** Regular classes scheduled from the demo outcome.
 
 ## D. Reviews & ranking (the heart of the page)

@@ -27,7 +27,20 @@ class DemoRequestController extends Controller {
             // Which of the five booking flows this came from, so the console can
             // filter by it instead of pattern-matching the message text.
             'type'               => 'nullable|in:' . implode(',', DemoRequest::TYPES),
+            // The teacher the STUDENT picked from the suggestions/directory.
+            // Kept distinct from assigned_tutor_id (which only staff set), so a
+            // later coordinator reassignment cannot silently move the
+            // conversion credit off the teacher the family actually chose.
+            'requested_tutor_id' => 'nullable|integer|exists:tutors,id',
         ]);
+
+        // A student may only request a tutor who is actually listed. `exists`
+        // proves the row is real, not that it is public — an unpublished or
+        // draft tutor id would otherwise be bookable by anyone who guessed it.
+        if (! empty($data['requested_tutor_id'])
+            && ! \App\Models\Tutor::published()->whereKey($data['requested_tutor_id'])->exists()) {
+            unset($data['requested_tutor_id']);
+        }
 
         // If the request carries a valid bearer token, link it to that account.
         $user = auth('sanctum')->user();

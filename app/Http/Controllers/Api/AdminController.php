@@ -33,7 +33,7 @@ class AdminController extends Controller {
      */
     public function demoRequests(Request $request) {
         $q = DemoRequest::query()
-            ->with(['student:id,name', 'course:id,name,slug', 'assignedTutor:id,name,slug', 'user:id,name,email'])
+            ->with(['student:id,name', 'course:id,name,slug', 'assignedTutor:id,name,slug', 'requestedTutor:id,name,slug', 'user:id,name,email'])
             ->latest();
         if ($s = $request->string('status')->toString()) $q->where('status', $s);
         if ($t = $request->string('type')->toString())   $q->where('type', $t);
@@ -122,12 +122,28 @@ class AdminController extends Controller {
     public function assignDemo(Request $request, DemoRequest $demoRequest) {
         $data = $request->validate([
             'assigned_tutor_id' => 'nullable|integer|exists:tutors,id',
-            'status'            => 'nullable|in:new,scheduled,converted,closed',
+            // Wired to the model constant, not a literal — the two used to
+            // drift because the vocabulary lived here AND in the console.
+            'status'            => 'nullable|in:' . implode(',', DemoRequest::STATUSES),
             'scheduled_at'      => 'nullable|date',
         ]);
+
+        $before = $demoRequest->status;
+        $after  = $data['status'] ?? $before;
+
+        // The demo happened: stamp it once, and never clear it. A timestamp
+        // rather than a status lookup, so the fact survives a later status
+        // change — it is the conversion denominator and the review gate.
+        if (in_array($after, DemoRequest::HELD, true) && $demoRequest->completed_at === null) {
+            $data['completed_at'] = now();
+        }
+
         $demoRequest->update($data);
 
-        if (($data['status'] ?? null) === 'scheduled') {
+        // Compare the TRANSITION, not the payload. The old check fired on the
+        // incoming value, so re-saving an already-scheduled demo sent the
+        // parent a second identical notification.
+        if ($after === 'scheduled' && $before !== 'scheduled') {
             AppNotification::send(
                 $demoRequest->user_id,
                 'demo_scheduled',
@@ -137,7 +153,7 @@ class AdminController extends Controller {
             );
         }
 
-        return new DemoRequestResource($demoRequest->fresh()->load(['assignedTutor:id,name,slug', 'student:id,name']));
+        return new DemoRequestResource($demoRequest->fresh()->load(['assignedTutor:id,name,slug', 'requestedTutor:id,name,slug', 'student:id,name']));
     }
 
     /**
@@ -237,16 +253,30 @@ class AdminController extends Controller {
             'plan'     => 'nullable|string|max:60',
         ]);
         abort_if($demoRequest->student_id === null, 422, 'This demo has no linked student to enrol.');
+        // Converting twice used to create a SECOND enrolment against the same
+        // demo. The relation is hasOne, so the duplicate was invisible in the
+        // UI while still counted in the DB — and it would have double-counted
+        // this teacher's conversion rate.
+        abort_if($demoRequest->enrollment()->exists(), 422, 'This demo has already been converted to an enrolment.');
 
         $enrollment = Enrollment::create([
             'student_id'      => $demoRequest->student_id,
-            'tutor_id'        => $data['tutor_id'] ?? $demoRequest->assigned_tutor_id,
+            // Explicit override wins; then who actually taught it; then who the
+            // student chose. Without the last term the family's own choice was
+            // silently dropped at the moment of enrolment.
+            'tutor_id'        => $data['tutor_id'] ?? $demoRequest->creditedTutorId(),
             'course_id'       => $demoRequest->course_id,
             'demo_request_id' => $demoRequest->id,
             'plan'            => $data['plan'] ?? null,
             'status'          => 'active',
         ]);
-        $demoRequest->update(['status' => 'converted']);
+        // Converting proves the demo was held, so backfill completed_at for
+        // demos converted straight from 'scheduled' without passing through
+        // 'completed' — otherwise the denominator loses them.
+        $demoRequest->update([
+            'status'       => 'converted',
+            'completed_at' => $demoRequest->completed_at ?? now(),
+        ]);
 
         AppNotification::send(
             $demoRequest->user_id,
@@ -403,6 +433,11 @@ class AdminController extends Controller {
                 'tutors_listed'      => Tutor::where('is_published', true)->count(),
                 'demos_total'        => DemoRequest::count(),
                 'demos_new'          => DemoRequest::where('status', 'new')->count(),
+                // Demos that provably took place — the conversion denominator.
+                // 'converted' is a subset of it, so the rate is converted/held,
+                // never converted/all-bookings (which would count leads that
+                // never got as far as a class).
+                'demos_held'         => DemoRequest::held()->count(),
                 'demos_converted'    => DemoRequest::where('status', 'converted')->count(),
                 'enrollments_active' => Enrollment::where('status', 'active')->count(),
                 'classes_logged'     => ClassLog::count(),

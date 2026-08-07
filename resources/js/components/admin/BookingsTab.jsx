@@ -24,11 +24,17 @@ const TYPES = [
 ];
 const TYPE_LABEL = Object.fromEntries(TYPES.map(t => [t.key, t.label]));
 
+// The demo lifecycle, mirroring App\Models\DemoRequest::STATUSES. 'Completed'
+// is the one that matters: it is what makes a demo reviewable and what the
+// teacher's conversion rate is measured against.
 const STATUSES = [
   { key: '', label: 'All' },
   { key: 'new', label: 'New' },
+  { key: 'contacted', label: 'Contacted' },
   { key: 'scheduled', label: 'Scheduled' },
+  { key: 'completed', label: 'Completed' },
   { key: 'converted', label: 'Converted' },
+  { key: 'no_show', label: 'No show' },
   { key: 'closed', label: 'Closed' },
 ];
 
@@ -120,7 +126,18 @@ export default function BookingsTab() {
         Event sign-ups made before this release were recorded as contact messages and do not appear here.
       </p>
 
-      {details && <BookingDetails booking={details} onClose={() => setDetails(null)} onChanged={refresh} />}
+      {/* Re-read the open booking out of the refreshed list, so acting on it
+          (mark completed, assign) updates the drawer rather than leaving it
+          showing the state it was opened in. Falls back to the captured row if
+          a filter has since excluded it — e.g. marking a demo completed while
+          the "New" chip is active. */}
+      {details && (
+        <BookingDetails
+          booking={rows.find(r => r.id === details.id) ?? details}
+          onClose={() => setDetails(null)}
+          onChanged={refresh}
+        />
+      )}
       {deleting && (
         <ConfirmDialog
           title="Delete this booking?"
@@ -186,6 +203,17 @@ function BookingDetails({ booking, onClose, onChanged }) {
         </p>
       )}
 
+      {booking.requested_tutor && (
+        <p className="mt-3 rounded-lg bg-indigo-50 px-3 py-2 text-xs text-indigo-800">
+          <strong>The family chose {booking.requested_tutor.name}.</strong>
+          {booking.assigned_tutor && booking.assigned_tutor.id !== booking.requested_tutor.id
+            ? ` Currently assigned to ${booking.assigned_tutor.name} — reassigning moves the conversion credit.`
+            : ' Assign them below to keep the booking with the teacher the family picked.'}
+        </p>
+      )}
+
+      <LifecycleBar booking={booking} onChanged={onChanged} />
+
       <div className="mt-5 border-t border-slate-100 pt-4">
         {/* Clear the roster filter on pick, or the select can hide the chosen
             option and render as unselected while the id stays armed. */}
@@ -226,6 +254,39 @@ function BookingDetails({ booking, onClose, onChanged }) {
         {assign.isSuccess && <p className="mt-2 text-xs font-semibold text-green-700">Assigned ✓</p>}
       </div>
     </Modal>
+  );
+}
+
+// Drive the demo through its lifecycle. Only 'Completed' and 'No show' are
+// offered as one-click actions because those two are the ones nothing else
+// sets: 'scheduled' comes from Assign & schedule and 'converted' from Convert
+// to enrolment, and marking a demo completed is what makes it reviewable and
+// countable. 'Contacted' is here so a coordinator can park a booking honestly
+// between "arrived" and "time fixed".
+const NEXT_STATES = [
+  { key: 'contacted', label: 'Mark contacted', when: s => s === 'new' },
+  { key: 'completed', label: 'Demo happened',  when: s => ['new', 'contacted', 'scheduled'].includes(s) },
+  { key: 'no_show',   label: 'No show',        when: s => ['contacted', 'scheduled'].includes(s) },
+];
+
+function LifecycleBar({ booking, onChanged }) {
+  const set = useMutation({
+    mutationFn: (status) => assignDemo(booking.id, { status }),
+    onSuccess: onChanged,
+  });
+  const actions = NEXT_STATES.filter(a => a.when(booking.status));
+  if (actions.length === 0) return null;
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-2">
+      <span className="text-xs font-semibold text-slate-500">Move this demo on:</span>
+      {actions.map(a => (
+        <button key={a.key} type="button" disabled={set.isPending}
+          onClick={() => set.mutate(a.key)}
+          className={btnGhost + ' px-3 py-1.5 text-xs'}>{a.label}</button>
+      ))}
+      {set.isError && <span className="text-xs text-red-600">{errText(set.error)}</span>}
+    </div>
   );
 }
 

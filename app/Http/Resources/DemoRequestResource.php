@@ -20,9 +20,13 @@ class DemoRequestResource extends JsonResource {
             'user_id'        => $this->user_id,
             'student_id'     => $this->student_id,
             'scheduled_at'   => optional($this->scheduled_at)->toDateTimeString(),
+            'completed_at'   => optional($this->completed_at)->toDateTimeString(),
             'course'         => $this->whenLoaded('course', fn () => $this->course?->only(['name', 'slug'])),
             'student'        => $this->whenLoaded('student', fn () => $this->student?->name),
             'assigned_tutor' => $this->whenLoaded('assignedTutor', fn () => $this->assignedTutor ? $this->assignedTutor->only(['id', 'name', 'slug']) : null),
+            // Who the family chose, as opposed to who staff assigned. Shown in
+            // the console so a coordinator can see when they differ.
+            'requested_tutor'=> $this->whenLoaded('requestedTutor', fn () => $this->requestedTutor ? $this->requestedTutor->only(['id', 'name', 'slug']) : null),
             'account'        => $this->whenLoaded('user', fn () => $this->user ? $this->user->only(['name', 'email']) : null),
             'created_at'     => optional($this->created_at)->toDateString(),
         ];

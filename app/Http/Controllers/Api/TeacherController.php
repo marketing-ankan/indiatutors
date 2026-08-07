@@ -64,10 +64,14 @@ class TeacherController extends Controller {
         $tutor = $this->tutorFor($request);
         if (!$tutor) return TeacherDemoResource::collection([]);
 
+        // Expressed as "not finished" rather than a whitelist of live states:
+        // the old whereIn(['new','scheduled']) meant every state added to the
+        // lifecycle silently vanished from the teacher's portal — they would
+        // simply never see a booking sitting in 'contacted'.
         return TeacherDemoResource::collection(
             $tutor->assignedDemos()
                 ->with(['student:id,name', 'course:id,name,slug'])
-                ->whereIn('status', ['new', 'scheduled'])
+                ->whereNotIn('status', ['converted', 'no_show', 'closed'])
                 ->latest()->get()
         );
     }

@@ -897,7 +897,9 @@ function ParentEnrollmentDetail({ id }) {
 
 function RequestsCard() {
   const { data: reqs = [], isLoading } = useQuery({ queryKey:['my-demo-requests'], queryFn: fetchMyDemoRequests });
-  const statusColor = { new:'bg-amber-50 text-amber-700', scheduled:'bg-blue-50 text-blue-700', converted:'bg-green-50 text-green-700', enrolled:'bg-green-50 text-green-700', closed:'bg-slate-100 text-slate-600' };
+  const statusColor = { new:'bg-amber-50 text-amber-700', contacted:'bg-indigo-50 text-indigo-700', scheduled:'bg-blue-50 text-blue-700', completed:'bg-teal-50 text-teal-700', converted:'bg-green-50 text-green-700', enrolled:'bg-green-50 text-green-700', no_show:'bg-red-50 text-red-700', closed:'bg-slate-100 text-slate-600' };
+  // Parents see plain English, not the internal token.
+  const statusLabel = { no_show: 'Not attended', completed: 'Demo done', new: 'Received' };
 
   return (
     <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
@@ -915,7 +917,7 @@ function RequestsCard() {
                   {[r.student, r.grade, r.mode].filter(Boolean).join(' · ')}{r.created_at && ` · requested ${r.created_at}`}
                 </div>
               </div>
-              <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor[r.status]||'bg-slate-100 text-slate-600'}`}>{r.status}</span>
+              <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor[r.status]||'bg-slate-100 text-slate-600'}`}>{statusLabel[r.status] ?? r.status}</span>
             </li>
           ))}
         </ul>
