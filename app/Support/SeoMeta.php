@@ -19,7 +19,7 @@ class SeoMeta {
 
         $meta = self::resolve($path, $base, $canonical, $request);
         return array_merge([
-            'title'       => self::SITE . ' — Live Online Tutoring & Verified Home Tutors Across India',
+            'title'       => self::SITE . ' — Live Online Tutoring & Home Tutors Across India',
             'description' => self::DEFAULT_DESC,
             'image'       => null,
             'type'        => 'website',
@@ -47,7 +47,7 @@ class SeoMeta {
         // Static pages — titles match the live site's <title> per the parity audit.
         static $statics = null;
         $statics ??= [
-            ''                  => ['title' => self::SITE . ' — Live Online Tutoring & Verified Home Tutors Across India'],
+            ''                  => ['title' => self::SITE . ' — Live Online Tutoring & Home Tutors Across India'],
             'courses'           => ['title' => 'Shop — ' . self::SITE, 'description' => 'Browse 130+ live and self-paced courses across academics, coding, music, dance, languages and more.'],
             'find-tutors'       => ['title' => 'Find a Verified Tutor — ' . self::SITE, 'description' => 'Browse verified, qualification-checked tutors by subject, city and mode. Book a free trial class.'],
             'physical-classes'  => ['title' => 'Home Tuition — Find a Home Tutor Near You | ' . self::SITE, 'description' => 'Find verified home tutors near you by pincode, subject and class. Book a free home demo with a tutor who teaches in your area.'],
@@ -63,7 +63,7 @@ class SeoMeta {
             'account'           => ['title' => 'Account & Orders — ' . self::SITE, 'robots' => 'noindex, nofollow'],
             'my-courses'        => ['title' => 'My Courses — ' . self::SITE, 'robots' => 'noindex, nofollow'],
             // Live-parity quirk: WP titles the posts index with the site name twice.
-            'blog'              => ['title' => self::SITE . ' — ' . self::SITE . ' — Live Online Tutoring & Verified Home Tutors Across India', 'description' => 'Practical advice on tutoring, study skills and helping your child learn.'],
+            'blog'              => ['title' => 'Blog — ' . self::SITE, 'description' => 'Practical advice on tutoring, study skills and helping your child learn.'],
             // The four policy pages. Legacy spellings below them 301 here, but
             // keep their entries so a direct hit still resolves a sane title.
             'terms-conditions'  => ['title' => 'Terms & Conditions — ' . self::SITE, 'description' => 'The terms that govern your use of Indiatutors Online — enrolment, scheduling, conduct, intellectual property and liability.'],

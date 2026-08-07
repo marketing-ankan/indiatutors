@@ -139,7 +139,7 @@ export default function PlansPage({ initialCtype = 'oneone' }) {
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">Plans & Pricing</h1>
           <p className="mt-3 text-slate-300 max-w-xl">Affordable, personalised sessions for your kids to excel — flexible plans designed for every learner.</p>
           <div className="mt-5 flex flex-wrap gap-2 text-xs font-semibold">
-            {['🎯 Personalised 1:1 & group','💯 Expert-verified tutors','🌍 20+ countries','⭐ Rated 4.9/5'].map(c => (
+            {['🎯 Personalised 1:1 & group','💯 Expert tutors','🌍 Learners across time zones','🎁 First demo class free'].map(c => (
               <span key={c} className="rounded-full bg-white/12 ring-1 ring-white/25 px-3.5 py-1.5">{c}</span>
             ))}
           </div>
