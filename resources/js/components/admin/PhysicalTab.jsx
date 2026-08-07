@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Eye, ShieldCheck, AlertTriangle, Phone, Loader2 } from 'lucide-react';
+import { Eye, ShieldCheck, AlertTriangle, Phone, Loader2, MapPin } from 'lucide-react';
 import {
   fetchAdminPhysicalProfiles, updateAdminPhysicalProfile,
   fetchAdminRequirements, fetchAdminRequirement, updateAdminRequirement,
+  fetchRequirementSuggestions,
 } from '../../lib/api.js';
 import {
   AdminTable, Chips, SearchBox, Pager, StatusBadge, Modal, btnGhost, errText, day,
@@ -51,7 +52,12 @@ function ProfilesPanel() {
 
   const update = useMutation({
     mutationFn: updateAdminPhysicalProfile,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin-physical-profiles'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-physical-profiles'] });
+      // Suggestions rank only ACTIVE profiles — a pause/activate here must
+      // not leave a stale shortlist cached on any open requirement.
+      qc.invalidateQueries({ queryKey: ['admin-requirement-suggestions'] });
+    },
   });
 
   const rows = data?.data ?? [];
@@ -313,6 +319,8 @@ function RequirementModal({ requirement, onClose }) {
               {r.notes && <p className="mt-1"><strong>Staff notes:</strong> {r.notes}</p>}
             </div>
           )}
+
+          <SuggestionsPanel requirementId={requirement.id} />
         </div>
       )}
 
@@ -338,6 +346,69 @@ function RequirementModal({ requirement, onClose }) {
         matching export and writes the chosen teacher back here.
       </p>
     </Modal>
+  );
+}
+
+// Read-only ranked shortlist for a request — same TeacherMatcher rules as the
+// matching export, anchored on the family's own coordinates when captured.
+// Suggests only: recording the actual assignment stays with the
+// leads-management software, so there is no "assign" button here on purpose.
+const MATCH_LABEL = {
+  same_pincode: 'same pincode', listed_pincode: 'lists this pincode',
+  within_radius: 'within radius', nearby: 'nearby — outside stated radius',
+};
+
+function SuggestionsPanel({ requirementId }) {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['admin-requirement-suggestions', requirementId],
+    queryFn: () => fetchRequirementSuggestions(requirementId),
+    staleTime: 60_000,
+  });
+
+  return (
+    <div>
+      <h4 className="mb-1 text-[11px] font-bold uppercase tracking-wide text-slate-400">
+        Suggested teachers <span className="normal-case font-semibold">(ranked hints — assignment stays in the leads software)</span>
+      </h4>
+      {isLoading && <p className="rounded-lg bg-slate-50 p-3 text-xs text-slate-400"><Loader2 className="inline h-3.5 w-3.5 animate-spin" /> Ranking nearby teachers…</p>}
+      {isError && <p className="rounded-lg bg-red-50 p-3 text-xs text-red-600">Could not load suggestions.</p>}
+      {data && data.data.length === 0 && (
+        <p className="rounded-lg bg-slate-50 p-3 text-xs text-slate-500">
+          No active teacher can plausibly serve this address{data.meta?.subjects?.length ? ' for these subjects' : ''} — widen the radius in the leads software or recruit locally.
+        </p>
+      )}
+      {data && data.data.length > 0 && (
+        <ul className="space-y-1.5">
+          {data.data.map(s => (
+            <li key={s.profile_id} className="rounded-lg bg-slate-50 p-3 text-xs">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <strong className="text-slate-800">{s.name || `Profile #${s.profile_id}`}</strong>
+                {s.distance_km != null && (
+                  <span className="inline-flex items-center gap-0.5 rounded-full bg-brand-50 px-2 py-0.5 font-semibold text-brand-700">
+                    <MapPin className="h-3 w-3" />{s.distance_km} km
+                  </span>
+                )}
+                {(s.match || []).map(m => (
+                  <span key={m} className={`rounded-full px-2 py-0.5 font-semibold ${m === 'nearby' ? 'bg-amber-50 text-amber-700' : 'bg-green-50 text-green-700'}`}>
+                    {MATCH_LABEL[m] || m}
+                  </span>
+                ))}
+                {s.police_verified && <span className="rounded-full bg-green-50 px-2 py-0.5 font-semibold text-green-700">police-verified</span>}
+              </div>
+              <p className="mt-1 text-slate-600">
+                {(s.matched_subjects?.length ? s.matched_subjects : s.offerings.map(o => o.subject)).join(', ') || '—'}
+                {s.experience_years ? ` · ${s.experience_years} y exp` : ''}
+                {s.radius_km ? ` · serves ${s.radius_km} km` : ''}
+                {[s.locality, s.city].filter(Boolean).length ? ` · ${[s.locality, s.city].filter(Boolean).join(', ')}` : ''}
+              </p>
+              {(s.phone || s.email) && (
+                <p className="mt-0.5 text-slate-500">{[s.phone, s.email].filter(Boolean).join(' · ')}</p>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

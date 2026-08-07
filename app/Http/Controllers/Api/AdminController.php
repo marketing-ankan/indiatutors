@@ -140,6 +140,96 @@ class AdminController extends Controller {
         return new DemoRequestResource($demoRequest->fresh()->load(['assignedTutor:id,name,slug', 'student:id,name']));
     }
 
+    /**
+     * Read-only ranked hints for the booking drawer: which directory tutors
+     * fit this demo request. Online bookings have no location to measure, so
+     * this ranks on subject / grade / mode / city — each hit is named in
+     * `why` so staff see the reasoning, not just an ordering. Physical
+     * bookings exclude online-only tutors outright; nothing else is filtered,
+     * a weak match is still worth a phone call.
+     *
+     * The tutor directory is small (tens of rows), so scoring in PHP over the
+     * published set is simpler and no slower than pushing CSV-column matching
+     * into SQL.
+     */
+    public function demoSuggestions(DemoRequest $demoRequest) {
+        // The Mode select (online / home tutor) is offered on every booking
+        // flow, not just the 'physical' one — honour either signal.
+        $wantsHome = $demoRequest->type === 'physical' || $demoRequest->mode === 'home';
+        $city      = mb_strtolower(trim((string) $demoRequest->city));
+        $gradeNum  = preg_match('/(\d{1,2})/', (string) $demoRequest->grade, $m) ? (int) $m[1] : null;
+
+        // "Maths & Science" / "Physics, Chemistry" → ['math','science',…];
+        // tokens under 3 chars are noise ("ap", "&"). 'maths' must become
+        // 'math' or it never substring-matches a tutor row's "Mathematics".
+        $tokens = collect(preg_split('/[,\/&+]|\band\b/i', mb_strtolower(trim((string) $demoRequest->subject))))
+            ->map(fn ($t) => trim($t))
+            ->map(fn ($t) => $t === 'maths' ? 'math' : $t)
+            ->filter(fn ($t) => mb_strlen($t) >= 3)->values();
+
+        $rows = Tutor::published()->get()
+            ->map(function (Tutor $t) use ($tokens, $gradeNum, $wantsHome, $city) {
+                $mode = $t->teaching_mode ?: 'online';
+                if ($wantsHome && ! in_array($mode, ['home', 'both'], true)) {
+                    return null; // cannot visit a home, whatever else fits
+                }
+
+                $why   = [];
+                $score = 0;
+
+                $subjects = mb_strtolower((string) $t->subjects);
+                if ($tokens->first(fn ($tok) => str_contains($subjects, $tok))) {
+                    $score += 3;
+                    $why[]  = 'subject';
+                }
+
+                if ($gradeNum !== null && $t->grades) {
+                    foreach (preg_split('/[,\s]+/', (string) $t->grades, -1, PREG_SPLIT_NO_EMPTY) as $g) {
+                        $hit = preg_match('/^(\d{1,2})\s*-\s*(\d{1,2})$/', $g, $r)
+                            ? ($gradeNum >= (int) $r[1] && $gradeNum <= (int) $r[2])
+                            : (ctype_digit($g) && (int) $g === $gradeNum);
+                        if ($hit) {
+                            $score += 1;
+                            $why[]  = 'grade';
+                            break;
+                        }
+                    }
+                }
+
+                if ($wantsHome) {
+                    $why[] = 'home-visits';
+                    $score += 1;
+                    if ($city !== '' && mb_strtolower((string) $t->city) === $city) {
+                        $score += 2;
+                        $why[]  = 'same-city';
+                    }
+                }
+
+                return $score > 0 ? ['tutor' => $t, 'score' => $score, 'why' => $why] : null;
+            })
+            ->filter()
+            ->sortBy([
+                fn ($a, $b) => $b['score'] <=> $a['score'],
+                fn ($a, $b) => ((int) $b['tutor']->experience_years) <=> ((int) $a['tutor']->experience_years),
+                fn ($a, $b) => $a['tutor']->position <=> $b['tutor']->position,
+            ])
+            ->take(8)->values();
+
+        return response()->json([
+            'data' => $rows->map(fn ($r) => [
+                'id'               => $r['tutor']->id,
+                'name'             => $r['tutor']->name,
+                'subjects'         => $r['tutor']->subjects_list,
+                'city'             => $r['tutor']->city,
+                'teaching_mode'    => $r['tutor']->teaching_mode,
+                'experience_years' => $r['tutor']->experience_years,
+                'verified'         => (bool) $r['tutor']->verified,
+                'why'              => $r['why'],
+            ])->all(),
+            'meta' => ['count' => $rows->count()],
+        ]);
+    }
+
     /** Convert a demo request into an enrollment (student + tutor + course). */
     public function convert(Request $request, DemoRequest $demoRequest) {
         $data = $request->validate([

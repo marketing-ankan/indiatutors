@@ -180,6 +180,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(\App\Http\Middleware\EnsureAdmin::class)->prefix('admin')->group(function () {
         Route::get('/overview',                          [AdminController::class, 'overview']);
         Route::get('/demo-requests',                     [AdminController::class, 'demoRequests']);
+        Route::get('/demo-requests/{demoRequest}/suggestions', [AdminController::class, 'demoSuggestions']);
         Route::patch('/demo-requests/{demoRequest}',     [AdminController::class, 'assignDemo']);
         Route::delete('/demo-requests/{demoRequest}',    [AdminController::class, 'destroyDemoRequest']);
         Route::post('/demo-requests/{demoRequest}/convert',[AdminController::class, 'convert']);
@@ -234,6 +235,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::patch('/physical/profiles/{profile}',         [AdminPhysicalController::class, 'updateProfile']);
             Route::get('/physical/requirements',                 [AdminPhysicalController::class, 'requirements']);
             Route::get('/physical/requirements/{requirement}',   [AdminPhysicalController::class, 'requirement']);
+            Route::get('/physical/requirements/{requirement}/suggestions', [AdminPhysicalController::class, 'suggestions']);
             Route::patch('/physical/requirements/{requirement}', [AdminPhysicalController::class, 'updateRequirement']);
         });
 

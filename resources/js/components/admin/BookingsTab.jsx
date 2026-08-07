@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Trash2, UserCheck, GraduationCap } from 'lucide-react';
+import { Trash2, UserCheck, GraduationCap, Sparkles } from 'lucide-react';
 import {
   fetchAdminDemoRequests, fetchTutors, assignDemo, convertDemo, deleteAdminDemo,
+  fetchDemoSuggestions,
 } from '../../lib/api.js';
 import {
   AdminTable, Chips, SearchBox, Pager, StatusBadge, Modal, ConfirmDialog,
@@ -186,6 +187,10 @@ function BookingDetails({ booking, onClose, onChanged }) {
       )}
 
       <div className="mt-5 border-t border-slate-100 pt-4">
+        {/* Clear the roster filter on pick, or the select can hide the chosen
+            option and render as unselected while the id stays armed. */}
+        <DemoSuggestions bookingId={booking.id} onPick={id => { setTutorId(String(id)); setTutorQuery(''); }} />
+
         <label className="mb-1 block text-xs font-semibold text-slate-700">Record the assigned tutor</label>
         <input value={tutorQuery} onChange={e => setTutorQuery(e.target.value)}
           placeholder="Search by name, subject or city…" className={inp + ' mb-2'} />
@@ -197,7 +202,7 @@ function BookingDetails({ booking, onClose, onChanged }) {
           <p className="mt-1 text-xs text-slate-500">No tutor matches “{tutorQuery}”.</p>
         )}
         <p className="mt-1 text-[11px] text-slate-400">
-          Listed alphabetically, not ranked — who to assign is decided in the leads-management software.
+          The full roster, listed alphabetically — the suggestions above are ranked hints, the final call is yours.
         </p>
 
         <div className="mt-3 flex flex-wrap items-end gap-2">
@@ -221,5 +226,46 @@ function BookingDetails({ booking, onClose, onChanged }) {
         {assign.isSuccess && <p className="mt-2 text-xs font-semibold text-green-700">Assigned ✓</p>}
       </div>
     </Modal>
+  );
+}
+
+// Ranked hints for the picker below: subject / grade / mode / city fits, each
+// named so staff see WHY a tutor is proposed. Clicking one fills the select —
+// it does not assign; the buttons below still do that explicitly.
+const WHY_LABEL = { subject: 'subject', grade: 'grade', 'home-visits': 'home visits', 'same-city': 'same city' };
+
+function DemoSuggestions({ bookingId, onPick }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['admin-demo-suggestions', bookingId],
+    queryFn: () => fetchDemoSuggestions(bookingId),
+    staleTime: 60_000,
+  });
+
+  if (isLoading) return <p className="mb-3 text-xs text-slate-400">Ranking suggested tutors…</p>;
+  if (!data || data.data.length === 0) return null; // nothing scored — the plain roster below is the honest view
+
+  return (
+    <div className="mb-4">
+      <p className="mb-1.5 flex items-center gap-1 text-xs font-semibold text-slate-700">
+        <Sparkles className="h-3.5 w-3.5 text-brand-600" /> Suggested for this booking
+      </p>
+      <ul className="space-y-1">
+        {data.data.map(t => (
+          <li key={t.id}>
+            <button type="button" onClick={() => onPick(t.id)}
+              className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-lg bg-slate-50 px-3 py-2 text-left text-xs ring-1 ring-transparent transition hover:bg-brand-50 hover:ring-brand-200">
+              <strong className="text-slate-800">{t.name}</strong>
+              <span className="text-slate-500">{(t.subjects || []).slice(0, 3).join(', ')}{t.city ? ` · ${t.city}` : ''}{t.experience_years ? ` · ${t.experience_years} y` : ''}</span>
+              <span className="ml-auto flex flex-wrap gap-1">
+                {(t.why || []).map(w => (
+                  <span key={w} className="rounded-full bg-brand-50 px-2 py-0.5 font-semibold text-brand-700">{WHY_LABEL[w] || w}</span>
+                ))}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-1 text-[11px] text-slate-400">Click a suggestion to fill the picker — nothing is assigned until you press the button.</p>
+    </div>
   );
 }

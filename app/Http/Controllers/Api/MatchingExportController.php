@@ -145,35 +145,15 @@ class MatchingExportController extends Controller
                 fn ($o) => $o->where('subject', 'like', "%{$subject}%")))
             ->get()
             ->map(function (PhysicalTeachingProfile $p) use ($pin, $centre, $withinKm) {
-                $reasons = [];
-                $km      = null;
+                // Qualification + reason semantics live in TeacherMatcher so the
+                // Staff Console suggestions can never drift from this export.
+                $q = \App\Support\TeacherMatcher::qualify($p, $pin, $centre, $withinKm);
 
-                if ((string) $p->pincode === $pin) {
-                    $reasons[] = 'same_pincode';
-                }
-                if (in_array($pin, (array) ($p->extra_pincodes ?? []), true)) {
-                    $reasons[] = 'listed_pincode';
-                }
-                if ($p->latitude !== null && $p->longitude !== null) {
-                    $km = self::haversineKm(
-                        (float) $centre['latitude'], (float) $centre['longitude'],
-                        (float) $p->latitude, (float) $p->longitude
-                    );
-                    if ((float) $p->service_radius_km > 0 && $km <= (float) $p->service_radius_km) {
-                        $reasons[] = 'within_radius';
-                    } elseif ($km <= $withinKm && ! $reasons) {
-                        $reasons[] = 'nearby';
-                    }
-                }
-
-                return $reasons ? ['profile' => $p, 'km' => $km, 'reasons' => $reasons] : null;
+                return $q ? ['profile' => $p] + $q : null;
             })
-            ->filter()
-            // Hard qualifiers first, then plain distance. 'nearby' rows sink.
-            ->sortBy([
-                fn ($a, $b) => (int) ($a['reasons'] === ['nearby']) <=> (int) ($b['reasons'] === ['nearby']),
-                fn ($a, $b) => ($a['km'] ?? 9e9) <=> ($b['km'] ?? 9e9),
-            ])
+            ->filter();
+
+        $rows = \App\Support\TeacherMatcher::rank($rows)
             ->take(min((int) $request->integer('per_page', 25), 100))
             ->values();
 
@@ -191,17 +171,6 @@ class MatchingExportController extends Controller
                 'count'     => $rows->count(),
             ],
         ]);
-    }
-
-    private static function haversineKm(float $lat1, float $lng1, float $lat2, float $lng2): float
-    {
-        $r = 6371.0;
-        $dLat = deg2rad($lat2 - $lat1);
-        $dLng = deg2rad($lng2 - $lng1);
-        $a = sin($dLat / 2) ** 2
-           + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
-
-        return 2 * $r * asin(min(1.0, sqrt($a)));
     }
 
     public function teacher(PhysicalTeachingProfile $profile)

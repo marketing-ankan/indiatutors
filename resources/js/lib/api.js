@@ -130,6 +130,7 @@ export const deleteExamUpdate = async (id) => { await api.delete(`/admin/exam-up
 
 // Admin (staff)
 export const fetchAdminDemoRequests = async (p={}) => { const { data } = await api.get('/admin/demo-requests', { params: typeof p === 'string' ? { status: p } : p }); return data; };
+export const fetchDemoSuggestions   = async (id) => { const { data } = await api.get(`/admin/demo-requests/${id}/suggestions`); return data; };
 export const fetchAdminTeachers = async (status='') => { const { data } = await api.get('/admin/teachers', { params:{ status } }); return data; };
 export const approveTeacher     = async (id, status) => { const { data } = await api.patch(`/admin/teachers/${id}`, { status }); return data.data; };
 export const assignDemo       = async (id, payload) => { const { data } = await api.patch(`/admin/demo-requests/${id}`, payload); return data.data; };
@@ -258,6 +259,7 @@ export const fetchAdminPhysicalProfile  = async (id) => { const { data } = await
 export const updateAdminPhysicalProfile = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/physical/profiles/${id}`, p); return data.data; };
 export const fetchAdminRequirements     = async (p={}) => { const { data } = await api.get('/admin/physical/requirements', { params:p }); return data; };
 export const fetchAdminRequirement      = async (id) => { const { data } = await api.get(`/admin/physical/requirements/${id}`); return data.data; };
+export const fetchRequirementSuggestions = async (id) => { const { data } = await api.get(`/admin/physical/requirements/${id}/suggestions`); return data; };
 export const updateAdminRequirement     = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/physical/requirements/${id}`, p); return data.data; };
 
 export const fetchAdminLessons      = async (courseId) => { const { data } = await api.get(`/admin/video-courses/${courseId}/lessons`); return data.data; };
