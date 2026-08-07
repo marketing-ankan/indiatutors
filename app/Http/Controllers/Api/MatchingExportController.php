@@ -72,6 +72,13 @@ class MatchingExportController extends Controller
 
     public function teachers(Request $request)
     {
+        // ?near=<pincode> switches the endpoint from sync-feed mode to
+        // suggestion mode — see nearTeachers(). Kept as a mode of the same
+        // route so the consumer needs exactly one URL and one key.
+        if ($request->filled('near')) {
+            return $this->nearTeachers($request);
+        }
+
         $q = PhysicalTeachingProfile::query()
             ->with(['offerings', 'slots', 'exceptions', 'user:id,name,email,phone'])
             ->when($request->filled('status'), fn ($b) => $b->where('status', $request->string('status')),
@@ -87,6 +94,114 @@ class MatchingExportController extends Controller
             'data' => collect($page->items())->map(fn ($p) => $this->teacherPayload($p))->all(),
             'meta' => $this->meta($page),
         ]);
+    }
+
+    /**
+     * Suggestion mode: teachers who can plausibly serve ?near=<pincode>,
+     * ranked by distance, each row annotated with WHY it qualifies.
+     *
+     * This lives on the SITE and not in the consumer because only the site
+     * has the pincode centroids (PincodeDirectory) — the LMS sees six digits;
+     * the distance math is only honest on this side of the wire. The
+     * distances are centroid-to-point or centroid-to-centroid: good to a few
+     * km, which is match-shortlist accuracy, not routing accuracy — the
+     * `approx` flag says which.
+     *
+     * A teacher qualifies by any of:
+     *   same_pincode    — profile pincode equals the target
+     *   listed_pincode  — target appears in extra_pincodes (their explicit
+     *                     "I also serve" list; reachable regardless of radius)
+     *   within_radius   — haversine distance <= their service_radius_km
+     *   nearby          — within ?within_km (default 25, cap 100) but outside
+     *                     their stated radius; shown so a coordinator can ask
+     *                     "would you stretch 3km for this one?", ranked last
+     *
+     * ?subject=<name> additionally requires an offering whose subject contains
+     * the string case-insensitively.
+     */
+    private function nearTeachers(Request $request)
+    {
+        $pin = preg_replace('/\D/', '', (string) $request->string('near'));
+        if (strlen($pin) !== 6) {
+            return response()->json(['message' => 'near must be a 6-digit pincode'], 422);
+        }
+
+        $centre = \App\Support\PincodeDirectory::lookup($pin);
+        if (! $centre || ! isset($centre['latitude'], $centre['longitude']) || $centre['latitude'] === null) {
+            return response()->json([
+                'data' => [],
+                'meta' => ['near' => $pin, 'resolved' => false,
+                           'note' => 'Unknown pincode — no centroid available, no distance ranking possible.'],
+            ]);
+        }
+
+        $withinKm = min(max((float) $request->input('within_km', 25), 1), 100);
+        $subject  = trim((string) $request->string('subject'));
+
+        $rows = PhysicalTeachingProfile::query()
+            ->with(['offerings', 'slots', 'exceptions', 'user:id,name,email,phone'])
+            ->where('status', 'active')
+            ->when($subject !== '', fn ($b) => $b->whereHas('offerings',
+                fn ($o) => $o->where('subject', 'like', "%{$subject}%")))
+            ->get()
+            ->map(function (PhysicalTeachingProfile $p) use ($pin, $centre, $withinKm) {
+                $reasons = [];
+                $km      = null;
+
+                if ((string) $p->pincode === $pin) {
+                    $reasons[] = 'same_pincode';
+                }
+                if (in_array($pin, (array) ($p->extra_pincodes ?? []), true)) {
+                    $reasons[] = 'listed_pincode';
+                }
+                if ($p->latitude !== null && $p->longitude !== null) {
+                    $km = self::haversineKm(
+                        (float) $centre['latitude'], (float) $centre['longitude'],
+                        (float) $p->latitude, (float) $p->longitude
+                    );
+                    if ((float) $p->service_radius_km > 0 && $km <= (float) $p->service_radius_km) {
+                        $reasons[] = 'within_radius';
+                    } elseif ($km <= $withinKm && ! $reasons) {
+                        $reasons[] = 'nearby';
+                    }
+                }
+
+                return $reasons ? ['profile' => $p, 'km' => $km, 'reasons' => $reasons] : null;
+            })
+            ->filter()
+            // Hard qualifiers first, then plain distance. 'nearby' rows sink.
+            ->sortBy([
+                fn ($a, $b) => (int) ($a['reasons'] === ['nearby']) <=> (int) ($b['reasons'] === ['nearby']),
+                fn ($a, $b) => ($a['km'] ?? 9e9) <=> ($b['km'] ?? 9e9),
+            ])
+            ->take(min((int) $request->integer('per_page', 25), 100))
+            ->values();
+
+        return response()->json([
+            'data' => $rows->map(fn ($r) => $this->teacherPayload($r['profile']) + [
+                'distance_km' => $r['km'] !== null ? round($r['km'], 1) : null,
+                'match'       => $r['reasons'],
+            ])->all(),
+            'meta' => [
+                'near'      => $pin,
+                'resolved'  => true,
+                'centre'    => ['district' => $centre['district'] ?? null, 'state' => $centre['state'] ?? null],
+                'approx'    => ($centre['source'] ?? null) !== 'device',
+                'within_km' => $withinKm,
+                'count'     => $rows->count(),
+            ],
+        ]);
+    }
+
+    private static function haversineKm(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $r = 6371.0;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+        $a = sin($dLat / 2) ** 2
+           + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
+
+        return 2 * $r * asin(min(1.0, sqrt($a)));
     }
 
     public function teacher(PhysicalTeachingProfile $profile)
