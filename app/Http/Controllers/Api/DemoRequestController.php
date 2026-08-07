@@ -42,6 +42,14 @@ class DemoRequestController extends Controller {
         }
 
         $demo = DemoRequest::create($data + ['status' => 'new']);
+
+        // Copy into the LMS (best-effort, after the save — see LmsLeadPush).
+        // Course name resolved here because the LMS has no course_id concept.
+        $courseName = !empty($data['course_id'])
+            ? \App\Models\Course::whereKey($data['course_id'])->value('name')
+            : null;
+        \App\Support\LmsLeadPush::demoRequest($demo, $courseName);
+
         return response()->json(['message' => 'Demo request received. Our team will contact you within 24 hours.', 'id' => $demo->id], 201);
     }
 

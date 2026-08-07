@@ -102,4 +102,15 @@ return [
         'key' => env('MATCHING_API_KEY'),
     ],
 
+    // The IndiaTutors LMS (leads console, its own Hostinger slot). New
+    // enquiries are pushed to its POST /api/leads/intake so staff work them
+    // there instead of in seven write-only tables. Base URL unset = the push
+    // is off and enquiries are stored locally only — the site must never
+    // depend on the LMS being up. One env edit per side moves either domain.
+    'lms' => [
+        'base_url'     => env('LMS_BASE_URL', ''),
+        'intake_token' => env('LMS_INTAKE_TOKEN', ''),
+        'brand'        => env('LMS_BRAND', 'indiatutors-online'),
+    ],
+
 ];
