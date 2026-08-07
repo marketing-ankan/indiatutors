@@ -131,6 +131,11 @@ class TuitionRequirementController extends Controller
 
         $requirement = TuitionRequirement::create($data);
 
+        // Copy the enquiry into the LMS so staff see it there. AFTER the save,
+        // best-effort, bounded at ~3s — a dead LMS costs the visitor nothing
+        // but latency, never their submission.
+        \App\Support\LmsLeadPush::tuitionRequirement($requirement->fresh());
+
         return (new TuitionRequirementResource($requirement))
             ->additional(['message' => "Requirement {$requirement->fresh()->code} received — our team will match a tutor near you and call you back."])
             ->response()->setStatusCode(201);

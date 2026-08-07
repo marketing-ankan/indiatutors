@@ -43,6 +43,10 @@ class ContactController extends Controller {
         ]);
         $ticket->addMessage($data['message'], $user, false);
 
+        // Copy into the LMS (best-effort, after the save — see LmsLeadPush;
+        // it skips newsletter signups and tickets with no phone AND no email).
+        \App\Support\LmsLeadPush::contactTicket($ticket->fresh());
+
         return response()->json([
             'message' => "Thanks — we'll be in touch soon.",
             'id'      => $ticket->id,
