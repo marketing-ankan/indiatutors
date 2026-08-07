@@ -242,12 +242,21 @@ export const WHATSAPP_TESTIMONIALS = [
   { init: 'V', name: 'Vikram', time: '8:55 PM', text: 'From shy to confident in three months. Worth every rupee. Thank you team! 💙' },
 ];
 
-// Instagram account. Post thumbnails come from /api/social/instagram once
-// INSTAGRAM_ACCESS_TOKEN is set; until then the section renders a follow
-// invitation rather than inventing posts.
+// Instagram feed (WinQuest product-page parity). PLACEHOLDER tiles — swap the
+// handle + real post thumbnails/links when the Instagram integration is ready.
 export const INSTAGRAM = {
   handle: 'indiatutorsonline',
   url: 'https://www.instagram.com/indiatutorsonline',
+  posts: [
+    { emoji: '🎨', tint: 'from-[#F58529] to-[#DD2A7B]' },
+    { emoji: '🎹', tint: 'from-[#DD2A7B] to-[#8134AF]' },
+    { emoji: '🧮', tint: 'from-[#8134AF] to-[#515BD4]' },
+    { emoji: '♟️', tint: 'from-[#515BD4] to-[#F58529]' },
+    { emoji: '🐍', tint: 'from-[#F58529] to-[#8134AF]' },
+    { emoji: '🎻', tint: 'from-[#DD2A7B] to-[#515BD4]' },
+    { emoji: '💃', tint: 'from-[#8134AF] to-[#F58529]' },
+    { emoji: '🗣️', tint: 'from-[#515BD4] to-[#DD2A7B]' },
+  ],
 };
 
 // Course-name → PRICING.rates row lookup, so the product-page buy card shows

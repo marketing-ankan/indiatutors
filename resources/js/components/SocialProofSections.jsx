@@ -206,56 +206,36 @@ function LatestNews() {
   );
 }
 
-// Shown until the Instagram Graph token is configured (and whenever the feed
-// comes back empty). A follow invitation is honest about having nothing to
-// show yet; eight emoji-on-gradient tiles pretending to be posts were not.
-function InstagramInvite() {
-  return (
-    <section className="py-14 bg-white">
-      <div className="container-wide">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF] px-6 py-12 text-center text-white shadow-[0_10px_40px_rgba(129,52,175,.22)] sm:px-12">
-          <span aria-hidden="true" className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-white/10" />
-          <span aria-hidden="true" className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-white/10" />
-          <span className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/30">
-            <Instagram className="h-8 w-8" />
-          </span>
-          <h2 className="relative mt-5 font-heading text-2xl font-extrabold sm:text-3xl">Follow Us on Instagram</h2>
-          <p className="relative mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/90">
-            Class highlights, student artwork, exam tips and behind-the-scenes moments from our
-            teachers — all on <strong className="font-bold">@{INSTAGRAM.handle}</strong>.
-          </p>
-          <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"
-            className="relative mt-7 inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3 text-sm font-bold text-[#C1246B] shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-            <Instagram className="h-4 w-4" /> Follow @{INSTAGRAM.handle}
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 // Instagram Feed — real latest posts via /api/social/instagram when the token
-// is configured (auto-refresh hourly).
+// is configured (auto-refresh hourly); placeholder tiles until then.
 function InstagramFeed() {
   const { data } = useQuery({ queryKey: ['social-instagram'], queryFn: fetchSocialInstagram, staleTime: 3600_000 });
   const posts = data?.configured ? (data.data || []) : [];
-  if (!posts.length) return <InstagramInvite />;
-
   return (
     <section className="py-14 bg-white">
       <div className="container-wide">
         <SectionHead>Instagram Feed</SectionHead>
         <p className="text-center text-slate-500 -mt-6 mb-9">A glimpse into our classes, creativity &amp; student success — straight from our Instagram 📷✨</p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8">
-          {posts.slice(0, 8).map(p => (
-            <a key={p.id} href={p.permalink} target="_blank" rel="noopener noreferrer"
-              className="group relative aspect-square overflow-hidden rounded-xl bg-slate-100">
-              <img src={p.image} alt={p.caption || 'Instagram post'} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.05]" />
-              <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/30 group-hover:opacity-100">
-                <Instagram className="h-6 w-6 text-white" />
-              </span>
-            </a>
-          ))}
+          {posts.length > 0
+            ? posts.slice(0, 8).map(p => (
+              <a key={p.id} href={p.permalink} target="_blank" rel="noopener noreferrer"
+                className="group relative aspect-square overflow-hidden rounded-xl bg-slate-100">
+                <img src={p.image} alt={p.caption || 'Instagram post'} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.05]" />
+                <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/30 group-hover:opacity-100">
+                  <Instagram className="h-6 w-6 text-white" />
+                </span>
+              </a>
+            ))
+            : INSTAGRAM.posts.map((p, i) => (
+              <a key={i} href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"
+                className={`group relative flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br ${p.tint} text-4xl transition-transform duration-300 hover:scale-[1.03]`}>
+                <span>{p.emoji}</span>
+                <span className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/30 group-hover:opacity-100">
+                  <Instagram className="h-6 w-6 text-white" />
+                </span>
+              </a>
+            ))}
         </div>
         <div className="mt-8 text-center">
           <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"
