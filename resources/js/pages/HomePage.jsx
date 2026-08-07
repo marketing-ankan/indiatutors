@@ -597,7 +597,7 @@ export default function HomePage() {
           <div className="mt-8 flex flex-col sm:flex-row flex-wrap gap-x-8 gap-y-3 justify-center text-sm text-white/85">
             <a href="tel:+919330811581" className="inline-flex items-center gap-2 hover:text-white"><Phone className="h-4 w-4" aria-hidden="true" />+91 93308 11581</a>
             <a href="tel:+13023065099" className="inline-flex items-center gap-2 hover:text-white"><Phone className="h-4 w-4" aria-hidden="true" />(+1) 302 306 5099</a>
-            <a href="mailto:contact@indiatutorsonline.com" className="inline-flex items-center gap-2 hover:text-white"><Mail className="h-4 w-4" aria-hidden="true" />contact@indiatutorsonline.com</a>
+            <a href="mailto:connect@indiatutorsonline.com" className="inline-flex items-center gap-2 hover:text-white"><Mail className="h-4 w-4" aria-hidden="true" />connect@indiatutorsonline.com</a>
           </div>
         </div>
       </section>
