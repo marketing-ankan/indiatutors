@@ -199,7 +199,7 @@ export default function CoursesPage() {
             <div className="rounded-xl bg-gradient-to-br from-[#0B1220] to-brand-800 p-4 text-white">
               <p className="text-sm font-bold">🎁 First demo class is free</p>
               <Link to="/book-demo" className="mt-3 block rounded-lg bg-[#D4AF37] px-4 py-2 text-center text-sm font-bold text-[#0B1220] hover:brightness-105">Book a Free Demo</Link>
-              <Link to="/plans-pricing" className="mt-2 block rounded-lg border border-white/50 px-4 py-2 text-center text-sm font-bold hover:bg-white/10">See Plans &amp; Pricing</Link>
+              <Link to="/plans" className="mt-2 block rounded-lg border border-white/50 px-4 py-2 text-center text-sm font-bold hover:bg-white/10">See Plans &amp; Pricing</Link>
             </div>
           </aside>
 

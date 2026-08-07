@@ -118,7 +118,9 @@ export default function TutorProfilePage() {
         <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-20 h-[420px] w-[420px] rounded-full" style={{ background: 'radial-gradient(circle,rgba(30,64,175,.30) 0%,transparent 70%)' }} />
         <div aria-hidden="true" className="pointer-events-none absolute -bottom-[60px] -left-[60px] h-[280px] w-[280px] rounded-full" style={{ background: 'radial-gradient(circle,rgba(0,180,216,.16) 0%,transparent 70%)' }} />
         <div className="container-wide relative pt-[60px]">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-green-600/40 bg-green-600/[.18] px-3.5 py-[5px] text-[0.70rem] font-bold uppercase tracking-[.10em] text-green-300">✓ Verified Tutor</div>
+          {tutor.verified && (
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-green-600/40 bg-green-600/[.18] px-3.5 py-[5px] text-[0.70rem] font-bold uppercase tracking-[.10em] text-green-300">✓ Verified Tutor</div>
+          )}
           <div className="mt-[18px] grid items-end gap-9 sm:grid-cols-[200px_1fr]">
             <div>
               {tutor.image_url
