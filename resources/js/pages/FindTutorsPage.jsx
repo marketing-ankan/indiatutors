@@ -90,7 +90,7 @@ export default function FindTutorsPage({ subjectOverride = '' }) {
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">Find Tutors</h1>
           <p className="mt-3 text-slate-300 max-w-xl">Connect with expert tutors for online classes and home tuition across India. {isLoading ? '…' : results.length} tutors available.</p>
           <div className="mt-6 flex flex-wrap gap-8">
-            {[[isLoading ? '…' : results.length, 'Tutors Found'], ['100%', 'Verified Profiles'], ['₹0', 'Platform Fee']].map(([n,l]) => (
+            {[[isLoading ? '…' : results.length, 'Tutors Found'], [isLoading ? '…' : results.filter(t => t.verified).length, 'Verified Profiles'], ['₹0', 'Platform Fee']].map(([n,l]) => (
               <div key={l}><div className="text-2xl font-extrabold">{n}</div><div className="text-xs text-slate-400 font-semibold">{l}</div></div>
             ))}
           </div>

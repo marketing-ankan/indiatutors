@@ -28,10 +28,10 @@ export default function CityPage() {
           </div>
           <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight">Online &amp; Home Tutors in {name}</h1>
           <p className="mt-4 text-lg text-slate-300 max-w-2xl">
-            Verified, qualification-checked tutors for live 1-on-1 and home tuition across {name}{state ? `, ${state}` : ''}. Book a free trial class today.
+            Experienced tutors for live 1-on-1 and home tuition across {name}{state ? `, ${state}` : ''} — verified tutors carry a badge on their profile. Book a free trial class today.
           </p>
           <div className="mt-6 flex flex-wrap gap-6 text-sm">
-            <span className="inline-flex items-center gap-2"><Users className="h-4 w-4 text-brand-300"/><b>{tutor_count}</b> verified tutors</span>
+            <span className="inline-flex items-center gap-2"><Users className="h-4 w-4 text-brand-300"/><b>{tutor_count}</b> tutors</span>
             <span className="inline-flex items-center gap-2"><BookOpen className="h-4 w-4 text-brand-300"/><b>{subjects.length}</b> subjects</span>
             {localities.length > 0 && <span className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-brand-300"/><b>{localities.length}</b> localities covered</span>}
           </div>
@@ -59,7 +59,7 @@ export default function CityPage() {
           <div className="flex items-end justify-between mb-6">
             <div>
               <h2 className="text-2xl font-extrabold">Meet tutors in {name}</h2>
-              <p className="text-sm text-slate-500 mt-1">{tutor_count} verified educator{tutor_count===1?'':'s'} ready to teach.</p>
+              <p className="text-sm text-slate-500 mt-1">{tutor_count} educator{tutor_count===1?'':'s'} ready to teach.</p>
             </div>
             <Link to={`/find-tutors?city=${encodeURIComponent(name)}`} className="text-sm font-semibold text-brand-600 hover:text-brand-700 whitespace-nowrap">See all →</Link>
           </div>

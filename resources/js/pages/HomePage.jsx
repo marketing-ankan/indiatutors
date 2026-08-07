@@ -502,8 +502,7 @@ export default function HomePage() {
             {TEACHERS.map(t => (
               <article key={t.slug} className="group flex-shrink-0 snap-start w-[240px] sm:w-[260px] rounded-2xl bg-[#EEF3FC] border border-brand-600/10 shadow-[0_2px_12px_rgba(0,0,0,.07)] p-7 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-brand-300">
                 <img src={t.img} alt={t.name} width="80" height="80" className="mx-auto w-20 h-20 rounded-full object-cover ring-2 ring-transparent transition-all duration-300 group-hover:scale-105 group-hover:ring-brand-300" loading="lazy" />
-                <p className="mt-3 text-[13px] font-bold text-green-600">✓ Verified</p>
-                <h3 className="mt-1 font-heading font-bold text-slate-900">{t.name}</h3>
+                <h3 className="mt-3 font-heading font-bold text-slate-900">{t.name}</h3>
                 <p className="mt-1 text-[13px] text-slate-500 leading-snug min-h-[2.4rem]">{t.subj}</p>
                 <p className="mt-1 text-xs text-slate-400">{t.exp}</p>
                 <Link to={`/tutor/${t.slug}`} className="mt-4 inline-flex rounded-lg border-2 border-brand-600/35 text-brand-600 px-5 py-1.5 text-[13px] font-bold hover:bg-white">Book Trial</Link>

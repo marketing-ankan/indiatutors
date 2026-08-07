@@ -587,7 +587,9 @@ export default function CourseDetailPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {WORKSHOPS.map(w => (
               <div key={w.t} className="rounded-[14px] bg-white border border-[#E7E7EF] overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                <div className="h-[140px] bg-gradient-to-br from-brand-600 to-brand-800" />
+                <div className="h-[140px] bg-gradient-to-br from-brand-600 to-brand-800">
+                  <img src={w.img} alt="" aria-hidden="true" loading="lazy" className="h-full w-full object-cover" />
+                </div>
                 <div className="p-5 flex flex-col flex-1">
                   <h3 className="font-heading font-bold text-slate-900">{w.t}</h3>
                   <p className="mt-1 text-sm text-slate-500 flex-1">{w.d}</p>

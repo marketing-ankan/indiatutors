@@ -8,14 +8,14 @@ import { imageFor } from '../data/courseImages.js';
 // floating stat cards, content + sticky facts aside, course grid, CTA band.
 
 const STATS = [
-  ['100+', 'Subjects'], ['100%', 'Verified tutors'],
+  ['100+', 'Subjects'], ['75+', 'Expert tutors'],
   ['10,000+', 'Classes delivered'], ['20+', 'Countries served'],
 ];
 
 const OFFERS = [
   ['Live one-on-one sessions', 'personalised curriculum, direct mentorship'],
   ['Group classes', 'collaborative learning at affordable rates'],
-  ['Home tuition', 'verified tutors who visit your home in your city'],
+  ['Home tuition', 'experienced tutors who visit your home in your city'],
   ['Post-class mentoring', 'doubt clearing and homework support'],
   ['Certification', 'recognised course completion certificates'],
   ['No fixed commitment', 'flexible scheduling, easy rescheduling'],
@@ -23,7 +23,7 @@ const OFFERS = [
 ];
 
 const FACTS = [
-  'Background-verified, expert tutors',
+  'Qualification-screened, expert tutors',
   'Live 1-on-1 & small group classes',
   'Transparent, affordable pricing',
   'Flexible scheduling across time zones',
@@ -84,13 +84,13 @@ export default function AboutPage() {
           <p className="text-slate-700 leading-relaxed text-[1.04rem]">At India Tutors Online, we believe that meaningful teacher-student interaction is the foundation of effective learning. Our mission is to make live, personalised education accessible to every family in India — without financial burden, without compromise on quality.</p>
 
           <SectionH2>What We Offer</SectionH2>
-          <p className="text-slate-700 leading-relaxed text-[1.04rem]">We connect students with verified, experienced tutors across 100+ subjects spanning academics, music, dance, coding, languages, yoga, chess, and competitive exam preparation. Every session is live and interactive — tailored to the individual child's pace, learning style, and goals.</p>
+          <p className="text-slate-700 leading-relaxed text-[1.04rem]">We connect students with experienced, handpicked tutors across 100+ subjects spanning academics, music, dance, coding, languages, yoga, chess, and competitive exam preparation. Every session is live and interactive — tailored to the individual child's pace, learning style, and goals.</p>
           <ul className="mt-4 space-y-1.5 text-slate-700 leading-relaxed list-disc pl-6">
             {OFFERS.map(([t,d]) => <li key={t}><strong className="text-slate-900">{t}</strong> — {d}</li>)}
           </ul>
 
           <SectionH2>Why Choose India Tutors Online?</SectionH2>
-          <p className="text-slate-700 leading-relaxed text-[1.04rem]">Every tutor on our platform is background-verified, qualification-checked, and rated by real students and parents. We believe education should be goal-oriented — every session takes your child one step closer to their academic or skill goal. Our fees are transparent, our tutors are passionate, and our platform is designed around the needs of Indian families.</p>
+          <p className="text-slate-700 leading-relaxed text-[1.04rem]">Tutors on our platform are qualification-screened before they are listed, and tutors who complete our verification checks carry a Verified badge on their profile. We believe education should be goal-oriented — every session takes your child one step closer to their academic or skill goal. Our fees are transparent, our tutors are passionate, and our platform is designed around the needs of Indian families.</p>
 
           <SectionH2>Our Reach</SectionH2>
           <p className="text-slate-700 leading-relaxed text-[1.04rem]">We serve students across India and internationally — in the USA, Canada, Australia, Singapore, and the United Kingdom. Our online tutors are available across all time zones. Our home tutors are available in major Indian cities including Kolkata, Delhi, Mumbai, Bangalore, Chennai, Hyderabad, and Pune.</p>
@@ -102,7 +102,7 @@ export default function AboutPage() {
           <div className="space-y-2 text-slate-700">
             <p className="flex gap-2"><MapPin className="h-4 w-4 text-brand-600 shrink-0 mt-1"/>Astra Tower, ANR-201, 2nd Floor, North Block, AA-II, New Town, Kolkata, West Bengal, India</p>
             <p className="flex gap-2 items-center"><Phone className="h-4 w-4 text-brand-600"/>+91 93308 11581</p>
-            <p className="flex gap-2 items-center"><Mail className="h-4 w-4 text-brand-600"/>contact@indiatutorsonline.com</p>
+            <p className="flex gap-2 items-center"><Mail className="h-4 w-4 text-brand-600"/><a href="mailto:connect@indiatutorsonline.com" className="hover:text-brand-600">connect@indiatutorsonline.com</a></p>
           </div>
         </div>
 
