@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 280" role="img" aria-label="Maths and Science Olympiad Prep">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#1c3a9c"/>
+      <stop offset="0.6" stop-color="#1e40af"/>
+      <stop offset="1" stop-color="#3b61ea"/>
+    </linearGradient>
+    <radialGradient id="glow2" cx="0.3" cy="0.3" r="0.65">
+      <stop offset="0" stop-color="#93b0fb" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#93b0fb" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots2" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.6" fill="#ffffff" fill-opacity="0.10"/>
+    </pattern>
+    <linearGradient id="gold2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6e27a"/>
+      <stop offset="0.5" stop-color="#D4AF37"/>
+      <stop offset="1" stop-color="#a8862a"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="280" fill="url(#bg2)"/>
+  <rect width="800" height="280" fill="url(#glow2)"/>
+  <rect width="800" height="280" fill="url(#dots2)"/>
+
+  <!-- floating maths symbols -->
+  <g fill="#ffffff" fill-opacity="0.25" font-family="Georgia, 'Times New Roman', serif">
+    <text x="112" y="80" font-size="34" font-style="italic">&#960;</text>
+    <text x="150" y="220" font-size="28">&#8721;</text>
+    <text x="620" y="70" font-size="24">&#8730;x</text>
+    <text x="668" y="215" font-size="26">&#247;</text>
+    <text x="555" y="245" font-size="22" font-style="italic">x&#178;</text>
+    <text x="205" y="60" font-size="20">&#8734;</text>
+  </g>
+
+  <!-- geometry: triangle + compass arc -->
+  <g stroke="#ffffff" stroke-opacity="0.30" fill="none" stroke-width="2">
+    <path d="M600 190 L662 96 L724 190 Z"/>
+    <circle cx="662" cy="158" r="26" stroke-dasharray="4 6"/>
+  </g>
+
+  <!-- medal -->
+  <g transform="translate(310,120)">
+    <path d="M-20 -78 L 6 -78 L 22 -34 L -4 -34 Z" fill="#1e40af" stroke="#ffffff" stroke-opacity="0.5" stroke-width="2"/>
+    <path d="M20 -78 L -6 -78 L -22 -34 L 4 -34 Z" fill="#16276b" stroke="#ffffff" stroke-opacity="0.5" stroke-width="2"/>
+    <circle r="46" cy="8" fill="url(#gold2)"/>
+    <circle r="38" cy="8" fill="none" stroke="#ffffff" stroke-opacity="0.55" stroke-width="2"/>
+    <path d="M0 -14 L7.1 -1.6 L21.3 1.2 L11.5 11.8 L13.2 26.1 L0 20 L-13.2 26.1 L-11.5 11.8 L-21.3 1.2 L-7.1 -1.6 Z" fill="#16276b"/>
+  </g>
+
+  <!-- laurel hints -->
+  <g stroke="#D4AF37" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-opacity="0.9">
+    <path d="M238 170 q -18 -34 -2 -66"/>
+    <path d="M238 170 q -30 -6 -40 -30"/>
+    <path d="M382 170 q 18 -34 2 -66"/>
+    <path d="M382 170 q 30 -6 40 -30"/>
+  </g>
+
+  <!-- podium -->
+  <g transform="translate(430,236)" font-family="Poppins, Arial, sans-serif" font-weight="700" text-anchor="middle">
+    <rect x="0" y="-52" width="52" height="52" rx="4" fill="#ffffff" fill-opacity="0.92"/>
+    <rect x="-54" y="-34" width="52" height="34" rx="4" fill="#ffffff" fill-opacity="0.55"/>
+    <rect x="54" y="-24" width="52" height="24" rx="4" fill="#ffffff" fill-opacity="0.35"/>
+    <text x="26" y="-18" font-size="24" fill="#1e40af">1</text>
+    <text x="-28" y="-10" font-size="18" fill="#16276b">2</text>
+    <text x="80" y="-4" font-size="15" fill="#16276b">3</text>
+  </g>
+
+  <!-- badge -->
+  <g transform="translate(112,150)">
+    <rect x="0" y="-26" rx="14" width="176" height="30" fill="#0b1220" fill-opacity="0.55" stroke="#D4AF37" stroke-opacity="0.65"/>
+    <text x="88" y="-5" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-size="14" font-weight="700" fill="#ffffff" letter-spacing="2">IMO &#8226; NSO &#8226; NTSE</text>
+    <rect x="0" y="16" width="64" height="4" rx="2" fill="#D4AF37"/>
+  </g>
+</svg>

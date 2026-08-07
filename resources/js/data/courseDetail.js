@@ -29,7 +29,7 @@ export const CARD_FEATURES = [
 ];
 
 export const FAQS = [
-  { q: 'How do I get started?', a: 'To get started simply book a demo, to book a free live demo session with the instructor, please click on the "Book a Demo" button and provide details to schedule the class. For details, please contact Seema at (+91) 74391 54909 or seema@indiatutorsonline.com' },
+  { q: 'How do I get started?', a: 'To get started simply book a demo — click on the "Book a Demo" button and provide details to schedule a free live demo session with the instructor. For help, WhatsApp our coordinator on +91 93308 11581 or email connect@indiatutorsonline.com.' },
   { q: 'How does payment work?', a: 'We require monthly advance payments for the number of classes scheduled in a calendar month. We use PayPal, or other payment apps for the collection of fees. You will be asked to select your choice of payment method during the initial setup of the class.' },
   { q: 'What if I miss a class?', a: "For batch classes, we would be able to share a timed recording upon parent's request. For one to one sessions, the class would be rescheduled. We request the parents to inform prior in advance in such cases." },
   { q: 'Do I need to sign any contract?', a: 'All our engagements are based on the terms and conditions and other requirements mentioned in the website. We provide complete flexibility to our students to exit the course anytime if they do not find the classes beneficial to them.' },
@@ -50,9 +50,9 @@ export const FAQS = [
 ];
 
 export const WORKSHOPS = [
-  { t: 'JEE / NEET Foundation Bootcamp', d: 'A head-start for Classes 9–10 on the concepts that matter most for JEE and NEET, taught the exam way.' },
-  { t: 'Maths & Science Olympiad Prep', d: 'Problem-solving sessions for IMO / NSO / NTSE aspirants — pattern-based practice with expert mentors.' },
-  { t: 'CBSE Board Exam Crash Course', d: 'Last-mile revision for Classes 10 & 12 — sample papers, marking schemes and time-management drills.' },
+  { t: 'JEE / NEET Foundation Bootcamp', d: 'A head-start for Classes 9–10 on the concepts that matter most for JEE and NEET, taught the exam way.', img: '/build/images/workshops/jee-neet-bootcamp.svg' },
+  { t: 'Maths & Science Olympiad Prep', d: 'Problem-solving sessions for IMO / NSO / NTSE aspirants — pattern-based practice with expert mentors.', img: '/build/images/workshops/olympiad-prep.svg' },
+  { t: 'CBSE Board Exam Crash Course', d: 'Last-mile revision for Classes 10 & 12 — sample papers, marking schemes and time-management drills.', img: '/build/images/workshops/cbse-crash-course.svg' },
 ];
 
 // Recent student wins — WinQuest-parity carousel cards: emoji icon, bold win
@@ -131,7 +131,7 @@ export const JOURNEY = [
 
 // "Trusted by 10,000+ families" strip (WinQuest-parity, India-centric).
 export const TRUST_POINTS = [
-  '👩‍🏫 Verified expert tutors',
+  '👩‍🏫 Qualification-screened expert tutors',
   '🎯 1-on-1 personalised attention',
   '🎁 First class is 100% free',
   '⭐ 4.9 / 5 from 1,200+ reviews',

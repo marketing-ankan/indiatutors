@@ -15,7 +15,7 @@
  * forgetting to bump it meant returning visitors kept being served the previous
  * image bytes indefinitely — exactly the "old photo until I hard-refresh" bug.
  */
-const VERSION = 'd1944a67';
+const VERSION = 'bfe96cd1';
 const SHELL_CACHE = `ito-shell-${VERSION}`;
 const ASSET_CACHE = `ito-assets-${VERSION}`;
 const SHELL_URLS = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
