@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet" />
 
     @php($m = $meta ?? [])
-    <title>{{ $m['title'] ?? 'Indiatutors Online — Live Online Tutoring & Verified Home Tutors Across India' }}</title>
+    <title>{{ $m['title'] ?? 'Indiatutors Online — Live Online Tutoring & Home Tutors Across India' }}</title>
     <meta name="description" content="{{ $m['description'] ?? 'Live 1-on-1 classes, group sessions, and self-paced video courses across Academics, Coding, Music, Dance, Languages & more.' }}" />
     <meta name="robots" content="{{ $m['robots'] ?? 'index, follow' }}" />
     @isset($m['canonical'])<link rel="canonical" href="{{ $m['canonical'] }}" />@endisset

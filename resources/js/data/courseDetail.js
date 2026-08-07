@@ -76,7 +76,7 @@ export const STUDENT_WINS = [
 export const ABOUT_STATS = [
   { icon: '📚', num: '100+', label: 'Subjects & skills' },
   { icon: '🎓', num: '10,000+', label: 'Classes delivered' },
-  { icon: '⭐', num: '4.9/5', label: 'Average rating' },
+  { icon: '👩‍🏫', num: '75+', label: 'Expert tutors' },
   { icon: '🎁', num: 'Free', label: 'First demo class' },
 ];
 export const ABOUT_STEPS = [
@@ -134,7 +134,7 @@ export const TRUST_POINTS = [
   '👩‍🏫 Qualification-screened expert tutors',
   '🎯 1-on-1 personalised attention',
   '🎁 First class is 100% free',
-  '⭐ 4.9 / 5 from 1,200+ reviews',
+  '🕐 Flexible scheduling across time zones',
 ];
 
 // "What Our Parents Say About Us" — WinQuest-parity spotlight cards (avatar,
