@@ -23,6 +23,7 @@ use App\Models\User;
 use App\Models\TeacherProfile;
 use App\Models\Tutor;
 use App\Support\TeacherPerformance;
+use App\Support\TutorMatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -173,73 +174,22 @@ class AdminController extends Controller {
         // The Mode select (online / home tutor) is offered on every booking
         // flow, not just the 'physical' one — honour either signal.
         $wantsHome = $demoRequest->type === 'physical' || $demoRequest->mode === 'home';
-        $city      = mb_strtolower(trim((string) $demoRequest->city));
-        $gradeNum  = preg_match('/(\d{1,2})/', (string) $demoRequest->grade, $m) ? (int) $m[1] : null;
 
-        // "Maths & Science" / "Physics, Chemistry" → ['math','science',…];
-        // tokens under 3 chars are noise ("ap", "&"). 'maths' must become
-        // 'math' or it never substring-matches a tutor row's "Mathematics".
-        $tokens = collect(preg_split('/[,\/&+]|\band\b/i', mb_strtolower(trim((string) $demoRequest->subject))))
-            ->map(fn ($t) => trim($t))
-            ->map(fn ($t) => $t === 'maths' ? 'math' : $t)
-            ->filter(fn ($t) => mb_strlen($t) >= 3)->values();
+        // The same matcher the family sees while booking (TutorController::
+        // suggestions). Two copies of this scoring would drift, and the first
+        // time staff and parent saw different orders nobody could say which was
+        // right. What differs between them is only what each side may SEE.
+        $rows = TutorMatcher::rank(
+            Tutor::published()->get(),
+            $demoRequest->subject,
+            $demoRequest->grade,
+            $demoRequest->city,
+            $wantsHome,
+        )->take(8);
 
-        $rows = Tutor::published()->get()
-            ->map(function (Tutor $t) use ($tokens, $gradeNum, $wantsHome, $city) {
-                $mode = $t->teaching_mode ?: 'online';
-                if ($wantsHome && ! in_array($mode, ['home', 'both'], true)) {
-                    return null; // cannot visit a home, whatever else fits
-                }
-
-                $why   = [];
-                $score = 0;
-
-                $subjects = mb_strtolower((string) $t->subjects);
-                if ($tokens->first(fn ($tok) => str_contains($subjects, $tok))) {
-                    $score += 3;
-                    $why[]  = 'subject';
-                }
-
-                if ($gradeNum !== null && $t->grades) {
-                    foreach (preg_split('/[,\s]+/', (string) $t->grades, -1, PREG_SPLIT_NO_EMPTY) as $g) {
-                        $hit = preg_match('/^(\d{1,2})\s*-\s*(\d{1,2})$/', $g, $r)
-                            ? ($gradeNum >= (int) $r[1] && $gradeNum <= (int) $r[2])
-                            : (ctype_digit($g) && (int) $g === $gradeNum);
-                        if ($hit) {
-                            $score += 1;
-                            $why[]  = 'grade';
-                            break;
-                        }
-                    }
-                }
-
-                if ($wantsHome) {
-                    $why[] = 'home-visits';
-                    $score += 1;
-                    if ($city !== '' && mb_strtolower((string) $t->city) === $city) {
-                        $score += 2;
-                        $why[]  = 'same-city';
-                    }
-                }
-
-                return $score > 0 ? ['tutor' => $t, 'score' => $score, 'why' => $why] : null;
-            })
-            ->filter()
-            ->sortBy([
-                fn ($a, $b) => $b['score'] <=> $a['score'],
-                fn ($a, $b) => ((int) $b['tutor']->experience_years) <=> ((int) $a['tutor']->experience_years),
-                fn ($a, $b) => $a['tutor']->position <=> $b['tutor']->position,
-            ])
-            ->take(8)->values();
-
-        // Track record, batched — three queries for the whole shortlist rather
-        // than three per row. Shown to staff only: a conversion rate is an
-        // internal management number, not something a visitor should read off
-        // a teacher's public profile.
-        //
-        // Deliberately NOT part of `score` yet. Ranking on it is D3, and doing
-        // it before the data has accumulated would rank teachers on one or two
-        // demos each — see MIN_DEMOS_FOR_RATE.
+        // Track record, batched — three queries for the shortlist rather than
+        // three per row. Staff only: a conversion rate is an internal
+        // management number, not something a visitor reads off a profile.
         $perf = TeacherPerformance::forTutors($rows->pluck('tutor.id')->all());
 
         return response()->json([

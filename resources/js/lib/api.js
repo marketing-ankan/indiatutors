@@ -190,6 +190,9 @@ export const submitCourseReview = async ({ slug, ...p }) => { const { data } = a
 // signed-in visitor has a completed demo with this teacher — the page uses it
 // so it never shows a form the API would reject.
 export const fetchTutorReviews = async (slug) => { const { data } = await api.get(`/tutors/${slug}/reviews`); return data; };
+// Ranked shortlist for the booking flow. Public-safe: fit reasons and the real
+// star rating, never the internal ranking score or conversion rate.
+export const fetchTutorSuggestions = async (p={}) => { const { data } = await api.get('/tutors/suggestions', { params:p }); return data; };
 export const submitTutorReview = async ({ slug, ...p }) => { const { data } = await api.post(`/tutors/${slug}/reviews`, p); return data; };
 
 // Admin console

@@ -131,6 +131,131 @@ class TeacherPerformance
      */
     public const MIN_DEMOS_FOR_RATE = 5;
 
+    /**
+     * How strongly a teacher with no history is held to the platform average.
+     *
+     * Owner's decision, 2026-08-10: rank everyone from day one, smoothed toward
+     * the mean, rather than parking new teachers at the bottom. The alternative
+     * was self-defeating — a teacher ranked last gets no bookings, so never
+     * accumulates the demos that would lift them, and the ranking silently
+     * freezes the current roster in place.
+     *
+     * Read these as "worth this many imaginary average demos/reviews". At
+     * PRIOR_DEMOS = 5 a teacher's own record outweighs the prior once they pass
+     * ten demos, which is roughly when a rate stops being noise.
+     */
+    public const PRIOR_DEMOS   = 5;
+    public const PRIOR_REVIEWS = 3;
+
+    /** Weighting of the two signals in the final score. They measure different
+     *  things — what families SAY vs what they DO — so both must count, and
+     *  conversion leads because it is the harder one to game. */
+    public const W_CONVERSION = 0.6;
+    public const W_REVIEWS    = 0.4;
+
+    /** Fallback means for an empty platform, so the very first teacher is not
+     *  divided by zero or scored against nothing. */
+    private const SEED_RATE   = 0.35;   // 35% of held demos convert
+    private const SEED_RATING = 4.0;
+
+    /**
+     * How much platform history the mean itself needs before it is trusted.
+     *
+     * Without this the prior is as noisy as the thing it is meant to steady.
+     * Caught in testing: with a single 5★ review on the whole site the "mean
+     * rating" was 5.0, so a teacher with NO reviews was smoothed to a perfect
+     * score and outranked a 4.6★ veteran with twenty. Same trap on the demo
+     * side — three lucky early conversions would set the house average at 100%
+     * and flatter every newcomer for months.
+     *
+     * Below these counts we use the seed constants: a deliberately modest
+     * assumption is safer than a confident one drawn from four data points.
+     */
+    private const MEAN_MIN_DEMOS   = 20;
+    private const MEAN_MIN_REVIEWS = 10;
+
+    /**
+     * Platform-wide averages, the anchor every teacher is smoothed toward.
+     * Two queries, cached per request — the ranking calls this once per list,
+     * never per row.
+     */
+    private static ?array $means = null;
+
+    public static function platformMeans(): array
+    {
+        if (self::$means !== null) {
+            return self::$means;
+        }
+
+        // Only demos credited to a teacher. Every per-teacher figure is scoped
+        // to CREDITED, so the mean they are shrunk toward must come from the
+        // same population — and workshop, group and free-class registrations
+        // belong to nobody. Counting them let MEAN_MIN_DEMOS be satisfied with
+        // zero teacher history: 25 converted workshop sign-ups would set the
+        // house rate to 80% and score every teacher with no record at 78
+        // instead of the 51 the seed fallback intends. Mirrors the
+        // whereNotNull('tutor_id') already on the rating mean below.
+        $demos = DemoRequest::query()->whereRaw(self::CREDITED . ' IS NOT NULL');
+        $held  = (int) $demos->clone()->held()->count();
+        $conv  = (int) $demos->clone()->where('status', 'converted')->count();
+
+        $ratings = DB::table('reviews')->where('status', 'approved')->whereNotNull('tutor_id');
+        $ratingN = (int) $ratings->clone()->count();
+
+        return self::$means = [
+            'rate' => $held >= self::MEAN_MIN_DEMOS
+                ? $conv / $held
+                : self::SEED_RATE,
+            'rating' => $ratingN >= self::MEAN_MIN_REVIEWS
+                ? (float) $ratings->clone()->avg('rating')
+                : self::SEED_RATING,
+            // Exposed so the console can say "ranking is still warming up"
+            // rather than implying these numbers carry more weight than they do.
+            'from_real_data' => $held >= self::MEAN_MIN_DEMOS && $ratingN >= self::MEAN_MIN_REVIEWS,
+        ];
+    }
+
+    /** Test/seed hook — forget the memoised means. */
+    public static function flushMeans(): void { self::$means = null; }
+
+    /**
+     * The ranking score, 0–100. Bayesian shrinkage on both signals: a teacher's
+     * own numbers are blended with the platform mean in proportion to how much
+     * evidence they actually have, so
+     *
+     *   - one demo converted does NOT read as 100%,
+     *   - a veteran at 60% over 50 demos outranks a newcomer at 1-for-1,
+     *   - and a brand-new teacher still gets a defensible mid-table score
+     *     instead of a zero that would deny them the bookings they need.
+     *
+     * Deliberately NOT shown to students as a number. It orders a list; it is
+     * not a grade out of 100 to publish next to someone's name.
+     */
+    public static function score(array $p): float
+    {
+        $m = self::platformMeans();
+
+        $held      = (int) ($p['demos_held'] ?? 0);
+        $converted = (int) ($p['demos_converted'] ?? 0);
+        $rate = (self::PRIOR_DEMOS * $m['rate'] + $converted) / (self::PRIOR_DEMOS + $held);
+
+        $count = (int) ($p['review_count'] ?? 0);
+        // Prefer the exact sum when the caller has it. review_avg is rounded to
+        // one decimal for DISPLAY, and reconstructing the total from it can move
+        // a teacher's score by enough to flip a tie-break — the ranking must not
+        // depend on a rounding artefact.
+        $sum = array_key_exists('review_sum', $p)
+            ? (float) $p['review_sum']
+            : ($count > 0 ? (float) ($p['review_avg'] ?? 0) * $count : 0.0);
+        $rating = (self::PRIOR_REVIEWS * $m['rating'] + $sum) / (self::PRIOR_REVIEWS + $count);
+
+        // Ratings are 1–5; normalise to 0–1 across the usable band so a 3★
+        // average is not treated as 60% good.
+        $ratingNorm = max(0.0, min(1.0, ($rating - 1) / 4));
+
+        return round((self::W_CONVERSION * $rate + self::W_REVIEWS * $ratingNorm) * 100, 2);
+    }
+
     public static function forTutor(int $tutorId): array
     {
         $demos = DemoRequest::query()->whereRaw(self::CREDITED . ' = ?', [$tutorId]);
@@ -140,8 +265,9 @@ class TeacherPerformance
 
         $reviews = Review::approved()->where('tutor_id', $tutorId);
         $count   = (int) $reviews->clone()->count();
+        $sum     = (float) $reviews->clone()->sum('rating');
 
-        return [
+        $p = [
             'demos_held'      => $held,
             'demos_converted' => $converted,
             'conversion_rate' => $held >= self::MIN_DEMOS_FOR_RATE
@@ -149,8 +275,12 @@ class TeacherPerformance
                 : null,
             'rate_pending'    => $held < self::MIN_DEMOS_FOR_RATE,
             'review_count'    => $count,
-            'review_avg'      => $count > 0 ? round((float) $reviews->clone()->avg('rating'), 1) : null,
+            'review_avg'      => $count > 0 ? round($sum / $count, 1) : null,
         ];
+        // Scored on the exact sum, then dropped — it is scoring input, not part
+        // of the payload any caller reads.
+        $p['score'] = self::score($p + ['review_sum' => $sum]);
+        return $p;
     }
 
     /**
@@ -181,7 +311,7 @@ class TeacherPerformance
         $reviewRows = DB::table('reviews')
             ->select('tutor_id')
             ->selectRaw('COUNT(*) as c')
-            ->selectRaw('AVG(rating) as avg_rating')
+            ->selectRaw('SUM(rating) as sum_rating')
             ->where('status', 'approved')
             ->whereIn('tutor_id', $ids)
             ->groupBy('tutor_id')
@@ -194,14 +324,18 @@ class TeacherPerformance
             $held      = (int) ($d->held ?? 0);
             $converted = (int) ($d->converted ?? 0);
             $count     = (int) ($r->c ?? 0);
-            $out[$id] = [
+            $sum       = (float) ($r->sum_rating ?? 0);
+            $row = [
                 'demos_held'      => $held,
                 'demos_converted' => $converted,
                 'conversion_rate' => $held >= self::MIN_DEMOS_FOR_RATE ? round($converted / $held * 100) : null,
                 'rate_pending'    => $held < self::MIN_DEMOS_FOR_RATE,
                 'review_count'    => $count,
-                'review_avg'      => $count > 0 ? round((float) $r->avg_rating, 1) : null,
+                'review_avg'      => $count > 0 ? round($sum / $count, 1) : null,
             ];
+            // Exact sum, matching forTutor() — the two paths must not disagree.
+            $row['score'] = self::score($row + ['review_sum' => $sum]);
+            $out[$id] = $row;
         }
         return $out;
     }

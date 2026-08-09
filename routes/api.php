@@ -54,6 +54,9 @@ Route::post('/tutors/{tutor:slug}/reviews', [ReviewController::class, 'storeForT
 
 Route::get('/tutors',            [TutorController::class, 'index']);
 Route::get('/tutors/filters',    [TutorController::class, 'filters']);
+// Ranked shortlist for the booking flow. Must precede /tutors/{slug} or the
+// literal segment is swallowed as a slug.
+Route::get('/tutors/suggestions',[TutorController::class, 'suggestions']);
 Route::get('/tutors/{slug}',     [TutorController::class, 'show'])->name('api.tutors.show');
 
 Route::get('/cities',            [CityController::class, 'index']);

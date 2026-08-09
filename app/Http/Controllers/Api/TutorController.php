@@ -3,6 +3,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TutorResource;
 use App\Models\Tutor;
+use App\Support\TeacherPerformance;
+use App\Support\TutorMatcher;
 use Illuminate\Http\Request;
 
 class TutorController extends Controller {
@@ -53,6 +55,65 @@ class TutorController extends Controller {
     public function show(string $slug) {
         $tutor = Tutor::where('slug', $slug)->published()->firstOrFail();
         return (new TutorResource($tutor))->additional(['route' => 'api.tutors.show']);
+    }
+
+    /**
+     * The shortlist a family sees while booking a demo (B1 in
+     * docs/ECOSYSTEM-PLAN.md): teachers who fit what they typed, best first.
+     *
+     * Same fit scoring the Staff Console uses, plus the Stage 3 ranking — so
+     * the order a parent sees and the order a coordinator sees come from one
+     * implementation and cannot drift apart.
+     *
+     * WHAT A VISITOR IS NOT TOLD. Conversion rate, demo counts and the ranking
+     * score are management numbers; publishing them would turn a teacher's
+     * quiet month into a public scarlet letter and invite gaming. The parent
+     * sees the things that actually help them choose — subjects, experience,
+     * fee, city, and the star rating real families left after a real demo.
+     */
+    public function suggestions(Request $request) {
+        $data = $request->validate([
+            'subject' => 'nullable|string|max:120',
+            'grade'   => 'nullable|string|max:40',
+            'city'    => 'nullable|string|max:80',
+            'mode'    => 'nullable|in:online,home',
+        ]);
+
+        $rows = TutorMatcher::rank(
+            Tutor::published()->get(),
+            $data['subject'] ?? null,
+            $data['grade'] ?? null,
+            $data['city'] ?? null,
+            ($data['mode'] ?? null) === 'home',
+        )->take(6);
+
+        $perf = TeacherPerformance::forTutors($rows->pluck('tutor.id')->all());
+
+        return response()->json([
+            'data' => $rows->map(function ($r) use ($perf) {
+                $t = $r['tutor'];
+                $p = $perf[$t->id] ?? [];
+                return [
+                    'id'               => $t->id,
+                    'name'             => $t->name,
+                    'slug'             => $t->slug,
+                    'image_url'        => $t->image_url,
+                    'tagline'          => $t->tagline,
+                    'qualification'    => $t->qualification,
+                    'subjects'         => $t->subjects_list,
+                    'city'             => $t->city,
+                    'teaching_mode'    => $t->teaching_mode,
+                    'experience_years' => $t->experience_years,
+                    'fee_hourly'       => $t->fee_hourly,
+                    'verified'         => (bool) $t->verified,
+                    'why'              => $r['why'],
+                    // Public-safe slice only. No score, no conversion, no demo counts.
+                    'review_avg'       => $p['review_avg'] ?? null,
+                    'review_count'     => $p['review_count'] ?? 0,
+                ];
+            })->values()->all(),
+            'meta' => ['count' => $rows->count()],
+        ]);
     }
 
     /** Distinct subjects + cities for building filter dropdowns */

@@ -32,11 +32,11 @@ Everything downstream keys off two facts this stage establishes: **did the demo 
 both. Today's four statuses (new/scheduled/converted/closed) cannot express "completed but not
 converted", so a review gate and an honest conversion rate are both impossible until this lands.
 
-**Stage 2 — collect the two signals** (D1 reviews, D2 conversion) ← *in progress*
+**Stage 2 — collect the two signals** (D1 reviews, D2 conversion) — ✅ **done 2026-08-10** (`6af9625`)
 Shipped early precisely because they need *time*, not because they're urgent. Every demo that happens
 from this point forward becomes ranking data.
 
-**Stage 3 — rank and surface it** (D3 + D3a, D5, B1, B2, A2)
+**Stage 3 — rank and surface it** (D3 + D3a, D5, B1, B2, A2) ← *in progress*
 Now there is something to rank. The suggestion engine already exists (`TeacherMatcher`); this stage
 adds the ranking term and turns the staff-only shortlist into the student-facing one.
 
@@ -80,10 +80,19 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
 
 ## B. Search → suggestion → selection (student-facing)
 
-- ⬜ **B1. Student-facing teacher suggestions.** The ranked shortlist a student sees when booking a
-  demo, from their own details (subject, grade, location) against teacher details.
-  *Engine exists: `App\Support\TeacherMatcher` (distance + subject), currently staff-only.*
-- ⬜ **B2. Teacher list → profile view → select.** The browse/compare step before booking.
+- 🔨 **B1. Student-facing teacher suggestions.** *Stage 3 — built, awaiting owner sign-off.*
+  The ranked shortlist now appears **inside the booking flow**, matching the page's own drawing of the
+  journey (search → suggestion → select → demo = the lead). `GET /api/tutors/suggestions` is public and
+  carries only what helps a family choose — subjects, experience, fee, city, and the star rating real
+  families left after real demos. Score, conversion rate and demo counts are absent (verified).
+  New `App\Support\TutorMatcher` holds the fit scoring, shared with the Staff Console: two copies would
+  drift, and the first time parent and coordinator saw different orders nobody could say which was right.
+- 🔨 **B2. Teacher list → profile view → select.** *Stage 3 — built, awaiting owner sign-off.*
+  Each shortlist card names *why* it was suggested and links to the full profile in a new tab, so a
+  parent can check qualifications, availability and reviews without losing a part-filled form.
+  Selecting is optional — blank still means "a coordinator will match us". Arriving from a tutor's own
+  profile (`?tutor=slug`) now records that as the choice too, instead of only mentioning it in the
+  message box.
 - ✅ **B3. Demo booking is the lead.** *Owner-confirmed 2026-08-07 · commit `cb5ca16`.*
   `requested_tutor_id` records who the **family chose**, separate from the staff-set
   `assigned_tutor_id` — one shared column would have moved conversion credit to the wrong teacher on
@@ -110,9 +119,9 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
 
 ## D. Reviews & ranking (the heart of the page)
 
-- 🔨 **D1. Teacher reviews, up to 5★, gated on a completed demo.** Only a student who actually sat the
-  demo can review that teacher.
-  **Stage 2 — built, awaiting owner sign-off.** The gate is `reviews.demo_request_id` (UNIQUE), not a
+- ✅ **D1. Teacher reviews, up to 5★, gated on a completed demo.** *Owner-confirmed 2026-08-10 ·
+  commit `6af9625`.* Only a student who actually sat the demo can review that teacher.
+  The gate is `reviews.demo_request_id` (UNIQUE), not a
   permission check: the demo *is* the proof, so "one review per demo" is an index rather than
   application logic that a double-submit could race, and a review can never describe a class the
   reviewer did not attend. Extends the existing `reviews` table so staff keep one moderation queue.
@@ -120,25 +129,42 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
   **Also killed a live lie:** `TutorProfilePage` shipped a "Write a Review" form whose submit handler
   called `setSent(true)` and stored nothing, above a hardcoded empty state that never fetched — the
   exact deceit the `reviews` table was created to end for courses, left in place for teachers.
-- 🔨 **D2. Conversion tracking — demo → regular enrolment.** The "efficiency" number.
-  **Stage 2 — built, awaiting owner sign-off.** `App\Support\TeacherPerformance` computes it over
+- ✅ **D2. Conversion tracking — demo → regular enrolment.** *Owner-confirmed 2026-08-10 · commit
+  `6af9625`.* The "efficiency" number.
+  `App\Support\TeacherPerformance` computes it over
   **held demos only** — never all bookings, which would punish a teacher for the coordinator's
   backlog, and never counting no-shows against them. Staff-only: a conversion rate is an internal
   management number and is absent from every public endpoint (verified).
   Kept in the same class as the review gate on purpose: both must agree on *which demos count*, and a
   teacher scored on one basis but reviewed on another is a bug nobody would notice for months.
-- ⬜ **D3. Teacher ranking score.** Combines review score + conversion rate (+ other efficiency signals).
+- 🔨 **D3. Teacher ranking score.** Combines review score + conversion rate (+ other efficiency signals).
   Applies to **online and physical** teachers alike.
+  **Stage 3 — built, awaiting owner sign-off.** `TeacherPerformance::score()` blends conversion (0.6)
+  and rating (0.4), each Bayesian-smoothed toward the platform mean. Weighted so conversion leads,
+  because it is the harder signal to game: a teacher with 5.0★ from 15 reviews but 4 conversions in 40
+  demos scores **46**, below a quiet closer at 28/40 with no reviews at all (**69.7**). The score
+  orders lists and is never shown to a family — it is not a grade to publish beside someone's name.
 - ❓ **D3a. Decision: low-volume protection.** One demo converted = "100%" would outrank a veteran at
   60% over 50 demos. Needs a minimum-demo floor or smoothing — founder's call on which.
-  **Interim answer shipped in Stage 2, still open for the founder.** `TeacherPerformance` withholds
-  the rate entirely below `MIN_DEMOS_FOR_RATE = 5` (`conversion_rate: null`, `rate_pending: true`) and
-  the console shows the raw "4/7 demos" instead. Hiding is the conservative choice — it never states a
-  number it cannot defend. Smoothing toward the platform mean would rank *everyone* from day one
-  instead, at the cost of a figure no teacher can reproduce by hand. Decide before D3 ranks on it.
+  ✅ **DECIDED 2026-08-10 — smooth toward the platform average.** Ranking everyone from day one, rather
+  than parking newcomers at the bottom, because last place is self-fulfilling: no bookings → no demos
+  → never leaves last place, and the roster freezes. Implemented as Bayesian shrinkage
+  (`PRIOR_DEMOS = 5`, `PRIOR_REVIEWS = 3`). A 1-for-1 newcomer scores **57.5**, below a 60% veteran at
+  **69.9** — the protection the decision was for.
+  Displayed figures keep the stricter rule: `conversion_rate` is still withheld below
+  `MIN_DEMOS_FOR_RATE = 5` and the console shows raw "4/7 demos". Smoothing decides *order*; it never
+  puts an invented percentage in front of a human.
+  **A second guard was needed and added:** the mean itself must be earned. With one 5★ review sitewide,
+  the "average rating" was 5.0, so a teacher with *no* reviews outranked a 4.6★ veteran with twenty.
+  Below `MEAN_MIN_DEMOS = 20` / `MEAN_MIN_REVIEWS = 10` the priors fall back to modest seeds (35%, 4.0)
+  — a cautious assumption beats a confident one drawn from four data points.
 - ⬜ **D4. Testimonials & social proof on the profile.** WhatsApp testimonials, performance photos/videos.
   *Note: today's testimonial arrays are placeholders. Real ones need consent — see WEBSITE-IMPROVEMENTS.md §A3.*
-- ⬜ **D5. Ranking feeds back into suggestions (B1).** Closing the loop.
+- 🔨 **D5. Ranking feeds back into suggestions (B1).** *Stage 3 — built, awaiting owner sign-off.*
+  The loop is closed: reviews and conversions from held demos feed the score, the score breaks ties in
+  `TutorMatcher`, and the shortlist a family sees is that ordering. **Fit still dominates** — track
+  record only separates teachers who already match the subject and grade asked for, so a superb Physics
+  teacher can never win a Piano enquiry on reputation alone.
 
 ## E. Student offering & retention (left column of the page)
 
