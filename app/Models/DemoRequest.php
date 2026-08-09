@@ -38,6 +38,8 @@ class DemoRequest extends Model {
     /** The teacher the student picked when booking — see the migration for why this is not assignedTutor. */
     public function requestedTutor(){ return $this->belongsTo(Tutor::class, 'requested_tutor_id'); }
     public function enrollment()    { return $this->hasOne(Enrollment::class); }
+    /** At most one — reviews.demo_request_id is UNIQUE. */
+    public function review()        { return $this->hasOne(Review::class); }
 
     /** Demos that provably took place — the honest conversion denominator. */
     public function scopeHeld($q) { return $q->whereIn('status', self::HELD); }

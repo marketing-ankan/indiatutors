@@ -22,6 +22,7 @@ use App\Models\TeacherApplication;
 use App\Models\User;
 use App\Models\TeacherProfile;
 use App\Models\Tutor;
+use App\Support\TeacherPerformance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -231,6 +232,16 @@ class AdminController extends Controller {
             ])
             ->take(8)->values();
 
+        // Track record, batched — three queries for the whole shortlist rather
+        // than three per row. Shown to staff only: a conversion rate is an
+        // internal management number, not something a visitor should read off
+        // a teacher's public profile.
+        //
+        // Deliberately NOT part of `score` yet. Ranking on it is D3, and doing
+        // it before the data has accumulated would rank teachers on one or two
+        // demos each — see MIN_DEMOS_FOR_RATE.
+        $perf = TeacherPerformance::forTutors($rows->pluck('tutor.id')->all());
+
         return response()->json([
             'data' => $rows->map(fn ($r) => [
                 'id'               => $r['tutor']->id,
@@ -241,6 +252,7 @@ class AdminController extends Controller {
                 'experience_years' => $r['tutor']->experience_years,
                 'verified'         => (bool) $r['tutor']->verified,
                 'why'              => $r['why'],
+                'performance'      => $perf[$r['tutor']->id] ?? null,
             ])->all(),
             'meta' => ['count' => $rows->count()],
         ]);

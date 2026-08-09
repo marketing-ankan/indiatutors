@@ -186,6 +186,11 @@ export const fetchMyOrders    = async () => { const { data } = await api.get('/m
 // Public course reviews
 export const fetchCourseReviews = async (slug) => { const { data } = await api.get(`/courses/${slug}/reviews`); return data; };
 export const submitCourseReview = async ({ slug, ...p }) => { const { data } = await api.post(`/courses/${slug}/reviews`, p); return data; };
+// Teacher reviews. The GET also returns `can_review`, which says whether the
+// signed-in visitor has a completed demo with this teacher — the page uses it
+// so it never shows a form the API would reject.
+export const fetchTutorReviews = async (slug) => { const { data } = await api.get(`/tutors/${slug}/reviews`); return data; };
+export const submitTutorReview = async ({ slug, ...p }) => { const { data } = await api.post(`/tutors/${slug}/reviews`, p); return data; };
 
 // Admin console
 export const fetchAdminOverview    = async () => { const { data } = await api.get('/admin/overview'); return data.data; };

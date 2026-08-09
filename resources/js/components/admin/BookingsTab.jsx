@@ -295,6 +295,31 @@ function LifecycleBar({ booking, onChanged }) {
 // it does not assign; the buttons below still do that explicitly.
 const WHY_LABEL = { subject: 'subject', grade: 'grade', 'home-visits': 'home visits', 'same-city': 'same city' };
 
+// Track record, staff-only. Deliberately does NOT influence the ordering yet —
+// ranking on it is Stage 3, and doing it now would rank teachers on one or two
+// demos apiece. A rate is withheld below the minimum sample rather than shown
+// as a flattering 100%, so "1 of 1 converted" cannot masquerade as a record.
+function TrackRecord({ p }) {
+  if (!p || (p.demos_held === 0 && p.review_count === 0)) return null;
+  return (
+    <span className="flex flex-wrap gap-1">
+      {p.review_count > 0 && (
+        <span className="rounded-full bg-amber-50 px-2 py-0.5 font-semibold text-amber-700">
+          ★ {p.review_avg} ({p.review_count})
+        </span>
+      )}
+      {p.demos_held > 0 && (
+        <span className="rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-600"
+          title={p.rate_pending ? 'Too few completed demos to state a rate yet' : 'Demos that took place and became enrolments'}>
+          {p.conversion_rate !== null
+            ? `${p.conversion_rate}% converted`
+            : `${p.demos_converted}/${p.demos_held} demos`}
+        </span>
+      )}
+    </span>
+  );
+}
+
 function DemoSuggestions({ bookingId, onPick }) {
   const { data, isLoading } = useQuery({
     queryKey: ['admin-demo-suggestions', bookingId],
@@ -317,6 +342,7 @@ function DemoSuggestions({ bookingId, onPick }) {
               className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-lg bg-slate-50 px-3 py-2 text-left text-xs ring-1 ring-transparent transition hover:bg-brand-50 hover:ring-brand-200">
               <strong className="text-slate-800">{t.name}</strong>
               <span className="text-slate-500">{(t.subjects || []).slice(0, 3).join(', ')}{t.city ? ` · ${t.city}` : ''}{t.experience_years ? ` · ${t.experience_years} y` : ''}</span>
+              <TrackRecord p={t.performance} />
               <span className="ml-auto flex flex-wrap gap-1">
                 {(t.why || []).map(w => (
                   <span key={w} className="rounded-full bg-brand-50 px-2 py-0.5 font-semibold text-brand-700">{WHY_LABEL[w] || w}</span>

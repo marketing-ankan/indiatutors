@@ -16,12 +16,17 @@ class ReviewResource extends JsonResource {
             'body'        => $this->body,
             'status'      => $this->when($isAdmin, $this->status),
             'subject'     => [
-                'kind' => $this->video_course_id ? 'video' : 'course',
+                'kind' => $this->tutor_id ? 'teacher' : ($this->video_course_id ? 'video' : 'course'),
                 'name' => $this->whenLoaded('course', fn () => $this->course?->name)
-                    ?: $this->whenLoaded('videoCourse', fn () => $this->videoCourse?->title),
+                    ?: $this->whenLoaded('videoCourse', fn () => $this->videoCourse?->title)
+                    ?: $this->whenLoaded('tutor', fn () => $this->tutor?->name),
                 'slug' => $this->whenLoaded('course', fn () => $this->course?->slug)
-                    ?: $this->whenLoaded('videoCourse', fn () => $this->videoCourse?->slug),
+                    ?: $this->whenLoaded('videoCourse', fn () => $this->videoCourse?->slug)
+                    ?: $this->whenLoaded('tutor', fn () => $this->tutor?->slug),
             ],
+            // Staff need to see that a teacher review is demo-backed when they
+            // moderate it — that provenance is the whole basis for trusting it.
+            'demo_backed' => $this->when($isAdmin, (bool) $this->demo_request_id),
             'created_at'  => optional($this->created_at)->toDateString(),
         ];
     }

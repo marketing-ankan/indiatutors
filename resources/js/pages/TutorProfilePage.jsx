@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { fetchTutor, submitContact } from '../lib/api.js';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { fetchTutor, submitContact, fetchTutorReviews, submitTutorReview } from '../lib/api.js';
 
 // Tutor profile — 1:1 rebuild of the live /tutor/{slug} "ito-profile" template:
 // gradient hero (✓ Verified Tutor badge, 180px circular photo, name, tagline,
@@ -33,29 +33,100 @@ const FormRow = ({ label, children }) => (
 );
 const inputCls = 'w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500';
 
-function ReviewForm() {
+const Stars = ({ n }) => (
+  <span className="text-[#f59e0b]" aria-label={`${n} out of 5`}>{'★'.repeat(n)}<span className="text-slate-300">{'★'.repeat(5 - n)}</span></span>
+);
+
+/**
+ * Parent Reviews — real, and only from families who actually had a demo.
+ *
+ * This section used to render a form whose submit handler called setSent(true)
+ * and stored nothing, under an empty state that never fetched. Both are gone:
+ * the list is live, and the form appears only when the API says this visitor
+ * has a completed demo with this teacher to review.
+ */
+function TutorReviews({ slug }) {
+  const qc = useQueryClient();
+  const { data } = useQuery({ queryKey: ['tutor-reviews', slug], queryFn: () => fetchTutorReviews(slug) });
+  const reviews = data?.data ?? [];
+  const summary = data?.summary;
+  const gate = data?.can_review;
+
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
+  const [body, setBody] = useState('');
   const [sent, setSent] = useState(false);
-  if (sent) return <div className="mt-4 rounded-xl bg-green-50 p-4 text-sm font-semibold text-green-800 ring-1 ring-green-100">Thanks! Your review has been submitted for moderation.</div>;
+
+  const submit = useMutation({
+    mutationFn: () => submitTutorReview({ slug, rating, body, demo_id: gate?.demo_id }),
+    onSuccess: () => { setSent(true); qc.invalidateQueries({ queryKey: ['tutor-reviews', slug] }); },
+  });
+
   return (
-    <div className="mt-5 rounded-xl border p-5" style={{ borderColor: BORDER, background: '#f9f9fc' }}>
-      <h3 className="font-heading mb-3 font-bold" style={{ color: NAVY }}>Write a Review</h3>
-      <form onSubmit={e => { e.preventDefault(); setSent(true); }}>
-        <FormRow label="Your Rating *">
-          <div className="flex gap-1">
-            {[1, 2, 3, 4, 5].map(i => (
-              <button key={i} type="button" onClick={() => setRating(i)} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(0)} aria-label={`${i} star${i > 1 ? 's' : ''}`}
-                className={`text-2xl leading-none ${(hover || rating) >= i ? 'text-[#f59e0b]' : 'text-slate-300'}`}>★</button>
-            ))}
-          </div>
-        </FormRow>
-        <FormRow label="Your Name *"><input required className={inputCls} placeholder="e.g. Ramesh Sharma" /></FormRow>
-        <FormRow label="Email (not published)"><input type="email" className={inputCls} placeholder="you@example.com" /></FormRow>
-        <FormRow label="Your Review *"><textarea required rows={3} className={inputCls} placeholder="Share your experience with this tutor..." /></FormRow>
-        <button type="submit" className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-800">⭐ Submit Review</button>
-      </form>
-    </div>
+    <>
+      {summary?.rating_count > 0 && (
+        <p className="mb-4 flex items-center gap-2 text-sm">
+          <Stars n={Math.round(summary.rating_avg)} />
+          <strong style={{ color: NAVY }}>{summary.rating_avg}</strong>
+          <span style={{ color: MUTED }}>from {summary.rating_count} {summary.rating_count === 1 ? 'review' : 'reviews'}</span>
+        </p>
+      )}
+
+      {reviews.length > 0 ? (
+        <ul className="space-y-4">
+          {reviews.map(r => (
+            <li key={r.id} className="rounded-xl border p-4" style={{ borderColor: BORDER }}>
+              <div className="flex flex-wrap items-center gap-2">
+                <Stars n={r.rating} />
+                <span className="text-sm font-bold" style={{ color: NAVY }}>{r.author_name}</span>
+                <span className="text-xs" style={{ color: MUTED }}>{r.created_at}</span>
+              </div>
+              {r.body && <p className="mt-2 text-sm leading-relaxed text-slate-700">{r.body}</p>}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-slate-500">No reviews yet — reviews here come only from families who have completed a demo class with this teacher.</p>
+      )}
+
+      {sent ? (
+        <div className="mt-5 rounded-xl bg-green-50 p-4 text-sm font-semibold text-green-800 ring-1 ring-green-100">
+          Thanks! Your review has been submitted for moderation.
+        </div>
+      ) : gate?.allowed ? (
+        <div className="mt-5 rounded-xl border p-5" style={{ borderColor: BORDER, background: '#f9f9fc' }}>
+          <h3 className="font-heading mb-3 font-bold" style={{ color: NAVY }}>Write a Review</h3>
+          <form onSubmit={e => { e.preventDefault(); if (rating) submit.mutate(); }}>
+            <FormRow label="Your Rating *">
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <button key={i} type="button" onClick={() => setRating(i)} onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(0)} aria-label={`${i} star${i > 1 ? 's' : ''}`}
+                    className={`text-2xl leading-none ${(hover || rating) >= i ? 'text-[#f59e0b]' : 'text-slate-300'}`}>★</button>
+                ))}
+              </div>
+            </FormRow>
+            <FormRow label="Your Review *">
+              <textarea required rows={3} value={body} onChange={e => setBody(e.target.value)} className={inputCls}
+                placeholder="How did the demo class go?" />
+            </FormRow>
+            <button type="submit" disabled={!rating || submit.isPending}
+              className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-800 disabled:opacity-60">
+              {submit.isPending ? 'Submitting…' : '⭐ Submit Review'}
+            </button>
+            {!rating && <p className="mt-2 text-xs" style={{ color: MUTED }}>Pick a star rating to submit.</p>}
+            {submit.isError && (
+              <p className="mt-2 text-xs text-red-600">
+                {submit.error?.response?.data?.message || 'Could not submit your review — please try again.'}
+              </p>
+            )}
+          </form>
+        </div>
+      ) : gate?.reason ? (
+        // Say why, rather than silently hiding the form — a parent who took a
+        // demo last week should understand what they are waiting for.
+        <p className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-sm ring-1 ring-slate-100" style={{ color: MUTED }}>{gate.reason}</p>
+      ) : null}
+    </>
   );
 }
 
@@ -197,8 +268,7 @@ export default function TutorProfilePage() {
           </Section>
 
           <Section title="Parent Reviews" id="reviews">
-            <p className="text-slate-500">No reviews yet — be the first to share your experience.</p>
-            <ReviewForm />
+            <TutorReviews slug={slug} />
           </Section>
         </main>
 

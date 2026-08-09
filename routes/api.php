@@ -43,6 +43,14 @@ Route::get('/courses/{slug}',    [CourseController::class, 'show'])->name('api.c
 // Two segments, so these never shadow /courses/{slug} above.
 Route::get('/courses/{course:slug}/reviews',  [ReviewController::class, 'index']);
 Route::post('/courses/{course:slug}/reviews', [ReviewController::class, 'store'])->middleware('throttle:5,1');
+// Teacher reviews. GET is public (it also tells a signed-in visitor whether
+// they may write one); POST needs an account, because the gate is a demo that
+// account actually had — see App\Support\TeacherPerformance.
+// {slug}, not {tutor:slug}: tutorIndex resolves it with published() so a draft
+// teacher 404s here exactly as their profile page does.
+Route::get('/tutors/{slug}/reviews',  [ReviewController::class, 'tutorIndex']);
+Route::post('/tutors/{tutor:slug}/reviews', [ReviewController::class, 'storeForTutor'])
+    ->middleware(['auth:sanctum', 'throttle:5,1']);
 
 Route::get('/tutors',            [TutorController::class, 'index']);
 Route::get('/tutors/filters',    [TutorController::class, 'filters']);

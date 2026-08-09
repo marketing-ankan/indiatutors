@@ -26,13 +26,13 @@ Agreed 2026-08-07. The order is not the order the page is written in, for one re
 > ranks nothing. So the parts that *collect* the signals must ship first and start accruing data while
 > the rest is being built. By the time the ranking exists it has months of history to rank on.
 
-**Stage 1 — the demo lifecycle** (C3, B3) ← *start here*
+**Stage 1 — the demo lifecycle** (C3, B3) — ✅ **done 2026-08-07** (`cb5ca16`)
 Everything downstream keys off two facts this stage establishes: **did the demo actually happen**, and
 **which teacher did the student choose**. Reviews gate on the first; conversion rate and ranking need
 both. Today's four statuses (new/scheduled/converted/closed) cannot express "completed but not
 converted", so a review gate and an honest conversion rate are both impossible until this lands.
 
-**Stage 2 — collect the two signals** (D1 reviews, D2 conversion)
+**Stage 2 — collect the two signals** (D1 reviews, D2 conversion) ← *in progress*
 Shipped early precisely because they need *time*, not because they're urgent. Every demo that happens
 from this point forward becomes ranking data.
 
@@ -84,11 +84,14 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
   demo, from their own details (subject, grade, location) against teacher details.
   *Engine exists: `App\Support\TeacherMatcher` (distance + subject), currently staff-only.*
 - ⬜ **B2. Teacher list → profile view → select.** The browse/compare step before booking.
-- 🔨 **B3. Demo booking is the lead.** Selecting a teacher and booking creates the lead record.
-  *Exists as `DemoRequest`; needs the chosen teacher attached at booking time.*
-  **Stage 1 — in progress.** The teacher a *student chose* and the tutor *staff assigned* are two
-  different facts and must be two different columns, or the conversion metric silently credits the
-  wrong person whenever a coordinator reassigns.
+- ✅ **B3. Demo booking is the lead.** *Owner-confirmed 2026-08-07 · commit `cb5ca16`.*
+  `requested_tutor_id` records who the **family chose**, separate from the staff-set
+  `assigned_tutor_id` — one shared column would have moved conversion credit to the wrong teacher on
+  every coordinator reassignment. Captured on the public booking, gated on the tutor being published
+  (an unlisted id is dropped, the lead is still saved). The console drawer shows both and flags when
+  they differ.
+  *Still to come in Stage 3 (B1/B2): the student-facing UI that lets them pick that teacher — the
+  column and the API accept it today, the public booking form does not yet offer it.*
 
 ## C. Demo scheduling & coordination
 
@@ -97,25 +100,42 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
   only through the coordinator? (The matching export is key-gated precisely because these are home
   addresses and phone numbers — the same care applies here.)
 - ⬜ **C2. Coordinator flow for physical demos.** demo → visit → coordinate → confirmation → time slot → final.
-- 🔨 **C3. Demo state machine.** selected → contacted → time-confirmed → scheduled → completed / no-show.
-  *Today `DemoRequest.status` is only new/scheduled/converted/closed — too coarse for this.*
-  **Stage 1 — in progress.** The pivotal missing state is **completed**: without it there is no honest
-  answer to "did this demo happen?", so D1's review gate and D2's conversion denominator are both
-  unbuildable. `converted` is not a substitute — a demo that happened and did *not* convert is exactly
-  the case the ranking must be able to see.
+- ✅ **C3. Demo state machine.** *Owner-confirmed 2026-08-07 · commit `cb5ca16`.*
+  `new → contacted → scheduled → completed → converted`, plus `no_show` as its own state (deliberately
+  not `closed`: a no-show must not count against a teacher the way a held-but-unsold demo does).
+  **`completed_at` is a timestamp, not a status lookup**, so "this demo happened" survives any later
+  status change — that single fact is what D1's review gate and D2's denominator both hang on.
+  Console drives it with buttons that offer only the states valid from where the demo actually is.
 - ⬜ **C4. Class schedule after a successful demo.** Regular classes scheduled from the demo outcome.
 
 ## D. Reviews & ranking (the heart of the page)
 
-- ⬜ **D1. Teacher reviews, up to 5★, gated on a completed demo.** Only a student who actually sat the
+- 🔨 **D1. Teacher reviews, up to 5★, gated on a completed demo.** Only a student who actually sat the
   demo can review that teacher.
-  *New schema — the existing `Review` model attaches to **courses**, not tutors.*
-- ⬜ **D2. Conversion tracking — demo → regular enrolment.** The "efficiency" number.
-  *The data is already being recorded: `assignDemo` → `convert` → `Enrollment`.*
+  **Stage 2 — built, awaiting owner sign-off.** The gate is `reviews.demo_request_id` (UNIQUE), not a
+  permission check: the demo *is* the proof, so "one review per demo" is an index rather than
+  application logic that a double-submit could race, and a review can never describe a class the
+  reviewer did not attend. Extends the existing `reviews` table so staff keep one moderation queue.
+  Reviews still land `pending`.
+  **Also killed a live lie:** `TutorProfilePage` shipped a "Write a Review" form whose submit handler
+  called `setSent(true)` and stored nothing, above a hardcoded empty state that never fetched — the
+  exact deceit the `reviews` table was created to end for courses, left in place for teachers.
+- 🔨 **D2. Conversion tracking — demo → regular enrolment.** The "efficiency" number.
+  **Stage 2 — built, awaiting owner sign-off.** `App\Support\TeacherPerformance` computes it over
+  **held demos only** — never all bookings, which would punish a teacher for the coordinator's
+  backlog, and never counting no-shows against them. Staff-only: a conversion rate is an internal
+  management number and is absent from every public endpoint (verified).
+  Kept in the same class as the review gate on purpose: both must agree on *which demos count*, and a
+  teacher scored on one basis but reviewed on another is a bug nobody would notice for months.
 - ⬜ **D3. Teacher ranking score.** Combines review score + conversion rate (+ other efficiency signals).
   Applies to **online and physical** teachers alike.
 - ❓ **D3a. Decision: low-volume protection.** One demo converted = "100%" would outrank a veteran at
   60% over 50 demos. Needs a minimum-demo floor or smoothing — founder's call on which.
+  **Interim answer shipped in Stage 2, still open for the founder.** `TeacherPerformance` withholds
+  the rate entirely below `MIN_DEMOS_FOR_RATE = 5` (`conversion_rate: null`, `rate_pending: true`) and
+  the console shows the raw "4/7 demos" instead. Hiding is the conservative choice — it never states a
+  number it cannot defend. Smoothing toward the platform mean would rank *everyone* from day one
+  instead, at the cost of a figure no teacher can reproduce by hand. Decide before D3 ranks on it.
 - ⬜ **D4. Testimonials & social proof on the profile.** WhatsApp testimonials, performance photos/videos.
   *Note: today's testimonial arrays are placeholders. Real ones need consent — see WEBSITE-IMPROVEMENTS.md §A3.*
 - ⬜ **D5. Ranking feeds back into suggestions (B1).** Closing the loop.
