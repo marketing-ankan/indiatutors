@@ -5,7 +5,8 @@ import {
   LayoutGrid, BookOpen, Award, Trophy, LifeBuoy, CalendarClock, FolderOpen,
   Clock, LogOut, Menu, X, Users, ShieldCheck,
 } from 'lucide-react';
-import { fetchMyRecord, fetchMyEnrollments, fetchCourses, fetchTeacherDemos, fetchOnlineAllowance } from '../../lib/api.js';
+import { fetchMyRecord, fetchMyEnrollments, fetchCourses, fetchTeacherDemos, fetchOnlineAllowance,
+  fetchMyCourseMaterials, downloadCourseMaterial } from '../../lib/api.js';
 import { useAuth } from '../../lib/auth.jsx';
 
 /**
@@ -370,6 +371,88 @@ export function KeepLearning() {
         ))}
       </div>
     </section>
+  );
+}
+
+/**
+ * E3 + E4 — the company material for the courses you are enrolled in, plus any
+ * video courses you own.
+ *
+ * This section used to render `MyCoursesCard` alone, which returns null when a
+ * learner owns no video courses — so the whole Materials page came up
+ * completely blank, with a sidebar item promising something and a void beside
+ * it. A card that hides itself is fine inside a stack of other cards; as the
+ * only child of a section it is a bug.
+ *
+ * It also surfaces the company decks, which existed only as an API until now.
+ */
+export function ClassMaterialsSection({ children }) {
+  const { data: groups = [], isLoading } = useQuery({
+    queryKey: ['my-course-materials'],
+    queryFn: fetchMyCourseMaterials,
+  });
+
+  const [busy, setBusy] = useState(null);
+  const total = groups.reduce((a, g) => a + g.materials.length, 0);
+
+  const get = async (m) => {
+    setBusy(m.id);
+    try { await downloadCourseMaterial(m.id, m.title); } finally { setBusy(null); }
+  };
+
+  return (
+    <>
+      <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+        <h2 className="font-heading flex items-center gap-2 text-lg font-bold text-[#0B1220]">
+          <FolderOpen className="h-5 w-5 text-brand-600" />Class materials
+        </h2>
+        <p className="mt-1 text-xs text-slate-500">
+          Notes, slides and worksheets for the classes you are enrolled in.
+        </p>
+
+        {isLoading ? (
+          <p className="mt-3 text-sm text-slate-400">Loading…</p>
+        ) : total === 0 ? (
+          <p className="mt-3 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-500 ring-1 ring-slate-100">
+            Nothing shared yet. Material appears here once you are enrolled in a class and your teacher
+            or our team publishes it.
+          </p>
+        ) : (
+          <div className="mt-4 space-y-5">
+            {groups.map(g => (
+              <div key={g.course?.id ?? 'x'}>
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{g.course?.name}</p>
+                <ul className="mt-2 space-y-1.5">
+                  {g.materials.map(m => (
+                    <li key={m.id} className="flex flex-wrap items-center gap-2 rounded-lg px-3 py-2 ring-1 ring-slate-100">
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-semibold text-slate-800">{m.title}</span>
+                        {m.description && <span className="block truncate text-xs text-slate-500">{m.description}</span>}
+                      </span>
+                      <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-slate-500">{m.type}</span>
+                      {m.has_file ? (
+                        <button onClick={() => get(m)} disabled={busy === m.id}
+                          className="rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+                          {busy === m.id ? 'Opening…' : 'Download'}
+                        </button>
+                      ) : m.link_url ? (
+                        <a href={m.link_url} target="_blank" rel="noopener noreferrer"
+                          className="rounded-lg px-3 py-1.5 text-xs font-bold text-brand-700 ring-1 ring-brand-200 hover:bg-brand-50">
+                          Open ↗
+                        </a>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Video courses, when the learner owns any — this hides itself. */}
+      {children}
+    </>
   );
 }
 

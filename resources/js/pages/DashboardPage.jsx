@@ -18,7 +18,7 @@ import {
   acceptDemoSlot, declineDemoSlot,
   fetchMyAchievements, createMyAchievement, updateMyAchievement, fetchMyRecord,
 } from '../lib/api.js';
-import DashboardShell, { KeepLearning, SuggestedCourses, ParentRail, TeacherRail } from '../components/dashboard/DashboardShell.jsx';
+import DashboardShell, { KeepLearning, SuggestedCourses, ParentRail, TeacherRail, ClassMaterialsSection } from '../components/dashboard/DashboardShell.jsx';
 import {
   fetchTeacherProfile, updateTeacherProfile,
   fetchTeacherStudents, fetchTeacherDemos, fetchClassLogs, addClassLog,
@@ -216,7 +216,7 @@ function StudentDashboard() {
         </>
       )}
 
-      {section === 'materials' && <MyCoursesCard />}
+      {section === 'materials' && <ClassMaterialsSection><MyCoursesCard /></ClassMaterialsSection>}
 
       {section === 'achievements' && (
         <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
