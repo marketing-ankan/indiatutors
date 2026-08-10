@@ -106,8 +106,8 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
 
 ## C. Demo scheduling & coordination
 
-- 🔨 **C1. Teacher can contact the student after selection** — under coordinator guidance, not open
-  contact. *Stage 4 — built, awaiting owner sign-off.*
+- ✅ **C1. Teacher can contact the student after selection** — under coordinator guidance, not open
+  contact. *Owner-confirmed 2026-08-10 · commit `c3cfa94`.*
 - ✅ **C1a. DECIDED 2026-08-10 — nothing until a coordinator releases it.** A teacher sees the enquiry
   (subject, grade, area, proposed times) and never the phone, email or address until a human presses
   **Release contact**. Stored as `contact_released_at` + `contact_released_by`, not a boolean: when the
@@ -115,8 +115,8 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
   possible (reassignment happens) and cannot unsee what was seen — which is why the audit row matters.
   The withholding lives in `TeacherDemoResource`, not at each call site: a field that is only safe
   because one query happened not to select it is one refactor from leaking.
-- 🔨 **C2. Coordinator flow for physical demos.** demo → visit → coordinate → confirmation → time slot → final.
-  *Stage 4 — built, awaiting owner sign-off.* **Decided: in-app by default, phone as fallback.** Slots
+- ✅ **C2. Coordinator flow for physical demos.** demo → visit → coordinate → confirmation → time slot → final.
+  *Owner-confirmed 2026-08-10 · commit `c3cfa94`.* **Decided: in-app by default, phone as fallback.** Slots
   are rows (`demo_slot_proposals`), not prose in a notes box — a teacher proposes, the family accepts
   from their dashboard, and a coordinator can settle it on a call and log the result. `source` records
   which happened, because "the parent chose this" and "staff were told this on a call" are different
@@ -128,7 +128,18 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
   **`completed_at` is a timestamp, not a status lookup**, so "this demo happened" survives any later
   status change — that single fact is what D1's review gate and D2's denominator both hang on.
   Console drives it with buttons that offer only the states valid from where the demo actually is.
-- ⬜ **C4. Class schedule after a successful demo.** Regular classes scheduled from the demo outcome.
+- 🔨 **C4. Class schedule after a successful demo.** Regular classes scheduled from the demo outcome.
+  *Stage 4 — built, awaiting owner sign-off.* New `enrollment_schedules` holds the recurring weekly
+  timetable (a rule — "Tuesdays at 16:00" — not dated events; those are `class_logs`). **Converting a
+  demo carries its agreed time straight into the timetable**, so nobody re-negotiates a slot the family
+  already agreed once; staff can edit it afterwards. Removing a class deactivates rather than deletes,
+  so what a family was promised survives a timetable change.
+  **Not done: a staff editor.** The API is built and tested, but the console has no enrolments surface
+  at all to hang it on (only analytics counts) — that needs its own tab.
+  **Known limitation: timezones.** Weekdays and times are derived in the app timezone (Asia/Kolkata).
+  For an NRI family a "Tuesday 3:00 PM" class may fall on Monday evening locally. This is the existing
+  site-wide convention (`scheduled_at`, class logs), not new here — but it should be fixed properly
+  before the overseas audience the marketing copy claims is served in earnest.
 
 ## D. Reviews & ranking (the heart of the page)
 

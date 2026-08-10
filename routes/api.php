@@ -219,6 +219,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/students',                          [AdminStudentController::class, 'index']);
         Route::patch('/students/{student}',              [AdminStudentController::class, 'update']);
         Route::get('/enrollments',                       [AdminController::class, 'enrollments']);
+        // C4 — the weekly timetable that follows a converted demo.
+        Route::post('/enrollments/{enrollment}/schedule',            [AdminController::class, 'addEnrollmentSchedule']);
+        Route::delete('/enrollments/{enrollment}/schedule/{schedule}',[AdminController::class, 'removeEnrollmentSchedule']);
         Route::get('/orders',                            [AdminController::class, 'orders']);
         Route::patch('/orders/{order}',                  [AdminController::class, 'updateOrder']);
         Route::delete('/orders/{order}',                 [AdminController::class, 'destroyOrder']);

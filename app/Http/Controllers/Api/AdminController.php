@@ -14,6 +14,7 @@ use App\Models\Course;
 use App\Models\CourseProposal;
 use App\Models\DemoRequest;
 use App\Models\Enrollment;
+use App\Models\EnrollmentSchedule;
 use App\Models\Order;
 use App\Models\RescheduleRequest;
 use App\Models\Review;
@@ -289,6 +290,52 @@ class AdminController extends Controller {
         );
     }
 
+    /**
+     * Add a weekly class to an enrolment's timetable.
+     *
+     * Staff-editable because the demo slot is only a first guess: the family
+     * that could manage a Saturday trial often wants Tuesdays once term starts.
+     */
+    public function addEnrollmentSchedule(Request $request, Enrollment $enrollment) {
+        $data = $request->validate([
+            'weekday'          => 'required|integer|min:1|max:7',
+            'start_time'       => 'required|date_format:H:i',
+            'duration_minutes' => 'nullable|integer|min:15|max:240',
+            'note'             => 'nullable|string|max:200',
+        ]);
+
+        // The unique index is the real guard; this turns the collision into a
+        // sentence instead of a 500.
+        $exists = $enrollment->schedules()
+            ->where('weekday', $data['weekday'])
+            ->where('start_time', $data['start_time'] . ':00')
+            ->exists();
+        abort_if($exists, 422, 'This enrolment already has a class at that time.');
+
+        $enrollment->schedules()->create([
+            'weekday'          => $data['weekday'],
+            'start_time'       => $data['start_time'] . ':00',
+            'duration_minutes' => $data['duration_minutes'] ?? 60,
+            'note'             => $data['note'] ?? null,
+        ]);
+
+        AuditLog::record('enrollment_schedule_added', 'enrollment', $enrollment->id,
+            'Enrolment #' . $enrollment->id, $data);
+
+        return new EnrollmentResource($enrollment->fresh()->load(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug', 'schedules']));
+    }
+
+    /** Stop a weekly class. Kept, not deleted — the timetable has a history. */
+    public function removeEnrollmentSchedule(Enrollment $enrollment, EnrollmentSchedule $schedule) {
+        abort_if($schedule->enrollment_id !== $enrollment->id, 404, 'That class is not on this enrolment.');
+
+        $schedule->update(['active' => false]);
+        AuditLog::record('enrollment_schedule_removed', 'enrollment', $enrollment->id,
+            'Enrolment #' . $enrollment->id, ['weekday' => $schedule->weekday, 'start_time' => $schedule->start_time]);
+
+        return new EnrollmentResource($enrollment->fresh()->load(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug', 'schedules']));
+    }
+
     /** Convert a demo request into an enrollment (student + tutor + course). */
     public function convert(Request $request, DemoRequest $demoRequest) {
         $data = $request->validate([
@@ -321,6 +368,21 @@ class AdminController extends Controller {
             'completed_at' => $demoRequest->completed_at ?? now(),
         ]);
 
+        // C4: the regular timetable starts from the demo outcome. The slot that
+        // suited the family for the demo is the best first guess at the slot
+        // that suits them every week — nobody has to re-agree a time they have
+        // already agreed once. Staff can edit it afterwards; this is a starting
+        // point, not a commitment.
+        $agreed = $demoRequest->scheduled_at;
+        if ($agreed) {
+            $enrollment->schedules()->create([
+                'weekday'          => $agreed->dayOfWeekIso,
+                'start_time'       => $agreed->format('H:i:s'),
+                'duration_minutes' => $demoRequest->slots()->where('status', 'accepted')->value('duration_minutes') ?? 60,
+                'note'             => 'Carried over from the demo class',
+            ]);
+        }
+
         AppNotification::send(
             $demoRequest->user_id,
             'enrolled',
@@ -330,13 +392,15 @@ class AdminController extends Controller {
         );
 
         return (new EnrollmentResource(
-            $enrollment->load(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug'])
+            // schedules included so the console can show the timetable it just
+            // carried over from the demo, rather than making staff reload.
+            $enrollment->load(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug', 'schedules'])
         ))->response()->setStatusCode(201);
     }
 
     public function enrollments() {
         return EnrollmentResource::collection(
-            Enrollment::with(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug'])->latest()->paginate(20)
+            Enrollment::with(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug', 'schedules'])->latest()->paginate(20)
         );
     }
 

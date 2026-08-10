@@ -16,7 +16,7 @@ class EnrollmentController extends Controller {
     public function myIndex(Request $request) {
         return EnrollmentResource::collection(
             $this->enrollmentsFor($request->user())
-                ->with(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug'])
+                ->with(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug', 'schedules'])
                 ->latest()->get()
         );
     }

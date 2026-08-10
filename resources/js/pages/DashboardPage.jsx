@@ -788,6 +788,16 @@ function ParentEnrollmentRow({ e }) {
         <div className="min-w-0">
           <div className="font-semibold text-sm text-slate-800">{e.course?.name || e.plan || 'Enrollment'}</div>
           <div className="text-xs text-slate-500">{[e.student, e.tutor?.name && `with ${e.tutor.name}`, e.plan].filter(Boolean).join(' · ')}</div>
+          {/* The weekly timetable, on the row itself rather than behind the
+              expander: "when is my child's class" is the question this card is
+              opened to answer, and it used to require a phone call. */}
+          {e.schedule?.length > 0 && (
+            <div className="mt-1 flex flex-wrap gap-1">
+              {e.schedule.map(s => (
+                <span key={s.id} className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-700">{s.label}</span>
+              ))}
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor[e.status]||'bg-slate-100 text-slate-600'}`}>{e.status}</span>
