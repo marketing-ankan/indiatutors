@@ -47,7 +47,9 @@ const FAQ = [
 const inp = "w-full rounded-md ring-1 ring-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
 
 function ReferralForm() {
-  const empty = { registered_email:'', parent_name:'', email:'', whatsapp:'', student_name:'', subjects:'', timezone:'', consent:false };
+  // 2026-08-10: "Time zone" became "City" — India-only, so every referral is IST
+  // and the question answered nothing. City actually routes the lead (home tuition).
+  const empty = { registered_email:'', parent_name:'', email:'', whatsapp:'', student_name:'', subjects:'', city:'', consent:false };
   const [f, setF] = useState(empty);
   const set = k => e => setF({ ...f, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value });
   const send = useMutation({
@@ -63,7 +65,7 @@ function ReferralForm() {
         f.whatsapp && `WhatsApp: ${f.whatsapp}`,
         f.student_name && `Student: ${f.student_name}`,
         f.subjects && `Subjects of interest: ${f.subjects}`,
-        f.timezone && `Time zone: ${f.timezone}`,
+        f.city && `City: ${f.city}`,
       ].filter(Boolean).join('\n'),
     }),
   });
@@ -87,10 +89,10 @@ function ReferralForm() {
       <div className="grid sm:grid-cols-2 gap-3">
         <input placeholder="Parent Name" value={f.parent_name} onChange={set('parent_name')} className={inp}/>
         <input type="email" placeholder="Email" value={f.email} onChange={set('email')} className={inp}/>
-        <input placeholder="WhatsApp Number (with country code)" value={f.whatsapp} onChange={set('whatsapp')} className={inp}/>
+        <input placeholder="WhatsApp Number" value={f.whatsapp} onChange={set('whatsapp')} className={inp}/>
         <input placeholder="Student Name" value={f.student_name} onChange={set('student_name')} className={inp}/>
         <input placeholder="Subject(s) of Interest" value={f.subjects} onChange={set('subjects')} className={inp}/>
-        <input placeholder="Time Zone" value={f.timezone} onChange={set('timezone')} className={inp}/>
+        <input placeholder="City" value={f.city} onChange={set('city')} className={inp}/>
       </div>
       <label className="flex items-start gap-2 text-sm text-slate-600">
         <input type="checkbox" required checked={f.consent} onChange={set('consent')} className="mt-1"/>

@@ -32,12 +32,16 @@ const rateFor = (subject, level, ctype, cur) => {
 const GRADES = ['Pre-K','Kindergarten',...Array.from({length:12},(_,i)=>`Grade ${i+1}`)];
 
 function PdfRequestForm() {
-  const [f, setF] = useState({ name:'', email:'', country:'India' });
+  // Country dropped 2026-08-10 with the rest of the overseas UI: the business
+  // is India-only, so it asked a question whose answer changed nothing and
+  // implied we quote elsewhere. The message no longer carries a country line —
+  // a field nobody acts on is friction on a lead form.
+  const [f, setF] = useState({ name:'', email:'' });
   const [open, setOpen] = useState(false);
   const send = useMutation({
     mutationFn: () => submitContact({
       name: f.name, email: f.email, subject: 'Full pricing PDF request',
-      message: `Please send the full pricing PDF.\nCountry: ${f.country}`,
+      message: 'Please send the full pricing PDF.',
     }),
   });
   if (!open) return (
@@ -45,14 +49,19 @@ function PdfRequestForm() {
   );
   if (send.isSuccess) return <p className="text-center text-sm font-semibold text-green-700 py-3">✅ Thanks — the full pricing PDF is on its way to your inbox.</p>;
   return (
-    <form onSubmit={e=>{e.preventDefault();send.mutate();}} className="grid sm:grid-cols-4 gap-2">
-      <input required placeholder="Full Name *" value={f.name} onChange={e=>setF({...f,name:e.target.value})} className={inp}/>
-      <input required type="email" placeholder="Email ID *" value={f.email} onChange={e=>setF({...f,email:e.target.value})} className={inp}/>
-      <select value={f.country} onChange={e=>setF({...f,country:e.target.value})} className={inp}>
-        {PRICING.countries.map(c=><option key={c.name}>{c.name}</option>)}
-      </select>
-      <button disabled={send.isPending} className="rounded-xl bg-slate-900 text-white py-2.5 text-sm font-bold hover:bg-slate-800 disabled:opacity-60">{send.isPending?'Sending…':'Send me the PDF'}</button>
-    </form>
+    <>
+      {/* 3 columns now the country select is gone, so the row still fills. */}
+      <form onSubmit={e=>{e.preventDefault();send.mutate();}} className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <input required placeholder="Full Name *" value={f.name} onChange={e=>setF({...f,name:e.target.value})} className={inp}/>
+        <input required type="email" placeholder="Email ID *" value={f.email} onChange={e=>setF({...f,email:e.target.value})} className={inp}/>
+        <button disabled={send.isPending} className="rounded-xl bg-slate-900 text-white py-2.5 text-sm font-bold hover:bg-slate-800 disabled:opacity-60">{send.isPending?'Sending…':'Send me the PDF'}</button>
+      </form>
+      {/* B3 in the audit: this form failed silently, so a lead that errored
+          just looked like nothing had happened. */}
+      {send.isError && (
+        <p className="mt-2 text-center text-xs text-red-600">Could not send that — please try again, or email connect@indiatutorsonline.com.</p>
+      )}
+    </>
   );
 }
 

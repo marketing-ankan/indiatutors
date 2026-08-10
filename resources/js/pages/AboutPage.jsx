@@ -27,7 +27,7 @@ const FACTS = [
   'Qualification-screened, expert tutors',
   'Live 1-on-1 & small group classes',
   'Transparent, affordable pricing',
-  'Flexible scheduling across time zones',
+  'Flexible scheduling around school hours',
   'First demo class is free',
 ];
 
@@ -54,7 +54,7 @@ export default function AboutPage() {
           <div>
             <span className="inline-block rounded-full bg-white/15 ring-1 ring-white/25 px-3.5 py-1.5 text-xs font-bold mb-4">💎 About Us</span>
             <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.07]">About Indiatutors Online</h1>
-            <p className="mt-4 text-slate-300 max-w-xl text-lg leading-relaxed">India's trusted online tutoring marketplace — live, personalised learning that makes quality education accessible to every family, anywhere in the world.</p>
+            <p className="mt-4 text-slate-300 max-w-xl text-lg leading-relaxed">India's trusted online tutoring marketplace — live, personalised learning that makes quality education accessible to every family, in every corner of India.</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link to="/book-demo" className="rounded-xl bg-[#D4AF37] text-[#0B1220] px-6 py-3 text-sm font-bold shadow-lg shadow-[#D4AF37]/30 hover:brightness-105">🎯 Book a Free Demo</Link>
               <Link to="/find-tutors" className="rounded-xl border border-white/60 px-6 py-3 text-sm font-bold hover:bg-white/10">Find Tutors</Link>
@@ -94,7 +94,12 @@ export default function AboutPage() {
           <p className="text-slate-700 leading-relaxed text-[1.04rem]">Tutors on our platform are qualification-screened before they are listed, and tutors who complete our verification checks carry a Verified badge on their profile. We believe education should be goal-oriented — every session takes your child one step closer to their academic or skill goal. Our fees are transparent, our tutors are passionate, and our platform is designed around the needs of Indian families.</p>
 
           <SectionH2>Our Reach</SectionH2>
-          <p className="text-slate-700 leading-relaxed text-[1.04rem]">We serve students across India and internationally — in the USA, Canada, Australia, Singapore, and the United Kingdom. Our online tutors are available across all time zones. Our home tutors are available in major Indian cities including Kolkata, Delhi, Mumbai, Bangalore, Chennai, Hyderabad, and Pune.</p>
+          {/* Was "We serve students across India and internationally — in the USA,
+              Canada, Australia, Singapore, and the United Kingdom." The owner
+              confirmed 2026-08-10 that the business is India-only, which made that
+              a checkable claim that isn't true — same category as the fabricated
+              ratings removed on 2026-08-07. */}
+          <p className="text-slate-700 leading-relaxed text-[1.04rem]">We teach students across India — from metros to smaller towns — with online classes scheduled around Indian school hours. Our home tutors visit students in major Indian cities including Kolkata, Delhi, Mumbai, Bangalore, Chennai, Hyderabad, and Pune.</p>
 
           <SectionH2>Subject Categories</SectionH2>
           <p className="text-slate-700 leading-relaxed text-[1.04rem]">Academics (CBSE, ICSE/ISC, IB, IGCSE, State Boards) · Commerce &amp; Computer Science · JEE / NEET / CUET Prep · Olympiads · Music (Piano, Violin, Guitar, Tabla, Vocal) · Dance (Bharatnatyam, Kathak, Bollywood, Contemporary) · IT & Coding (Python, AI/ML, Robotics, Java, Web Dev) · Languages (Spanish, French, German, Hindi, Sanskrit) · Chess · Yoga · Creative Arts</p>
