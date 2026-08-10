@@ -123,6 +123,107 @@ class QuestionController extends Controller
         ], 201);
     }
 
+    // ---- Staff authoring -----------------------------------------------------
+
+    /**
+     * Everything on one lesson, answers included — this is the marking side.
+     * Attempt counts ride along so an author can see which questions are
+     * actually being sat before editing one out from under a student.
+     */
+    public function adminForLesson(VideoLesson $lesson)
+    {
+        $rows = Question::withCount('attempts')
+            ->where('video_lesson_id', $lesson->id)
+            ->orderBy('level')->orderBy('position')->orderBy('id')
+            ->get();
+
+        return response()->json(['data' => $rows->map(fn (Question $q) => self::staffRow($q))->all()]);
+    }
+
+    public function adminStore(Request $request, VideoLesson $lesson)
+    {
+        $data = $this->validateQuestion($request);
+
+        $question = Question::create($data + [
+            'video_lesson_id' => $lesson->id,
+            'video_course_id' => $lesson->video_course_id,
+        ]);
+
+        \App\Models\AuditLog::record('question_added', 'video_lesson', $lesson->id,
+            $lesson->title, ['level' => $question->level, 'topic' => $question->topic]);
+
+        return response()->json(['data' => self::staffRow($question)], 201);
+    }
+
+    public function adminUpdate(Request $request, Question $question)
+    {
+        $data = $this->validateQuestion($request);
+        $question->update($data);
+
+        return response()->json(['data' => self::staffRow($question->fresh())]);
+    }
+
+    public function adminDestroy(Question $question)
+    {
+        // Answer history dies with the question (cascade) — that is the honest
+        // outcome, but the author should know they are erasing evidence, so the
+        // count is in the confirm copy the UI shows before calling this.
+        $lessonId = $question->video_lesson_id;
+        $title    = mb_substr($question->prompt, 0, 80);
+        $question->delete();
+
+        \App\Models\AuditLog::record('question_deleted', 'video_lesson', $lessonId, $title);
+
+        return response()->json(['message' => 'Question deleted.']);
+    }
+
+    /**
+     * One rule set for create and update — the option list and the correct key
+     * are validated TOGETHER, because "correct_key must be one of the option
+     * keys" is the invariant the whole scorer stands on. A question whose
+     * correct answer is not among its options marks every student wrong.
+     */
+    private function validateQuestion(Request $request): array
+    {
+        $data = $request->validate([
+            'level'          => 'required|integer|in:' . implode(',', QuestionBank::LEVELS),
+            'topic'          => 'nullable|string|max:120',
+            'prompt'         => 'required|string|max:2000',
+            'options'        => 'required|array|min:2|max:6',
+            'options.*.key'  => 'required|string|max:8|distinct',
+            'options.*.text' => 'required|string|max:400',
+            'correct_key'    => 'required|string|max:8',
+            'explanation'    => 'nullable|string|max:600',
+            'is_published'   => 'nullable|boolean',
+            'position'       => 'nullable|integer|min:0|max:9999',
+        ]);
+
+        $keys = array_column($data['options'], 'key');
+        abort_unless(in_array($data['correct_key'], $keys, true), 422,
+            'The correct answer must be one of the options.');
+
+        $data['is_published'] = $data['is_published'] ?? true;
+        $data['position']     = $data['position'] ?? 0;
+
+        return $data;
+    }
+
+    private static function staffRow(Question $q): array
+    {
+        return [
+            'id'            => $q->id,
+            'level'         => $q->level,
+            'topic'         => $q->topic,
+            'prompt'        => $q->prompt,
+            'options'       => $q->options,
+            'correct_key'   => $q->correct_key,
+            'explanation'   => $q->explanation,
+            'is_published'  => $q->is_published,
+            'position'      => $q->position,
+            'attempts'      => (int) ($q->attempts_count ?? 0),
+        ];
+    }
+
     /** F8 — where this learner is weak, per topic. */
     public function weakAreas(Request $request)
     {

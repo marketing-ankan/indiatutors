@@ -277,6 +277,11 @@ Route::middleware('auth:sanctum')->group(function () {
         // A4 — a teacher's own edits reach the public listing only through here.
         Route::post('/teachers/{teacherProfile}/publish', [AdminTeacherController::class, 'publishChanges']);
         Route::post('/teachers/{teacherProfile}/discard', [AdminTeacherController::class, 'discardChanges']);
+        // F7 — question authoring. Answers travel only on these staff routes.
+        Route::get('/lessons/{lesson}/questions',        [QuestionController::class, 'adminForLesson']);
+        Route::post('/lessons/{lesson}/questions',       [QuestionController::class, 'adminStore']);
+        Route::patch('/questions/{question}',            [QuestionController::class, 'adminUpdate']);
+        Route::delete('/questions/{question}',           [QuestionController::class, 'adminDestroy']);
         Route::get('/course-materials',                  [CourseMaterialController::class, 'adminIndex']);
         Route::post('/course-materials',                 [CourseMaterialController::class, 'store']);
         Route::patch('/course-materials/{material}',     [CourseMaterialController::class, 'update']);

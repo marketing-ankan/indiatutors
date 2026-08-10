@@ -299,3 +299,8 @@ export const fetchAdminLessons      = async (courseId) => { const { data } = awa
 export const createAdminLesson      = async ({ courseId, ...p }) => { const { data } = await api.post(`/admin/video-courses/${courseId}/lessons`, p); return data; };
 export const updateAdminLesson      = async ({ courseId, id, ...p }) => { const { data } = await api.patch(`/admin/video-courses/${courseId}/lessons/${id}`, p); return data; };
 export const deleteAdminLesson      = async ({ courseId, id }) => { const { data } = await api.delete(`/admin/video-courses/${courseId}/lessons/${id}`); return data; };
+// F7 — question authoring. These admin routes are the only place answers travel.
+export const fetchAdminQuestions    = async (lessonId) => { const { data } = await api.get(`/admin/lessons/${lessonId}/questions`); return data.data; };
+export const createAdminQuestion    = async ({ lessonId, ...p }) => { const { data } = await api.post(`/admin/lessons/${lessonId}/questions`, p); return data.data; };
+export const updateAdminQuestion    = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/questions/${id}`, p); return data.data; };
+export const deleteAdminQuestion    = async (id) => { const { data } = await api.delete(`/admin/questions/${id}`); return data; };
