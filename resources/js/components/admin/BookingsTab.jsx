@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Trash2, UserCheck, GraduationCap, Sparkles } from 'lucide-react';
 import {
   fetchAdminDemoRequests, fetchTutors, assignDemo, convertDemo, deleteAdminDemo,
-  fetchDemoSuggestions,
+  fetchDemoSuggestions, releaseDemoContact, logDemoSlot,
 } from '../../lib/api.js';
 import {
   AdminTable, Chips, SearchBox, Pager, StatusBadge, Modal, ConfirmDialog,
@@ -213,6 +213,7 @@ function BookingDetails({ booking, onClose, onChanged }) {
       )}
 
       <LifecycleBar booking={booking} onChanged={onChanged} />
+      <Coordination booking={booking} onChanged={onChanged} />
 
       <div className="mt-5 border-t border-slate-100 pt-4">
         {/* Clear the roster filter on pick, or the select can hide the chosen
@@ -254,6 +255,85 @@ function BookingDetails({ booking, onClose, onChanged }) {
         {assign.isSuccess && <p className="mt-2 text-xs font-semibold text-green-700">Assigned ✓</p>}
       </div>
     </Modal>
+  );
+}
+
+const SLOT_TONE = {
+  proposed: 'bg-amber-50 text-amber-700', accepted: 'bg-green-50 text-green-700',
+  declined: 'bg-slate-100 text-slate-500', withdrawn: 'bg-slate-100 text-slate-500',
+  superseded: 'bg-slate-100 text-slate-500',
+};
+
+/**
+ * The coordinator's half of the demo: who may contact the family, and when the
+ * class actually is.
+ *
+ * Contact release is a deliberate act, not a side effect of assigning someone —
+ * most of these students are minors and the home-tuition side carries a street
+ * address. The button says plainly what it hands over.
+ *
+ * "Log a time agreed by phone" is the fallback path: teachers propose slots
+ * in-app and families accept them there, but a coordinator who settles it on a
+ * call still needs somewhere truthful to put the result.
+ */
+function Coordination({ booking, onChanged }) {
+  const [when, setWhen] = useState('');
+  const [note, setNote] = useState('');
+
+  const release = useMutation({ mutationFn: (v) => releaseDemoContact(booking.id, v), onSuccess: onChanged });
+  const logSlot = useMutation({
+    mutationFn: () => logDemoSlot(booking.id, { starts_at: when.replace('T', ' ') + ':00', note: note || null }),
+    onSuccess: () => { setWhen(''); setNote(''); onChanged(); },
+  });
+
+  const released = !!booking.contact_released_at;
+  const slots = booking.slots ?? [];
+
+  return (
+    <div className="mt-4 rounded-lg border border-slate-200 p-3">
+      <p className="mb-2 text-xs font-bold text-slate-700">Coordination</p>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <button type="button" disabled={release.isPending || (!released && !booking.assigned_tutor)}
+          title={!booking.assigned_tutor && !released ? 'Assign a teacher first' : ''}
+          onClick={() => release.mutate(!released)}
+          className={btnGhost + ' px-3 py-1.5 text-xs'}>
+          {released ? 'Withdraw contact details' : 'Release contact to teacher'}
+        </button>
+        <span className="text-[11px] text-slate-500">
+          {released
+            ? `The teacher can see this family's phone and email (released ${booking.contact_released_at}).`
+            : 'The teacher sees the enquiry only — no phone, email or address.'}
+        </span>
+      </div>
+      {release.isError && <p className="mt-1 text-xs text-red-600">{errText(release.error)}</p>}
+
+      {slots.length > 0 && (
+        <ul className="mt-3 space-y-1">
+          {slots.map(s => (
+            <li key={s.id} className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="font-semibold text-slate-800">{s.starts_at}</span>
+              <span className={`rounded-full px-2 py-0.5 font-semibold ${SLOT_TONE[s.status] || 'bg-slate-100 text-slate-600'}`}>{s.status}</span>
+              <span className="text-slate-400">
+                {s.source === 'coordinator' ? 'logged by staff' : 'proposed by teacher'}
+                {s.note ? ` · ${s.note}` : ''}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="mt-3 flex flex-wrap items-end gap-2">
+        <label className="text-[11px] font-semibold text-slate-600">
+          Time agreed by phone
+          <input type="datetime-local" value={when} onChange={e => setWhen(e.target.value)} className={inp + ' mt-0.5 w-52'} />
+        </label>
+        <input value={note} onChange={e => setNote(e.target.value)} placeholder="Note (who agreed it)" className={inp + ' w-52'} />
+        <button type="button" disabled={!when || logSlot.isPending} onClick={() => logSlot.mutate()}
+          className={btnGhost + ' px-3 py-2 text-xs'}>Log &amp; schedule</button>
+      </div>
+      {logSlot.isError && <p className="mt-1 text-xs text-red-600">{errText(logSlot.error)}</p>}
+    </div>
   );
 }
 

@@ -1,11 +1,11 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-MSys-x0h.css",
+    "file": "assets/app-BCaB_Rfg.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/components/admin/AdminConsole.jsx": {
-    "file": "assets/AdminConsole-Bm1gOVq0.js",
+    "file": "assets/AdminConsole-Cfnrgc_h.js",
     "name": "AdminConsole",
     "src": "resources/js/components/admin/AdminConsole.jsx",
     "isDynamicEntry": true,
@@ -14,7 +14,7 @@
     ]
   },
   "resources/js/main.jsx": {
-    "file": "assets/main-BEioRCHd.js",
+    "file": "assets/main-B8rV_H0g.js",
     "name": "main",
     "src": "resources/js/main.jsx",
     "isEntry": true,
@@ -23,7 +23,7 @@
       "resources/js/components/admin/AdminConsole.jsx"
     ],
     "css": [
-      "assets/app-MSys-x0h.css"
+      "assets/app-BCaB_Rfg.css"
     ]
   }
 }

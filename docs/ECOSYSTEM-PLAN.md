@@ -36,11 +36,13 @@ converted", so a review gate and an honest conversion rate are both impossible u
 Shipped early precisely because they need *time*, not because they're urgent. Every demo that happens
 from this point forward becomes ranking data.
 
-**Stage 3 — rank and surface it** (D3 + D3a, D5, B1, B2, A2) ← *in progress*
+**Stage 3 — rank and surface it** (D3 + D3a, D5, B1, B2) — ✅ **done 2026-08-10** (`f01f28e`)
+*A2 moved to Stage 4: the profile now shows real reviews, but the media that makes it worth
+visiting — the intro video — is blocked on R2 keys and belongs with the other media work.*
 Now there is something to rank. The suggestion engine already exists (`TeacherMatcher`); this stage
 adds the ranking term and turns the staff-only shortlist into the student-facing one.
 
-**Stage 4 — coordination and media** (C1 + C1a, C2, C4, A1, A3, A4, D4)
+**Stage 4 — coordination and media** (C1 + C1a, C2, C4, A2, A3, A4, A1, D4) ← *in progress*
 The human workflow around the demo, and the profile media that makes a profile worth viewing.
 A1 stays last in this stage because it is blocked on R2 keys regardless.
 
@@ -80,14 +82,14 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
 
 ## B. Search → suggestion → selection (student-facing)
 
-- 🔨 **B1. Student-facing teacher suggestions.** *Stage 3 — built, awaiting owner sign-off.*
+- ✅ **B1. Student-facing teacher suggestions.** *Owner-confirmed 2026-08-10 · commit `f01f28e`.*
   The ranked shortlist now appears **inside the booking flow**, matching the page's own drawing of the
   journey (search → suggestion → select → demo = the lead). `GET /api/tutors/suggestions` is public and
   carries only what helps a family choose — subjects, experience, fee, city, and the star rating real
   families left after real demos. Score, conversion rate and demo counts are absent (verified).
   New `App\Support\TutorMatcher` holds the fit scoring, shared with the Staff Console: two copies would
   drift, and the first time parent and coordinator saw different orders nobody could say which was right.
-- 🔨 **B2. Teacher list → profile view → select.** *Stage 3 — built, awaiting owner sign-off.*
+- ✅ **B2. Teacher list → profile view → select.** *Owner-confirmed 2026-08-10 · commit `f01f28e`.*
   Each shortlist card names *why* it was suggested and links to the full profile in a new tab, so a
   parent can check qualifications, availability and reviews without losing a part-filled form.
   Selecting is optional — blank still means "a coordinator will match us". Arriving from a tutor's own
@@ -104,11 +106,22 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
 
 ## C. Demo scheduling & coordination
 
-- ⬜ **C1. Teacher can contact the student after selection** — under coordinator guidance, not open contact.
-- ❓ **C1a. Decision: contact reveal policy.** Does the student's phone go to the teacher directly, or
-  only through the coordinator? (The matching export is key-gated precisely because these are home
-  addresses and phone numbers — the same care applies here.)
-- ⬜ **C2. Coordinator flow for physical demos.** demo → visit → coordinate → confirmation → time slot → final.
+- 🔨 **C1. Teacher can contact the student after selection** — under coordinator guidance, not open
+  contact. *Stage 4 — built, awaiting owner sign-off.*
+- ✅ **C1a. DECIDED 2026-08-10 — nothing until a coordinator releases it.** A teacher sees the enquiry
+  (subject, grade, area, proposed times) and never the phone, email or address until a human presses
+  **Release contact**. Stored as `contact_released_at` + `contact_released_by`, not a boolean: when the
+  question is *who gave this teacher our number, and when*, a flag cannot answer it. Withdrawal is
+  possible (reassignment happens) and cannot unsee what was seen — which is why the audit row matters.
+  The withholding lives in `TeacherDemoResource`, not at each call site: a field that is only safe
+  because one query happened not to select it is one refactor from leaking.
+- 🔨 **C2. Coordinator flow for physical demos.** demo → visit → coordinate → confirmation → time slot → final.
+  *Stage 4 — built, awaiting owner sign-off.* **Decided: in-app by default, phone as fallback.** Slots
+  are rows (`demo_slot_proposals`), not prose in a notes box — a teacher proposes, the family accepts
+  from their dashboard, and a coordinator can settle it on a call and log the result. `source` records
+  which happened, because "the parent chose this" and "staff were told this on a call" are different
+  facts and only one is the family's own word. Accepting is atomic: it schedules the demo, closes the
+  competing offers, and stamps `scheduled_at`. Only one accepted slot may ever stand.
 - ✅ **C3. Demo state machine.** *Owner-confirmed 2026-08-07 · commit `cb5ca16`.*
   `new → contacted → scheduled → completed → converted`, plus `no_show` as its own state (deliberately
   not `closed`: a no-show must not count against a teacher the way a held-but-unsold demo does).
@@ -137,9 +150,9 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
   management number and is absent from every public endpoint (verified).
   Kept in the same class as the review gate on purpose: both must agree on *which demos count*, and a
   teacher scored on one basis but reviewed on another is a bug nobody would notice for months.
-- 🔨 **D3. Teacher ranking score.** Combines review score + conversion rate (+ other efficiency signals).
-  Applies to **online and physical** teachers alike.
-  **Stage 3 — built, awaiting owner sign-off.** `TeacherPerformance::score()` blends conversion (0.6)
+- ✅ **D3. Teacher ranking score.** *Owner-confirmed 2026-08-10 · commit `f01f28e`.* Combines review
+  score + conversion rate. Applies to **online and physical** teachers alike.
+  `TeacherPerformance::score()` blends conversion (0.6)
   and rating (0.4), each Bayesian-smoothed toward the platform mean. Weighted so conversion leads,
   because it is the harder signal to game: a teacher with 5.0★ from 15 reviews but 4 conversions in 40
   demos scores **46**, below a quiet closer at 28/40 with no reviews at all (**69.7**). The score
@@ -160,7 +173,7 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
   — a cautious assumption beats a confident one drawn from four data points.
 - ⬜ **D4. Testimonials & social proof on the profile.** WhatsApp testimonials, performance photos/videos.
   *Note: today's testimonial arrays are placeholders. Real ones need consent — see WEBSITE-IMPROVEMENTS.md §A3.*
-- 🔨 **D5. Ranking feeds back into suggestions (B1).** *Stage 3 — built, awaiting owner sign-off.*
+- ✅ **D5. Ranking feeds back into suggestions (B1).** *Owner-confirmed 2026-08-10 · commit `f01f28e`.*
   The loop is closed: reviews and conversions from held demos feed the score, the score breaks ties in
   `TutorMatcher`, and the shortlist a family sees is that ordering. **Fit still dominates** — track
   record only separates teachers who already match the subject and grade asked for, so a superb Physics

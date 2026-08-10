@@ -21,6 +21,18 @@ class DemoRequestResource extends JsonResource {
             'student_id'     => $this->student_id,
             'scheduled_at'   => optional($this->scheduled_at)->toDateTimeString(),
             'completed_at'   => optional($this->completed_at)->toDateTimeString(),
+            // Whether the assigned teacher has been given this family's contact
+            // details. Surfaced so staff can see it at a glance and the family
+            // could later be told — it is their data being shared.
+            'contact_released_at' => optional($this->contact_released_at)->toDateTimeString(),
+            'slots' => $this->whenLoaded('slots', fn () => $this->slots->map(fn ($s) => [
+                'id'        => $s->id,
+                'starts_at' => $s->starts_at->toDateTimeString(),
+                'duration_minutes' => $s->duration_minutes,
+                'note'      => $s->note,
+                'status'    => $s->status,
+                'source'    => $s->source,
+            ])->values()),
             'course'         => $this->whenLoaded('course', fn () => $this->course?->only(['name', 'slug'])),
             'student'        => $this->whenLoaded('student', fn () => $this->student?->name),
             'assigned_tutor' => $this->whenLoaded('assignedTutor', fn () => $this->assignedTutor ? $this->assignedTutor->only(['id', 'name', 'slug']) : null),

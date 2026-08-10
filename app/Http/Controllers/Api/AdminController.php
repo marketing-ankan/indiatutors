@@ -26,6 +26,7 @@ use App\Support\TeacherPerformance;
 use App\Support\TutorMatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class AdminController extends Controller {
@@ -35,7 +36,8 @@ class AdminController extends Controller {
      */
     public function demoRequests(Request $request) {
         $q = DemoRequest::query()
-            ->with(['student:id,name', 'course:id,name,slug', 'assignedTutor:id,name,slug', 'requestedTutor:id,name,slug', 'user:id,name,email'])
+            ->with(['student:id,name', 'course:id,name,slug', 'assignedTutor:id,name,slug', 'requestedTutor:id,name,slug', 'user:id,name,email',
+                    'slots' => fn ($q) => $q->orderBy('starts_at')])
             ->latest();
         if ($s = $request->string('status')->toString()) $q->where('status', $s);
         if ($t = $request->string('type')->toString())   $q->where('type', $t);
@@ -206,6 +208,85 @@ class AdminController extends Controller {
             ])->all(),
             'meta' => ['count' => $rows->count()],
         ]);
+    }
+
+    /**
+     * Release (or withdraw) the family's contact details to the assigned teacher.
+     *
+     * Owner's rule, 2026-08-10: a teacher sees nothing identifying until a
+     * coordinator decides. This is that decision, made explicitly and recorded
+     * with a name and a time — most of these students are minors, and the
+     * home-tuition side carries a street address.
+     *
+     * Withdrawing is offered because reassignment happens. It cannot unsee what
+     * was already seen, which is exactly why the audit row matters.
+     */
+    public function releaseDemoContact(Request $request, DemoRequest $demoRequest) {
+        $data = $request->validate(['released' => 'required|boolean']);
+
+        abort_if($data['released'] && ! $demoRequest->assigned_tutor_id, 422,
+            'Assign a teacher first — there is nobody to release these details to.');
+
+        $demoRequest->update($data['released']
+            ? ['contact_released_at' => now(), 'contact_released_by' => $request->user()->id]
+            : ['contact_released_at' => null, 'contact_released_by' => null]);
+
+        AuditLog::record(
+            $data['released'] ? 'demo_contact_released' : 'demo_contact_withdrawn',
+            'booking', $demoRequest->id,
+            trim($demoRequest->name . ' · ' . ($demoRequest->subject ?: $demoRequest->type)),
+            ['tutor_id' => $demoRequest->assigned_tutor_id],
+        );
+
+        return new DemoRequestResource(
+            $demoRequest->fresh()->load(['assignedTutor:id,name,slug', 'requestedTutor:id,name,slug', 'student:id,name', 'slots'])
+        );
+    }
+
+    /**
+     * Log a time agreed on the phone — the fallback half of the owner's
+     * "in-app by default, phone as fallback" decision.
+     *
+     * Recorded with source='coordinator' so it is never mistaken for the
+     * family's own click. Both end in the same place (a scheduled demo), but
+     * only one of them is the family's word, and a dispute months later turns
+     * on knowing which.
+     */
+    public function logDemoSlot(Request $request, DemoRequest $demoRequest) {
+        $data = $request->validate([
+            'starts_at'        => 'required|date',
+            'duration_minutes' => 'nullable|integer|min:15|max:240',
+            'note'             => 'nullable|string|max:300',
+        ]);
+
+        DB::transaction(function () use ($request, $demoRequest, $data) {
+            $slot = $demoRequest->slots()->create([
+                'proposed_by'      => $request->user()->id,
+                'source'           => 'coordinator',
+                'starts_at'        => $data['starts_at'],
+                'duration_minutes' => $data['duration_minutes'] ?? 45,
+                'note'             => $data['note'] ?? null,
+                // Agreed on the call, so it is already settled — there is
+                // nobody left to confirm it.
+                'status'           => 'accepted',
+                'responded_at'     => now(),
+            ]);
+            // live(), not open(): a time agreed on the phone replaces one the
+            // family had already accepted online. Closing only the pending ones
+            // left TWO accepted slots on the demo and two entries in the
+            // teacher's calendar for a single class.
+            $demoRequest->slots()->where('id', '!=', $slot->id)->live()
+                ->update(['status' => 'superseded', 'responded_at' => now()]);
+            $demoRequest->update(['status' => 'scheduled', 'scheduled_at' => $slot->starts_at]);
+        });
+
+        AuditLog::record('demo_slot_logged', 'booking', $demoRequest->id,
+            trim($demoRequest->name . ' · ' . ($demoRequest->subject ?: $demoRequest->type)),
+            ['starts_at' => $data['starts_at']]);
+
+        return new DemoRequestResource(
+            $demoRequest->fresh()->load(['assignedTutor:id,name,slug', 'requestedTutor:id,name,slug', 'student:id,name', 'slots'])
+        );
     }
 
     /** Convert a demo request into an enrollment (student + tutor + course). */

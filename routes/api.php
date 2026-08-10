@@ -126,6 +126,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/kyc/{document}', [KycController::class, 'destroy']);
 
     Route::get('/my/demo-requests', [DemoRequestController::class, 'myIndex']);
+    // The family answers a proposed time. Ownership is checked in the
+    // controller — these ids are guessable and this writes to a teacher's diary.
+    Route::post('/my/demo-requests/{demoRequest}/slots/{slot}/accept',  [DemoRequestController::class, 'acceptSlot']);
+    Route::post('/my/demo-requests/{demoRequest}/slots/{slot}/decline', [DemoRequestController::class, 'declineSlot']);
     Route::get('/my/enrollments',   [EnrollmentController::class, 'myIndex']);
     Route::get('/my/upcoming-classes', [EnrollmentController::class, 'upcomingClasses']);
     Route::get('/my/enrollments/{enrollment}', [EnrollmentController::class, 'myShow']);
@@ -172,6 +176,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/teacher/profile',  [TeacherController::class, 'updateMine']);
     Route::get('/teacher/students', [TeacherController::class, 'students']);
     Route::get('/teacher/demos',    [TeacherController::class, 'demos']);
+    Route::post('/teacher/demos/{demoRequest}/slots',                [TeacherController::class, 'proposeDemoSlot']);
+    Route::patch('/teacher/demos/{demoRequest}/slots/{slot}/withdraw',[TeacherController::class, 'withdrawDemoSlot']);
     Route::get('/teacher/enrollments/{enrollment}/logs',  [TeacherController::class, 'classLogs']);
     Route::post('/teacher/enrollments/{enrollment}/logs', [TeacherController::class, 'storeClassLog']);
     Route::get('/teacher/enrollments/{enrollment}/curriculum',    [TeacherController::class, 'curriculum']);
@@ -192,6 +198,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/overview',                          [AdminController::class, 'overview']);
         Route::get('/demo-requests',                     [AdminController::class, 'demoRequests']);
         Route::get('/demo-requests/{demoRequest}/suggestions', [AdminController::class, 'demoSuggestions']);
+        // Coordinator controls: who may see the family's details, and logging a
+        // time settled on a phone call.
+        Route::patch('/demo-requests/{demoRequest}/contact',   [AdminController::class, 'releaseDemoContact']);
+        Route::post('/demo-requests/{demoRequest}/slots',      [AdminController::class, 'logDemoSlot']);
         Route::patch('/demo-requests/{demoRequest}',     [AdminController::class, 'assignDemo']);
         Route::delete('/demo-requests/{demoRequest}',    [AdminController::class, 'destroyDemoRequest']);
         Route::post('/demo-requests/{demoRequest}/convert',[AdminController::class, 'convert']);

@@ -12,6 +12,8 @@ use App\Models\AppNotification;
 use App\Models\ClassLog;
 use App\Models\ClassMaterial;
 use App\Models\CurriculumItem;
+use App\Models\DemoRequest;
+use App\Models\DemoSlotProposal;
 use App\Models\Enrollment;
 use App\Models\RescheduleRequest;
 use Illuminate\Http\Request;
@@ -70,10 +72,76 @@ class TeacherController extends Controller {
         // simply never see a booking sitting in 'contacted'.
         return TeacherDemoResource::collection(
             $tutor->assignedDemos()
-                ->with(['student:id,name', 'course:id,name,slug'])
+                ->with(['student:id,name', 'course:id,name,slug', 'slots'])
                 ->whereNotIn('status', ['converted', 'no_show', 'closed'])
                 ->latest()->get()
         );
+    }
+
+    /**
+     * Propose a time for a demo you have been assigned.
+     *
+     * This is the in-app half of the owner's "in-app by default, phone as
+     * fallback" decision: the teacher offers slots, the family accepts one from
+     * their dashboard, and no phone number has to change hands for that to
+     * happen. A coordinator can still settle it on a call and log the result.
+     */
+    public function proposeDemoSlot(Request $request, DemoRequest $demoRequest) {
+        $tutor = $this->tutorFor($request);
+        // Assignment is the authorisation. A teacher must not be able to
+        // schedule against a booking that is not theirs, and the id is
+        // guessable, so this check is the whole gate.
+        abort_if(! $tutor || $demoRequest->assigned_tutor_id !== $tutor->id, 403,
+            'This demo is not assigned to you.');
+        abort_if(in_array($demoRequest->status, ['converted', 'no_show', 'closed'], true), 422,
+            'This demo is already closed.');
+
+        $data = $request->validate([
+            'starts_at'        => 'required|date|after:now',
+            'duration_minutes' => 'nullable|integer|min:15|max:240',
+            'note'             => 'nullable|string|max:300',
+        ]);
+
+        // A wall of open offers is not a choice, it is noise for the family and
+        // a scheduling hazard for the teacher.
+        abort_if($demoRequest->slots()->open()->count() >= 5, 422,
+            'You already have five open proposals on this demo — withdraw one first.');
+
+        $slot = $demoRequest->slots()->create([
+            'proposed_by'      => $request->user()->id,
+            'source'           => 'teacher',
+            'starts_at'        => $data['starts_at'],
+            'duration_minutes' => $data['duration_minutes'] ?? 45,
+            'note'             => $data['note'] ?? null,
+            'status'           => 'proposed',
+        ]);
+
+        // Move a brand-new booking along: someone has now actually engaged with
+        // it, which is exactly what 'contacted' records.
+        if ($demoRequest->status === 'new') {
+            $demoRequest->update(['status' => 'contacted']);
+        }
+
+        AppNotification::send(
+            $demoRequest->user_id,
+            'demo_slot_proposed',
+            'A demo time has been proposed',
+            trim(($demoRequest->subject ?: 'Your demo') . ' — ' . $slot->starts_at->toDayDateTimeString()
+                . '. Open your dashboard to accept or ask for another time.'),
+        );
+
+        return response()->json(['message' => 'Time proposed. The family will be asked to confirm.'], 201);
+    }
+
+    /** Withdraw a slot you proposed and no longer want to hold. */
+    public function withdrawDemoSlot(Request $request, DemoRequest $demoRequest, DemoSlotProposal $slot) {
+        $tutor = $this->tutorFor($request);
+        abort_if(! $tutor || $demoRequest->assigned_tutor_id !== $tutor->id, 403, 'This demo is not assigned to you.');
+        abort_if($slot->demo_request_id !== $demoRequest->id, 404, 'That slot is not on this demo.');
+        abort_if($slot->status !== 'proposed', 422, 'Only an open proposal can be withdrawn.');
+
+        $slot->update(['status' => 'withdrawn', 'responded_at' => now()]);
+        return response()->json(['message' => 'Proposal withdrawn.']);
     }
 
     public function classLogs(Request $request, Enrollment $enrollment) {

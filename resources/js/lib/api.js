@@ -53,6 +53,9 @@ export const deleteStudent = async (id) => { await api.delete(`/students/${id}`)
 
 // My demo requests + enrollments (signed-in parent)
 export const fetchMyDemoRequests = async () => { const { data } = await api.get('/my/demo-requests'); return data.data; };
+// The family answers a time their teacher proposed.
+export const acceptDemoSlot  = async ({ demoId, slotId }) => { const { data } = await api.post(`/my/demo-requests/${demoId}/slots/${slotId}/accept`); return data; };
+export const declineDemoSlot = async ({ demoId, slotId }) => { const { data } = await api.post(`/my/demo-requests/${demoId}/slots/${slotId}/decline`); return data; };
 export const fetchMyEnrollments  = async () => { const { data } = await api.get('/my/enrollments'); return data.data; };
 
 // Teacher portal (own profile + classroom)
@@ -60,6 +63,10 @@ export const fetchTeacherProfile  = async () => { const { data } = await api.get
 export const updateTeacherProfile = async (payload) => { const { data } = await api.put('/teacher/profile', payload); return data.data; };
 export const fetchTeacherStudents = async () => { const { data } = await api.get('/teacher/students'); return data.data; };
 export const fetchTeacherDemos    = async () => { const { data } = await api.get('/teacher/demos'); return data.data; };
+// A teacher offers a time. No phone number needed for this to work — contact
+// details stay withheld until a coordinator releases them.
+export const proposeDemoSlot      = async ({ demoId, ...p }) => { const { data } = await api.post(`/teacher/demos/${demoId}/slots`, p); return data; };
+export const withdrawDemoSlot     = async ({ demoId, slotId }) => { const { data } = await api.patch(`/teacher/demos/${demoId}/slots/${slotId}/withdraw`); return data; };
 export const fetchClassLogs = async (enrollmentId) => { const { data } = await api.get(`/teacher/enrollments/${enrollmentId}/logs`); return data.data; };
 export const addClassLog    = async (enrollmentId, payload) => { const { data } = await api.post(`/teacher/enrollments/${enrollmentId}/logs`, payload); return data.data; };
 
@@ -134,6 +141,10 @@ export const fetchDemoSuggestions   = async (id) => { const { data } = await api
 export const fetchAdminTeachers = async (status='') => { const { data } = await api.get('/admin/teachers', { params:{ status } }); return data; };
 export const approveTeacher     = async (id, status) => { const { data } = await api.patch(`/admin/teachers/${id}`, { status }); return data.data; };
 export const assignDemo       = async (id, payload) => { const { data } = await api.patch(`/admin/demo-requests/${id}`, payload); return data.data; };
+// Coordinator controls: who may see the family's details, and logging a time
+// settled on a phone call.
+export const releaseDemoContact = async (id, released) => { const { data } = await api.patch(`/admin/demo-requests/${id}/contact`, { released }); return data.data; };
+export const logDemoSlot        = async (id, payload) => { const { data } = await api.post(`/admin/demo-requests/${id}/slots`, payload); return data.data; };
 export const convertDemo      = async (id, payload) => { const { data } = await api.post(`/admin/demo-requests/${id}/convert`, payload); return data.data; };
 export const fetchAdminEnrollments = async () => { const { data } = await api.get('/admin/enrollments'); return data; };
 

@@ -15,6 +15,7 @@ const AdminConsole = lazy(() => import('../components/admin/AdminConsole.jsx'));
 import {
   fetchStudents, createStudent, deleteStudent,
   fetchKyc, uploadKyc, deleteKyc, fetchMyDemoRequests, fetchMyEnrollments,
+  acceptDemoSlot, declineDemoSlot,
   fetchTeacherProfile, updateTeacherProfile,
   fetchTeacherStudents, fetchTeacherDemos, fetchClassLogs, addClassLog,
   fetchCurriculum, addCurriculumItem, updateCurriculumItem, deleteCurriculumItem,
@@ -910,23 +911,93 @@ function RequestsCard() {
       {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : reqs.length ? (
         <ul className="divide-y divide-slate-100">
           {reqs.map(r => (
-            <li key={r.id} className="flex items-center justify-between py-3">
-              <div>
-                <div className="font-semibold text-sm text-slate-800">{r.course?.name || r.subject || 'General enquiry'}</div>
-                <div className="text-xs text-slate-500">
-                  {[r.student, r.grade, r.mode].filter(Boolean).join(' · ')}{r.created_at && ` · requested ${r.created_at}`}
+            <li key={r.id} className="py-3">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="font-semibold text-sm text-slate-800">{r.course?.name || r.subject || 'General enquiry'}</div>
+                  <div className="text-xs text-slate-500">
+                    {[r.student, r.grade, r.mode].filter(Boolean).join(' · ')}{r.created_at && ` · requested ${r.created_at}`}
+                  </div>
+                  {(r.assigned_tutor || r.requested_tutor) && (
+                    <div className="text-xs text-slate-500">with {(r.assigned_tutor || r.requested_tutor).name}</div>
+                  )}
                 </div>
+                <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor[r.status]||'bg-slate-100 text-slate-600'}`}>{statusLabel[r.status] ?? r.status}</span>
               </div>
-              <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor[r.status]||'bg-slate-100 text-slate-600'}`}>{statusLabel[r.status] ?? r.status}</span>
+              <ProposedTimes demo={r} />
             </li>
           ))}
         </ul>
-      ) : (
-        <p className="text-sm text-slate-500">No demo requests yet. <Link to="/book-demo" className="text-brand-600 font-semibold">Book your first free demo →</Link></p>
-      )}
+      ) : <p className="text-sm text-slate-500">No demo requests yet.</p>}
     </section>
   );
 }
+
+/**
+ * Times the teacher has offered, and the family's answer.
+ *
+ * This is the family end of "in-app by default, phone as fallback": the parent
+ * confirms a slot here rather than waiting for a call, and no contact details
+ * have to be exchanged for the class to get booked.
+ */
+function ProposedTimes({ demo }) {
+  const qc = useQueryClient();
+  const open = (demo.slots ?? []).filter(s => s.status === 'proposed');
+  const agreed = (demo.slots ?? []).find(s => s.status === 'accepted');
+
+  const answer = useMutation({
+    mutationFn: ({ slotId, yes }) => (yes ? acceptDemoSlot : declineDemoSlot)({ demoId: demo.id, slotId }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['my-demo-requests'] }),
+  });
+
+  if (!agreed && open.length === 0) return null;
+
+  // A confirmed time does NOT hide later offers. Returning early on `agreed`
+  // meant a teacher asking to move the class proposed a new slot the family
+  // could never see or answer — their request just vanished.
+  const heading = agreed
+    ? (open.length === 1 ? 'Your teacher has suggested a different time' : 'Your teacher has suggested other times')
+    : (open.length === 1 ? 'Your teacher suggested a time' : 'Your teacher suggested some times');
+
+  return (
+    <>
+      {agreed && (
+        <p className="mt-1 text-xs font-semibold text-green-700">
+          Confirmed for {new Date(agreed.starts_at.replace(' ', 'T')).toLocaleString()}
+        </p>
+      )}
+      {open.length > 0 && (
+    <div className="mt-2 rounded-lg bg-brand-50 p-2.5 ring-1 ring-brand-100">
+      <p className="text-xs font-bold text-brand-800">{heading}</p>
+      <ul className="mt-1.5 space-y-1.5">
+        {open.map(s => (
+          <li key={s.id} className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold text-slate-800">
+              {new Date(s.starts_at.replace(' ', 'T')).toLocaleString()}
+            </span>
+            {s.note && <span className="text-[11px] text-slate-500">{s.note}</span>}
+            <span className="ml-auto flex gap-1.5">
+              <button type="button" disabled={answer.isPending}
+                onClick={() => answer.mutate({ slotId: s.id, yes: true })}
+                className="rounded-md bg-brand-600 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+                That works
+              </button>
+              <button type="button" disabled={answer.isPending}
+                onClick={() => answer.mutate({ slotId: s.id, yes: false })}
+                className="rounded-md px-2.5 py-1 text-[11px] font-semibold text-slate-500 ring-1 ring-slate-200 hover:bg-white">
+                Can't make it
+              </button>
+            </span>
+          </li>
+        ))}
+      </ul>
+      {answer.isError && <p className="mt-1 text-[11px] text-red-600">Could not save that — please try again.</p>}
+    </div>
+      )}
+    </>
+  );
+}
+
 
 function RescheduleBlock({ id, reschedules }) {
   const qc = useQueryClient();

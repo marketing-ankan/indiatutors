@@ -28,8 +28,8 @@ class DemoRequest extends Model {
     /** States that prove the demo actually took place. */
     public const HELD = ['completed','converted'];
 
-    protected $fillable = ['user_id','student_id','assigned_tutor_id','requested_tutor_id','name','email','phone_country_code','phone','subject','grade','board','mode','city','country','timezone','message','whatsapp_consent','marketing_consent','course_id','status','type','scheduled_at','completed_at'];
-    protected $casts = ['whatsapp_consent'=>'boolean','marketing_consent'=>'boolean','scheduled_at'=>'datetime','completed_at'=>'datetime'];
+    protected $fillable = ['user_id','student_id','assigned_tutor_id','requested_tutor_id','name','email','phone_country_code','phone','subject','grade','board','mode','city','country','timezone','message','whatsapp_consent','marketing_consent','course_id','status','type','scheduled_at','completed_at','contact_released_at','contact_released_by'];
+    protected $casts = ['whatsapp_consent'=>'boolean','marketing_consent'=>'boolean','scheduled_at'=>'datetime','completed_at'=>'datetime','contact_released_at'=>'datetime'];
 
     public function user()          { return $this->belongsTo(User::class); }
     public function student()       { return $this->belongsTo(Student::class); }
@@ -40,6 +40,18 @@ class DemoRequest extends Model {
     public function enrollment()    { return $this->hasOne(Enrollment::class); }
     /** At most one — reviews.demo_request_id is UNIQUE. */
     public function review()        { return $this->hasOne(Review::class); }
+    public function slots()         { return $this->hasMany(DemoSlotProposal::class); }
+    public function contactReleaser(){ return $this->belongsTo(User::class, 'contact_released_by'); }
+
+    /**
+     * Whether the assigned teacher may see the family's phone, email and
+     * address. Owner's rule (2026-08-10): only after a coordinator says so —
+     * never as a side effect of a status change.
+     */
+    public function contactIsReleased(): bool
+    {
+        return $this->contact_released_at !== null;
+    }
 
     /** Demos that provably took place — the honest conversion denominator. */
     public function scopeHeld($q) { return $q->whereIn('status', self::HELD); }
