@@ -113,6 +113,10 @@ function ParentDashboard() {
         <TuitionRequirementsCard />
       </div>
       <div className="grid lg:grid-cols-2 gap-6 mt-6">
+        <PlansAndOffersCard />
+        <CertificatesCard />
+      </div>
+      <div className="grid lg:grid-cols-2 gap-6 mt-6">
         <StudentsCard />
         <KycCard />
       </div>
@@ -139,8 +143,9 @@ function StudentDashboard() {
         <EnrollmentsCard />
         <UpcomingClassesCard />
       </div>
-      <div className="mt-6">
+      <div className="grid lg:grid-cols-2 gap-6 mt-6">
         <ExamUpdatesCard />
+        <CertificatesCard />
       </div>
       <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6 mt-6">
         <h2 className="text-lg font-bold flex items-center gap-2 mb-1"><Award className="h-5 w-5 text-brand-600"/>My portfolio</h2>
@@ -905,6 +910,43 @@ function ParentEnrollmentDetail({ id }) {
     </div>
   );
 }
+
+/**
+ * E1 and E8 — the places these will live, holding nothing yet.
+ *
+ * Owner, 2026-08-10: keep the buttons and options, but show nothing for free
+ * plans (E1, "decided later") and certification (E8, "we haven't decided").
+ *
+ * So these are scaffolding, and the copy says so plainly. The alternative —
+ * inventing a plan tier or a certificate to fill the space — is exactly the
+ * kind of placeholder that was cleaned out of this site in August, when
+ * fabricated ratings and testimonials had to be deleted. An empty section that
+ * admits it is empty can sit here safely until there is something real; a
+ * fake one cannot.
+ */
+function ComingSoonCard({ icon: Icon, title, blurb }) {
+  return (
+    <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
+      <h2 className="text-lg font-bold flex items-center gap-2 mb-1">
+        <Icon className="h-5 w-5 text-brand-600" />{title}
+      </h2>
+      <p className="text-sm text-slate-500">{blurb}</p>
+      <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500 ring-1 ring-slate-100">
+        Nothing here yet — we'll let you know as soon as this is available.
+      </p>
+    </section>
+  );
+}
+
+const PlansAndOffersCard = () => (
+  <ComingSoonCard icon={Megaphone} title="Plans &amp; offers"
+    blurb="Free plans, referral rewards and seasonal offers will appear here." />
+);
+
+const CertificatesCard = () => (
+  <ComingSoonCard icon={Award} title="Certificates"
+    blurb="Certificates for completed courses will appear here once your course offers one." />
+);
 
 function RequestsCard() {
   const { data: reqs = [], isLoading } = useQuery({ queryKey:['my-demo-requests'], queryFn: fetchMyDemoRequests });

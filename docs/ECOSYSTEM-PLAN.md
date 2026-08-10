@@ -227,7 +227,11 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
 *Explained by the owner 2026-08-10. Several of these are not what the shorthand on the page suggested —
 recorded here in his own terms so the next reader does not re-guess them.*
 
-- ⬜ **E1. Marketing — free plans + incentives.** 🚫 **Owner: "decided later."** Not a build item yet.
+- 🔨 **E1. Marketing — free plans + incentives.** 🚫 **Owner: "decided later" — nothing to show.**
+  *Owner, 2026-08-10: "keep the buttons and options, but there will be nothing shown."* So a
+  **Plans & offers** card sits on the parent dashboard holding an honest empty state, and no invented
+  tier. Filling it with a plausible-looking plan is exactly the placeholder habit that had to be
+  cleaned out of this site in August.
 - 🔨 **E2. Backup classes — a substitute-teacher system.** *Stage 5 — built, awaiting owner sign-off.*
   *Not "extra classes for the student", which is how the two words read.* When the allotted teacher is
   not available, another teacher covers — chosen on demand and availability.
@@ -250,6 +254,8 @@ recorded here in his own terms so the next reader does not re-guess them.*
 - ⬜ **E7. Student achievements.**
 - ⬜ **E8. Certification.** Certificates for **some** courses. 🚫 **Owner: "we haven't decided about
   certification"** — which courses, and what the certificate asserts, are open.
+  Same treatment as E1: a **Certificates** card exists on both the parent and student dashboards with
+  an empty state, so the place is reserved without asserting a credential nobody has defined.
 - ⬜ **E9. 25% online allowance — a TEACHER entitlement, not a student club.**
   The page's "Club — 25% online class" is not a membership tier. A teacher who normally teaches
   **offline/physical** classes may take a class **online** when they cannot attend in person, capped at
