@@ -526,7 +526,15 @@ export const ABOUT_LIST = [
   { icon: 'home', t: 'Home Tuitions', d: 'Verified in-person tutors in your locality for focused, face-to-face learning.' },
   { icon: 'play', t: 'Self-Paced Video Courses', d: 'Structured recorded courses to learn anytime, revisit lessons and practise at your own speed.' },
 ];
-export const ABOUT_STATS = [['8,000+','Students trained'],['75+','Expert tutors'],['15+','Countries reached'],['4.9★','Avg. rating']];
+// Two removals, 2026-08-10:
+//   '15+ Countries reached' — the owner confirmed the business is India-only.
+//   '4.9★ Avg. rating'      — a fabricated rating. The 7 August sweep deleted
+//                             every other invented score but missed this one,
+//                             because it renders on the HOME page from this
+//                             file while the similarly-named ABOUT_STATS in
+//                             courseDetail.js (already cleaned) sits on course
+//                             pages. Two exports, one name, one survivor.
+export const ABOUT_STATS = [['8,000+','Students trained'],['75+','Expert tutors'],['100+','Subjects & skills'],['Free','First demo class']];
 export const HOW_STEPS = [
   { n: 1, icon: 'search', t: 'Find Your Course', d: 'Browse 100+ courses across Academics, Coding, Music, Dance & more. Filter by subject, age, or learning format.' },
   { n: 2, icon: 'calendar', t: 'Book a Free Trial', d: 'Try a class for free — no payment, no commitment. Meet your tutor and see if the fit is right.' },

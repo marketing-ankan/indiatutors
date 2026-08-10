@@ -168,10 +168,11 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
   so what a family was promised survives a timetable change.
   **Not done: a staff editor.** The API is built and tested, but the console has no enrolments surface
   at all to hang it on (only analytics counts) — that needs its own tab.
-  **Known limitation: timezones.** Weekdays and times are derived in the app timezone (Asia/Kolkata).
-  For an NRI family a "Tuesday 3:00 PM" class may fall on Monday evening locally. This is the existing
-  site-wide convention (`scheduled_at`, class logs), not new here — but it should be fixed properly
-  before the overseas audience the marketing copy claims is served in earnest.
+  ~~**Known limitation: timezones.**~~ **CLOSED by the owner, 2026-08-10: "there will be no students
+  overseas — it's India based."** Times render in Asia/Kolkata site-wide, which is correct for an
+  India-only audience, so no timezone work is needed. Re-open this only if the business genuinely takes
+  overseas students later.
+  ⚠️ **But the marketing copy still says otherwise** — see *Claims that contradict India-only* below.
 
 ## D. Reviews & ranking (the heart of the page)
 
@@ -416,6 +417,24 @@ The failure mode is quiet and expensive: leads keep being delivered to a system 
 the `lms_lead_no` stamp marks them as already pushed, so they look handled. Unset the two env vars to
 stop it (the code fails dark by design), and treat the intake contract as frozen until the new LMS
 exists. `docs/MATCHING-DATA-CONTRACT.md` describes the export for the *old* consumer.
+
+## Claims that contradict India-only — 2026-08-10
+
+The owner stated plainly that there are no overseas students; the business is India-based. That settles
+the timezone question, but it leaves the site advertising a reach it does not have. These are the same
+category as the fabricated ratings deleted on 2026-08-07 — a checkable claim that is not true — and
+they need the owner's word before removal, because "countries served" might have been intended to mean
+something else (NRI enquiries, tutors located abroad):
+
+- `resources/js/pages/HomePage.jsx:299` — "15+ Countries Served"
+- `resources/js/pages/AboutPage.jsx:12` — "20+ Countries served"
+- `resources/js/pages/BecomeTeacherPage.jsx:29` — "20+ Countries"
+- `resources/js/data/homeLive.js:529` — "15+ Countries reached"
+- `resources/js/pages/PlansPage.jsx:18,52` — a country picker that quotes **USD** to anyone outside
+  India. If nobody outside India buys, this is dead UI that also implies international operation.
+
+Not touched unilaterally: marketing and pricing copy is the founder's call, and the audit convention in
+[[WEBSITE-IMPROVEMENTS.md]] is to surface these rather than rewrite them.
 
 ## Boundaries to preserve
 

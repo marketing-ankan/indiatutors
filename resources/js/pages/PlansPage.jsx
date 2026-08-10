@@ -118,7 +118,9 @@ function PlanCard({ plan, sel }) {
 
 export default function PlansPage({ initialCtype = 'oneone' }) {
   const [flow, setFlow] = useState('new');
-  const [sel, setSel] = useState({ subject:'', level:'Beginner', ctype: initialCtype, cpw:1, grade:'', country:'India', tz:'IST (India)' });
+  // country stays 'India' so every quote resolves to INR; `tz` is gone with its
+  // picker rather than left as state nothing reads.
+  const [sel, setSel] = useState({ subject:'', level:'Beginner', ctype: initialCtype, cpw:1, grade:'', country:'India' });
   const set = (k) => (e) => setSel(s => ({ ...s, [k]: k === 'cpw' ? Number(e.target.value) : e.target.value }));
   const cur = curOf(sel.country);
   const fullSel = { ...sel, cur };
@@ -207,10 +209,12 @@ export default function PlansPage({ initialCtype = 'oneone' }) {
                   <select value={sel.cpw} onChange={set('cpw')} className={inp}>{[1,2,3,4,5].map(n=><option key={n} value={n}>{n}</option>)}</select></div>
                 <div><label className={lbl}>Student Grade</label>
                   <select value={sel.grade} onChange={set('grade')} className={inp}><option value="">— Optional —</option>{GRADES.map(g=><option key={g}>{g}</option>)}</select></div>
-                <div><label className={lbl}>Country</label>
-                  <select value={sel.country} onChange={set('country')} className={inp}>{PRICING.countries.map(c=><option key={c.name}>{c.name}</option>)}</select></div>
-                <div><label className={lbl}>Time Zone</label>
-                  <select value={sel.tz} onChange={set('tz')} className={inp}>{PRICING.timezones.map(t=><option key={t}>{t}</option>)}</select></div>
+                {/* Country and Time Zone pickers removed 2026-08-10. The owner
+                    confirmed the business is India-only, so offering a country
+                    list quoted every non-Indian visitor a USD price nobody can
+                    actually buy, and the timezone list implied classes are
+                    scheduled outside IST. `sel.country` stays 'India', so
+                    curOf() resolves to INR for every quote. */}
               </div>
             </section>
 

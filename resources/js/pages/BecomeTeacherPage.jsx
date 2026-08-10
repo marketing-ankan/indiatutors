@@ -26,7 +26,10 @@ const WHY = [
   { icon: '✅', t: 'Verified badge & public profile', d: 'Build reviews and a verified public profile that attracts more students over time.' },
 ];
 
-const STATS = [['10,000+', 'Classes delivered'], ['20+', 'Countries'], ['100+', 'Subjects']];
+// "20+ Countries" removed 2026-08-10 — owner confirmed India-only. Replaced
+// with the tutor count rather than dropped, because this grid is fixed at
+// three columns and a gap would read as a rendering fault.
+const STATS = [['10,000+', 'Classes delivered'], ['75+', 'Expert tutors'], ['100+', 'Subjects']];
 
 const EMPTY_PHYSICAL = {
   nationality: 'Indian', country: 'India', at_student_home: true,
