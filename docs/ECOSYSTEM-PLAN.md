@@ -316,8 +316,16 @@ recorded here in his own terms so the next reader does not re-guess them.*
 
 ## F. Video courses — AI tutor player (bottom of the page)
 
-- ⬜ **F1. AI assistant — free alternative to Claude.** *Gemini is already wired; blocked on a working key.*
-- ⬜ **F2. Stop & ask mid-video — type + voice input.**
+- 🔨 **F1. AI assistant.** *Owner supplied the key 2026-08-10 — LIVE and answering.*
+  Gemini, grounded on the lesson transcript. **The pinned `gemini-2.0-flash` was returning HTTP 429
+  `limit: 0` — zero free-tier quota, not overuse.** Switched to the `gemini-flash-latest` alias, which
+  answered immediately on the same key: Google moves free quota between versions and a pinned model
+  silently dies with it.
+- 🔨 **F2. Stop & ask mid-video — type + voice input.** *Built 2026-08-10.*
+  Engaging the assistant (focusing the box, tapping the mic) pauses the video — one handler covering
+  the R2 `<video>` directly and YouTube/Bunny by postMessage. Voice uses the browser`s own
+  SpeechRecognition (en-IN): no audio reaches our servers, only the text, exactly as if typed. The mic
+  button does not render where the API is absent (Firefox) rather than sitting there dead.
 - ⬜ **F3. AI explains on a board.**
 - ⬜ **F4. Presentations + live examples + diagrams.**
 - ⬜ **F5. Openable diagram → simulator.**

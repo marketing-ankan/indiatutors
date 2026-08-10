@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { PlayCircle, Lock, CheckCircle2, ShoppingCart } from 'lucide-react';
@@ -26,6 +26,25 @@ export default function VideoCourseDetailPage() {
   const lessons = data?.lessons ?? [];
   const firstPlayable = lessons.find(l => l.unlocked);
   const [activeId, setActiveId] = useState(null);
+
+  // F2 "stop & ask": the moment a student engages the assistant, the video
+  // stops talking over them. One function covers every provider we embed —
+  // the R2 <video> is paused directly; YouTube (enablejsapi) and Bunny
+  // (player.js protocol) are paused by postMessage. Unknown iframes ignore
+  // the messages harmlessly, which is the right failure: never break the
+  // page to pause a player.
+  const playerWrap = useRef(null);
+  const pauseActiveVideo = useCallback(() => {
+    const root = playerWrap.current;
+    if (!root) return;
+    root.querySelectorAll('video').forEach(v => { try { v.pause(); } catch { /* ignore */ } });
+    root.querySelectorAll('iframe').forEach(f => {
+      try {
+        f.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: 'pauseVideo', args: [] }), '*'); // YouTube
+        f.contentWindow?.postMessage(JSON.stringify({ context: 'player.js', version: '0.0.11', method: 'pause' }), '*'); // Bunny
+      } catch { /* cross-origin refusals are fine */ }
+    });
+  }, []);
   useEffect(() => { if (firstPlayable && activeId == null) setActiveId(firstPlayable.id); }, [firstPlayable, activeId]);
 
   if (isLoading) return <div className="container-wide py-20 text-slate-500">Loading course…</div>;
@@ -55,7 +74,7 @@ export default function VideoCourseDetailPage() {
 
       <div className="container-wide grid grid-cols-1 items-start gap-8 pb-16 lg:grid-cols-[minmax(0,1fr)_360px]">
         {/* PLAYER + PLAYLIST */}
-        <div>
+        <div ref={playerWrap}>
           {active?.playback && active.playback_kind === 'video' ? (
             // R2 serves a bare presigned MP4, so we supply the controls: speed,
             // ±10s and keyboard shortcuts. iframe providers keep their own.
@@ -82,7 +101,7 @@ export default function VideoCourseDetailPage() {
           {active && <h2 className="font-heading mt-4 text-xl font-extrabold text-[#0B1220]">{active.title}</h2>}
 
           {active?.has_ai && (
-            <LessonAssistant courseId={course.id} lessonId={active.id} lessonTitle={active.title} />
+            <LessonAssistant courseId={course.id} lessonId={active.id} lessonTitle={active.title} onEngage={pauseActiveVideo} />
           )}
 
           <div className="mt-6">

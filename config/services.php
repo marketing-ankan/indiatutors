@@ -72,7 +72,12 @@ return [
     'ai' => [
         'provider' => env('AI_PROVIDER', 'gemini'),
         'key'      => env('AI_API_KEY', env('GEMINI_API_KEY')),
-        'model'    => env('AI_MODEL', 'gemini-2.0-flash'),
+        // The `-latest` alias on purpose, not a pinned version. Google moves
+        // free-tier quota between model versions — on 2026-08-10 the pinned
+        // gemini-2.0-flash returned 429 `limit: 0` (zero free quota, not
+        // overuse) while gemini-flash-latest answered fine on the same key.
+        // The alias follows wherever the free quota goes; a pin dies with it.
+        'model'    => env('AI_MODEL', 'gemini-flash-latest'),
     ],
 
     // Social feeds on the course page. YouTube needs no credentials — the
