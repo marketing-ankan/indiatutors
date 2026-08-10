@@ -74,10 +74,23 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
 - ⬜ **A1. Teacher profile video.** Recorded/uploaded at profile creation, published **only after admin
   approval**. Shown on the public teacher profile.
   *Blocked on R2 keys (same storage as video courses).*
-- ⬜ **A2. Public teacher profile page — full version.** Qualifications, testimonials, timetable /
-  time availability, intro video, reviews, ranking position.
-- 🔨 **A3. Teacher details capture — WinQuest parity.** All locations served + availability + time.
-  *Stage 4 — the sync half built, awaiting owner sign-off.*
+- ✅ **A2. Public teacher profile page — full version.** *Owner-confirmed 2026-08-10.*
+  Qualifications, timetable / time availability, reviews.
+  **The timetable was the missing piece** — the section showed mode, city and areas but no *times*.
+  Published from the STRUCTURED weekly slots (weekday + start + end) the home-tuition intake already
+  captures, not `teacher_profiles.availability` (the old free-text `{days, slots}`): the grid that
+  replaced that box says why in its own comment — "5-8pm weekdays" cannot be intersected by any booking
+  flow, so publishing it would put times on a public page nothing can honour.
+  A teacher with no slots shows **no section at all** — an invented timetable is worse than none — and
+  the same for a paused teacher, or one who has declared a break.
+  Rating summary also surfaced in the hero, sharing one cache key with the reviews section so the two
+  can never disagree.
+  **Deliberately NOT shipped: ranking position on the public profile.** A public rank is gameable and
+  turns a quiet month into a visible demotion; the score exists to *order* lists, not to be printed
+  beside someone's name. Ask if you want it.
+  *Still outstanding: testimonials (D4, needs consent decisions) and the intro video (A1, needs R2).*
+- ✅ **A3. Teacher details capture — WinQuest parity.** *Owner-confirmed 2026-08-10 · commit `1bf33e5`.*
+  All locations served + availability + time.
   **Fixed a silent data bug found here:** `linkTutor` copied a profile into the public `tutors` row
   exactly once, at approval, and returned early forever after; `updateMine` wrote only to
   `teacher_profiles`. So every public listing was frozen at its approval-day snapshot. Demonstrated on
@@ -88,8 +101,8 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
   from a profile — they are claims the platform makes, not fields a teacher fills in.
   *Still thin: the directory has no structured availability/time. `physical_teaching_profiles` has the
   rich version (geocoded, radius, slot table); the `tutors` row carries only a comma string.*
-- 🔨 **A4. Admin approval gate for profile content.** Reviewed before it goes public.
-  *Stage 4 — built for profile text, awaiting owner sign-off.* An approved teacher's edits mark the
+- ✅ **A4. Admin approval gate for profile content.** *Owner-confirmed 2026-08-10 · commit `1bf33e5`.*
+  Reviewed before it goes public. An approved teacher's edits mark the
   profile for review (`changes_submitted_at`) and reach the public listing only when staff press
   **Publish**. Staff see a field-by-field before/after — a reviewer who cannot see the change can only
   rubber-stamp it, and the fee line is the one that matters: a teacher can quietly double their rate

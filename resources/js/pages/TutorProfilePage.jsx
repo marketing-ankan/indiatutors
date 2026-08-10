@@ -14,6 +14,15 @@ const NAVY = '#0B1220';
 const BORDER = '#e8e8f0';
 const MUTED = '#6b7280';
 
+/** "16:00" → "4:00 PM". Times come from the server as 24h; parents read 12h. */
+const fmtTime = (hhmm) => {
+  const [h, m] = String(hhmm).split(':').map(Number);
+  if (Number.isNaN(h)) return hhmm;
+  const suffix = h >= 12 ? 'PM' : 'AM';
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  return `${hour12}:${String(m ?? 0).padStart(2, '0')} ${suffix}`;
+};
+
 const Section = ({ title, id, children }) => (
   <div id={id} className="mb-6 rounded-[14px] border bg-white p-6 shadow-[0_4px_24px_rgba(30,64,175,.10)] sm:px-[30px] sm:py-7" style={{ borderColor: BORDER }}>
     <h2 className="font-heading mb-4 text-xl font-bold" style={{ color: NAVY }}>{title}</h2>
@@ -161,6 +170,11 @@ function EnquiryForm({ tutor }) {
 export default function TutorProfilePage() {
   const { slug } = useParams();
   const { data: tutor, isLoading, isError } = useQuery({ queryKey: ['tutor', slug], queryFn: () => fetchTutor(slug) });
+  // Both queries run BEFORE any early return — hooks cannot be conditional, and
+  // putting this below the loading branch blanked the page with React #310.
+  // Same cache key as TutorReviews below, so React Query serves one fetch and
+  // the hero and the reviews section can never show different numbers.
+  const { data: reviewData } = useQuery({ queryKey: ['tutor-reviews', slug], queryFn: () => fetchTutorReviews(slug) });
 
   if (isLoading) return <div className="container-wide py-20 text-slate-500">Loading tutor…</div>;
   if (isError || !tutor) return (
@@ -175,9 +189,15 @@ export default function TutorProfilePage() {
   const fee = Number(tutor.fee_hourly || 0);
   const feeStr = `₹${fee.toLocaleString('en-IN')}`;
   const trialFree = !(Number(tutor.fee_trial) > 0);
+  // Absent entirely when nobody has reviewed: a blank star row reads as a bad
+  // score, and "no reviews yet" is the honest state for a new teacher.
+  const ratingCount = reviewData?.summary?.rating_count ?? 0;
+  const ratingAvg   = reviewData?.summary?.rating_avg;
+
   const stats = [
     [feeStr, 'Per Hour'],
     [modeLabel, 'Mode'],
+    ...(ratingCount > 0 ? [[`★ ${ratingAvg}`, `${ratingCount} ${ratingCount === 1 ? 'review' : 'reviews'}`]] : []),
     ...(tutor.qualification ? [[tutor.qualification, 'Qualification']] : []),
     ...(tutor.verified ? [['✓ Yes', 'Verified']] : []),
   ];
@@ -263,6 +283,33 @@ export default function TutorProfilePage() {
                 <div className="flex flex-wrap gap-2">
                   {tutor.localities.map(l => <SubjectTag key={l} soft>{l}</SubjectTag>)}
                 </div>
+              </>
+            )}
+
+            {/* A2 — when they actually teach. Built from the structured weekly
+                slots the teacher set, so a parent can check it fits before
+                booking. Hidden entirely when a teacher has not set any: an
+                invented timetable is worse than none. */}
+            {tutor.availability?.length > 0 && (
+              <>
+                <p className="mb-2 mt-5 text-[0.82rem] font-bold uppercase tracking-[.07em]" style={{ color: MUTED }}>Weekly Availability</p>
+                <ul className="divide-y rounded-xl border" style={{ borderColor: BORDER }}>
+                  {tutor.availability.map(d => (
+                    <li key={d.weekday} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5">
+                      <span className="text-sm font-bold" style={{ color: NAVY }}>{d.day}</span>
+                      <span className="flex flex-wrap gap-1.5">
+                        {d.ranges.map(r => (
+                          <span key={`${r.from}-${r.to}`} className="rounded-full bg-[#F3F6FC] px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+                            {fmtTime(r.from)} – {fmtTime(r.to)}
+                          </span>
+                        ))}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-2 text-xs" style={{ color: MUTED }}>
+                  Times shown in India Standard Time. Your coordinator will confirm the exact slot.
+                </p>
               </>
             )}
           </Section>

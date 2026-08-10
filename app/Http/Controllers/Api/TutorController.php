@@ -54,7 +54,73 @@ class TutorController extends Controller {
 
     public function show(string $slug) {
         $tutor = Tutor::where('slug', $slug)->published()->firstOrFail();
-        return (new TutorResource($tutor))->additional(['route' => 'api.tutors.show']);
+
+        return (new TutorResource($tutor))->additional([
+            'route'        => 'api.tutors.show',
+            'availability' => self::weeklyAvailability($tutor),
+        ]);
+    }
+
+    /**
+     * When this teacher actually teaches, as a week of ranges (A2).
+     *
+     * Read from the STRUCTURED slots the home-tuition intake already captures
+     * (teaching_availability_slots: weekday + start + end), not from
+     * teacher_profiles.availability, which is the older free-text shape — the
+     * AvailabilityGrid that replaced it says why: "5-8pm weekdays" cannot be
+     * intersected with anything. Publishing the vague version would put words
+     * on a public page that no booking flow can honour.
+     *
+     * A teacher who has not set slots gets an empty array and the section is
+     * hidden, rather than a reassuring but invented timetable. Deliberately
+     * ignores date-specific exceptions (holidays): those change weekly and a
+     * public page cached anywhere would advertise stale absences.
+     */
+    public static function weeklyAvailability(Tutor $tutor): array
+    {
+        $profile = $tutor->user_id
+            ? \App\Models\PhysicalTeachingProfile::with('slots')
+                ->where('user_id', $tutor->user_id)
+                ->where('status', 'active')
+                ->first()
+            : null;
+
+        if (! $profile) {
+            return [];
+        }
+
+        // A declared break, or a start date still in the future, means "not
+        // now" — and the teacher's dashboard promises exactly that: the field
+        // is labelled "On a break until" with the hint "we'll pause your
+        // matches". Nothing derives `status` from these dates (pausing is a
+        // separate button), so status stays 'active' throughout a holiday and
+        // the filter above lets it through. Publishing the week anyway breaks
+        // the promise to the teacher and sends a parent to someone who is away.
+        //
+        // Distinct from the date-specific exceptions excluded above: those are
+        // a separate table of one-off holidays that change weekly. These are
+        // two stable columns on the row already loaded.
+        $today = now()->startOfDay();
+        // gte: "on a break until 1 Oct" reads as including that day.
+        if ($profile->on_break_until && $profile->on_break_until->gte($today)) {
+            return [];
+        }
+        if ($profile->available_from && $profile->available_from->gt($today)) {
+            return [];
+        }
+
+        return $profile->slots
+            ->groupBy('weekday')
+            ->map(fn ($slots, $weekday) => [
+                'weekday' => (int) $weekday,
+                'day'     => \App\Models\EnrollmentSchedule::DAYS[(int) $weekday] ?? '',
+                // The model's own accessors — they already handle MySQL
+                // returning "17:00:00" where sqlite returns what we stored.
+                'ranges'  => $slots->map(fn ($s) => ['from' => $s->start, 'to' => $s->end])->values()->all(),
+            ])
+            ->sortKeys()
+            ->values()
+            ->all();
     }
 
     /**

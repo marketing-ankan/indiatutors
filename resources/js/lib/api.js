@@ -32,7 +32,10 @@ export const fetchCategories     = async () => { const { data } = await api.get(
 export const fetchCourses        = async (p={}) => { const { data } = await api.get('/courses', { params:p }); return data; };
 export const fetchCourse         = async (slug) => { const { data } = await api.get(`/courses/${slug}`); return data.data; };
 export const fetchTutors         = async (p={}) => { const { data } = await api.get('/tutors', { params:p }); return data.data; };
-export const fetchTutor          = async (slug) => { const { data } = await api.get(`/tutors/${slug}`); return data.data; };
+// `availability` rides alongside the resource rather than inside it, because
+// the list endpoint shares TutorResource and computing a week of slots per row
+// would be an N+1. Merged here so callers see one tutor object.
+export const fetchTutor          = async (slug) => { const { data } = await api.get(`/tutors/${slug}`); return { ...data.data, availability: data.availability ?? [] }; };
 export const fetchTutorFilters   = async () => { const { data } = await api.get('/tutors/filters'); return data; };
 export const fetchCities         = async () => { const { data } = await api.get('/cities'); return data.data; };
 export const fetchCity           = async (slug) => { const { data } = await api.get(`/cities/${slug}`); return data; };
