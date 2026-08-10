@@ -74,6 +74,8 @@ export const fetchTeacherProfile  = async () => { const { data } = await api.get
 export const updateTeacherProfile = async (payload) => { const { data } = await api.put('/teacher/profile', payload); return data.data; };
 export const fetchTeacherStudents = async () => { const { data } = await api.get('/teacher/students'); return data.data; };
 export const fetchTeacherDemos    = async () => { const { data } = await api.get('/teacher/demos'); return data.data; };
+// E9 — how much of this month's 25% online allowance is left.
+export const fetchOnlineAllowance = async () => { const { data } = await api.get('/teacher/online-allowance'); return data.data; };
 // A teacher offers a time. No phone number needed for this to work — contact
 // details stay withheld until a coordinator releases them.
 export const proposeDemoSlot      = async ({ demoId, ...p }) => { const { data } = await api.post(`/teacher/demos/${demoId}/slots`, p); return data; };

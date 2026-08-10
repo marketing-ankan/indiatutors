@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   LayoutGrid, BookOpen, Award, Trophy, LifeBuoy, CalendarClock, FolderOpen,
-  Clock, LogOut, Menu, X,
+  Clock, LogOut, Menu, X, Users, ShieldCheck,
 } from 'lucide-react';
-import { fetchMyRecord, fetchMyEnrollments, fetchCourses } from '../../lib/api.js';
+import { fetchMyRecord, fetchMyEnrollments, fetchCourses, fetchTeacherDemos, fetchOnlineAllowance } from '../../lib/api.js';
 import { useAuth } from '../../lib/auth.jsx';
 
 /**
@@ -29,18 +29,41 @@ import { useAuth } from '../../lib/auth.jsx';
  * 2560px monitor is not showing a 1024px column in the middle of the screen.
  */
 
-const NAV = [
-  { key: 'overview',     label: 'Overview',     Icon: LayoutGrid },
-  { key: 'classes',      label: 'My classes',   Icon: BookOpen },
-  { key: 'materials',    label: 'Materials',    Icon: FolderOpen },
-  { key: 'achievements', label: 'Achievements', Icon: Trophy },
-  { key: 'certificates', label: 'Certificates', Icon: Award },
-  { key: 'support',      label: 'Help',         Icon: LifeBuoy },
-];
+/**
+ * Nav per role. Kept here rather than passed in, so the three dashboards
+ * cannot drift into three different navigation idioms.
+ */
+export const NAV_BY_ROLE = {
+  student: [
+    { key: 'overview',     label: 'Overview',     Icon: LayoutGrid },
+    { key: 'classes',      label: 'My classes',   Icon: BookOpen },
+    { key: 'materials',    label: 'Materials',    Icon: FolderOpen },
+    { key: 'achievements', label: 'Achievements', Icon: Trophy },
+    { key: 'certificates', label: 'Certificates', Icon: Award },
+    { key: 'support',      label: 'Help',         Icon: LifeBuoy },
+  ],
+  parent: [
+    { key: 'overview',     label: 'Overview',     Icon: LayoutGrid },
+    { key: 'classes',      label: 'Classes',      Icon: BookOpen },
+    { key: 'bookings',     label: 'Bookings',     Icon: CalendarClock },
+    { key: 'achievements', label: 'Achievements', Icon: Trophy },
+    { key: 'children',     label: 'My children',  Icon: Users },
+    { key: 'account',      label: 'Account',      Icon: ShieldCheck },
+    { key: 'support',      label: 'Help',         Icon: LifeBuoy },
+  ],
+  teacher: [
+    { key: 'overview',   label: 'Overview',   Icon: LayoutGrid },
+    { key: 'classroom',  label: 'Classroom',  Icon: BookOpen },
+    { key: 'schedule',   label: 'Schedule',   Icon: CalendarClock },
+    { key: 'requests',   label: 'Requests',   Icon: Trophy },
+    { key: 'profile',    label: 'My profile', Icon: ShieldCheck },
+  ],
+};
 
-export default function StudentShell({ section, onSection, children }) {
+export default function DashboardShell({ role = 'student', section, onSection, children, rail }) {
   const [open, setOpen] = useState(false);
   const { user, logout } = useAuth();
+  const NAV = NAV_BY_ROLE[role] ?? NAV_BY_ROLE.student;
 
   return (
     <div className="min-h-screen bg-[#F5F7FB]">
@@ -101,7 +124,10 @@ export default function StudentShell({ section, onSection, children }) {
               still has room to breathe beside it. */}
           <div className="grid grid-cols-1 gap-6 2xl:grid-cols-[minmax(0,1fr)_340px]">
             <div className="min-w-0 space-y-6">{children}</div>
-            <StatsRail />
+            {/* Each role brings its own rail. A teacher's numbers are not a
+                student's, and one rail trying to serve both would show every
+                role a column of blanks. */}
+            {rail ?? <StatsRail />}
           </div>
         </main>
       </div>
@@ -176,6 +202,104 @@ function StatsRail() {
           ))}
         </ul>
       </section>
+    </aside>
+  );
+}
+
+/**
+ * Parent rail — the household at a glance, summed across every child on the
+ * account. Same counted figures as a student sees, so a parent and their child
+ * can never be looking at two different truths.
+ */
+export function ParentRail() {
+  const { data: records = [] } = useQuery({ queryKey: ['my-record'], queryFn: fetchMyRecord });
+  const { data: enrolments = [] } = useQuery({ queryKey: ['my-enrollments'], queryFn: fetchMyEnrollments });
+  if (!records.length) return <aside className="hidden 2xl:block" aria-hidden="true" />;
+
+  const sum = k => records.reduce((a, r) => a + k(r), 0);
+
+  return (
+    <aside className="space-y-4 2xl:sticky 2xl:top-6 2xl:self-start">
+      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+        <p className="text-sm font-bold text-[#0B1220]">Your household</p>
+        <p className="mt-0.5 text-xs text-slate-500">Counted across {records.length} {records.length === 1 ? 'child' : 'children'}.</p>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <Tile value={sum(r => r.classes.attended)} label="Classes attended" />
+          <Tile value={sum(r => r.classes.hours)} label="Hours taught" />
+          <Tile value={enrolments.filter(e => e.status === 'active').length} label="Active classes" />
+          <Tile value={sum(r => r.achievements.total)} label="Achievements" />
+        </div>
+      </section>
+
+      {records.map(r => (
+        <section key={r.student.id} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+          <p className="truncate text-sm font-bold text-[#0B1220]">{r.student.name}</p>
+          <p className="mt-0.5 text-xs text-slate-500">{r.student.grade || 'Student'}</p>
+          <ul className="mt-3 flex justify-between gap-1">
+            {r.week.map(d => (
+              <li key={d.date} className="flex flex-col items-center gap-1">
+                <span className="text-[10px] font-semibold uppercase text-slate-400">{d.label}</span>
+                <span title={d.date}
+                  className={`flex h-7 w-7 items-center justify-center rounded-lg text-[11px] font-bold
+                    ${d.attended ? 'bg-brand-600 text-white' : d.future ? 'bg-slate-50 text-slate-300' : 'bg-slate-100 text-slate-400'}`}>
+                  {d.attended ? '✓' : '·'}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {r.classes.missed > 0 && (
+            <p className="mt-2 text-xs text-slate-500">{r.classes.missed} missed{r.substitutions > 0 && ` · ${r.substitutions} covered by a substitute`}</p>
+          )}
+        </section>
+      ))}
+    </aside>
+  );
+}
+
+/**
+ * Teacher rail — what a teacher needs at a glance: the work waiting on them,
+ * and how much of their monthly online allowance is left (E9). Deliberately NO
+ * conversion rate or ranking score: those are management figures, and putting a
+ * teacher's own score in front of them turns a matching signal into a
+ * performance review nobody agreed to.
+ */
+export function TeacherRail() {
+  const { data: demos = [] } = useQuery({ queryKey: ['teacher-demos'], queryFn: fetchTeacherDemos });
+  const { data: allowance } = useQuery({ queryKey: ['online-allowance'], queryFn: fetchOnlineAllowance });
+
+  const awaiting = demos.filter(d => ['new', 'contacted'].includes(d.status)).length;
+  const scheduled = demos.filter(d => d.status === 'scheduled').length;
+
+  return (
+    <aside className="space-y-4 2xl:sticky 2xl:top-6 2xl:self-start">
+      <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+        <p className="text-sm font-bold text-[#0B1220]">Waiting on you</p>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <Tile value={awaiting} label="Demos to arrange" />
+          <Tile value={scheduled} label="Demos scheduled" />
+        </div>
+        {awaiting > 0 && (
+          <p className="mt-2 text-xs text-slate-500">Propose a time from the Classroom section — the family confirms it.</p>
+        )}
+      </section>
+
+      {allowance?.eligible && (
+        <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+          <p className="flex items-center gap-1.5 text-sm font-bold text-[#0B1220]">
+            <Clock className="h-4 w-4 text-brand-600" />Online classes this month
+          </p>
+          <p className="mt-0.5 text-xs text-slate-500">
+            You may take {allowance.allowed} of your {allowance.required} classes online.
+          </p>
+          <div className="mt-3 flex items-center gap-2">
+            <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+              <div className="h-full rounded-full bg-brand-600"
+                style={{ width: `${allowance.allowed ? Math.min(100, (allowance.used / allowance.allowed) * 100) : 0}%` }} />
+            </div>
+            <span className="text-xs font-bold tabular-nums text-[#0B1220]">{allowance.remaining} left</span>
+          </div>
+        </section>
+      )}
     </aside>
   );
 }

@@ -18,7 +18,7 @@ import {
   acceptDemoSlot, declineDemoSlot,
   fetchMyAchievements, createMyAchievement, updateMyAchievement, fetchMyRecord,
 } from '../lib/api.js';
-import StudentShell, { KeepLearning, SuggestedCourses } from '../components/dashboard/StudentShell.jsx';
+import DashboardShell, { KeepLearning, SuggestedCourses, ParentRail, TeacherRail } from '../components/dashboard/DashboardShell.jsx';
 import {
   fetchTeacherProfile, updateTeacherProfile,
   fetchTeacherStudents, fetchTeacherDemos, fetchClassLogs, addClassLog,
@@ -55,17 +55,15 @@ export default function DashboardPage() {
   if (isLoading) return <div className="mx-auto max-w-5xl px-4 py-20 text-slate-500">Loading your dashboard…</div>;
   if (!isAuthed) return <Navigate to="/login" replace />;
 
-  // The student view owns its whole page — its own sidebar, padding and
-  // full-bleed width — so it renders outside the centred shell the other
-  // roles share. Wrapping it would put a 1024px column in the middle of a
-  // 2560px monitor, which is the thing being fixed.
-  if (user.role === 'student') return <StudentDashboard />;
+  // Student, parent and teacher each own their whole page now — sidebar,
+  // padding and full-bleed width live in DashboardShell. Only the admin
+  // console still renders inside the centred wrapper below, because it has
+  // its own tab chrome and was never the thing being squeezed.
+  const Owned = { student: StudentDashboard, parent: ParentDashboard, teacher: TeacherDashboard }[user.role];
+  if (Owned) return <Owned />;
 
   const View = VIEW_BY_ROLE[user.role] ?? ParentDashboard;
-  // The console needs the width; the other two read better narrow.
-  const width = user.role === 'admin'
-    ? 'max-w-[1600px]'
-    : 'max-w-5xl';
+  const width = 'max-w-[1600px]';
 
   return (
     <div className={`mx-auto w-full ${width} px-4 sm:px-6 lg:px-8 py-10`}>
@@ -86,60 +84,85 @@ function AdminDashboard() {
 }
 
 function TeacherDashboard() {
+  const [section, setSection] = useState('overview');
+
   return (
-    <div className="space-y-6">
-      <div className="grid lg:grid-cols-2 gap-6">
-        <TeacherProfileCard />
-        <KycCard />
-      </div>
-      {/* Full width: it is a four-step form with a grid in it, and squeezing it
-          into a half-column column makes the availability grid scroll sideways
-          on a laptop. */}
-      <PhysicalProfileCard />
-      <TeacherClassroom />
-      <TeacherCalendarCard />
-      <div className="grid lg:grid-cols-2 gap-6">
-        <TeacherReschedulesCard />
-        <TeacherProposalsCard />
-      </div>
-    </div>
+    <DashboardShell role="teacher" section={section} onSection={setSection} rail={<TeacherRail />}>
+      {section === 'overview' && (
+        <>
+          <TeacherClassroom />
+          <TeacherCalendarCard />
+        </>
+      )}
+
+      {section === 'classroom' && <TeacherClassroom />}
+
+      {section === 'schedule' && <TeacherCalendarCard />}
+
+      {section === 'requests' && (
+        <>
+          <TeacherReschedulesCard />
+          <TeacherProposalsCard />
+        </>
+      )}
+
+      {section === 'profile' && (
+        <>
+          <TeacherProfileCard />
+          {/* Full width: it is a four-step form with an availability grid in it,
+              and squeezing it into a half column makes that grid scroll
+              sideways on a laptop. */}
+          <PhysicalProfileCard />
+          <KycCard />
+        </>
+      )}
+    </DashboardShell>
   );
 }
 
 function ParentDashboard() {
+  const [section, setSection] = useState('overview');
+
   return (
-    <>
-      <GettingStartedCard />
-      <MyCoursesCard />
-      <div className="grid lg:grid-cols-2 gap-6 mt-6">
-        <RequestsCard />
-        <EnrollmentsCard />
-      </div>
-      <div className="grid lg:grid-cols-2 gap-6 mt-6">
-        <UpcomingClassesCard />
-        <ExamUpdatesCard />
-      </div>
-      <div className="mt-6">
-        <TuitionRequirementsCard />
-      </div>
-      <div className="mt-6">
-        <StudentRecordCard />
-      </div>
-      <div className="mt-6">
-        <AchievementsCard />
-      </div>
-      <div className="grid lg:grid-cols-2 gap-6 mt-6">
-        <PlansAndOffersCard />
-        <CertificatesCard />
-      </div>
-      <div className="grid lg:grid-cols-2 gap-6 mt-6">
-        <StudentsCard />
-        <KycCard />
-      </div>
-      <div className="mt-6">
-        <SupportCard />
-      </div>
-    </>
+    <DashboardShell role="parent" section={section} onSection={setSection} rail={<ParentRail />}>
+      {section === 'overview' && (
+        <>
+          <GettingStartedCard />
+          <MyCoursesCard />
+          <UpcomingClassesCard />
+          <ExamUpdatesCard />
+        </>
+      )}
+
+      {section === 'classes' && (
+        <>
+          <EnrollmentsCard />
+          <UpcomingClassesCard />
+          <TuitionRequirementsCard />
+        </>
+      )}
+
+      {section === 'bookings' && (
+        <>
+          <RequestsCard />
+          <PlansAndOffersCard />
+        </>
+      )}
+
+      {section === 'achievements' && (
+        <>
+          <StudentRecordCard />
+          <AchievementsCard />
+          <CertificatesCard />
+        </>
+      )}
+
+      {section === 'children' && <StudentsCard />}
+
+      {section === 'account' && <KycCard />}
+
+      {section === 'support' && <SupportCard />}
+    </DashboardShell>
   );
 }
 
@@ -163,7 +186,7 @@ function StudentDashboard() {
   // once, plainly, instead of rendering six empty cards.
   if (!profile) {
     return (
-      <StudentShell section="overview" onSection={() => {}}>
+      <DashboardShell role="student" section="overview" onSection={() => {}}>
         <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
           <h2 className="font-heading text-lg font-bold text-[#0B1220]">Your account isn't linked to a student yet</h2>
           <p className="mt-2 text-sm text-slate-600">
@@ -171,12 +194,12 @@ function StudentDashboard() {
           </p>
         </section>
         <SupportCard />
-      </StudentShell>
+      </DashboardShell>
     );
   }
 
   return (
-    <StudentShell section={section} onSection={setSection}>
+    <DashboardShell role="student" section={section} onSection={setSection}>
       {section === 'overview' && (
         <>
           <KeepLearning />
@@ -210,7 +233,7 @@ function StudentDashboard() {
 
       {section === 'certificates' && <CertificatesCard />}
       {section === 'support' && <SupportCard />}
-    </StudentShell>
+    </DashboardShell>
   );
 }
 
@@ -576,7 +599,7 @@ function TeacherCalendarCard() {
         </span>
       </p>
       {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : (
-        <div className="grid lg:grid-cols-[1fr_16rem] gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_16rem] gap-5">
           <div>
             <div className="grid grid-cols-7 text-center text-[11px] font-bold text-slate-400 mb-1">
               {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(w=><div key={w}>{w}</div>)}
