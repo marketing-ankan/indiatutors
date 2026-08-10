@@ -17,6 +17,9 @@ import {
   fetchKyc, uploadKyc, deleteKyc, fetchMyDemoRequests, fetchMyEnrollments,
   acceptDemoSlot, declineDemoSlot,
   fetchMyAchievements, createMyAchievement, updateMyAchievement, fetchMyRecord,
+} from '../lib/api.js';
+import DashboardShell, { KeepLearning, SuggestedCourses, ParentRail, TeacherRail, ClassMaterialsSection } from '../components/dashboard/DashboardShell.jsx';
+import {
   fetchTeacherProfile, updateTeacherProfile,
   fetchTeacherStudents, fetchTeacherDemos, fetchClassLogs, addClassLog,
   fetchCurriculum, addCurriculumItem, updateCurriculumItem, deleteCurriculumItem,
@@ -52,11 +55,15 @@ export default function DashboardPage() {
   if (isLoading) return <div className="mx-auto max-w-5xl px-4 py-20 text-slate-500">Loading your dashboard…</div>;
   if (!isAuthed) return <Navigate to="/login" replace />;
 
+  // Student, parent and teacher each own their whole page now — sidebar,
+  // padding and full-bleed width live in DashboardShell. Only the admin
+  // console still renders inside the centred wrapper below, because it has
+  // its own tab chrome and was never the thing being squeezed.
+  const Owned = { student: StudentDashboard, parent: ParentDashboard, teacher: TeacherDashboard }[user.role];
+  if (Owned) return <Owned />;
+
   const View = VIEW_BY_ROLE[user.role] ?? ParentDashboard;
-  // The console needs the width; the other three read better narrow.
-  const width = user.role === 'admin'
-    ? 'max-w-[1600px]'
-    : 'max-w-5xl';
+  const width = 'max-w-[1600px]';
 
   return (
     <div className={`mx-auto w-full ${width} px-4 sm:px-6 lg:px-8 py-10`}>
@@ -77,60 +84,85 @@ function AdminDashboard() {
 }
 
 function TeacherDashboard() {
+  const [section, setSection] = useState('overview');
+
   return (
-    <div className="space-y-6">
-      <div className="grid lg:grid-cols-2 gap-6">
-        <TeacherProfileCard />
-        <KycCard />
-      </div>
-      {/* Full width: it is a four-step form with a grid in it, and squeezing it
-          into a half-column column makes the availability grid scroll sideways
-          on a laptop. */}
-      <PhysicalProfileCard />
-      <TeacherClassroom />
-      <TeacherCalendarCard />
-      <div className="grid lg:grid-cols-2 gap-6">
-        <TeacherReschedulesCard />
-        <TeacherProposalsCard />
-      </div>
-    </div>
+    <DashboardShell role="teacher" section={section} onSection={setSection} rail={<TeacherRail />}>
+      {section === 'overview' && (
+        <>
+          <TeacherClassroom />
+          <TeacherCalendarCard />
+        </>
+      )}
+
+      {section === 'classroom' && <TeacherClassroom />}
+
+      {section === 'schedule' && <TeacherCalendarCard />}
+
+      {section === 'requests' && (
+        <>
+          <TeacherReschedulesCard />
+          <TeacherProposalsCard />
+        </>
+      )}
+
+      {section === 'profile' && (
+        <>
+          <TeacherProfileCard />
+          {/* Full width: it is a four-step form with an availability grid in it,
+              and squeezing it into a half column makes that grid scroll
+              sideways on a laptop. */}
+          <PhysicalProfileCard />
+          <KycCard />
+        </>
+      )}
+    </DashboardShell>
   );
 }
 
 function ParentDashboard() {
+  const [section, setSection] = useState('overview');
+
   return (
-    <>
-      <GettingStartedCard />
-      <MyCoursesCard />
-      <div className="grid lg:grid-cols-2 gap-6 mt-6">
-        <RequestsCard />
-        <EnrollmentsCard />
-      </div>
-      <div className="grid lg:grid-cols-2 gap-6 mt-6">
-        <UpcomingClassesCard />
-        <ExamUpdatesCard />
-      </div>
-      <div className="mt-6">
-        <TuitionRequirementsCard />
-      </div>
-      <div className="mt-6">
-        <StudentRecordCard />
-      </div>
-      <div className="mt-6">
-        <AchievementsCard />
-      </div>
-      <div className="grid lg:grid-cols-2 gap-6 mt-6">
-        <PlansAndOffersCard />
-        <CertificatesCard />
-      </div>
-      <div className="grid lg:grid-cols-2 gap-6 mt-6">
-        <StudentsCard />
-        <KycCard />
-      </div>
-      <div className="mt-6">
-        <SupportCard />
-      </div>
-    </>
+    <DashboardShell role="parent" section={section} onSection={setSection} rail={<ParentRail />}>
+      {section === 'overview' && (
+        <>
+          <GettingStartedCard />
+          <MyCoursesCard />
+          <UpcomingClassesCard />
+          <ExamUpdatesCard />
+        </>
+      )}
+
+      {section === 'classes' && (
+        <>
+          <EnrollmentsCard />
+          <UpcomingClassesCard />
+          <TuitionRequirementsCard />
+        </>
+      )}
+
+      {section === 'bookings' && (
+        <>
+          <RequestsCard />
+          <PlansAndOffersCard />
+        </>
+      )}
+
+      {section === 'achievements' && (
+        <>
+          <StudentRecordCard />
+          <AchievementsCard />
+          <CertificatesCard />
+        </>
+      )}
+
+      {section === 'children' && <StudentsCard />}
+
+      {section === 'account' && <KycCard />}
+
+      {section === 'support' && <SupportCard />}
+    </DashboardShell>
   );
 }
 
@@ -138,50 +170,70 @@ function ParentDashboard() {
  * A student sees their own learning and nothing about running an account:
  * no "my students" (adding children is a guardian's job), no KYC (we verify
  * the adult), no demo-booking card (a demo is booked by whoever pays).
+ *
+ * Laid out to the reference the owner supplied (left nav, wide learning
+ * column, stats rail) in IndiaTutors colours, and full width at every size.
+ * The sections are switched in the sidebar rather than stacked into one long
+ * scroll, which is what made the old page a column of mostly-empty cards.
  */
 function StudentDashboard() {
   const { user } = useAuth();
   const profile = user.student_profile;
+  const [section, setSection] = useState('overview');
+
+  // An account nobody has linked to a student record has no classes, no
+  // materials and no portfolio — and no amount of layout fixes that. Say so
+  // once, plainly, instead of rendering six empty cards.
+  if (!profile) {
+    return (
+      <DashboardShell role="student" section="overview" onSection={() => {}}>
+        <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+          <h2 className="font-heading text-lg font-bold text-[#0B1220]">Your account isn't linked to a student yet</h2>
+          <p className="mt-2 text-sm text-slate-600">
+            Ask your parent or our team to link it — then your classes, materials and portfolio all appear here.
+          </p>
+        </section>
+        <SupportCard />
+      </DashboardShell>
+    );
+  }
 
   return (
-    <>
-      <MyCoursesCard />
-      {/* E6 — a student sees their own record, same figures as their guardian's. */}
-      <div className="mt-6">
-        <StudentRecordCard />
-      </div>
-      <div className="grid lg:grid-cols-2 gap-6 mt-6">
-        <EnrollmentsCard />
-        <UpcomingClassesCard />
-      </div>
-      <div className="grid lg:grid-cols-2 gap-6 mt-6">
-        <ExamUpdatesCard />
-        <CertificatesCard />
-      </div>
-      <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6 mt-6">
-        <h2 className="text-lg font-bold flex items-center gap-2 mb-1"><Award className="h-5 w-5 text-brand-600"/>My portfolio</h2>
-        {profile ? (
-          <>
-            <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-slate-500 mb-2">
-              <span>Your achievements, certificates and milestones — added by you and your teachers.</span>
-              <span className="rounded bg-brand-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-brand-700">{profile.code}</span>
-            </p>
-            <PortfolioPanel studentId={profile.id} />
-          </>
-        ) : (
-          // No invented data: an account with no linked profile genuinely has
-          // no classes to show, and the fix is an action someone else takes.
-          <p className="text-sm text-slate-500">
-            Your account isn't linked to a student profile yet, so there's nothing to show here.
-            Ask your parent or our team to link it — then your classes, materials and portfolio appear on this page.
-            {' '}You can also ask us below and we'll sort it out.
+    <DashboardShell role="student" section={section} onSection={setSection}>
+      {section === 'overview' && (
+        <>
+          <KeepLearning />
+          <UpcomingClassesCard />
+          <SuggestedCourses />
+        </>
+      )}
+
+      {section === 'classes' && (
+        <>
+          <EnrollmentsCard />
+          <UpcomingClassesCard />
+          <ExamUpdatesCard />
+        </>
+      )}
+
+      {section === 'materials' && <ClassMaterialsSection><MyCoursesCard /></ClassMaterialsSection>}
+
+      {section === 'achievements' && (
+        <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+          <h2 className="font-heading mb-1 flex items-center gap-2 text-lg font-bold text-[#0B1220]">
+            <Award className="h-5 w-5 text-brand-600" />My portfolio
+          </h2>
+          <p className="mb-3 flex flex-wrap items-center gap-x-1.5 text-xs text-slate-500">
+            <span>Your achievements, certificates and milestones — added by you and your teachers.</span>
+            <span className="rounded bg-brand-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-brand-700">{profile.code}</span>
           </p>
-        )}
-      </section>
-      <div className="mt-6">
-        <SupportCard />
-      </div>
-    </>
+          <PortfolioPanel studentId={profile.id} />
+        </section>
+      )}
+
+      {section === 'certificates' && <CertificatesCard />}
+      {section === 'support' && <SupportCard />}
+    </DashboardShell>
   );
 }
 
@@ -547,7 +599,7 @@ function TeacherCalendarCard() {
         </span>
       </p>
       {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : (
-        <div className="grid lg:grid-cols-[1fr_16rem] gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_16rem] gap-5">
           <div>
             <div className="grid grid-cols-7 text-center text-[11px] font-bold text-slate-400 mb-1">
               {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(w=><div key={w}>{w}</div>)}

@@ -59,6 +59,17 @@ export const fetchMyDemoRequests = async () => { const { data } = await api.get(
 // The family answers a time their teacher proposed.
 // E7 — achievements a family records. Private unless they consent AND staff approve.
 export const fetchMyAchievements  = async () => { const { data } = await api.get('/my/achievements'); return data.data; };
+// E3/E4 — company-supplied material for the courses you are enrolled in.
+export const fetchMyCourseMaterials = async () => { const { data } = await api.get('/my/course-materials'); return data.data; };
+// A blob download, not a plain href: the file lives on the private disk behind
+// a bearer token, so a raw <a href> would just 401.
+export const downloadCourseMaterial = async (id, filename) => {
+  const res = await api.get(`/course-materials/${id}/download`, { responseType: 'blob' });
+  const url = URL.createObjectURL(res.data);
+  const a = Object.assign(document.createElement('a'), { href: url, download: filename || 'material' });
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+};
 // E6 — classes attended, materials held, per student on the account.
 export const fetchMyRecord        = async () => { const { data } = await api.get('/my/record'); return data.data; };
 export const createMyAchievement  = async (p) => { const { data } = await api.post('/my/achievements', p); return data; };
@@ -74,6 +85,8 @@ export const fetchTeacherProfile  = async () => { const { data } = await api.get
 export const updateTeacherProfile = async (payload) => { const { data } = await api.put('/teacher/profile', payload); return data.data; };
 export const fetchTeacherStudents = async () => { const { data } = await api.get('/teacher/students'); return data.data; };
 export const fetchTeacherDemos    = async () => { const { data } = await api.get('/teacher/demos'); return data.data; };
+// E9 — how much of this month's 25% online allowance is left.
+export const fetchOnlineAllowance = async () => { const { data } = await api.get('/teacher/online-allowance'); return data.data; };
 // A teacher offers a time. No phone number needed for this to work — contact
 // details stay withheld until a coordinator releases them.
 export const proposeDemoSlot      = async ({ demoId, ...p }) => { const { data } = await api.post(`/teacher/demos/${demoId}/slots`, p); return data; };

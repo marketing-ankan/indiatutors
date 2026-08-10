@@ -91,7 +91,7 @@ export default function SupportCard() {
           </div>
           <input required value={form.subject} onChange={set('subject')} className={field}
             placeholder="What's it about? e.g. Class did not happen on Tuesday" />
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <select value={form.category} onChange={set('category')} className={field}>
               <option value="">Choose a topic…</option>
               {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
