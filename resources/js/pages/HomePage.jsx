@@ -296,7 +296,11 @@ export default function HomePage() {
   ];
 
   const TRUST = [
-    ['15+', 'Countries Served'], ['120+', 'Courses Offered'], ['75+', 'Expert Tutors'],
+    // "15+ Countries Served" removed 2026-08-10: the owner confirmed the
+    // business is India-only, so it was a checkable claim that is not true.
+    // Not replaced with a substitute number — five true stats beat six with a
+    // padded one.
+    ['120+', 'Courses Offered'], ['75+', 'Expert Tutors'],
     ['8,000+', 'Students Trained'], ['200+', 'Free Workshops Run'], ['100%', 'Free First Demo'],
   ];
 
@@ -345,7 +349,7 @@ export default function HomePage() {
 
       {/* TRUST NUMBERS */}
       <section className="py-10" style={{ background: CREAM }}>
-        <div className="container-wide grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 text-center">
+        <div className="container-wide grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 text-center">
           {TRUST.map(([n, l]) => (
             <div key={l}>
               <div className="font-heading text-2xl font-extrabold text-brand-600">{n}</div>

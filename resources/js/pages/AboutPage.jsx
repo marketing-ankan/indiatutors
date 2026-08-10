@@ -8,8 +8,9 @@ import { imageFor } from '../data/courseImages.js';
 // floating stat cards, content + sticky facts aside, course grid, CTA band.
 
 const STATS = [
+  // "20+ Countries served" removed 2026-08-10 — owner confirmed India-only.
   ['100+', 'Subjects'], ['75+', 'Expert tutors'],
-  ['10,000+', 'Classes delivered'], ['20+', 'Countries served'],
+  ['10,000+', 'Classes delivered'], ['Free', 'First demo class'],
 ];
 
 const OFFERS = [
