@@ -244,6 +244,9 @@ Route::middleware('auth:sanctum')->group(function () {
         // One merged queue over teacher_profiles + unclaimed teacher_applications.
         Route::get('/teachers-console',                  [AdminTeacherController::class, 'index']);
         Route::patch('/teachers/{teacherProfile}/listing',[AdminTeacherController::class, 'toggleListing']);
+        // A4 — a teacher's own edits reach the public listing only through here.
+        Route::post('/teachers/{teacherProfile}/publish', [AdminTeacherController::class, 'publishChanges']);
+        Route::post('/teachers/{teacherProfile}/discard', [AdminTeacherController::class, 'discardChanges']);
         Route::get('/reviews',                           [ReviewController::class, 'adminIndex']);
         Route::post('/reviews',                          [ReviewController::class, 'adminStore']);
         Route::patch('/reviews/{review}',                [ReviewController::class, 'update']);

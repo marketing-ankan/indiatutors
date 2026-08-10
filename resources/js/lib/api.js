@@ -210,6 +210,9 @@ export const submitTutorReview = async ({ slug, ...p }) => { const { data } = aw
 export const fetchAdminOverview    = async () => { const { data } = await api.get('/admin/overview'); return data.data; };
 export const fetchAdminTeacherRows = async (p={}) => { const { data } = await api.get('/admin/teachers-console', { params:p }); return data; };
 export const toggleTeacherListing  = async ({ id, is_listed }) => { const { data } = await api.patch(`/admin/teachers/${id}/listing`, { is_listed }); return data.data; };
+// A4 — a teacher's own edits reach their public listing only through these.
+export const publishTeacherChanges = async (id) => { const { data } = await api.post(`/admin/teachers/${id}/publish`); return data; };
+export const discardTeacherChanges = async (id) => { const { data } = await api.post(`/admin/teachers/${id}/discard`); return data; };
 export const updateTeacherApplication = async ({ id, status }) => { const { data } = await api.patch(`/admin/teacher-applications/${id}`, { status }); return data; };
 export const teacherApplicationCvUrl  = (id) => `${baseURL}/admin/teacher-applications/${id}/cv`;
 export const downloadTeacherCv     = async (id, filename) => {

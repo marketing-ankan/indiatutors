@@ -419,10 +419,12 @@ class AdminController extends Controller {
             'from' => $before, 'to' => $data['status'],
         ]);
 
-        // On approval, give the teacher a listed directory tutor (idempotent) so
-        // they can be assigned demos and see their own enrollments in the portal.
+        // On approval, publish the profile to the public directory so they can
+        // be assigned demos and appear to families. Publishing (not the old
+        // create-once linkTutor) so re-approving a teacher who edited while
+        // pending pushes those edits live too.
         if ($data['status'] === 'approved') {
-            $this->linkTutor($teacherProfile);
+            TeacherProfilePublisher::publish($teacherProfile);
         }
 
         AppNotification::send(

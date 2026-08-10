@@ -16,6 +16,7 @@ use App\Models\DemoRequest;
 use App\Models\DemoSlotProposal;
 use App\Models\Enrollment;
 use App\Models\RescheduleRequest;
+use App\Support\TeacherProfilePublisher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -45,6 +46,26 @@ class TeacherController extends Controller {
         ]);
         $profile = $request->user()->teacherProfile()->firstOrCreate([], ['status' => 'pending']);
         $profile->update($data);
+        $profile->refresh();
+
+        // An approved teacher's edits do NOT go live on their own. They mark the
+        // profile for review and an admin publishes them — the same instinct
+        // that keeps a family's phone number behind a coordinator.
+        //
+        // Only stamped when the edit would actually change the public listing:
+        // saving the form with nothing altered must not create review work, or
+        // staff learn to clear the queue without reading it. A profile that is
+        // not yet approved needs no flag — approval publishes it anyway.
+        if ($profile->status === 'approved') {
+            $diff = TeacherProfilePublisher::diff($profile, $request->user()->tutor()->first());
+            if ($diff && ! $profile->hasUnpublishedChanges()) {
+                $profile->forceFill(['changes_submitted_at' => now()])->save();
+            } elseif (! $diff && $profile->hasUnpublishedChanges()) {
+                // Edited back to what is already published — nothing to review.
+                $profile->forceFill(['changes_submitted_at' => null])->save();
+            }
+        }
+
         return new TeacherProfileResource($profile->fresh());
     }
 

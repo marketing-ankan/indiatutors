@@ -76,9 +76,28 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
   *Blocked on R2 keys (same storage as video courses).*
 - ⬜ **A2. Public teacher profile page — full version.** Qualifications, testimonials, timetable /
   time availability, intro video, reviews, ranking position.
-- ⬜ **A3. Teacher details capture — WinQuest parity.** All locations served + availability + time.
-  *Partly exists for home-tuition teachers (`physical_teaching_profiles`); the directory `tutors` table is thinner.*
-- ⬜ **A4. Admin approval gate for profile media.** Video and photos reviewed before they go public.
+- 🔨 **A3. Teacher details capture — WinQuest parity.** All locations served + availability + time.
+  *Stage 4 — the sync half built, awaiting owner sign-off.*
+  **Fixed a silent data bug found here:** `linkTutor` copied a profile into the public `tutors` row
+  exactly once, at approval, and returned early forever after; `updateMine` wrote only to
+  `teacher_profiles`. So every public listing was frozen at its approval-day snapshot. Demonstrated on
+  the preview DB: a teacher raised their fee from ₹800 to ₹1500 and the public page kept quoting ₹800.
+  Nobody notices stale-but-plausible data, and families are quoted from it.
+  One `App\Support\TeacherProfilePublisher` now owns the profile → listing mapping, so the create and
+  update paths cannot drift. `verified`, `is_published` and `slug` are deliberately NOT publishable
+  from a profile — they are claims the platform makes, not fields a teacher fills in.
+  *Still thin: the directory has no structured availability/time. `physical_teaching_profiles` has the
+  rich version (geocoded, radius, slot table); the `tutors` row carries only a comma string.*
+- 🔨 **A4. Admin approval gate for profile content.** Reviewed before it goes public.
+  *Stage 4 — built for profile text, awaiting owner sign-off.* An approved teacher's edits mark the
+  profile for review (`changes_submitted_at`) and reach the public listing only when staff press
+  **Publish**. Staff see a field-by-field before/after — a reviewer who cannot see the change can only
+  rubber-stamp it, and the fee line is the one that matters: a teacher can quietly double their rate
+  and families are quoted from the public listing.
+  Noise guards, so the queue stays worth reading: a no-op save creates no review item, and editing back
+  to the published value clears the flag. `changes_submitted_at` / `published_at` are **not fillable**,
+  so a teacher cannot mass-assign their way past the gate (verified — the attempt is ignored).
+  *Media (video/photos) is A1, blocked on R2 keys, and will use this same gate.*
 
 ## B. Search → suggestion → selection (student-facing)
 
@@ -128,8 +147,8 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
   **`completed_at` is a timestamp, not a status lookup**, so "this demo happened" survives any later
   status change — that single fact is what D1's review gate and D2's denominator both hang on.
   Console drives it with buttons that offer only the states valid from where the demo actually is.
-- 🔨 **C4. Class schedule after a successful demo.** Regular classes scheduled from the demo outcome.
-  *Stage 4 — built, awaiting owner sign-off.* New `enrollment_schedules` holds the recurring weekly
+- ✅ **C4. Class schedule after a successful demo.** *Owner-confirmed 2026-08-10 · commit `412a392`.*
+  Regular classes scheduled from the demo outcome. New `enrollment_schedules` holds the recurring weekly
   timetable (a rule — "Tuesdays at 16:00" — not dated events; those are `class_logs`). **Converting a
   demo carries its agreed time straight into the timetable**, so nobody re-negotiates a slot the family
   already agreed once; staff can edit it afterwards. Removing a class deactivates rather than deletes,
