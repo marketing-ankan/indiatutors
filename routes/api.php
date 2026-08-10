@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\CourseController;
+use App\Http\Controllers\Api\CourseMaterialController;
 use App\Http\Controllers\Api\DemoRequestController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\ExamUpdateController;
@@ -143,6 +144,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/my/enrollments/{enrollment}', [EnrollmentController::class, 'myShow']);
     Route::post('/my/enrollments/{enrollment}/reschedules', [EnrollmentController::class, 'requestReschedule']);
     Route::get('/materials/{material}/download', [EnrollmentController::class, 'downloadMaterial']);
+    // E3 + E4 — company-supplied course material. One list for the teacher who
+    // teaches it and the students enrolled on it; entitlement derived from live
+    // enrolments, re-checked on download.
+    Route::get('/my/course-materials',                    [CourseMaterialController::class, 'mine']);
+    Route::get('/course-materials/{material}/download',   [CourseMaterialController::class, 'download']);
 
     // Student portfolio (Phase 6)
     Route::get('/students/{student}/portfolio',  [PortfolioController::class, 'index']);
@@ -262,6 +268,10 @@ Route::middleware('auth:sanctum')->group(function () {
         // A4 — a teacher's own edits reach the public listing only through here.
         Route::post('/teachers/{teacherProfile}/publish', [AdminTeacherController::class, 'publishChanges']);
         Route::post('/teachers/{teacherProfile}/discard', [AdminTeacherController::class, 'discardChanges']);
+        Route::get('/course-materials',                  [CourseMaterialController::class, 'adminIndex']);
+        Route::post('/course-materials',                 [CourseMaterialController::class, 'store']);
+        Route::patch('/course-materials/{material}',     [CourseMaterialController::class, 'update']);
+        Route::delete('/course-materials/{material}',    [CourseMaterialController::class, 'destroy']);
         Route::get('/achievements',                      [StudentAchievementController::class, 'adminIndex']);
         Route::patch('/achievements/{achievement}',      [StudentAchievementController::class, 'adminUpdate']);
         Route::get('/reviews',                           [ReviewController::class, 'adminIndex']);

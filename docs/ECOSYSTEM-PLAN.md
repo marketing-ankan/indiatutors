@@ -250,10 +250,23 @@ recorded here in his own terms so the next reader does not re-guess them.*
   (inside declared availability, not already teaching that slot, not absent themselves, not on a
   break), and only then *are they good* (`TeacherPerformance` breaks ties). The free-check is what
   makes it trustworthy: offering someone already teaching at 4pm is worse than offering nobody.
-- ⬜ **E3. Materials — full access.** *Defined by the owner 2026-08-10.* The **study material for the
-  class taken**, accessible to the students **enrolled** in that online or physical class. So access is
-  a consequence of enrolment, not a catalogue browse — the gate is "are you in this class".
-- ⬜ **E4. Company-provided teaching material.** *Defined 2026-08-10 — not "teacher's own uploads".*
+- 🔨 **E3 + E4. Company-provided teaching material.** *Stage 5 — built together, awaiting sign-off.*
+  **One table, two audiences** (`course_materials`), because they are one artefact: the company
+  publishes a PPT/PDF to a course, the teacher teaches from it, and every enrolled student gets the
+  same file. Two tables would mean two upload paths and an inevitable day where the teacher is on v2
+  and the class is reading v1.
+  **Not `class_materials`**, which already exists and is the opposite direction: a *teacher* uploading
+  to *one* enrolment. Same file shape, different owner, different lifetime.
+  **Entitlement is derived, never stored.** No join table says who may read what — a learner sees the
+  courses they are enrolled in, a teacher sees the courses they teach. Enrol someone and access
+  appears; end the enrolment and it vanishes, with no second list to keep in step (verified: ending an
+  enrolment drops the list to zero and the direct download to 403).
+  Files sit on the private disk and every download re-checks entitlement, like class materials and KYC
+  — a public URL would outlive the enrolment. Unpublished material is staff-only, so a half-finished
+  deck cannot reach a class because someone uploaded it early.
+  *Known gap: targeting is by `course_id`, so enrolments created from a free-text demo (no course) get
+  no company material. Same data gap that surfaced in E2.*
+- ⬜ ~~**E4. Company-provided teaching material.**~~ *Merged into E3 above — see why.*
   **The company supplies the PPT/PDF** for a given class or syllabus; the teacher teaches from it, and
   **the same file is given to the enrolled student**. So E3 and E4 are two ends of ONE artefact: one
   upload, two audiences. Build them together or they will drift into two libraries of the same file.
