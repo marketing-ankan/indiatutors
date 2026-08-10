@@ -112,6 +112,21 @@ class StudentAchievementController extends Controller
         return response()->json(['message' => 'Removed.']);
     }
 
+    /**
+     * E6 — "my learning so far", one block per student on the account.
+     *
+     * Lives beside achievements because both answer "what has this student
+     * done", and both are scoped by the same ownership rule.
+     */
+    public function record(Request $request)
+    {
+        $students = Student::whereIn('id', self::ownedStudentIds($request))->orderBy('name')->get();
+
+        return response()->json([
+            'data' => $students->map(fn (Student $s) => \App\Support\StudentRecord::forStudent($s))->all(),
+        ]);
+    }
+
     // ---- Staff moderation ---------------------------------------------------
 
     public function adminIndex(Request $request)

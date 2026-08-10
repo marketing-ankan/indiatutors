@@ -273,9 +273,17 @@ recorded here in his own terms so the next reader does not re-guess them.*
   *Supersedes the earlier "content source is WinQuest" note — that was my inference from the word
   "winquest" on the page, not an instruction.*
 - ⬜ **E5. Terms & conditions.** *Policy pages exist; entity name still pending.*
-- ⬜ **E6. Student contents — the student's own record.** *Defined 2026-08-10.* Personal details and
-  counts: **how many classes attended, how many materials they hold**, and similar. A "my learning so
-  far" summary, not a content library — distinct from E3, which is the material itself.
+- 🔨 **E6. Student contents — the student's own record.** *Stage 5 — built, awaiting sign-off.*
+  Classes attended, hours taught, materials held, achievements. A "learning so far" summary, not a
+  content library — distinct from E3, which is the material itself. Shown to the guardian and to a
+  student account, from the same figures.
+  **Every number is counted, never estimated.** Attendance reads `class_logs` and counts only
+  `completed`: a `scheduled` row is an intention, and counting it would inflate the figure the moment a
+  class is booked. Verified — 2 completed + 1 scheduled + 1 missed reads as "2 attended, 1 missed".
+  `missed` is reported rather than hidden, and substitute-covered classes are surfaced, because it is
+  the family's class that changed.
+  This is exactly the surface where a plausible invented figure would never be challenged, and this
+  project has already had to delete two sets of those.
 - ⬜ **E7. Student achievements — the real testimonial engine.** *Defined 2026-08-10, and bigger than
   the page's two words suggest.*
   A place for a **student to record an achievement they credit to IndiaTutors or a teacher** — "I got

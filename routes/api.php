@@ -129,6 +129,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // E7 — achievements a family records and credits. Private by default;
     // publication needs BOTH staff approval and the family's consent.
+    // E6 — the student's own record: classes attended, materials held.
+    Route::get('/my/record',                       [StudentAchievementController::class, 'record']);
     Route::get('/my/achievements',                 [StudentAchievementController::class, 'index']);
     Route::post('/my/achievements',                [StudentAchievementController::class, 'store'])->middleware('throttle:10,1');
     Route::patch('/my/achievements/{achievement}', [StudentAchievementController::class, 'update']);

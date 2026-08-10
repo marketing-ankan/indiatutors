@@ -2,7 +2,7 @@ import { useState, useRef, lazy, Suspense } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap, Briefcase, Save, Users, BookOpen, NotebookPen, ChevronDown, ChevronUp, ListChecks, FolderOpen, Link2, Download, Lightbulb, Calendar, Award, Megaphone, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap, Briefcase, Save, Users, BookOpen, NotebookPen, ChevronDown, ChevronUp, ListChecks, FolderOpen, Link2, Download, Lightbulb, Calendar, Award, Megaphone, BarChart3, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import DashboardHero from '../components/dashboard/DashboardHero.jsx';
 import SupportCard from '../components/dashboard/SupportCard.jsx';
@@ -16,7 +16,7 @@ import {
   fetchStudents, createStudent, deleteStudent,
   fetchKyc, uploadKyc, deleteKyc, fetchMyDemoRequests, fetchMyEnrollments,
   acceptDemoSlot, declineDemoSlot,
-  fetchMyAchievements, createMyAchievement, updateMyAchievement,
+  fetchMyAchievements, createMyAchievement, updateMyAchievement, fetchMyRecord,
   fetchTeacherProfile, updateTeacherProfile,
   fetchTeacherStudents, fetchTeacherDemos, fetchClassLogs, addClassLog,
   fetchCurriculum, addCurriculumItem, updateCurriculumItem, deleteCurriculumItem,
@@ -114,6 +114,9 @@ function ParentDashboard() {
         <TuitionRequirementsCard />
       </div>
       <div className="mt-6">
+        <StudentRecordCard />
+      </div>
+      <div className="mt-6">
         <AchievementsCard />
       </div>
       <div className="grid lg:grid-cols-2 gap-6 mt-6">
@@ -143,6 +146,10 @@ function StudentDashboard() {
   return (
     <>
       <MyCoursesCard />
+      {/* E6 — a student sees their own record, same figures as their guardian's. */}
+      <div className="mt-6">
+        <StudentRecordCard />
+      </div>
       <div className="grid lg:grid-cols-2 gap-6 mt-6">
         <EnrollmentsCard />
         <UpcomingClassesCard />
@@ -938,6 +945,58 @@ function ComingSoonCard({ icon: Icon, title, blurb }) {
       <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500 ring-1 ring-slate-100">
         Nothing here yet — we'll let you know as soon as this is available.
       </p>
+    </section>
+  );
+}
+
+/**
+ * E6 — the student's own record.
+ *
+ * Every figure is counted from a real row. This is precisely the surface where
+ * an invented number would never be challenged, and this project has already
+ * had to delete two sets of those. So a stat with nothing behind it is omitted
+ * rather than shown as a confident zero — except attendance, where zero is a
+ * true and useful answer.
+ */
+function StudentRecordCard() {
+  const { data: records = [], isLoading } = useQuery({ queryKey: ['my-record'], queryFn: fetchMyRecord });
+
+  if (isLoading) return null;
+  if (!records.length) return null;
+
+  const Stat = ({ value, label, tone = 'text-brand-600' }) => (
+    <div className="rounded-xl bg-slate-50 px-3 py-2.5 text-center ring-1 ring-slate-100">
+      <div className={`font-heading text-xl font-extrabold ${tone}`}>{value}</div>
+      <div className="text-[11px] uppercase tracking-wide text-slate-500 mt-0.5">{label}</div>
+    </div>
+  );
+
+  return (
+    <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
+      <h2 className="text-lg font-bold flex items-center gap-2 mb-1"><BarChart3 className="h-5 w-5 text-brand-600" />Learning so far</h2>
+      <p className="text-xs text-slate-500 mb-4">Counted from your actual classes and materials — nothing estimated.</p>
+
+      <div className="space-y-5">
+        {records.map(r => (
+          <div key={r.student.id}>
+            {records.length > 1 && (
+              <p className="mb-2 text-sm font-bold text-slate-800">{r.student.name}</p>
+            )}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <Stat value={r.classes.attended} label="Classes attended" />
+              <Stat value={r.classes.hours} label="Hours taught" />
+              <Stat value={r.materials.total} label="Materials" />
+              <Stat value={r.achievements.total} label="Achievements" />
+            </div>
+            {(r.classes.missed > 0 || r.substitutions > 0) && (
+              <p className="mt-2 text-xs text-slate-500">
+                {r.classes.missed > 0 && <>{r.classes.missed} missed{r.substitutions > 0 && ' · '}</>}
+                {r.substitutions > 0 && <>{r.substitutions} covered by a substitute teacher</>}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

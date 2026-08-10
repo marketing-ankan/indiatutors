@@ -59,6 +59,8 @@ export const fetchMyDemoRequests = async () => { const { data } = await api.get(
 // The family answers a time their teacher proposed.
 // E7 — achievements a family records. Private unless they consent AND staff approve.
 export const fetchMyAchievements  = async () => { const { data } = await api.get('/my/achievements'); return data.data; };
+// E6 — classes attended, materials held, per student on the account.
+export const fetchMyRecord        = async () => { const { data } = await api.get('/my/record'); return data.data; };
 export const createMyAchievement  = async (p) => { const { data } = await api.post('/my/achievements', p); return data; };
 export const updateMyAchievement  = async ({ id, ...p }) => { const { data } = await api.patch(`/my/achievements/${id}`, p); return data.data; };
 export const deleteMyAchievement  = async (id) => { await api.delete(`/my/achievements/${id}`); };
