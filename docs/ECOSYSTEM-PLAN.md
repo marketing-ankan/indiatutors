@@ -200,9 +200,9 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
   because it is the harder signal to game: a teacher with 5.0★ from 15 reviews but 4 conversions in 40
   demos scores **46**, below a quiet closer at 28/40 with no reviews at all (**69.7**). The score
   orders lists and is never shown to a family — it is not a grade to publish beside someone's name.
-- ❓ **D3a. Decision: low-volume protection.** One demo converted = "100%" would outrank a veteran at
-  60% over 50 demos. Needs a minimum-demo floor or smoothing — founder's call on which.
-  ✅ **DECIDED 2026-08-10 — smooth toward the platform average.** Ranking everyone from day one, rather
+- ✅ **D3a. Decision: low-volume protection.** One demo converted = "100%" would outrank a veteran at
+  60% over 50 demos. Needed a minimum-demo floor or smoothing — founder's call on which.
+  **DECIDED 2026-08-10 — smooth toward the platform average.** Ranking everyone from day one, rather
   than parking newcomers at the bottom, because last place is self-fulfilling: no bookings → no demos
   → never leaves last place, and the roster freezes. Implemented as Bayesian shrinkage
   (`PRIOR_DEMOS = 5`, `PRIOR_REVIEWS = 3`). A 1-for-1 newcomer scores **57.5**, below a 60% veteran at
