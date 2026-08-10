@@ -18,7 +18,7 @@ import { GENDERS, LANGUAGES } from '../data/physical.js';
 // handed to their account — so what they typed here is what the matcher sees.
 
 const WHY = [
-  { icon: '🗓️', t: 'Flexible scheduling', d: 'Choose your own hours and time zones — teach online or at home, from anywhere.' },
+  { icon: '🗓️', t: 'Flexible scheduling', d: 'Choose your own hours — teach online from anywhere in India, or at the student’s home in your city.' },
   { icon: '👨‍👩‍👧', t: 'Students come to you', d: 'We market, match and schedule. You focus on teaching, not on finding students.' },
   { icon: '💸', t: 'Monthly payouts, no hidden cuts', d: 'Fair, on-time payments straight to your account with transparent fees.' },
   { icon: '📊', t: 'Earnings dashboard & analytics', d: 'Track your classes, students, reviews and income from one simple dashboard.' },
@@ -206,7 +206,7 @@ export default function BecomeTeacherPage() {
         <div aria-hidden="true" className="absolute -right-16 -top-16 h-64 w-64 rounded-full" style={{ background: 'radial-gradient(circle,rgba(212,175,55,.28),transparent 70%)' }} />
         <div className="relative mx-auto max-w-4xl px-4 py-16 text-center sm:px-6">
           <h1 className="font-heading text-4xl font-extrabold tracking-tight sm:text-5xl">Become a Teacher at Indiatutors Online</h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-slate-200">Share your expertise with students across India and worldwide. Flexible hours, fair pay, and a platform that handles the rest — you just teach.</p>
+          <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-slate-200">Share your expertise with students across India. Flexible hours, fair pay, and a platform that handles the rest — you just teach.</p>
           <div className="mt-6 flex flex-wrap justify-center gap-3 text-sm font-semibold">
             {['💰 Earn on your schedule', '🌍 Online & home tuition', '🎯 We bring the students'].map((c) => (
               <span key={c} className="rounded-full bg-white/15 px-4 py-1.5 ring-1 ring-white/25">{c}</span>

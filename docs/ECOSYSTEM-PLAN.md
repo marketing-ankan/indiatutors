@@ -421,20 +421,46 @@ exists. `docs/MATCHING-DATA-CONTRACT.md` describes the export for the *old* cons
 ## Claims that contradict India-only — 2026-08-10
 
 The owner stated plainly that there are no overseas students; the business is India-based. That settles
-the timezone question, but it leaves the site advertising a reach it does not have. These are the same
-category as the fabricated ratings deleted on 2026-08-07 — a checkable claim that is not true — and
-they need the owner's word before removal, because "countries served" might have been intended to mean
-something else (NRI enquiries, tutors located abroad):
+the timezone question, but it left the site advertising a reach it does not have — the same category as
+the fabricated ratings deleted on 2026-08-07: a checkable claim that is not true.
 
-- `resources/js/pages/HomePage.jsx:299` — "15+ Countries Served"
-- `resources/js/pages/AboutPage.jsx:12` — "20+ Countries served"
-- `resources/js/pages/BecomeTeacherPage.jsx:29` — "20+ Countries"
-- `resources/js/data/homeLive.js:529` — "15+ Countries reached"
-- `resources/js/pages/PlansPage.jsx:18,52` — a country picker that quotes **USD** to anyone outside
-  India. If nobody outside India buys, this is dead UI that also implies international operation.
+### ✅ Resolved on owner's instruction (2026-08-10)
 
-Not touched unilaterally: marketing and pricing copy is the founder's call, and the audit convention in
-[[WEBSITE-IMPROVEMENTS.md]] is to surface these rather than rewrite them.
+The owner then said explicitly: *"remove the country stats and drop the USD picker"*, then *"remove that
+country dropdown too"*. Done:
+
+- `HomePage.jsx` / `AboutPage.jsx` / `BecomeTeacherPage.jsx` / `homeLive.js` — the "15+/20+ Countries"
+  stat tiles are gone.
+- `PlansPage.jsx` — Country + Time Zone pickers gone from the calculator, and the country `<select>`
+  gone from the pricing-PDF request form. `sel.country` is pinned to `'India'`, so `curOf()` resolves
+  to INR on every path; the USD arrays in `data/pricing.js` are now unreachable but left in place
+  (deleting them is a large diff with no user-visible effect, and they document the old quotes).
+- `AboutPage.jsx` — "Our Reach" no longer claims the USA, Canada, Australia, Singapore and the UK;
+  hero no longer says "anywhere in the world"; "scheduling across time zones" → "around school hours".
+- `BecomeTeacherPage.jsx` — "across India and worldwide" → "across India".
+- `ReferEarnPage.jsx` — the free-text **Time Zone** field became **City** (every referral is IST now,
+  and city actually routes the lead for home tuition).
+
+### ❓ Still open — legal text, needs the founder, not me
+
+The four policy pages still describe an overseas business, and these are **not** copy edits. Deleting a
+consumer right because the marketing stance changed is a decision with legal consequences, so they stay
+untouched until the founder (or their lawyer) rules:
+
+- `data/legal.js:209, 720, 728` — fees "shown as an indicative USD price for overseas Students", and the
+  ₹750 registration fee "shown as approximately $10". The USD price they refer to **no longer exists
+  anywhere on the site**, so these clauses now describe UI that isn't there.
+- `data/legal.js:270` — an entire *Overseas & NRI Families* clause.
+- `data/legal.js:843` — *Overseas Students & the EU / UK Cooling-Off Right*.
+- `data/legal.js:394` — a GDPR / UK-GDPR undertaking for EU and UK residents.
+- `data/legal.js:987` — the referral programme states "You may take part from outside India."
+
+Note `legal.js:360` ("worldwide, royalty-free licence") is **correct as written** — that is the standard
+scope of a content licence, not a claim about where students live. Leave it.
+
+Convention held elsewhere: marketing and pricing copy is the founder's call, and the audit convention in
+[[WEBSITE-IMPROVEMENTS.md]] is to surface rather than rewrite — the items above were changed only
+because the owner gave the instruction directly.
 
 ## Boundaries to preserve
 
