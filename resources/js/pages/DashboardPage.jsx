@@ -17,6 +17,9 @@ import {
   fetchKyc, uploadKyc, deleteKyc, fetchMyDemoRequests, fetchMyEnrollments,
   acceptDemoSlot, declineDemoSlot,
   fetchMyAchievements, createMyAchievement, updateMyAchievement, fetchMyRecord,
+} from '../lib/api.js';
+import StudentShell, { KeepLearning, SuggestedCourses } from '../components/dashboard/StudentShell.jsx';
+import {
   fetchTeacherProfile, updateTeacherProfile,
   fetchTeacherStudents, fetchTeacherDemos, fetchClassLogs, addClassLog,
   fetchCurriculum, addCurriculumItem, updateCurriculumItem, deleteCurriculumItem,
@@ -52,8 +55,14 @@ export default function DashboardPage() {
   if (isLoading) return <div className="mx-auto max-w-5xl px-4 py-20 text-slate-500">Loading your dashboard…</div>;
   if (!isAuthed) return <Navigate to="/login" replace />;
 
+  // The student view owns its whole page — its own sidebar, padding and
+  // full-bleed width — so it renders outside the centred shell the other
+  // roles share. Wrapping it would put a 1024px column in the middle of a
+  // 2560px monitor, which is the thing being fixed.
+  if (user.role === 'student') return <StudentDashboard />;
+
   const View = VIEW_BY_ROLE[user.role] ?? ParentDashboard;
-  // The console needs the width; the other three read better narrow.
+  // The console needs the width; the other two read better narrow.
   const width = user.role === 'admin'
     ? 'max-w-[1600px]'
     : 'max-w-5xl';
@@ -138,50 +147,70 @@ function ParentDashboard() {
  * A student sees their own learning and nothing about running an account:
  * no "my students" (adding children is a guardian's job), no KYC (we verify
  * the adult), no demo-booking card (a demo is booked by whoever pays).
+ *
+ * Laid out to the reference the owner supplied (left nav, wide learning
+ * column, stats rail) in IndiaTutors colours, and full width at every size.
+ * The sections are switched in the sidebar rather than stacked into one long
+ * scroll, which is what made the old page a column of mostly-empty cards.
  */
 function StudentDashboard() {
   const { user } = useAuth();
   const profile = user.student_profile;
+  const [section, setSection] = useState('overview');
+
+  // An account nobody has linked to a student record has no classes, no
+  // materials and no portfolio — and no amount of layout fixes that. Say so
+  // once, plainly, instead of rendering six empty cards.
+  if (!profile) {
+    return (
+      <StudentShell section="overview" onSection={() => {}}>
+        <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+          <h2 className="font-heading text-lg font-bold text-[#0B1220]">Your account isn't linked to a student yet</h2>
+          <p className="mt-2 text-sm text-slate-600">
+            Ask your parent or our team to link it — then your classes, materials and portfolio all appear here.
+          </p>
+        </section>
+        <SupportCard />
+      </StudentShell>
+    );
+  }
 
   return (
-    <>
-      <MyCoursesCard />
-      {/* E6 — a student sees their own record, same figures as their guardian's. */}
-      <div className="mt-6">
-        <StudentRecordCard />
-      </div>
-      <div className="grid lg:grid-cols-2 gap-6 mt-6">
-        <EnrollmentsCard />
-        <UpcomingClassesCard />
-      </div>
-      <div className="grid lg:grid-cols-2 gap-6 mt-6">
-        <ExamUpdatesCard />
-        <CertificatesCard />
-      </div>
-      <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6 mt-6">
-        <h2 className="text-lg font-bold flex items-center gap-2 mb-1"><Award className="h-5 w-5 text-brand-600"/>My portfolio</h2>
-        {profile ? (
-          <>
-            <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-slate-500 mb-2">
-              <span>Your achievements, certificates and milestones — added by you and your teachers.</span>
-              <span className="rounded bg-brand-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-brand-700">{profile.code}</span>
-            </p>
-            <PortfolioPanel studentId={profile.id} />
-          </>
-        ) : (
-          // No invented data: an account with no linked profile genuinely has
-          // no classes to show, and the fix is an action someone else takes.
-          <p className="text-sm text-slate-500">
-            Your account isn't linked to a student profile yet, so there's nothing to show here.
-            Ask your parent or our team to link it — then your classes, materials and portfolio appear on this page.
-            {' '}You can also ask us below and we'll sort it out.
+    <StudentShell section={section} onSection={setSection}>
+      {section === 'overview' && (
+        <>
+          <KeepLearning />
+          <UpcomingClassesCard />
+          <SuggestedCourses />
+        </>
+      )}
+
+      {section === 'classes' && (
+        <>
+          <EnrollmentsCard />
+          <UpcomingClassesCard />
+          <ExamUpdatesCard />
+        </>
+      )}
+
+      {section === 'materials' && <MyCoursesCard />}
+
+      {section === 'achievements' && (
+        <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+          <h2 className="font-heading mb-1 flex items-center gap-2 text-lg font-bold text-[#0B1220]">
+            <Award className="h-5 w-5 text-brand-600" />My portfolio
+          </h2>
+          <p className="mb-3 flex flex-wrap items-center gap-x-1.5 text-xs text-slate-500">
+            <span>Your achievements, certificates and milestones — added by you and your teachers.</span>
+            <span className="rounded bg-brand-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-brand-700">{profile.code}</span>
           </p>
-        )}
-      </section>
-      <div className="mt-6">
-        <SupportCard />
-      </div>
-    </>
+          <PortfolioPanel studentId={profile.id} />
+        </section>
+      )}
+
+      {section === 'certificates' && <CertificatesCard />}
+      {section === 'support' && <SupportCard />}
+    </StudentShell>
   );
 }
 

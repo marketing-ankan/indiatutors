@@ -52,8 +52,11 @@ class CourseMaterial extends Model
             $q->where('tutor_id', $user->tutor->id);
         } else {
             $studentIds = $user->students()->pluck('id')->all();
-            if ($user->isStudent()) {
-                $studentIds = array_merge($studentIds, Student::where('user_id', $user->id)->pluck('id')->all());
+            // students.account_user_id is a student's OWN login; students.user_id
+            // is their guardian. Querying the wrong one hands a student an empty
+            // materials list while their parent sees the files.
+            if ($user->isStudent() && $user->studentProfile) {
+                $studentIds[] = $user->studentProfile->id;
             }
             if (! $studentIds) {
                 return [];

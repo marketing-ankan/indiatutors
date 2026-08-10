@@ -30,6 +30,45 @@ use App\Models\StudentAchievement;
  */
 class StudentRecord
 {
+    /** Mon–Sun of the current week: was a class held that day? */
+    private static function weekStrip($enrollmentIds): array
+    {
+        $start = now()->startOfWeek();
+        $held  = ClassLog::whereIn('enrollment_id', $enrollmentIds)
+            ->where('status', 'completed')
+            ->whereBetween('held_on', [$start->toDateString(), $start->copy()->endOfWeek()->toDateString()])
+            ->pluck('held_on')
+            ->map(fn ($d) => \Illuminate\Support\Carbon::parse($d)->toDateString())
+            ->all();
+
+        $out = [];
+        for ($i = 0; $i < 7; $i++) {
+            $day = $start->copy()->addDays($i);
+            $out[] = [
+                'label'    => $day->format('D'),
+                'date'     => $day->toDateString(),
+                'attended' => in_array($day->toDateString(), $held, true),
+                'future'   => $day->isFuture(),
+            ];
+        }
+        return $out;
+    }
+
+    /** Hours of class per week for the last six weeks — the chart. */
+    private static function recentWeeks($enrollmentIds): array
+    {
+        $out = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $from = now()->startOfWeek()->subWeeks($i);
+            $mins = (int) ClassLog::whereIn('enrollment_id', $enrollmentIds)
+                ->where('status', 'completed')
+                ->whereBetween('held_on', [$from->toDateString(), $from->copy()->endOfWeek()->toDateString()])
+                ->sum('duration_min');
+            $out[] = ['label' => $from->format('j M'), 'hours' => round($mins / 60, 1)];
+        }
+        return $out;
+    }
+
     public static function forStudent(Student $student): array
     {
         $enrollmentIds = Enrollment::where('student_id', $student->id)->pluck('id');
@@ -81,6 +120,16 @@ class StudentRecord
             // internal operations detail.
             'substitutions' => (int) ClassAbsence::whereIn('enrollment_id', $enrollmentIds)
                 ->whereIn('status', ClassAbsence::GOES_AHEAD)->count(),
+
+            // The dashboard's week strip and bar chart. Both are ATTENDANCE,
+            // counted from class_logs — the reference design shows a "streak"
+            // and a "points" total, and we have neither. Inventing them would
+            // put a motivating number on a child's screen that means nothing,
+            // which is the habit this project keeps deleting. What a family
+            // actually has is a record of classes held, so that is what is
+            // drawn.
+            'week'         => self::weekStrip($enrollmentIds),
+            'recent_weeks' => self::recentWeeks($enrollmentIds),
         ];
     }
 }

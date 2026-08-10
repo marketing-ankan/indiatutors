@@ -180,9 +180,11 @@ class StudentAchievementController extends Controller
         $ids  = $user->students()->pluck('id')->all();
 
         // A student-role account speaks for its own linked student record.
-        if ($user->isStudent()) {
-            $own = Student::where('user_id', $user->id)->pluck('id')->all();
-            $ids = array_values(array_unique(array_merge($ids, $own)));
+        // via studentProfile (students.account_user_id) — NOT users.id against
+        // students.user_id, which is the GUARDIAN column. Getting that wrong
+        // means a student logs in and sees an empty dashboard.
+        if ($user->isStudent() && $user->studentProfile) {
+            $ids = array_values(array_unique(array_merge($ids, [$user->studentProfile->id])));
         }
         return array_map('intval', $ids);
     }
