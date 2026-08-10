@@ -57,6 +57,12 @@ export const deleteStudent = async (id) => { await api.delete(`/students/${id}`)
 // My demo requests + enrollments (signed-in parent)
 export const fetchMyDemoRequests = async () => { const { data } = await api.get('/my/demo-requests'); return data.data; };
 // The family answers a time their teacher proposed.
+// E7 — achievements a family records. Private unless they consent AND staff approve.
+export const fetchMyAchievements  = async () => { const { data } = await api.get('/my/achievements'); return data.data; };
+export const createMyAchievement  = async (p) => { const { data } = await api.post('/my/achievements', p); return data; };
+export const updateMyAchievement  = async ({ id, ...p }) => { const { data } = await api.patch(`/my/achievements/${id}`, p); return data.data; };
+export const deleteMyAchievement  = async (id) => { await api.delete(`/my/achievements/${id}`); };
+
 export const acceptDemoSlot  = async ({ demoId, slotId }) => { const { data } = await api.post(`/my/demo-requests/${demoId}/slots/${slotId}/accept`); return data; };
 export const declineDemoSlot = async ({ demoId, slotId }) => { const { data } = await api.post(`/my/demo-requests/${demoId}/slots/${slotId}/decline`); return data; };
 export const fetchMyEnrollments  = async () => { const { data } = await api.get('/my/enrollments'); return data.data; };

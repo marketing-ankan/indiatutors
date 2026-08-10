@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\PincodeController;
 use App\Http\Controllers\Api\PortfolioController;
 use App\Http\Controllers\Api\TuitionRequirementController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\StudentAchievementController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\TeacherApplicationController;
 use App\Http\Controllers\Api\TeacherController;
@@ -124,6 +125,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/kyc',           [KycController::class, 'index']);
     Route::post('/kyc',          [KycController::class, 'store']);
     Route::delete('/kyc/{document}', [KycController::class, 'destroy']);
+
+    // E7 — achievements a family records and credits. Private by default;
+    // publication needs BOTH staff approval and the family's consent.
+    Route::get('/my/achievements',                 [StudentAchievementController::class, 'index']);
+    Route::post('/my/achievements',                [StudentAchievementController::class, 'store'])->middleware('throttle:10,1');
+    Route::patch('/my/achievements/{achievement}', [StudentAchievementController::class, 'update']);
+    Route::delete('/my/achievements/{achievement}',[StudentAchievementController::class, 'destroy']);
 
     Route::get('/my/demo-requests', [DemoRequestController::class, 'myIndex']);
     // The family answers a proposed time. Ownership is checked in the
@@ -254,6 +262,8 @@ Route::middleware('auth:sanctum')->group(function () {
         // A4 — a teacher's own edits reach the public listing only through here.
         Route::post('/teachers/{teacherProfile}/publish', [AdminTeacherController::class, 'publishChanges']);
         Route::post('/teachers/{teacherProfile}/discard', [AdminTeacherController::class, 'discardChanges']);
+        Route::get('/achievements',                      [StudentAchievementController::class, 'adminIndex']);
+        Route::patch('/achievements/{achievement}',      [StudentAchievementController::class, 'adminUpdate']);
         Route::get('/reviews',                           [ReviewController::class, 'adminIndex']);
         Route::post('/reviews',                          [ReviewController::class, 'adminStore']);
         Route::patch('/reviews/{review}',                [ReviewController::class, 'update']);

@@ -16,6 +16,7 @@ import {
   fetchStudents, createStudent, deleteStudent,
   fetchKyc, uploadKyc, deleteKyc, fetchMyDemoRequests, fetchMyEnrollments,
   acceptDemoSlot, declineDemoSlot,
+  fetchMyAchievements, createMyAchievement, updateMyAchievement,
   fetchTeacherProfile, updateTeacherProfile,
   fetchTeacherStudents, fetchTeacherDemos, fetchClassLogs, addClassLog,
   fetchCurriculum, addCurriculumItem, updateCurriculumItem, deleteCurriculumItem,
@@ -111,6 +112,9 @@ function ParentDashboard() {
       </div>
       <div className="mt-6">
         <TuitionRequirementsCard />
+      </div>
+      <div className="mt-6">
+        <AchievementsCard />
       </div>
       <div className="grid lg:grid-cols-2 gap-6 mt-6">
         <PlansAndOffersCard />
@@ -934,6 +938,119 @@ function ComingSoonCard({ icon: Icon, title, blurb }) {
       <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500 ring-1 ring-slate-100">
         Nothing here yet — we'll let you know as soon as this is available.
       </p>
+    </section>
+  );
+}
+
+const CONSENT_TONE = {
+  approved: 'bg-green-50 text-green-700', pending: 'bg-amber-50 text-amber-700', rejected: 'bg-slate-100 text-slate-500',
+};
+
+/**
+ * E7 — achievements a family records and credits.
+ *
+ * Owner, 2026-08-10: this is where real testimonials come from, and it goes in
+ * the student profile first (the teacher profile connects later).
+ *
+ * The consent checkbox is unticked by default and the copy says exactly what
+ * ticking it means. The August audit found achievement photos of identifiable
+ * minors reused from a sister brand — most subjects here are children, so
+ * "shared publicly" has to be a deliberate act, reversible at any time.
+ */
+function AchievementsCard() {
+  const qc = useQueryClient();
+  const { data: items = [], isLoading } = useQuery({ queryKey: ['my-achievements'], queryFn: fetchMyAchievements });
+  const { data: students = [] } = useQuery({ queryKey: ['students'], queryFn: fetchStudents });
+  const [open, setOpen] = useState(false);
+  const [f, setF] = useState({ student_id: '', title: '', body: '', achieved_on: '', consent_public: false, consent_name: false });
+
+  const create = useMutation({
+    mutationFn: () => createMyAchievement({ ...f, student_id: Number(f.student_id) || (students[0]?.id ?? null) }),
+    onSuccess: () => {
+      setF({ student_id: '', title: '', body: '', achieved_on: '', consent_public: false, consent_name: false });
+      setOpen(false);
+      qc.invalidateQueries({ queryKey: ['my-achievements'] });
+    },
+  });
+  const setConsent = useMutation({
+    mutationFn: ({ id, consent_public }) => updateMyAchievement({ id, consent_public }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['my-achievements'] }),
+  });
+
+  return (
+    <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
+      <div className="flex items-center justify-between mb-1">
+        <h2 className="text-lg font-bold flex items-center gap-2"><Award className="h-5 w-5 text-brand-600" />Achievements</h2>
+        <button onClick={() => setOpen(o => !o)} className="text-sm font-semibold text-brand-600 hover:text-brand-700">
+          {open ? 'Cancel' : '+ Add achievement'}
+        </button>
+      </div>
+      <p className="text-xs text-slate-500 mb-4">
+        Something your child achieved with us — an exam result, a grade, a competition. Yours to keep private, or to share.
+      </p>
+
+      {open && (
+        <form className="mb-4 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-100 space-y-3"
+          onSubmit={e => { e.preventDefault(); create.mutate(); }}>
+          {students.length > 1 && (
+            <select value={f.student_id} onChange={e => setF({ ...f, student_id: e.target.value })}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+              <option value="">Which student?</option>
+              {students.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+          )}
+          <input required value={f.title} onChange={e => setF({ ...f, title: e.target.value })}
+            placeholder="What did they achieve?" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+          <textarea rows={2} value={f.body} onChange={e => setF({ ...f, body: e.target.value })}
+            placeholder="Tell us a little more (optional)" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+          <input type="date" value={f.achieved_on} onChange={e => setF({ ...f, achieved_on: e.target.value })}
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+
+          <label className="flex gap-2 items-start text-xs text-slate-600">
+            <input type="checkbox" checked={f.consent_public} className="mt-0.5"
+              onChange={e => setF({ ...f, consent_public: e.target.checked, consent_name: e.target.checked && f.consent_name })} />
+            <span>You may share this on the Indiatutors website as a testimonial. Leave unticked to keep it private to my account.</span>
+          </label>
+          {f.consent_public && (
+            <label className="flex gap-2 items-start text-xs text-slate-600 pl-6">
+              <input type="checkbox" checked={f.consent_name} className="mt-0.5"
+                onChange={e => setF({ ...f, consent_name: e.target.checked })} />
+              <span>You may use my child's name. Otherwise it will read "a Class 8 student".</span>
+            </label>
+          )}
+
+          <button disabled={!f.title || create.isPending}
+            className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+            {create.isPending ? 'Saving…' : 'Save achievement'}
+          </button>
+          {create.isError && (
+            <p className="text-xs text-red-600">{create.error?.response?.data?.message || 'Could not save — please try again.'}</p>
+          )}
+        </form>
+      )}
+
+      {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : items.length ? (
+        <ul className="divide-y divide-slate-100">
+          {items.map(a => (
+            <li key={a.id} className="py-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold text-sm text-slate-800">{a.title}</span>
+                <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold capitalize ${CONSENT_TONE[a.status] || ''}`}>{a.status}</span>
+                {a.shown_publicly && <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-700">Shared publicly</span>}
+              </div>
+              <div className="text-xs text-slate-500">
+                {[a.student, a.tutor?.name && `with ${a.tutor.name}`, a.achieved_on].filter(Boolean).join(' · ')}
+              </div>
+              {a.body && <p className="mt-1 text-sm text-slate-600">{a.body}</p>}
+              <button onClick={() => setConsent.mutate({ id: a.id, consent_public: !a.consent_public })}
+                disabled={setConsent.isPending}
+                className="mt-1 text-xs font-semibold text-brand-600 hover:text-brand-700 disabled:opacity-60">
+                {a.consent_public ? 'Stop sharing this publicly' : 'Allow this to be shared'}
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="text-sm text-slate-500">Nothing added yet.</p>}
     </section>
   );
 }

@@ -215,7 +215,10 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
   Below `MEAN_MIN_DEMOS = 20` / `MEAN_MIN_REVIEWS = 10` the priors fall back to modest seeds (35%, 4.0)
   — a cautious assumption beats a confident one drawn from four data points.
 - ⬜ **D4. Testimonials & social proof on the profile.** WhatsApp testimonials, performance photos/videos.
-  *Note: today's testimonial arrays are placeholders. Real ones need consent — see WEBSITE-IMPROVEMENTS.md §A3.*
+  *Today's testimonial arrays are placeholders. Real ones need consent — see WEBSITE-IMPROVEMENTS.md §A3.*
+  **Now has a source: E7.** The owner's 2026-08-10 answer makes student-submitted achievements the
+  origin of real testimonials — self-written, attributable, and consented at submission. D4 stops being
+  "find some testimonials" and becomes "publish the ones E7 collects, once approved".
 - ✅ **D5. Ranking feeds back into suggestions (B1).** *Owner-confirmed 2026-08-10 · commit `f01f28e`.*
   The loop is closed: reviews and conversions from held demos feed the score, the score breaks ties in
   `TutorMatcher`, and the shortlist a family sees is that ordering. **Fit still dominates** — track
@@ -247,11 +250,30 @@ recorded here in his own terms so the next reader does not re-guess them.*
   (inside declared availability, not already teaching that slot, not absent themselves, not on a
   break), and only then *are they good* (`TeacherPerformance` breaks ties). The free-check is what
   makes it trustworthy: offering someone already teaching at 4pm is worse than offering nobody.
-- ⬜ **E3. Materials — full access.** *Content source is WinQuest.*
-- ⬜ **E4. Teacher materials.** *WinQuest.*
+- ⬜ **E3. Materials — full access.** *Defined by the owner 2026-08-10.* The **study material for the
+  class taken**, accessible to the students **enrolled** in that online or physical class. So access is
+  a consequence of enrolment, not a catalogue browse — the gate is "are you in this class".
+- ⬜ **E4. Company-provided teaching material.** *Defined 2026-08-10 — not "teacher's own uploads".*
+  **The company supplies the PPT/PDF** for a given class or syllabus; the teacher teaches from it, and
+  **the same file is given to the enrolled student**. So E3 and E4 are two ends of ONE artefact: one
+  upload, two audiences. Build them together or they will drift into two libraries of the same file.
+  *Supersedes the earlier "content source is WinQuest" note — that was my inference from the word
+  "winquest" on the page, not an instruction.*
 - ⬜ **E5. Terms & conditions.** *Policy pages exist; entity name still pending.*
-- ⬜ **E6. Student contents.**
-- ⬜ **E7. Student achievements.**
+- ⬜ **E6. Student contents — the student's own record.** *Defined 2026-08-10.* Personal details and
+  counts: **how many classes attended, how many materials they hold**, and similar. A "my learning so
+  far" summary, not a content library — distinct from E3, which is the material itself.
+- ⬜ **E7. Student achievements — the real testimonial engine.** *Defined 2026-08-10, and bigger than
+  the page's two words suggest.*
+  A place for a **student to record an achievement they credit to IndiaTutors or a teacher** — "I got
+  this because of them". It doubles as the **review / testimonial** source.
+  **This is the answer to D4.** The site currently shows demo testimonials plus some carried over from
+  the WinQuest site; the owner's intent is that real ones replace them, sourced here.
+  **Sequence, owner's words: "first integrate it in the student profile, and teacher profile will
+  connect later."**
+  ⚠️ **Consent is not optional here.** The August audit flagged achievement photos of identifiable
+  minors reused from a sister brand. Anything built for E7 must capture explicit publish-consent at
+  submission and default to private.
 - ⬜ **E8. Certification.** Certificates for **some** courses. 🚫 **Owner: "we haven't decided about
   certification"** — which courses, and what the certificate asserts, are open.
   Same treatment as E1: a **Certificates** card exists on both the parent and student dashboards with
@@ -295,6 +317,26 @@ Not achievements of this plan — context so we don't rebuild what exists.
 - `physical_teaching_profiles` — geocoded location, service radius, timetable slots, police-verified flag.
 - Video player + Gemini study assistant, shipped dark pending keys.
 - Pincode directory + geocoding with no maps API.
+
+## Portal design direction — 2026-08-10
+
+The owner supplied two reference dashboards (a purple "Student Portal" mobile app with a Quick Access
+tile grid; an "EDUBUZZ" web dashboard with a left nav, progress cards and a stats rail) and said:
+**"options will be as per the role, but designs more or less will be like this — maintain the colour
+palette of IndiaTutors."**
+
+Read as: adopt the *shape* — a tile/grid launcher, progress and streak cards, a left nav on desktop —
+not the palette. IndiaTutors is brand blue `#1E40AF` / navy `#0B1220` with gold `#D4AF37`; the
+references are purple and orange. Copying their colours would undo the parity work.
+
+**Role-based, not one dashboard with hidden rows.** Teachers get what a teacher needs to work; students
+and parents get what they need to learn and pay. The existing `ParentDashboard` / `StudentDashboard`
+split already reflects that and is the right seam to build on.
+
+**Do not import the reference tiles wholesale.** Those apps show Fees, Attendance, GradeSheet, Library,
+Exams, Notices, Gallery — a school MIS, not a tutoring marketplace. A tile that opens an empty
+"Library" is the placeholder habit this project keeps having to clean up. Tiles land when the thing
+behind them exists.
 
 ## Direction change — 2026-08-10
 
