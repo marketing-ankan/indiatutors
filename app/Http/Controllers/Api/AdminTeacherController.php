@@ -2,9 +2,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AppNotification;
 use App\Models\AuditLog;
 use App\Models\TeacherApplication;
 use App\Models\TeacherProfile;
+use App\Support\TeacherProfilePublisher;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -30,7 +32,11 @@ class AdminTeacherController extends Controller
         $search = trim($request->string('q')->toString());
 
         $profiles = TeacherProfile::query()
-            ->with(['user:id,name,email', 'user.tutor:id,user_id,slug,is_published'])
+            // The tutor relation is loaded WHOLE, not column-restricted. The
+            // pending-changes diff compares every published field against the
+            // profile, and a restricted select returns null for the columns it
+            // omits — which made every field look changed on every teacher.
+            ->with(['user:id,name,email', 'user.tutor'])
             ->get()
             ->map(fn (TeacherProfile $p) => [
                 'kind'       => 'profile',
@@ -46,6 +52,12 @@ class AdminTeacherController extends Controller
                 'tutor_slug' => $p->user?->tutor?->slug,
                 'has_cv'     => false,
                 'video_url'  => null,
+                // A4: edits waiting on a human, with the actual before/after so
+                // staff approve a change rather than a notification.
+                'pending_changes'  => $p->changes_submitted_at
+                    ? TeacherProfilePublisher::diff($p, $p->user?->tutor)
+                    : [],
+                'changes_since'    => optional($p->changes_submitted_at)->toDateTimeString(),
                 'updated_at' => $p->updated_at,
             ]);
 
@@ -128,6 +140,65 @@ class AdminTeacherController extends Controller
         ]);
 
         return response()->json(['data' => ['id' => $teacherProfile->id, 'is_listed' => (bool) $data['is_listed']]]);
+    }
+
+    /**
+     * Publish a teacher's pending edits to their public listing (A4).
+     *
+     * The gate exists because the alternative is a teacher's free text going
+     * live on a public page with nobody in between. Staff see the diff first —
+     * `pendingChanges` below hands them field-by-field before/after, so this is
+     * a decision rather than a rubber stamp.
+     */
+    public function publishChanges(TeacherProfile $teacherProfile)
+    {
+        $tutor = $teacherProfile->user?->tutor;
+        if (! $tutor) {
+            return response()->json([
+                'message' => 'This teacher has no directory listing yet — approve their application first.',
+            ], 422);
+        }
+
+        $diff = TeacherProfilePublisher::diff($teacherProfile, $tutor);
+        if (! $diff) {
+            // Clear a flag left by an edit that was later reverted, so the queue
+            // does not keep an item nobody can action.
+            $teacherProfile->forceFill(['changes_submitted_at' => null])->save();
+            return response()->json(['message' => 'Nothing to publish — the listing already matches this profile.']);
+        }
+
+        TeacherProfilePublisher::publish($teacherProfile);
+
+        AuditLog::record('teacher_profile_published', 'teacher_profile', $teacherProfile->id,
+            $teacherProfile->user?->name, ['fields' => array_keys($diff)]);
+
+        AppNotification::send(
+            $teacherProfile->user_id,
+            'teacher_profile_published',
+            'Your profile changes are live',
+            'The edits you made to your teaching profile have been reviewed and published.',
+        );
+
+        return response()->json([
+            'message' => 'Published ' . count($diff) . ' change' . (count($diff) === 1 ? '' : 's') . ' to the public profile.',
+            'data'    => ['id' => $teacherProfile->id, 'published' => array_keys($diff)],
+        ]);
+    }
+
+    /**
+     * Discard pending edits — the listing stays as it is.
+     *
+     * Note this does NOT revert teacher_profiles: the teacher's own copy keeps
+     * what they wrote, because silently rewriting someone's draft is worse than
+     * declining to publish it. Staff should say why out of band.
+     */
+    public function discardChanges(TeacherProfile $teacherProfile)
+    {
+        $teacherProfile->forceFill(['changes_submitted_at' => null])->save();
+        AuditLog::record('teacher_profile_changes_discarded', 'teacher_profile', $teacherProfile->id,
+            $teacherProfile->user?->name);
+
+        return response()->json(['message' => 'Changes left unpublished. The public profile is unchanged.']);
     }
 
     /** teacher_profiles stores a comma string, teacher_applications stores JSON. */

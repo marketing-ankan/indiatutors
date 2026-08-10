@@ -8,15 +8,18 @@ use App\Models\AuditLog;
 use App\Models\PhysicalTeachingProfile;
 use App\Models\TuitionRequirement;
 use App\Support\GradeScale;
+use App\Support\PincodeDirectory;
+use App\Support\TeacherMatcher;
 use Illuminate\Http\Request;
 
 /**
  * Staff console: the two physical / home-tuition queues.
  *
- * Read-and-triage only. This console shows what was captured and lets staff
- * verify, pause or close a record — it does not rank teachers or propose
- * candidates. Matching and suggesting happen in the leads-management software,
- * which reads /api/matching/v1/* and writes the chosen teacher back.
+ * Read, triage, and SUGGEST — since 2026-08-07 the console ranks plausible
+ * teachers for a requirement (suggestions(), read-only, same TeacherMatcher
+ * rules as the export). It still does not assign: which teacher goes to which
+ * student is recorded by the leads-management software through the export
+ * write-back, and updateRequirement() explains why that stays single-source.
  */
 class AdminPhysicalController extends Controller
 {
@@ -129,6 +132,107 @@ class AdminPhysicalController extends Controller
     public function requirement(TuitionRequirement $requirement)
     {
         return new TuitionRequirementResource($requirement);
+    }
+
+    /**
+     * Read-only ranked shortlist: who could plausibly serve this requirement,
+     * by real distance and subject overlap. Suggests, never assigns.
+     *
+     * Anchored on the requirement's own geocoded point when it has one — that
+     * is the actual doorstep, better than any centroid — falling back to the
+     * pincode centroid via PincodeDirectory. Reach and ordering rules are
+     * TeacherMatcher's, shared verbatim with /api/matching/v1/teachers?near=,
+     * so staff and the leads software always see the same shortlist logic.
+     */
+    public function suggestions(Request $request, TuitionRequirement $requirement)
+    {
+        $pin = preg_replace('/\D/', '', (string) $requirement->pincode);
+
+        if ($requirement->latitude !== null && $requirement->longitude !== null) {
+            $anchor = 'address';
+            $centre = [
+                'latitude'  => (float) $requirement->latitude,
+                'longitude' => (float) $requirement->longitude,
+                'district'  => $requirement->district,
+                'state'     => $requirement->state,
+            ];
+        } else {
+            $centre = strlen($pin) === 6 ? (PincodeDirectory::lookup($pin) ?? []) : [];
+            $anchor = isset($centre['latitude']) ? 'pincode' : 'pincode-only';
+        }
+
+        // The family already told us how far a teacher may live; honour it as
+        // the default "nearby" horizon instead of inventing one.
+        $withinKm = (float) ($request->input('within_km')
+            ?: $requirement->max_teacher_distance_km ?: 25);
+        $withinKm = min(max($withinKm, 1), 100);
+
+        $subjects = collect((array) ($requirement->subjects ?? []))
+            ->map(fn ($s) => trim((string) $s))->filter()->values();
+        if ($request->filled('subject')) {
+            $subjects = collect([trim((string) $request->string('subject'))]);
+        }
+
+        $rows = PhysicalTeachingProfile::query()
+            ->with(['offerings', 'user:id,name,email,phone'])
+            ->where('status', 'active')
+            ->when($subjects->isNotEmpty(), fn ($b) => $b->whereHas('offerings',
+                function ($o) use ($subjects) {
+                    $o->where(function ($w) use ($subjects) {
+                        foreach ($subjects as $s) {
+                            $w->orWhere('subject', 'like', "%{$s}%");
+                        }
+                    });
+                }))
+            ->get()
+            ->map(function (PhysicalTeachingProfile $p) use ($pin, $centre, $withinKm, $subjects) {
+                $q = TeacherMatcher::qualify($p, $pin, $centre, $withinKm);
+                if (! $q) {
+                    return null;
+                }
+                $matched = $subjects->isEmpty() ? collect() : $p->offerings
+                    ->pluck('subject')
+                    ->filter(fn ($sub) => $subjects->contains(
+                        fn ($s) => stripos((string) $sub, $s) !== false))
+                    ->unique()->values();
+
+                return ['profile' => $p, 'matched_subjects' => $matched] + $q;
+            })
+            ->filter();
+
+        $rows = TeacherMatcher::rank($rows)
+            ->take(min(max((int) $request->integer('limit', 10), 1), 25))
+            ->values();
+
+        return response()->json([
+            'data' => $rows->map(fn ($r) => [
+                'profile_id'       => $r['profile']->id,
+                'name'             => $r['profile']->user?->name,
+                'phone'            => $r['profile']->user?->phone,
+                'email'            => $r['profile']->user?->email,
+                'locality'         => $r['profile']->locality,
+                'city'             => $r['profile']->city,
+                'pincode'          => $r['profile']->pincode,
+                'radius_km'        => (float) $r['profile']->service_radius_km,
+                'experience_years' => $r['profile']->experience_years,
+                'police_verified'  => (bool) $r['profile']->police_verified,
+                'distance_km'      => $r['km'] !== null ? round($r['km'], 1) : null,
+                'match'            => $r['reasons'],
+                'matched_subjects' => $r['matched_subjects'],
+                'offerings'        => $r['profile']->offerings->map(fn ($o) => [
+                    'subject'     => $o->subject,
+                    'fee_hourly'  => $o->fee_hourly,
+                    'fee_monthly' => $o->fee_monthly,
+                ])->values(),
+            ])->all(),
+            'meta' => [
+                'anchor'    => $anchor,
+                'within_km' => $withinKm,
+                'subjects'  => $subjects,
+                'count'     => $rows->count(),
+                'note'      => 'Ranked hints only — the assignment itself is recorded by the leads-management software.',
+            ],
+        ]);
     }
 
     /**

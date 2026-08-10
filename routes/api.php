@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\CourseController;
+use App\Http\Controllers\Api\CourseMaterialController;
 use App\Http\Controllers\Api\DemoRequestController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\ExamUpdateController;
@@ -28,6 +29,7 @@ use App\Http\Controllers\Api\PincodeController;
 use App\Http\Controllers\Api\PortfolioController;
 use App\Http\Controllers\Api\TuitionRequirementController;
 use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\StudentAchievementController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\TeacherApplicationController;
 use App\Http\Controllers\Api\TeacherController;
@@ -43,9 +45,20 @@ Route::get('/courses/{slug}',    [CourseController::class, 'show'])->name('api.c
 // Two segments, so these never shadow /courses/{slug} above.
 Route::get('/courses/{course:slug}/reviews',  [ReviewController::class, 'index']);
 Route::post('/courses/{course:slug}/reviews', [ReviewController::class, 'store'])->middleware('throttle:5,1');
+// Teacher reviews. GET is public (it also tells a signed-in visitor whether
+// they may write one); POST needs an account, because the gate is a demo that
+// account actually had — see App\Support\TeacherPerformance.
+// {slug}, not {tutor:slug}: tutorIndex resolves it with published() so a draft
+// teacher 404s here exactly as their profile page does.
+Route::get('/tutors/{slug}/reviews',  [ReviewController::class, 'tutorIndex']);
+Route::post('/tutors/{tutor:slug}/reviews', [ReviewController::class, 'storeForTutor'])
+    ->middleware(['auth:sanctum', 'throttle:5,1']);
 
 Route::get('/tutors',            [TutorController::class, 'index']);
 Route::get('/tutors/filters',    [TutorController::class, 'filters']);
+// Ranked shortlist for the booking flow. Must precede /tutors/{slug} or the
+// literal segment is swallowed as a slug.
+Route::get('/tutors/suggestions',[TutorController::class, 'suggestions']);
 Route::get('/tutors/{slug}',     [TutorController::class, 'show'])->name('api.tutors.show');
 
 Route::get('/cities',            [CityController::class, 'index']);
@@ -114,12 +127,30 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/kyc',          [KycController::class, 'store']);
     Route::delete('/kyc/{document}', [KycController::class, 'destroy']);
 
+    // E7 — achievements a family records and credits. Private by default;
+    // publication needs BOTH staff approval and the family's consent.
+    // E6 — the student's own record: classes attended, materials held.
+    Route::get('/my/record',                       [StudentAchievementController::class, 'record']);
+    Route::get('/my/achievements',                 [StudentAchievementController::class, 'index']);
+    Route::post('/my/achievements',                [StudentAchievementController::class, 'store'])->middleware('throttle:10,1');
+    Route::patch('/my/achievements/{achievement}', [StudentAchievementController::class, 'update']);
+    Route::delete('/my/achievements/{achievement}',[StudentAchievementController::class, 'destroy']);
+
     Route::get('/my/demo-requests', [DemoRequestController::class, 'myIndex']);
+    // The family answers a proposed time. Ownership is checked in the
+    // controller — these ids are guessable and this writes to a teacher's diary.
+    Route::post('/my/demo-requests/{demoRequest}/slots/{slot}/accept',  [DemoRequestController::class, 'acceptSlot']);
+    Route::post('/my/demo-requests/{demoRequest}/slots/{slot}/decline', [DemoRequestController::class, 'declineSlot']);
     Route::get('/my/enrollments',   [EnrollmentController::class, 'myIndex']);
     Route::get('/my/upcoming-classes', [EnrollmentController::class, 'upcomingClasses']);
     Route::get('/my/enrollments/{enrollment}', [EnrollmentController::class, 'myShow']);
     Route::post('/my/enrollments/{enrollment}/reschedules', [EnrollmentController::class, 'requestReschedule']);
     Route::get('/materials/{material}/download', [EnrollmentController::class, 'downloadMaterial']);
+    // E3 + E4 — company-supplied course material. One list for the teacher who
+    // teaches it and the students enrolled on it; entitlement derived from live
+    // enrolments, re-checked on download.
+    Route::get('/my/course-materials',                    [CourseMaterialController::class, 'mine']);
+    Route::get('/course-materials/{material}/download',   [CourseMaterialController::class, 'download']);
 
     // Student portfolio (Phase 6)
     Route::get('/students/{student}/portfolio',  [PortfolioController::class, 'index']);
@@ -161,6 +192,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/teacher/profile',  [TeacherController::class, 'updateMine']);
     Route::get('/teacher/students', [TeacherController::class, 'students']);
     Route::get('/teacher/demos',    [TeacherController::class, 'demos']);
+    // E2 + E9 — "I cannot take this class on this date", resolved as a
+    // substitute or as an online class against the teacher's monthly allowance.
+    Route::get('/teacher/online-allowance',                          [TeacherController::class, 'onlineAllowance']);
+    Route::post('/teacher/enrollments/{enrollment}/absence',         [TeacherController::class, 'reportAbsence']);
+    Route::post('/teacher/demos/{demoRequest}/slots',                [TeacherController::class, 'proposeDemoSlot']);
+    Route::patch('/teacher/demos/{demoRequest}/slots/{slot}/withdraw',[TeacherController::class, 'withdrawDemoSlot']);
     Route::get('/teacher/enrollments/{enrollment}/logs',  [TeacherController::class, 'classLogs']);
     Route::post('/teacher/enrollments/{enrollment}/logs', [TeacherController::class, 'storeClassLog']);
     Route::get('/teacher/enrollments/{enrollment}/curriculum',    [TeacherController::class, 'curriculum']);
@@ -180,6 +217,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(\App\Http\Middleware\EnsureAdmin::class)->prefix('admin')->group(function () {
         Route::get('/overview',                          [AdminController::class, 'overview']);
         Route::get('/demo-requests',                     [AdminController::class, 'demoRequests']);
+        Route::get('/demo-requests/{demoRequest}/suggestions', [AdminController::class, 'demoSuggestions']);
+        // Coordinator controls: who may see the family's details, and logging a
+        // time settled on a phone call.
+        Route::patch('/demo-requests/{demoRequest}/contact',   [AdminController::class, 'releaseDemoContact']);
+        Route::post('/demo-requests/{demoRequest}/slots',      [AdminController::class, 'logDemoSlot']);
         Route::patch('/demo-requests/{demoRequest}',     [AdminController::class, 'assignDemo']);
         Route::delete('/demo-requests/{demoRequest}',    [AdminController::class, 'destroyDemoRequest']);
         Route::post('/demo-requests/{demoRequest}/convert',[AdminController::class, 'convert']);
@@ -197,6 +239,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/students',                          [AdminStudentController::class, 'index']);
         Route::patch('/students/{student}',              [AdminStudentController::class, 'update']);
         Route::get('/enrollments',                       [AdminController::class, 'enrollments']);
+        // E2 — cover that the system could not arrange, plus the override.
+        Route::get('/class-absences',                    [AdminController::class, 'classAbsences']);
+        Route::patch('/class-absences/{absence}',        [AdminController::class, 'updateClassAbsence']);
+        // C4 — the weekly timetable that follows a converted demo.
+        Route::post('/enrollments/{enrollment}/schedule',            [AdminController::class, 'addEnrollmentSchedule']);
+        Route::delete('/enrollments/{enrollment}/schedule/{schedule}',[AdminController::class, 'removeEnrollmentSchedule']);
         Route::get('/orders',                            [AdminController::class, 'orders']);
         Route::patch('/orders/{order}',                  [AdminController::class, 'updateOrder']);
         Route::delete('/orders/{order}',                 [AdminController::class, 'destroyOrder']);
@@ -219,6 +267,15 @@ Route::middleware('auth:sanctum')->group(function () {
         // One merged queue over teacher_profiles + unclaimed teacher_applications.
         Route::get('/teachers-console',                  [AdminTeacherController::class, 'index']);
         Route::patch('/teachers/{teacherProfile}/listing',[AdminTeacherController::class, 'toggleListing']);
+        // A4 — a teacher's own edits reach the public listing only through here.
+        Route::post('/teachers/{teacherProfile}/publish', [AdminTeacherController::class, 'publishChanges']);
+        Route::post('/teachers/{teacherProfile}/discard', [AdminTeacherController::class, 'discardChanges']);
+        Route::get('/course-materials',                  [CourseMaterialController::class, 'adminIndex']);
+        Route::post('/course-materials',                 [CourseMaterialController::class, 'store']);
+        Route::patch('/course-materials/{material}',     [CourseMaterialController::class, 'update']);
+        Route::delete('/course-materials/{material}',    [CourseMaterialController::class, 'destroy']);
+        Route::get('/achievements',                      [StudentAchievementController::class, 'adminIndex']);
+        Route::patch('/achievements/{achievement}',      [StudentAchievementController::class, 'adminUpdate']);
         Route::get('/reviews',                           [ReviewController::class, 'adminIndex']);
         Route::post('/reviews',                          [ReviewController::class, 'adminStore']);
         Route::patch('/reviews/{review}',                [ReviewController::class, 'update']);
@@ -234,6 +291,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::patch('/physical/profiles/{profile}',         [AdminPhysicalController::class, 'updateProfile']);
             Route::get('/physical/requirements',                 [AdminPhysicalController::class, 'requirements']);
             Route::get('/physical/requirements/{requirement}',   [AdminPhysicalController::class, 'requirement']);
+            Route::get('/physical/requirements/{requirement}/suggestions', [AdminPhysicalController::class, 'suggestions']);
             Route::patch('/physical/requirements/{requirement}', [AdminPhysicalController::class, 'updateRequirement']);
         });
 

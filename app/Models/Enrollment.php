@@ -13,4 +13,6 @@ class Enrollment extends Model {
     public function curriculumItems() { return $this->hasMany(CurriculumItem::class)->orderBy('position'); }
     public function materials()      { return $this->hasMany(ClassMaterial::class)->latest(); }
     public function reschedules()    { return $this->hasMany(RescheduleRequest::class)->latest(); }
+    /** The recurring weekly timetable — see EnrollmentSchedule. */
+    public function schedules()      { return $this->hasMany(EnrollmentSchedule::class)->orderBy('weekday')->orderBy('start_time'); }
 }

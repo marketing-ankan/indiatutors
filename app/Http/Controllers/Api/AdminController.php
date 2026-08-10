@@ -9,11 +9,13 @@ use App\Http\Resources\EnrollmentResource;
 use App\Http\Resources\TeacherProfileResource;
 use App\Models\AppNotification;
 use App\Models\AuditLog;
+use App\Models\ClassAbsence;
 use App\Models\ClassLog;
 use App\Models\Course;
 use App\Models\CourseProposal;
 use App\Models\DemoRequest;
 use App\Models\Enrollment;
+use App\Models\EnrollmentSchedule;
 use App\Models\Order;
 use App\Models\RescheduleRequest;
 use App\Models\Review;
@@ -22,8 +24,12 @@ use App\Models\TeacherApplication;
 use App\Models\User;
 use App\Models\TeacherProfile;
 use App\Models\Tutor;
+use App\Support\SubstituteFinder;
+use App\Support\TeacherPerformance;
+use App\Support\TutorMatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class AdminController extends Controller {
@@ -33,7 +39,8 @@ class AdminController extends Controller {
      */
     public function demoRequests(Request $request) {
         $q = DemoRequest::query()
-            ->with(['student:id,name', 'course:id,name,slug', 'assignedTutor:id,name,slug', 'user:id,name,email'])
+            ->with(['student:id,name', 'course:id,name,slug', 'assignedTutor:id,name,slug', 'requestedTutor:id,name,slug', 'user:id,name,email',
+                    'slots' => fn ($q) => $q->orderBy('starts_at')])
             ->latest();
         if ($s = $request->string('status')->toString()) $q->where('status', $s);
         if ($t = $request->string('type')->toString())   $q->where('type', $t);
@@ -122,12 +129,28 @@ class AdminController extends Controller {
     public function assignDemo(Request $request, DemoRequest $demoRequest) {
         $data = $request->validate([
             'assigned_tutor_id' => 'nullable|integer|exists:tutors,id',
-            'status'            => 'nullable|in:new,scheduled,converted,closed',
+            // Wired to the model constant, not a literal — the two used to
+            // drift because the vocabulary lived here AND in the console.
+            'status'            => 'nullable|in:' . implode(',', DemoRequest::STATUSES),
             'scheduled_at'      => 'nullable|date',
         ]);
+
+        $before = $demoRequest->status;
+        $after  = $data['status'] ?? $before;
+
+        // The demo happened: stamp it once, and never clear it. A timestamp
+        // rather than a status lookup, so the fact survives a later status
+        // change — it is the conversion denominator and the review gate.
+        if (in_array($after, DemoRequest::HELD, true) && $demoRequest->completed_at === null) {
+            $data['completed_at'] = now();
+        }
+
         $demoRequest->update($data);
 
-        if (($data['status'] ?? null) === 'scheduled') {
+        // Compare the TRANSITION, not the payload. The old check fired on the
+        // incoming value, so re-saving an already-scheduled demo sent the
+        // parent a second identical notification.
+        if ($after === 'scheduled' && $before !== 'scheduled') {
             AppNotification::send(
                 $demoRequest->user_id,
                 'demo_scheduled',
@@ -137,7 +160,264 @@ class AdminController extends Controller {
             );
         }
 
-        return new DemoRequestResource($demoRequest->fresh()->load(['assignedTutor:id,name,slug', 'student:id,name']));
+        return new DemoRequestResource($demoRequest->fresh()->load(['assignedTutor:id,name,slug', 'requestedTutor:id,name,slug', 'student:id,name']));
+    }
+
+    /**
+     * Read-only ranked hints for the booking drawer: which directory tutors
+     * fit this demo request. Online bookings have no location to measure, so
+     * this ranks on subject / grade / mode / city — each hit is named in
+     * `why` so staff see the reasoning, not just an ordering. Physical
+     * bookings exclude online-only tutors outright; nothing else is filtered,
+     * a weak match is still worth a phone call.
+     *
+     * The tutor directory is small (tens of rows), so scoring in PHP over the
+     * published set is simpler and no slower than pushing CSV-column matching
+     * into SQL.
+     */
+    public function demoSuggestions(DemoRequest $demoRequest) {
+        // The Mode select (online / home tutor) is offered on every booking
+        // flow, not just the 'physical' one — honour either signal.
+        $wantsHome = $demoRequest->type === 'physical' || $demoRequest->mode === 'home';
+
+        // The same matcher the family sees while booking (TutorController::
+        // suggestions). Two copies of this scoring would drift, and the first
+        // time staff and parent saw different orders nobody could say which was
+        // right. What differs between them is only what each side may SEE.
+        $rows = TutorMatcher::rank(
+            Tutor::published()->get(),
+            $demoRequest->subject,
+            $demoRequest->grade,
+            $demoRequest->city,
+            $wantsHome,
+        )->take(8);
+
+        // Track record, batched — three queries for the shortlist rather than
+        // three per row. Staff only: a conversion rate is an internal
+        // management number, not something a visitor reads off a profile.
+        $perf = TeacherPerformance::forTutors($rows->pluck('tutor.id')->all());
+
+        return response()->json([
+            'data' => $rows->map(fn ($r) => [
+                'id'               => $r['tutor']->id,
+                'name'             => $r['tutor']->name,
+                'subjects'         => $r['tutor']->subjects_list,
+                'city'             => $r['tutor']->city,
+                'teaching_mode'    => $r['tutor']->teaching_mode,
+                'experience_years' => $r['tutor']->experience_years,
+                'verified'         => (bool) $r['tutor']->verified,
+                'why'              => $r['why'],
+                'performance'      => $perf[$r['tutor']->id] ?? null,
+            ])->all(),
+            'meta' => ['count' => $rows->count()],
+        ]);
+    }
+
+    /**
+     * Release (or withdraw) the family's contact details to the assigned teacher.
+     *
+     * Owner's rule, 2026-08-10: a teacher sees nothing identifying until a
+     * coordinator decides. This is that decision, made explicitly and recorded
+     * with a name and a time — most of these students are minors, and the
+     * home-tuition side carries a street address.
+     *
+     * Withdrawing is offered because reassignment happens. It cannot unsee what
+     * was already seen, which is exactly why the audit row matters.
+     */
+    public function releaseDemoContact(Request $request, DemoRequest $demoRequest) {
+        $data = $request->validate(['released' => 'required|boolean']);
+
+        abort_if($data['released'] && ! $demoRequest->assigned_tutor_id, 422,
+            'Assign a teacher first — there is nobody to release these details to.');
+
+        $demoRequest->update($data['released']
+            ? ['contact_released_at' => now(), 'contact_released_by' => $request->user()->id]
+            : ['contact_released_at' => null, 'contact_released_by' => null]);
+
+        AuditLog::record(
+            $data['released'] ? 'demo_contact_released' : 'demo_contact_withdrawn',
+            'booking', $demoRequest->id,
+            trim($demoRequest->name . ' · ' . ($demoRequest->subject ?: $demoRequest->type)),
+            ['tutor_id' => $demoRequest->assigned_tutor_id],
+        );
+
+        return new DemoRequestResource(
+            $demoRequest->fresh()->load(['assignedTutor:id,name,slug', 'requestedTutor:id,name,slug', 'student:id,name', 'slots'])
+        );
+    }
+
+    /**
+     * Log a time agreed on the phone — the fallback half of the owner's
+     * "in-app by default, phone as fallback" decision.
+     *
+     * Recorded with source='coordinator' so it is never mistaken for the
+     * family's own click. Both end in the same place (a scheduled demo), but
+     * only one of them is the family's word, and a dispute months later turns
+     * on knowing which.
+     */
+    public function logDemoSlot(Request $request, DemoRequest $demoRequest) {
+        $data = $request->validate([
+            'starts_at'        => 'required|date',
+            'duration_minutes' => 'nullable|integer|min:15|max:240',
+            'note'             => 'nullable|string|max:300',
+        ]);
+
+        DB::transaction(function () use ($request, $demoRequest, $data) {
+            $slot = $demoRequest->slots()->create([
+                'proposed_by'      => $request->user()->id,
+                'source'           => 'coordinator',
+                'starts_at'        => $data['starts_at'],
+                'duration_minutes' => $data['duration_minutes'] ?? 45,
+                'note'             => $data['note'] ?? null,
+                // Agreed on the call, so it is already settled — there is
+                // nobody left to confirm it.
+                'status'           => 'accepted',
+                'responded_at'     => now(),
+            ]);
+            // live(), not open(): a time agreed on the phone replaces one the
+            // family had already accepted online. Closing only the pending ones
+            // left TWO accepted slots on the demo and two entries in the
+            // teacher's calendar for a single class.
+            $demoRequest->slots()->where('id', '!=', $slot->id)->live()
+                ->update(['status' => 'superseded', 'responded_at' => now()]);
+            $demoRequest->update(['status' => 'scheduled', 'scheduled_at' => $slot->starts_at]);
+        });
+
+        AuditLog::record('demo_slot_logged', 'booking', $demoRequest->id,
+            trim($demoRequest->name . ' · ' . ($demoRequest->subject ?: $demoRequest->type)),
+            ['starts_at' => $data['starts_at']]);
+
+        return new DemoRequestResource(
+            $demoRequest->fresh()->load(['assignedTutor:id,name,slug', 'requestedTutor:id,name,slug', 'student:id,name', 'slots'])
+        );
+    }
+
+    /**
+     * Add a weekly class to an enrolment's timetable.
+     *
+     * Staff-editable because the demo slot is only a first guess: the family
+     * that could manage a Saturday trial often wants Tuesdays once term starts.
+     */
+    public function addEnrollmentSchedule(Request $request, Enrollment $enrollment) {
+        $data = $request->validate([
+            'weekday'          => 'required|integer|min:1|max:7',
+            'start_time'       => 'required|date_format:H:i',
+            'duration_minutes' => 'nullable|integer|min:15|max:240',
+            'note'             => 'nullable|string|max:200',
+        ]);
+
+        // The unique index is the real guard; this turns the collision into a
+        // sentence instead of a 500.
+        $exists = $enrollment->schedules()
+            ->where('weekday', $data['weekday'])
+            ->where('start_time', $data['start_time'] . ':00')
+            ->exists();
+        abort_if($exists, 422, 'This enrolment already has a class at that time.');
+
+        $enrollment->schedules()->create([
+            'weekday'          => $data['weekday'],
+            'start_time'       => $data['start_time'] . ':00',
+            'duration_minutes' => $data['duration_minutes'] ?? 60,
+            'note'             => $data['note'] ?? null,
+        ]);
+
+        AuditLog::record('enrollment_schedule_added', 'enrollment', $enrollment->id,
+            'Enrolment #' . $enrollment->id, $data);
+
+        return new EnrollmentResource($enrollment->fresh()->load(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug', 'schedules']));
+    }
+
+    /** Stop a weekly class. Kept, not deleted — the timetable has a history. */
+    public function removeEnrollmentSchedule(Enrollment $enrollment, EnrollmentSchedule $schedule) {
+        abort_if($schedule->enrollment_id !== $enrollment->id, 404, 'That class is not on this enrolment.');
+
+        $schedule->update(['active' => false]);
+        AuditLog::record('enrollment_schedule_removed', 'enrollment', $enrollment->id,
+            'Enrolment #' . $enrollment->id, ['weekday' => $schedule->weekday, 'start_time' => $schedule->start_time]);
+
+        return new EnrollmentResource($enrollment->fresh()->load(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug', 'schedules']));
+    }
+
+    /**
+     * Classes whose teacher called in absent (E2), newest first.
+     *
+     * The owner's mandate is that this list should be nearly empty: the system
+     * assigns cover automatically and a coordinator steps in by exception. So
+     * the default view is the exceptions — `requested` and `uncovered` — and
+     * `?all=1` shows everything, including what resolved itself. Each row
+     * carries the ranked candidates, so an override is a choice from the same
+     * shortlist the system used rather than a fresh manual search.
+     */
+    public function classAbsences(Request $request) {
+        $q = ClassAbsence::query()
+            ->with(['enrollment.student:id,name', 'enrollment.course:id,name', 'originalTutor:id,name', 'substitute:id,name'])
+            ->upcoming()
+            ->orderBy('occurs_on');
+
+        if (! $request->boolean('all')) {
+            $q->needsAttention();
+        }
+
+        $rows = $q->limit(50)->get();
+
+        return response()->json([
+            'data' => $rows->map(fn (ClassAbsence $a) => [
+                'id'            => $a->id,
+                'occurs_on'     => $a->occurs_on->toDateString(),
+                'start_time'    => substr((string) $a->start_time, 0, 5),
+                'student'       => $a->enrollment?->student?->name,
+                'course'        => $a->enrollment?->course?->name,
+                'original'      => $a->originalTutor?->only(['id', 'name']),
+                'substitute'    => $a->substitute?->only(['id', 'name']),
+                'status'        => $a->status,
+                'reason'        => $a->reason,
+                'auto_assigned' => $a->auto_assigned,
+                // Only for rows a human has to act on — computing a shortlist
+                // for every settled row would be wasted work.
+                'candidates'    => in_array($a->status, ['requested', 'uncovered'], true)
+                    ? collect(SubstituteFinder::candidatesFor($a))
+                        ->map(fn ($c) => ['id' => $c['tutor']->id, 'name' => $c['tutor']->name, 'why' => $c['why']])->all()
+                    : [],
+            ])->all(),
+            'meta' => ['count' => $rows->count()],
+        ]);
+    }
+
+    /**
+     * Coordinator override: name the substitute yourself, or cancel the class.
+     *
+     * `auto_assigned` is set false here, which is the point — it is how we can
+     * later ask "how often does the automation actually hold?" rather than
+     * assuming it does.
+     */
+    public function updateClassAbsence(Request $request, ClassAbsence $absence) {
+        $data = $request->validate([
+            'substitute_tutor_id' => 'nullable|integer|exists:tutors,id',
+            'status'              => 'nullable|in:covered,uncovered,cancelled',
+        ]);
+
+        abort_if(
+            ($data['status'] ?? null) === 'covered' && empty($data['substitute_tutor_id']) && ! $absence->substitute_tutor_id,
+            422, 'Choose a substitute teacher before marking this covered.'
+        );
+        abort_if(
+            ($data['substitute_tutor_id'] ?? null) && (int) $data['substitute_tutor_id'] === (int) $absence->original_tutor_id,
+            422, 'That is the teacher who reported the absence.'
+        );
+
+        $absence->update(array_filter([
+            'substitute_tutor_id' => $data['substitute_tutor_id'] ?? $absence->substitute_tutor_id,
+            'status'              => $data['status'] ?? ($data['substitute_tutor_id'] ?? null ? 'covered' : $absence->status),
+        ]) + [
+            'auto_assigned' => false,
+            'decided_by'    => $request->user()->id,
+            'resolved_at'   => now(),
+        ]);
+
+        AuditLog::record('class_absence_override', 'enrollment', $absence->enrollment_id,
+            'Class on ' . $absence->occurs_on->toDateString(), $data);
+
+        return response()->json(['message' => 'Updated.', 'data' => ['id' => $absence->id, 'status' => $absence->fresh()->status]]);
     }
 
     /** Convert a demo request into an enrollment (student + tutor + course). */
@@ -147,16 +427,45 @@ class AdminController extends Controller {
             'plan'     => 'nullable|string|max:60',
         ]);
         abort_if($demoRequest->student_id === null, 422, 'This demo has no linked student to enrol.');
+        // Converting twice used to create a SECOND enrolment against the same
+        // demo. The relation is hasOne, so the duplicate was invisible in the
+        // UI while still counted in the DB — and it would have double-counted
+        // this teacher's conversion rate.
+        abort_if($demoRequest->enrollment()->exists(), 422, 'This demo has already been converted to an enrolment.');
 
         $enrollment = Enrollment::create([
             'student_id'      => $demoRequest->student_id,
-            'tutor_id'        => $data['tutor_id'] ?? $demoRequest->assigned_tutor_id,
+            // Explicit override wins; then who actually taught it; then who the
+            // student chose. Without the last term the family's own choice was
+            // silently dropped at the moment of enrolment.
+            'tutor_id'        => $data['tutor_id'] ?? $demoRequest->creditedTutorId(),
             'course_id'       => $demoRequest->course_id,
             'demo_request_id' => $demoRequest->id,
             'plan'            => $data['plan'] ?? null,
             'status'          => 'active',
         ]);
-        $demoRequest->update(['status' => 'converted']);
+        // Converting proves the demo was held, so backfill completed_at for
+        // demos converted straight from 'scheduled' without passing through
+        // 'completed' — otherwise the denominator loses them.
+        $demoRequest->update([
+            'status'       => 'converted',
+            'completed_at' => $demoRequest->completed_at ?? now(),
+        ]);
+
+        // C4: the regular timetable starts from the demo outcome. The slot that
+        // suited the family for the demo is the best first guess at the slot
+        // that suits them every week — nobody has to re-agree a time they have
+        // already agreed once. Staff can edit it afterwards; this is a starting
+        // point, not a commitment.
+        $agreed = $demoRequest->scheduled_at;
+        if ($agreed) {
+            $enrollment->schedules()->create([
+                'weekday'          => $agreed->dayOfWeekIso,
+                'start_time'       => $agreed->format('H:i:s'),
+                'duration_minutes' => $demoRequest->slots()->where('status', 'accepted')->value('duration_minutes') ?? 60,
+                'note'             => 'Carried over from the demo class',
+            ]);
+        }
 
         AppNotification::send(
             $demoRequest->user_id,
@@ -167,13 +476,15 @@ class AdminController extends Controller {
         );
 
         return (new EnrollmentResource(
-            $enrollment->load(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug'])
+            // schedules included so the console can show the timetable it just
+            // carried over from the demo, rather than making staff reload.
+            $enrollment->load(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug', 'schedules'])
         ))->response()->setStatusCode(201);
     }
 
     public function enrollments() {
         return EnrollmentResource::collection(
-            Enrollment::with(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug'])->latest()->paginate(20)
+            Enrollment::with(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug', 'schedules'])->latest()->paginate(20)
         );
     }
 
@@ -192,10 +503,12 @@ class AdminController extends Controller {
             'from' => $before, 'to' => $data['status'],
         ]);
 
-        // On approval, give the teacher a listed directory tutor (idempotent) so
-        // they can be assigned demos and see their own enrollments in the portal.
+        // On approval, publish the profile to the public directory so they can
+        // be assigned demos and appear to families. Publishing (not the old
+        // create-once linkTutor) so re-approving a teacher who edited while
+        // pending pushes those edits live too.
         if ($data['status'] === 'approved') {
-            $this->linkTutor($teacherProfile);
+            TeacherProfilePublisher::publish($teacherProfile);
         }
 
         AppNotification::send(
@@ -313,6 +626,11 @@ class AdminController extends Controller {
                 'tutors_listed'      => Tutor::where('is_published', true)->count(),
                 'demos_total'        => DemoRequest::count(),
                 'demos_new'          => DemoRequest::where('status', 'new')->count(),
+                // Demos that provably took place — the conversion denominator.
+                // 'converted' is a subset of it, so the rate is converted/held,
+                // never converted/all-bookings (which would count leads that
+                // never got as far as a class).
+                'demos_held'         => DemoRequest::held()->count(),
                 'demos_converted'    => DemoRequest::where('status', 'converted')->count(),
                 'enrollments_active' => Enrollment::where('status', 'active')->count(),
                 'classes_logged'     => ClassLog::count(),

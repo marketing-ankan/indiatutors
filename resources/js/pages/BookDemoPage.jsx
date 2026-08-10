@@ -1,11 +1,138 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { submitDemoRequest, fetchCourse, fetchTutor, fetchStudents } from '../lib/api.js';
+import { submitDemoRequest, fetchCourse, fetchTutor, fetchStudents, fetchTutorSuggestions } from '../lib/api.js';
 import { useAuth } from '../lib/auth.jsx';
 
-const empty = { name:'',email:'',phone_country_code:'+91',phone:'',subject:'',grade:'',board:'',mode:'online',city:'',country:'India',timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,message:'',whatsapp_consent:true,marketing_consent:false,course_id:null,student_id:null };
+const empty = { name:'',email:'',phone_country_code:'+91',phone:'',subject:'',grade:'',board:'',mode:'online',city:'',country:'India',timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,message:'',whatsapp_consent:true,marketing_consent:false,course_id:null,student_id:null,requested_tutor_id:null };
 const inp = "w-full rounded-md ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
+
+const WHY_LABEL = { subject: 'teaches this subject', grade: 'teaches this grade', 'home-visits': 'visits homes', 'same-city': 'in your city' };
+
+/**
+ * Pick your teacher, inside the booking flow (B1/B2 in docs/ECOSYSTEM-PLAN.md).
+ *
+ * The founder's system page draws the journey as search → suggestion → select →
+ * demo, with the demo BEING the lead — so the shortlist belongs here rather than
+ * only on the directory page, and choosing is what fills requested_tutor_id.
+ *
+ * Choosing stays OPTIONAL. A parent who does not know who they want should not
+ * be blocked from asking for help; leaving it blank is the existing behaviour,
+ * where a coordinator assigns someone.
+ *
+ * Each card says WHY it is suggested and links to the full profile, because the
+ * requirement is that a family can check qualifications, availability and
+ * reviews before committing. What it deliberately does NOT show is the ranking
+ * score or conversion rate — those order the list, they are not a grade to
+ * publish beside somebody's name.
+ */
+function TeacherShortlist({ subject, grade, city, mode, picked, onPick, onClear, lockedTo }) {
+  // Debounced so typing a subject does not fire a request per keystroke.
+  const [q, setQ] = useState({ subject, grade, city, mode });
+  useEffect(() => {
+    const id = setTimeout(() => setQ({ subject, grade, city, mode }), 400);
+    return () => clearTimeout(id);
+  }, [subject, grade, city, mode]);
+
+  // A city alone only scores for HOME enquiries — TutorMatcher weighs city
+  // inside the home branch, so an online enquiry with just a city can never
+  // return anyone. Asking for the subject in that case beats promising
+  // suggestions that will never arrive.
+  const hasSubject = (q.subject?.trim()?.length ?? 0) >= 3;
+  const wantsHome  = q.mode === 'home';
+  const enabled    = !lockedTo && (hasSubject || (wantsHome && !!q.city?.trim()));
+  const { data, isFetching } = useQuery({
+    queryKey: ['tutor-suggestions', q],
+    queryFn: () => fetchTutorSuggestions(q),
+    enabled,
+    staleTime: 60_000,
+  });
+
+  // Drop a pick the current criteria no longer support. Without this, choosing
+  // a Physics teacher and then changing the subject to Piano left the old id in
+  // the form — invisible (their card is gone) and unclearable (you cannot
+  // re-click a card that is not rendered) — and it is load-bearing: it decides
+  // whose conversion denominator this demo lands in and who the family is later
+  // allowed to review.
+  //
+  // Must sit ABOVE the early returns: hooks cannot run conditionally, and
+  // putting it after them crashed the whole page with React error #310.
+  useEffect(() => {
+    if (lockedTo || isFetching || !picked || !data) return;
+    if (!(data.data ?? []).some(t => t.id === picked)) onClear();
+    // Keyed on `data`, not on a derived rows array — that is rebuilt every
+    // render and would re-run this forever.
+  }, [lockedTo, isFetching, data, picked, onClear]);
+
+  // Arrived from a tutor's own profile — the choice is already made.
+  if (lockedTo) return null;
+
+  if (!enabled) {
+    return (
+      <p className="rounded-lg bg-slate-50 px-4 py-3 text-xs text-slate-500 ring-1 ring-slate-100">
+        {wantsHome
+          ? "Enter a subject or your city above and we'll suggest teachers who fit"
+          : "Enter a subject above and we'll suggest teachers who fit"}
+        {' '}— or leave it to us and a coordinator will match you.
+      </p>
+    );
+  }
+
+  const rows = data?.data ?? [];
+  if (!isFetching && rows.length === 0) return null;   // no fit: silence beats a bad guess
+
+  return (
+    <fieldset>
+      <legend className="mb-1 block text-xs font-semibold text-slate-700">
+        Choose a teacher <span className="font-normal text-slate-400">— optional, we'll match you if you skip it</span>
+      </legend>
+      {isFetching && rows.length === 0 ? (
+        <p className="text-xs text-slate-400">Finding teachers who fit…</p>
+      ) : (
+        <ul className="grid gap-2 sm:grid-cols-2">
+          {rows.map(t => {
+            const on = picked === t.id;
+            return (
+              <li key={t.id}>
+                <div className={`h-full rounded-xl border p-3 transition ${on ? 'border-brand-500 bg-brand-50 ring-1 ring-brand-300' : 'border-slate-200 bg-white hover:border-brand-300'}`}>
+                  <button type="button" onClick={() => onPick(t.id)} aria-pressed={on}
+                    className="flex w-full items-start gap-3 text-left">
+                    {t.image_url
+                      ? <img src={t.image_url} alt="" className="h-11 w-11 shrink-0 rounded-full object-cover" loading="lazy" />
+                      : <span aria-hidden="true" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-700">{t.name.slice(0, 1)}</span>}
+                    <span className="min-w-0 flex-1">
+                      <span className="flex flex-wrap items-center gap-x-1.5">
+                        <b className="text-sm text-slate-900">{t.name}</b>
+                        {t.review_count > 0 && (
+                          <span className="text-xs font-semibold text-amber-600">★ {t.review_avg} <span className="font-normal text-slate-400">({t.review_count})</span></span>
+                        )}
+                        {on && <span className="text-xs font-bold text-brand-700">✓ selected</span>}
+                      </span>
+                      <span className="mt-0.5 block truncate text-xs text-slate-500">
+                        {(t.subjects || []).slice(0, 3).join(', ')}
+                        {t.experience_years ? ` · ${t.experience_years} yrs` : ''}
+                        {t.city ? ` · ${t.city}` : ''}
+                      </span>
+                      <span className="mt-1 flex flex-wrap gap-1">
+                        {(t.why || []).map(w => (
+                          <span key={w} className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-600">{WHY_LABEL[w] || w}</span>
+                        ))}
+                      </span>
+                    </span>
+                  </button>
+                  <Link to={`/tutors/${t.slug}`} target="_blank" rel="noopener noreferrer"
+                    className="mt-2 inline-block text-xs font-semibold text-brand-600 hover:text-brand-700">
+                    View full profile ↗
+                  </Link>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </fieldset>
+  );
+}
 
 // The live page's five booking flows — same form engine, different framing.
 const BOOKING_TYPES = [
@@ -36,7 +163,17 @@ export default function BookDemoPage() {
   const { data: tutor }  = useQuery({ queryKey:['tutor', tutorSlug], queryFn:()=>fetchTutor(tutorSlug), enabled: !!tutorSlug });
   const { data: students = [] } = useQuery({ queryKey:['students'], queryFn: fetchStudents, enabled: isAuthed });
   useEffect(() => { if (course) setForm(f => ({ ...f, subject: f.subject || course.name, course_id: course.id })); }, [course]);
-  useEffect(() => { if (tutor) setForm(f => ({ ...f, message: f.message || `I'd like to request a demo with ${tutor.name}.` })); }, [tutor]);
+  // Arriving from a tutor's profile IS choosing that teacher — record it as the
+  // requested tutor, not just as prose in the message box. Otherwise the most
+  // deliberate choice a parent can make (they read the profile, then clicked
+  // "book a demo") would be the one case that left requested_tutor_id empty.
+  useEffect(() => {
+    if (tutor) setForm(f => ({
+      ...f,
+      requested_tutor_id: f.requested_tutor_id ?? tutor.id,
+      message: f.message || `I'd like to request a demo with ${tutor.name}.`,
+    }));
+  }, [tutor]);
   // Arriving from the Physical Classes / Home-Tuition or Board pages: switch to
   // the home-tutor flow and note the pincode/board in the message.
   useEffect(() => {
@@ -62,9 +199,17 @@ export default function BookDemoPage() {
       type: typeKey,
       message: typeKey === 'demo' ? form.message : `[${bookingType.heading}] ${form.message}`.trim(),
     }),
-    onSuccess: ()=>{ setOk(true); setForm(empty); },
+    // Reset, but keep what the URL asserted. On a ?tutor= page the banner still
+    // says "Booking a demo for X", and the ?tutor= effect will not re-fire (its
+    // dependency has not changed) — so a plain setForm(empty) left the second
+    // booking silently crediting nobody while the page claimed otherwise.
+    onSuccess: ()=>{ setOk(true); setForm({ ...empty, requested_tutor_id: tutor?.id ?? null, course_id: course?.id ?? null }); },
   });
   const set = k => e => setForm({...form, [k]: e.target.type==='checkbox'?e.target.checked:e.target.value});
+  // Stable identities: TeacherShortlist runs an effect keyed on these, and a
+  // fresh arrow every render would re-fire it on every keystroke.
+  const pickTutor  = useCallback(id => setForm(f => ({ ...f, requested_tutor_id: f.requested_tutor_id === id ? null : id })), []);
+  const clearTutor = useCallback(() => setForm(f => (f.requested_tutor_id === null ? f : { ...f, requested_tutor_id: null })), []);
 
   if (ok) return (
     <div className="mx-auto max-w-lg px-4 py-20 text-center">
@@ -128,6 +273,14 @@ export default function BookDemoPage() {
             <select value={form.mode} onChange={set('mode')} className={inp}><option value="online">Online</option><option value="home">Home tutor</option></select></div>
           <div><label className="block text-xs font-semibold text-slate-700 mb-1">City</label><input value={form.city} onChange={set('city')} className={inp}/></div>
         </div>
+        <TeacherShortlist
+          subject={form.subject} grade={form.grade} city={form.city} mode={form.mode}
+          picked={form.requested_tutor_id}
+          onPick={pickTutor}
+          onClear={clearTutor}
+          lockedTo={tutor}
+        />
+
         <div><label className="block text-xs font-semibold text-slate-700 mb-1">Anything specific we should know?</label><textarea rows={3} value={form.message} onChange={set('message')} className={inp}/></div>
         <div className="space-y-2 text-sm text-slate-600">
           <label className="flex gap-2 items-start"><input type="checkbox" checked={form.whatsapp_consent} onChange={set('whatsapp_consent')} className="mt-1"/>You may contact me on WhatsApp about this demo.</label>

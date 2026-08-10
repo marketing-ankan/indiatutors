@@ -32,7 +32,10 @@ export const fetchCategories     = async () => { const { data } = await api.get(
 export const fetchCourses        = async (p={}) => { const { data } = await api.get('/courses', { params:p }); return data; };
 export const fetchCourse         = async (slug) => { const { data } = await api.get(`/courses/${slug}`); return data.data; };
 export const fetchTutors         = async (p={}) => { const { data } = await api.get('/tutors', { params:p }); return data.data; };
-export const fetchTutor          = async (slug) => { const { data } = await api.get(`/tutors/${slug}`); return data.data; };
+// `availability` rides alongside the resource rather than inside it, because
+// the list endpoint shares TutorResource and computing a week of slots per row
+// would be an N+1. Merged here so callers see one tutor object.
+export const fetchTutor          = async (slug) => { const { data } = await api.get(`/tutors/${slug}`); return { ...data.data, availability: data.availability ?? [] }; };
 export const fetchTutorFilters   = async () => { const { data } = await api.get('/tutors/filters'); return data; };
 export const fetchCities         = async () => { const { data } = await api.get('/cities'); return data.data; };
 export const fetchCity           = async (slug) => { const { data } = await api.get(`/cities/${slug}`); return data; };
@@ -53,6 +56,17 @@ export const deleteStudent = async (id) => { await api.delete(`/students/${id}`)
 
 // My demo requests + enrollments (signed-in parent)
 export const fetchMyDemoRequests = async () => { const { data } = await api.get('/my/demo-requests'); return data.data; };
+// The family answers a time their teacher proposed.
+// E7 — achievements a family records. Private unless they consent AND staff approve.
+export const fetchMyAchievements  = async () => { const { data } = await api.get('/my/achievements'); return data.data; };
+// E6 — classes attended, materials held, per student on the account.
+export const fetchMyRecord        = async () => { const { data } = await api.get('/my/record'); return data.data; };
+export const createMyAchievement  = async (p) => { const { data } = await api.post('/my/achievements', p); return data; };
+export const updateMyAchievement  = async ({ id, ...p }) => { const { data } = await api.patch(`/my/achievements/${id}`, p); return data.data; };
+export const deleteMyAchievement  = async (id) => { await api.delete(`/my/achievements/${id}`); };
+
+export const acceptDemoSlot  = async ({ demoId, slotId }) => { const { data } = await api.post(`/my/demo-requests/${demoId}/slots/${slotId}/accept`); return data; };
+export const declineDemoSlot = async ({ demoId, slotId }) => { const { data } = await api.post(`/my/demo-requests/${demoId}/slots/${slotId}/decline`); return data; };
 export const fetchMyEnrollments  = async () => { const { data } = await api.get('/my/enrollments'); return data.data; };
 
 // Teacher portal (own profile + classroom)
@@ -60,6 +74,10 @@ export const fetchTeacherProfile  = async () => { const { data } = await api.get
 export const updateTeacherProfile = async (payload) => { const { data } = await api.put('/teacher/profile', payload); return data.data; };
 export const fetchTeacherStudents = async () => { const { data } = await api.get('/teacher/students'); return data.data; };
 export const fetchTeacherDemos    = async () => { const { data } = await api.get('/teacher/demos'); return data.data; };
+// A teacher offers a time. No phone number needed for this to work — contact
+// details stay withheld until a coordinator releases them.
+export const proposeDemoSlot      = async ({ demoId, ...p }) => { const { data } = await api.post(`/teacher/demos/${demoId}/slots`, p); return data; };
+export const withdrawDemoSlot     = async ({ demoId, slotId }) => { const { data } = await api.patch(`/teacher/demos/${demoId}/slots/${slotId}/withdraw`); return data; };
 export const fetchClassLogs = async (enrollmentId) => { const { data } = await api.get(`/teacher/enrollments/${enrollmentId}/logs`); return data.data; };
 export const addClassLog    = async (enrollmentId, payload) => { const { data } = await api.post(`/teacher/enrollments/${enrollmentId}/logs`, payload); return data.data; };
 
@@ -130,9 +148,14 @@ export const deleteExamUpdate = async (id) => { await api.delete(`/admin/exam-up
 
 // Admin (staff)
 export const fetchAdminDemoRequests = async (p={}) => { const { data } = await api.get('/admin/demo-requests', { params: typeof p === 'string' ? { status: p } : p }); return data; };
+export const fetchDemoSuggestions   = async (id) => { const { data } = await api.get(`/admin/demo-requests/${id}/suggestions`); return data; };
 export const fetchAdminTeachers = async (status='') => { const { data } = await api.get('/admin/teachers', { params:{ status } }); return data; };
 export const approveTeacher     = async (id, status) => { const { data } = await api.patch(`/admin/teachers/${id}`, { status }); return data.data; };
 export const assignDemo       = async (id, payload) => { const { data } = await api.patch(`/admin/demo-requests/${id}`, payload); return data.data; };
+// Coordinator controls: who may see the family's details, and logging a time
+// settled on a phone call.
+export const releaseDemoContact = async (id, released) => { const { data } = await api.patch(`/admin/demo-requests/${id}/contact`, { released }); return data.data; };
+export const logDemoSlot        = async (id, payload) => { const { data } = await api.post(`/admin/demo-requests/${id}/slots`, payload); return data.data; };
 export const convertDemo      = async (id, payload) => { const { data } = await api.post(`/admin/demo-requests/${id}/convert`, payload); return data.data; };
 export const fetchAdminEnrollments = async () => { const { data } = await api.get('/admin/enrollments'); return data; };
 
@@ -185,11 +208,22 @@ export const fetchMyOrders    = async () => { const { data } = await api.get('/m
 // Public course reviews
 export const fetchCourseReviews = async (slug) => { const { data } = await api.get(`/courses/${slug}/reviews`); return data; };
 export const submitCourseReview = async ({ slug, ...p }) => { const { data } = await api.post(`/courses/${slug}/reviews`, p); return data; };
+// Teacher reviews. The GET also returns `can_review`, which says whether the
+// signed-in visitor has a completed demo with this teacher — the page uses it
+// so it never shows a form the API would reject.
+export const fetchTutorReviews = async (slug) => { const { data } = await api.get(`/tutors/${slug}/reviews`); return data; };
+// Ranked shortlist for the booking flow. Public-safe: fit reasons and the real
+// star rating, never the internal ranking score or conversion rate.
+export const fetchTutorSuggestions = async (p={}) => { const { data } = await api.get('/tutors/suggestions', { params:p }); return data; };
+export const submitTutorReview = async ({ slug, ...p }) => { const { data } = await api.post(`/tutors/${slug}/reviews`, p); return data; };
 
 // Admin console
 export const fetchAdminOverview    = async () => { const { data } = await api.get('/admin/overview'); return data.data; };
 export const fetchAdminTeacherRows = async (p={}) => { const { data } = await api.get('/admin/teachers-console', { params:p }); return data; };
 export const toggleTeacherListing  = async ({ id, is_listed }) => { const { data } = await api.patch(`/admin/teachers/${id}/listing`, { is_listed }); return data.data; };
+// A4 — a teacher's own edits reach their public listing only through these.
+export const publishTeacherChanges = async (id) => { const { data } = await api.post(`/admin/teachers/${id}/publish`); return data; };
+export const discardTeacherChanges = async (id) => { const { data } = await api.post(`/admin/teachers/${id}/discard`); return data; };
 export const updateTeacherApplication = async ({ id, status }) => { const { data } = await api.patch(`/admin/teacher-applications/${id}`, { status }); return data; };
 export const teacherApplicationCvUrl  = (id) => `${baseURL}/admin/teacher-applications/${id}/cv`;
 export const downloadTeacherCv     = async (id, filename) => {
@@ -258,6 +292,7 @@ export const fetchAdminPhysicalProfile  = async (id) => { const { data } = await
 export const updateAdminPhysicalProfile = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/physical/profiles/${id}`, p); return data.data; };
 export const fetchAdminRequirements     = async (p={}) => { const { data } = await api.get('/admin/physical/requirements', { params:p }); return data; };
 export const fetchAdminRequirement      = async (id) => { const { data } = await api.get(`/admin/physical/requirements/${id}`); return data.data; };
+export const fetchRequirementSuggestions = async (id) => { const { data } = await api.get(`/admin/physical/requirements/${id}/suggestions`); return data; };
 export const updateAdminRequirement     = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/physical/requirements/${id}`, p); return data.data; };
 
 export const fetchAdminLessons      = async (courseId) => { const { data } = await api.get(`/admin/video-courses/${courseId}/lessons`); return data.data; };

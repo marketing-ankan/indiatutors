@@ -12,8 +12,14 @@ use App\Models\AppNotification;
 use App\Models\ClassLog;
 use App\Models\ClassMaterial;
 use App\Models\CurriculumItem;
+use App\Models\DemoRequest;
+use App\Models\DemoSlotProposal;
 use App\Models\Enrollment;
+use App\Models\ClassAbsence;
 use App\Models\RescheduleRequest;
+use App\Support\OnlineAllowance;
+use App\Support\SubstituteAssigner;
+use App\Support\TeacherProfilePublisher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -43,6 +49,26 @@ class TeacherController extends Controller {
         ]);
         $profile = $request->user()->teacherProfile()->firstOrCreate([], ['status' => 'pending']);
         $profile->update($data);
+        $profile->refresh();
+
+        // An approved teacher's edits do NOT go live on their own. They mark the
+        // profile for review and an admin publishes them — the same instinct
+        // that keeps a family's phone number behind a coordinator.
+        //
+        // Only stamped when the edit would actually change the public listing:
+        // saving the form with nothing altered must not create review work, or
+        // staff learn to clear the queue without reading it. A profile that is
+        // not yet approved needs no flag — approval publishes it anyway.
+        if ($profile->status === 'approved') {
+            $diff = TeacherProfilePublisher::diff($profile, $request->user()->tutor()->first());
+            if ($diff && ! $profile->hasUnpublishedChanges()) {
+                $profile->forceFill(['changes_submitted_at' => now()])->save();
+            } elseif (! $diff && $profile->hasUnpublishedChanges()) {
+                // Edited back to what is already published — nothing to review.
+                $profile->forceFill(['changes_submitted_at' => null])->save();
+            }
+        }
+
         return new TeacherProfileResource($profile->fresh());
     }
 
@@ -64,12 +90,162 @@ class TeacherController extends Controller {
         $tutor = $this->tutorFor($request);
         if (!$tutor) return TeacherDemoResource::collection([]);
 
+        // Expressed as "not finished" rather than a whitelist of live states:
+        // the old whereIn(['new','scheduled']) meant every state added to the
+        // lifecycle silently vanished from the teacher's portal — they would
+        // simply never see a booking sitting in 'contacted'.
         return TeacherDemoResource::collection(
             $tutor->assignedDemos()
-                ->with(['student:id,name', 'course:id,name,slug'])
-                ->whereIn('status', ['new', 'scheduled'])
+                ->with(['student:id,name', 'course:id,name,slug', 'slots'])
+                ->whereNotIn('status', ['converted', 'no_show', 'closed'])
                 ->latest()->get()
         );
+    }
+
+    /**
+     * Propose a time for a demo you have been assigned.
+     *
+     * This is the in-app half of the owner's "in-app by default, phone as
+     * fallback" decision: the teacher offers slots, the family accepts one from
+     * their dashboard, and no phone number has to change hands for that to
+     * happen. A coordinator can still settle it on a call and log the result.
+     */
+    public function proposeDemoSlot(Request $request, DemoRequest $demoRequest) {
+        $tutor = $this->tutorFor($request);
+        // Assignment is the authorisation. A teacher must not be able to
+        // schedule against a booking that is not theirs, and the id is
+        // guessable, so this check is the whole gate.
+        abort_if(! $tutor || $demoRequest->assigned_tutor_id !== $tutor->id, 403,
+            'This demo is not assigned to you.');
+        abort_if(in_array($demoRequest->status, ['converted', 'no_show', 'closed'], true), 422,
+            'This demo is already closed.');
+
+        $data = $request->validate([
+            'starts_at'        => 'required|date|after:now',
+            'duration_minutes' => 'nullable|integer|min:15|max:240',
+            'note'             => 'nullable|string|max:300',
+        ]);
+
+        // A wall of open offers is not a choice, it is noise for the family and
+        // a scheduling hazard for the teacher.
+        abort_if($demoRequest->slots()->open()->count() >= 5, 422,
+            'You already have five open proposals on this demo — withdraw one first.');
+
+        $slot = $demoRequest->slots()->create([
+            'proposed_by'      => $request->user()->id,
+            'source'           => 'teacher',
+            'starts_at'        => $data['starts_at'],
+            'duration_minutes' => $data['duration_minutes'] ?? 45,
+            'note'             => $data['note'] ?? null,
+            'status'           => 'proposed',
+        ]);
+
+        // Move a brand-new booking along: someone has now actually engaged with
+        // it, which is exactly what 'contacted' records.
+        if ($demoRequest->status === 'new') {
+            $demoRequest->update(['status' => 'contacted']);
+        }
+
+        AppNotification::send(
+            $demoRequest->user_id,
+            'demo_slot_proposed',
+            'A demo time has been proposed',
+            trim(($demoRequest->subject ?: 'Your demo') . ' — ' . $slot->starts_at->toDayDateTimeString()
+                . '. Open your dashboard to accept or ask for another time.'),
+        );
+
+        return response()->json(['message' => 'Time proposed. The family will be asked to confirm.'], 201);
+    }
+
+    /**
+     * "I cannot take this class on this date."
+     *
+     * One entry point for both of the owner's features, because they are one
+     * event with two resolutions: a substitute covers it (E2) or the teacher
+     * takes it online instead (E9, spending their monthly allowance).
+     *
+     * The automation mandate is that this resolves itself — the coordinator is
+     * the exception, not the router. So a substitute request is matched and
+     * assigned immediately; only a genuinely empty candidate list becomes
+     * `uncovered` and reaches a human.
+     */
+    public function reportAbsence(Request $request, Enrollment $enrollment) {
+        $tutor = $this->tutorFor($request);
+        abort_if(! $tutor || $enrollment->tutor_id !== $tutor->id, 403, 'This class is not yours.');
+
+        $data = $request->validate([
+            'occurs_on'  => 'required|date|after_or_equal:today',
+            'resolution' => 'required|in:substitute,online',
+            'reason'     => 'nullable|string|max:300',
+        ]);
+
+        $date = \Illuminate\Support\Carbon::parse($data['occurs_on'])->startOfDay();
+
+        // The class must actually be in the standing timetable that day, or
+        // there is nothing to be absent from.
+        $slot = $enrollment->schedules()->active()->where('weekday', $date->dayOfWeekIso)->first();
+        abort_if(! $slot, 422, 'There is no class scheduled for this enrolment on that day.');
+
+        abort_if(
+            ClassAbsence::where('enrollment_id', $enrollment->id)->whereDate('occurs_on', $date->toDateString())->exists(),
+            422, 'You have already reported this class.'
+        );
+
+        $absence = ClassAbsence::create([
+            'enrollment_id'          => $enrollment->id,
+            'enrollment_schedule_id' => $slot->id,
+            'occurs_on'              => $date->toDateString(),
+            'start_time'             => $slot->start_time,
+            'original_tutor_id'      => $tutor->id,
+            'status'                 => 'requested',
+            'reason'                 => $data['reason'] ?? null,
+        ]);
+
+        if ($data['resolution'] === 'online') {
+            $quota = OnlineAllowance::forTutor($tutor->id, $date);
+            if (! $quota['eligible']) {
+                $absence->delete();
+                abort(422, 'Your classes are already online — there is nothing to move.');
+            }
+            if ($quota['remaining'] < 1) {
+                $absence->delete();
+                abort(422, "You have used all {$quota['allowed']} online classes for this month. Request a substitute instead.");
+            }
+            $absence->update(['status' => 'online', 'resolved_at' => now()]);
+            self::notifyFamily($enrollment, 'Your class will be held online',
+                $date->toFormattedDayDateString() . ' will be taken online by your usual teacher.');
+
+            return response()->json([
+                'message' => 'Class moved online. ' . ($quota['remaining'] - 1) . ' of your ' . $quota['allowed'] . ' online classes left this month.',
+            ], 201);
+        }
+
+        return response()->json(SubstituteAssigner::resolve($absence), 201);
+    }
+
+    /** What this teacher has left of their 25%-per-month online allowance (E9). */
+    public function onlineAllowance(Request $request) {
+        $tutor = $this->tutorFor($request);
+        abort_unless($tutor, 403, 'Teacher accounts only.');
+        return response()->json(['data' => OnlineAllowance::forTutor($tutor->id)]);
+    }
+
+    private static function notifyFamily(Enrollment $enrollment, string $title, string $body): void {
+        $userId = $enrollment->student?->user_id;
+        if ($userId) {
+            AppNotification::send($userId, 'class_absence', $title, $body);
+        }
+    }
+
+    /** Withdraw a slot you proposed and no longer want to hold. */
+    public function withdrawDemoSlot(Request $request, DemoRequest $demoRequest, DemoSlotProposal $slot) {
+        $tutor = $this->tutorFor($request);
+        abort_if(! $tutor || $demoRequest->assigned_tutor_id !== $tutor->id, 403, 'This demo is not assigned to you.');
+        abort_if($slot->demo_request_id !== $demoRequest->id, 404, 'That slot is not on this demo.');
+        abort_if($slot->status !== 'proposed', 422, 'Only an open proposal can be withdrawn.');
+
+        $slot->update(['status' => 'withdrawn', 'responded_at' => now()]);
+        return response()->json(['message' => 'Proposal withdrawn.']);
     }
 
     public function classLogs(Request $request, Enrollment $enrollment) {

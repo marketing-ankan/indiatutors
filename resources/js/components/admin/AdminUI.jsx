@@ -94,14 +94,18 @@ const STATUS_TONE = {
   approved: 'bg-green-50 text-green-700', paid: 'bg-green-50 text-green-700', converted: 'bg-green-50 text-green-700',
   active: 'bg-green-50 text-green-700', published: 'bg-green-50 text-green-700',
   scheduled: 'bg-blue-50 text-blue-700', enrolled: 'bg-blue-50 text-blue-700',
-  rejected: 'bg-red-50 text-red-700', missed: 'bg-red-50 text-red-700',
+  contacted: 'bg-indigo-50 text-indigo-700', completed: 'bg-teal-50 text-teal-700',
+  rejected: 'bg-red-50 text-red-700', missed: 'bg-red-50 text-red-700', no_show: 'bg-red-50 text-red-700',
   cancelled: 'bg-slate-100 text-slate-600', closed: 'bg-slate-100 text-slate-600', draft: 'bg-slate-100 text-slate-600',
 };
+
+// Multi-word statuses would otherwise render as "No_show".
+const STATUS_LABEL = { no_show: 'No show' };
 
 export function StatusBadge({ status, children }) {
   return (
     <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-bold capitalize whitespace-nowrap ${STATUS_TONE[status] || 'bg-slate-100 text-slate-600'}`}>
-      {children ?? status}
+      {children ?? STATUS_LABEL[status] ?? status}
     </span>
   );
 }

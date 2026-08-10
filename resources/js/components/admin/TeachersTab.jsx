@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Check, X, Eye, FileDown, Video, Radio } from 'lucide-react';
 import {
   fetchAdminTeacherRows, approveTeacher, updateTeacherApplication,
-  toggleTeacherListing, downloadTeacherCv,
+  toggleTeacherListing, downloadTeacherCv, publishTeacherChanges, discardTeacherChanges,
 } from '../../lib/api.js';
 import { AdminTable, Chips, SearchBox, Pager, StatusBadge, btnGhost, errText } from './AdminUI.jsx';
 
@@ -24,6 +24,55 @@ const STATUSES = [
   { key: 'rejected', label: 'Rejected' },
 ];
 
+const FIELD_LABEL = {
+  tagline: 'Headline', qualification: 'Qualification', experience_years: 'Experience',
+  subjects: 'Subjects', city: 'City', languages: 'Languages', teaching_mode: 'Mode',
+  localities: 'Service areas', pincodes: 'Pincodes', bio: 'Bio', fee_hourly: 'Fee / hour',
+};
+
+/**
+ * A4 — what a teacher changed, before it reaches the public page.
+ *
+ * The before/after is shown rather than a bare "this teacher has edits",
+ * because a reviewer who cannot see the change can only rubber-stamp it. The
+ * fee line is the one that matters most: a teacher can quietly double their
+ * rate, and families are quoted from the public listing.
+ */
+function PendingChanges({ row, onPublish, onDiscard, busy }) {
+  const changes = Object.entries(row.pending_changes || {});
+  if (changes.length === 0) return null;
+
+  const show = (v) => (v === null || v === '' ? '—' : String(v));
+
+  return (
+    <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50/60 p-2">
+      <p className="text-[11px] font-bold text-amber-800">
+        Unpublished edits{row.changes_since ? ` · since ${row.changes_since}` : ''}
+      </p>
+      <ul className="mt-1 space-y-0.5">
+        {changes.map(([field, v]) => (
+          <li key={field} className="text-[11px] leading-snug">
+            <span className="font-semibold text-slate-700">{FIELD_LABEL[field] || field}: </span>
+            <span className="text-slate-500 line-through">{show(v.from)}</span>
+            <span className="text-slate-400"> → </span>
+            <span className="font-semibold text-slate-800">{show(v.to)}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-1.5 flex gap-1.5">
+        <button type="button" disabled={busy} onClick={onPublish}
+          className="rounded-md bg-brand-600 px-2 py-1 text-[11px] font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+          Publish
+        </button>
+        <button type="button" disabled={busy} onClick={onDiscard}
+          className="rounded-md px-2 py-1 text-[11px] font-semibold text-slate-600 ring-1 ring-slate-200 hover:bg-white disabled:opacity-60">
+          Leave unpublished
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function TeachersTab() {
   const qc = useQueryClient();
   const [status, setStatus] = useState('');
@@ -43,10 +92,23 @@ export default function TeachersTab() {
   };
   const onError = e => setError(errText(e));
 
+  // A4 — a teacher's edits reach the public listing only through these.
+  const publish = useMutation({
+    mutationFn: (id) => publishTeacherChanges(id),
+    onSuccess: () => { setError(''); refresh(); },
+    onError,
+  });
+  const discard = useMutation({
+    mutationFn: (id) => discardTeacherChanges(id),
+    onSuccess: () => { setError(''); refresh(); },
+    onError,
+  });
+
   const setProfileStatus = useMutation({ mutationFn: ({ id, status }) => approveTeacher(id, status), onSuccess: refresh, onError });
   const setAppStatus     = useMutation({ mutationFn: updateTeacherApplication, onSuccess: refresh, onError });
   const setListing       = useMutation({ mutationFn: toggleTeacherListing, onSuccess: refresh, onError });
-  const busy = setProfileStatus.isPending || setAppStatus.isPending || setListing.isPending;
+  const busy = setProfileStatus.isPending || setAppStatus.isPending || setListing.isPending
+    || publish.isPending || discard.isPending;
 
   const rows = data?.data ?? [];
   const filter = (key, setter) => { setter(key); setPage(1); };
@@ -76,8 +138,12 @@ export default function TeachersTab() {
                   {r.kind === 'application' ? 'Applicant' : 'Registered'}
                 </span>
                 {r.is_listed && <span className="rounded bg-green-50 px-1.5 py-0.5 text-[10px] font-bold uppercase text-green-700">Listed</span>}
+                {Object.keys(r.pending_changes || {}).length > 0 && (
+                  <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold uppercase text-amber-700">Edits to review</span>
+                )}
                 {r.city && <span className="text-[11px] text-slate-400">{r.city}</span>}
               </div>
+              <PendingChanges row={r} onPublish={() => publish.mutate(r.id)} onDiscard={() => discard.mutate(r.id)} busy={busy} />
             </td>
             <td className="px-3 py-3 text-slate-600">
               {r.subjects.length ? r.subjects.join(', ') : <span className="text-slate-400">—</span>}

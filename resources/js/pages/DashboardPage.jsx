@@ -2,7 +2,7 @@ import { useState, useRef, lazy, Suspense } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap, Briefcase, Save, Users, BookOpen, NotebookPen, ChevronDown, ChevronUp, ListChecks, FolderOpen, Link2, Download, Lightbulb, Calendar, Award, Megaphone, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, GraduationCap, Briefcase, Save, Users, BookOpen, NotebookPen, ChevronDown, ChevronUp, ListChecks, FolderOpen, Link2, Download, Lightbulb, Calendar, Award, Megaphone, BarChart3, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import DashboardHero from '../components/dashboard/DashboardHero.jsx';
 import SupportCard from '../components/dashboard/SupportCard.jsx';
@@ -15,6 +15,8 @@ const AdminConsole = lazy(() => import('../components/admin/AdminConsole.jsx'));
 import {
   fetchStudents, createStudent, deleteStudent,
   fetchKyc, uploadKyc, deleteKyc, fetchMyDemoRequests, fetchMyEnrollments,
+  acceptDemoSlot, declineDemoSlot,
+  fetchMyAchievements, createMyAchievement, updateMyAchievement, fetchMyRecord,
   fetchTeacherProfile, updateTeacherProfile,
   fetchTeacherStudents, fetchTeacherDemos, fetchClassLogs, addClassLog,
   fetchCurriculum, addCurriculumItem, updateCurriculumItem, deleteCurriculumItem,
@@ -111,6 +113,16 @@ function ParentDashboard() {
       <div className="mt-6">
         <TuitionRequirementsCard />
       </div>
+      <div className="mt-6">
+        <StudentRecordCard />
+      </div>
+      <div className="mt-6">
+        <AchievementsCard />
+      </div>
+      <div className="grid lg:grid-cols-2 gap-6 mt-6">
+        <PlansAndOffersCard />
+        <CertificatesCard />
+      </div>
       <div className="grid lg:grid-cols-2 gap-6 mt-6">
         <StudentsCard />
         <KycCard />
@@ -134,12 +146,17 @@ function StudentDashboard() {
   return (
     <>
       <MyCoursesCard />
+      {/* E6 — a student sees their own record, same figures as their guardian's. */}
+      <div className="mt-6">
+        <StudentRecordCard />
+      </div>
       <div className="grid lg:grid-cols-2 gap-6 mt-6">
         <EnrollmentsCard />
         <UpcomingClassesCard />
       </div>
-      <div className="mt-6">
+      <div className="grid lg:grid-cols-2 gap-6 mt-6">
         <ExamUpdatesCard />
+        <CertificatesCard />
       </div>
       <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6 mt-6">
         <h2 className="text-lg font-bold flex items-center gap-2 mb-1"><Award className="h-5 w-5 text-brand-600"/>My portfolio</h2>
@@ -787,6 +804,16 @@ function ParentEnrollmentRow({ e }) {
         <div className="min-w-0">
           <div className="font-semibold text-sm text-slate-800">{e.course?.name || e.plan || 'Enrollment'}</div>
           <div className="text-xs text-slate-500">{[e.student, e.tutor?.name && `with ${e.tutor.name}`, e.plan].filter(Boolean).join(' · ')}</div>
+          {/* The weekly timetable, on the row itself rather than behind the
+              expander: "when is my child's class" is the question this card is
+              opened to answer, and it used to require a phone call. */}
+          {e.schedule?.length > 0 && (
+            <div className="mt-1 flex flex-wrap gap-1">
+              {e.schedule.map(s => (
+                <span key={s.id} className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-700">{s.label}</span>
+              ))}
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor[e.status]||'bg-slate-100 text-slate-600'}`}>{e.status}</span>
@@ -895,9 +922,213 @@ function ParentEnrollmentDetail({ id }) {
   );
 }
 
+/**
+ * E1 and E8 — the places these will live, holding nothing yet.
+ *
+ * Owner, 2026-08-10: keep the buttons and options, but show nothing for free
+ * plans (E1, "decided later") and certification (E8, "we haven't decided").
+ *
+ * So these are scaffolding, and the copy says so plainly. The alternative —
+ * inventing a plan tier or a certificate to fill the space — is exactly the
+ * kind of placeholder that was cleaned out of this site in August, when
+ * fabricated ratings and testimonials had to be deleted. An empty section that
+ * admits it is empty can sit here safely until there is something real; a
+ * fake one cannot.
+ */
+function ComingSoonCard({ icon: Icon, title, blurb }) {
+  return (
+    <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
+      <h2 className="text-lg font-bold flex items-center gap-2 mb-1">
+        <Icon className="h-5 w-5 text-brand-600" />{title}
+      </h2>
+      <p className="text-sm text-slate-500">{blurb}</p>
+      <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500 ring-1 ring-slate-100">
+        Nothing here yet — we'll let you know as soon as this is available.
+      </p>
+    </section>
+  );
+}
+
+/**
+ * E6 — the student's own record.
+ *
+ * Every figure is counted from a real row. This is precisely the surface where
+ * an invented number would never be challenged, and this project has already
+ * had to delete two sets of those. So a stat with nothing behind it is omitted
+ * rather than shown as a confident zero — except attendance, where zero is a
+ * true and useful answer.
+ */
+function StudentRecordCard() {
+  const { data: records = [], isLoading } = useQuery({ queryKey: ['my-record'], queryFn: fetchMyRecord });
+
+  if (isLoading) return null;
+  if (!records.length) return null;
+
+  const Stat = ({ value, label, tone = 'text-brand-600' }) => (
+    <div className="rounded-xl bg-slate-50 px-3 py-2.5 text-center ring-1 ring-slate-100">
+      <div className={`font-heading text-xl font-extrabold ${tone}`}>{value}</div>
+      <div className="text-[11px] uppercase tracking-wide text-slate-500 mt-0.5">{label}</div>
+    </div>
+  );
+
+  return (
+    <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
+      <h2 className="text-lg font-bold flex items-center gap-2 mb-1"><BarChart3 className="h-5 w-5 text-brand-600" />Learning so far</h2>
+      <p className="text-xs text-slate-500 mb-4">Counted from your actual classes and materials — nothing estimated.</p>
+
+      <div className="space-y-5">
+        {records.map(r => (
+          <div key={r.student.id}>
+            {records.length > 1 && (
+              <p className="mb-2 text-sm font-bold text-slate-800">{r.student.name}</p>
+            )}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <Stat value={r.classes.attended} label="Classes attended" />
+              <Stat value={r.classes.hours} label="Hours taught" />
+              <Stat value={r.materials.total} label="Materials" />
+              <Stat value={r.achievements.total} label="Achievements" />
+            </div>
+            {(r.classes.missed > 0 || r.substitutions > 0) && (
+              <p className="mt-2 text-xs text-slate-500">
+                {r.classes.missed > 0 && <>{r.classes.missed} missed{r.substitutions > 0 && ' · '}</>}
+                {r.substitutions > 0 && <>{r.substitutions} covered by a substitute teacher</>}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+const CONSENT_TONE = {
+  approved: 'bg-green-50 text-green-700', pending: 'bg-amber-50 text-amber-700', rejected: 'bg-slate-100 text-slate-500',
+};
+
+/**
+ * E7 — achievements a family records and credits.
+ *
+ * Owner, 2026-08-10: this is where real testimonials come from, and it goes in
+ * the student profile first (the teacher profile connects later).
+ *
+ * The consent checkbox is unticked by default and the copy says exactly what
+ * ticking it means. The August audit found achievement photos of identifiable
+ * minors reused from a sister brand — most subjects here are children, so
+ * "shared publicly" has to be a deliberate act, reversible at any time.
+ */
+function AchievementsCard() {
+  const qc = useQueryClient();
+  const { data: items = [], isLoading } = useQuery({ queryKey: ['my-achievements'], queryFn: fetchMyAchievements });
+  const { data: students = [] } = useQuery({ queryKey: ['students'], queryFn: fetchStudents });
+  const [open, setOpen] = useState(false);
+  const [f, setF] = useState({ student_id: '', title: '', body: '', achieved_on: '', consent_public: false, consent_name: false });
+
+  const create = useMutation({
+    mutationFn: () => createMyAchievement({ ...f, student_id: Number(f.student_id) || (students[0]?.id ?? null) }),
+    onSuccess: () => {
+      setF({ student_id: '', title: '', body: '', achieved_on: '', consent_public: false, consent_name: false });
+      setOpen(false);
+      qc.invalidateQueries({ queryKey: ['my-achievements'] });
+    },
+  });
+  const setConsent = useMutation({
+    mutationFn: ({ id, consent_public }) => updateMyAchievement({ id, consent_public }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['my-achievements'] }),
+  });
+
+  return (
+    <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
+      <div className="flex items-center justify-between mb-1">
+        <h2 className="text-lg font-bold flex items-center gap-2"><Award className="h-5 w-5 text-brand-600" />Achievements</h2>
+        <button onClick={() => setOpen(o => !o)} className="text-sm font-semibold text-brand-600 hover:text-brand-700">
+          {open ? 'Cancel' : '+ Add achievement'}
+        </button>
+      </div>
+      <p className="text-xs text-slate-500 mb-4">
+        Something your child achieved with us — an exam result, a grade, a competition. Yours to keep private, or to share.
+      </p>
+
+      {open && (
+        <form className="mb-4 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-100 space-y-3"
+          onSubmit={e => { e.preventDefault(); create.mutate(); }}>
+          {students.length > 1 && (
+            <select value={f.student_id} onChange={e => setF({ ...f, student_id: e.target.value })}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+              <option value="">Which student?</option>
+              {students.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+          )}
+          <input required value={f.title} onChange={e => setF({ ...f, title: e.target.value })}
+            placeholder="What did they achieve?" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+          <textarea rows={2} value={f.body} onChange={e => setF({ ...f, body: e.target.value })}
+            placeholder="Tell us a little more (optional)" className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+          <input type="date" value={f.achieved_on} onChange={e => setF({ ...f, achieved_on: e.target.value })}
+            className="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+
+          <label className="flex gap-2 items-start text-xs text-slate-600">
+            <input type="checkbox" checked={f.consent_public} className="mt-0.5"
+              onChange={e => setF({ ...f, consent_public: e.target.checked, consent_name: e.target.checked && f.consent_name })} />
+            <span>You may share this on the Indiatutors website as a testimonial. Leave unticked to keep it private to my account.</span>
+          </label>
+          {f.consent_public && (
+            <label className="flex gap-2 items-start text-xs text-slate-600 pl-6">
+              <input type="checkbox" checked={f.consent_name} className="mt-0.5"
+                onChange={e => setF({ ...f, consent_name: e.target.checked })} />
+              <span>You may use my child's name. Otherwise it will read "a Class 8 student".</span>
+            </label>
+          )}
+
+          <button disabled={!f.title || create.isPending}
+            className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+            {create.isPending ? 'Saving…' : 'Save achievement'}
+          </button>
+          {create.isError && (
+            <p className="text-xs text-red-600">{create.error?.response?.data?.message || 'Could not save — please try again.'}</p>
+          )}
+        </form>
+      )}
+
+      {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : items.length ? (
+        <ul className="divide-y divide-slate-100">
+          {items.map(a => (
+            <li key={a.id} className="py-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold text-sm text-slate-800">{a.title}</span>
+                <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold capitalize ${CONSENT_TONE[a.status] || ''}`}>{a.status}</span>
+                {a.shown_publicly && <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-700">Shared publicly</span>}
+              </div>
+              <div className="text-xs text-slate-500">
+                {[a.student, a.tutor?.name && `with ${a.tutor.name}`, a.achieved_on].filter(Boolean).join(' · ')}
+              </div>
+              {a.body && <p className="mt-1 text-sm text-slate-600">{a.body}</p>}
+              <button onClick={() => setConsent.mutate({ id: a.id, consent_public: !a.consent_public })}
+                disabled={setConsent.isPending}
+                className="mt-1 text-xs font-semibold text-brand-600 hover:text-brand-700 disabled:opacity-60">
+                {a.consent_public ? 'Stop sharing this publicly' : 'Allow this to be shared'}
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="text-sm text-slate-500">Nothing added yet.</p>}
+    </section>
+  );
+}
+
+const PlansAndOffersCard = () => (
+  <ComingSoonCard icon={Megaphone} title="Plans &amp; offers"
+    blurb="Free plans, referral rewards and seasonal offers will appear here." />
+);
+
+const CertificatesCard = () => (
+  <ComingSoonCard icon={Award} title="Certificates"
+    blurb="Certificates for completed courses will appear here once your course offers one." />
+);
+
 function RequestsCard() {
   const { data: reqs = [], isLoading } = useQuery({ queryKey:['my-demo-requests'], queryFn: fetchMyDemoRequests });
-  const statusColor = { new:'bg-amber-50 text-amber-700', scheduled:'bg-blue-50 text-blue-700', converted:'bg-green-50 text-green-700', enrolled:'bg-green-50 text-green-700', closed:'bg-slate-100 text-slate-600' };
+  const statusColor = { new:'bg-amber-50 text-amber-700', contacted:'bg-indigo-50 text-indigo-700', scheduled:'bg-blue-50 text-blue-700', completed:'bg-teal-50 text-teal-700', converted:'bg-green-50 text-green-700', enrolled:'bg-green-50 text-green-700', no_show:'bg-red-50 text-red-700', closed:'bg-slate-100 text-slate-600' };
+  // Parents see plain English, not the internal token.
+  const statusLabel = { no_show: 'Not attended', completed: 'Demo done', new: 'Received' };
 
   return (
     <section className="rounded-2xl bg-white ring-1 ring-slate-100 shadow-sm p-6">
@@ -908,23 +1139,93 @@ function RequestsCard() {
       {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : reqs.length ? (
         <ul className="divide-y divide-slate-100">
           {reqs.map(r => (
-            <li key={r.id} className="flex items-center justify-between py-3">
-              <div>
-                <div className="font-semibold text-sm text-slate-800">{r.course?.name || r.subject || 'General enquiry'}</div>
-                <div className="text-xs text-slate-500">
-                  {[r.student, r.grade, r.mode].filter(Boolean).join(' · ')}{r.created_at && ` · requested ${r.created_at}`}
+            <li key={r.id} className="py-3">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="font-semibold text-sm text-slate-800">{r.course?.name || r.subject || 'General enquiry'}</div>
+                  <div className="text-xs text-slate-500">
+                    {[r.student, r.grade, r.mode].filter(Boolean).join(' · ')}{r.created_at && ` · requested ${r.created_at}`}
+                  </div>
+                  {(r.assigned_tutor || r.requested_tutor) && (
+                    <div className="text-xs text-slate-500">with {(r.assigned_tutor || r.requested_tutor).name}</div>
+                  )}
                 </div>
+                <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor[r.status]||'bg-slate-100 text-slate-600'}`}>{statusLabel[r.status] ?? r.status}</span>
               </div>
-              <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor[r.status]||'bg-slate-100 text-slate-600'}`}>{r.status}</span>
+              <ProposedTimes demo={r} />
             </li>
           ))}
         </ul>
-      ) : (
-        <p className="text-sm text-slate-500">No demo requests yet. <Link to="/book-demo" className="text-brand-600 font-semibold">Book your first free demo →</Link></p>
-      )}
+      ) : <p className="text-sm text-slate-500">No demo requests yet.</p>}
     </section>
   );
 }
+
+/**
+ * Times the teacher has offered, and the family's answer.
+ *
+ * This is the family end of "in-app by default, phone as fallback": the parent
+ * confirms a slot here rather than waiting for a call, and no contact details
+ * have to be exchanged for the class to get booked.
+ */
+function ProposedTimes({ demo }) {
+  const qc = useQueryClient();
+  const open = (demo.slots ?? []).filter(s => s.status === 'proposed');
+  const agreed = (demo.slots ?? []).find(s => s.status === 'accepted');
+
+  const answer = useMutation({
+    mutationFn: ({ slotId, yes }) => (yes ? acceptDemoSlot : declineDemoSlot)({ demoId: demo.id, slotId }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['my-demo-requests'] }),
+  });
+
+  if (!agreed && open.length === 0) return null;
+
+  // A confirmed time does NOT hide later offers. Returning early on `agreed`
+  // meant a teacher asking to move the class proposed a new slot the family
+  // could never see or answer — their request just vanished.
+  const heading = agreed
+    ? (open.length === 1 ? 'Your teacher has suggested a different time' : 'Your teacher has suggested other times')
+    : (open.length === 1 ? 'Your teacher suggested a time' : 'Your teacher suggested some times');
+
+  return (
+    <>
+      {agreed && (
+        <p className="mt-1 text-xs font-semibold text-green-700">
+          Confirmed for {new Date(agreed.starts_at.replace(' ', 'T')).toLocaleString()}
+        </p>
+      )}
+      {open.length > 0 && (
+    <div className="mt-2 rounded-lg bg-brand-50 p-2.5 ring-1 ring-brand-100">
+      <p className="text-xs font-bold text-brand-800">{heading}</p>
+      <ul className="mt-1.5 space-y-1.5">
+        {open.map(s => (
+          <li key={s.id} className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold text-slate-800">
+              {new Date(s.starts_at.replace(' ', 'T')).toLocaleString()}
+            </span>
+            {s.note && <span className="text-[11px] text-slate-500">{s.note}</span>}
+            <span className="ml-auto flex gap-1.5">
+              <button type="button" disabled={answer.isPending}
+                onClick={() => answer.mutate({ slotId: s.id, yes: true })}
+                className="rounded-md bg-brand-600 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+                That works
+              </button>
+              <button type="button" disabled={answer.isPending}
+                onClick={() => answer.mutate({ slotId: s.id, yes: false })}
+                className="rounded-md px-2.5 py-1 text-[11px] font-semibold text-slate-500 ring-1 ring-slate-200 hover:bg-white">
+                Can't make it
+              </button>
+            </span>
+          </li>
+        ))}
+      </ul>
+      {answer.isError && <p className="mt-1 text-[11px] text-red-600">Could not save that — please try again.</p>}
+    </div>
+      )}
+    </>
+  );
+}
+
 
 function RescheduleBlock({ id, reschedules }) {
   const qc = useQueryClient();
