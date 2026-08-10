@@ -322,8 +322,8 @@ recorded here in his own terms so the next reader does not re-guess them.*
 - ⬜ **F4. Presentations + live examples + diagrams.**
 - ⬜ **F5. Openable diagram → simulator.**
 - ⬜ **F6. End → continue; ask any question.**
-- ⬜ **F7. Question bank, Levels 1–3.**
-- ⬜ **F8. Weak-area detection with score thresholds (60% / 80% / 90%).**
+- 🔨 **F7. Question bank, Levels 1–3.** *Stage 5 — built, awaiting sign-off.*
+- 🔨 **F8. Weak-area detection with score thresholds (60% / 80% / 90%).** *Stage 5 — built, awaiting sign-off.*
 
 ---
 

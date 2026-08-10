@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\PhysicalProfileController;
 use App\Http\Controllers\Api\PincodeController;
 use App\Http\Controllers\Api\PortfolioController;
 use App\Http\Controllers\Api\TuitionRequirementController;
+use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\StudentAchievementController;
 use App\Http\Controllers\Api\StudentController;
@@ -129,6 +130,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // E7 — achievements a family records and credits. Private by default;
     // publication needs BOTH staff approval and the family's consent.
+    // F7 + F8 — the question ladder and the weakness it reveals. No AI provider
+    // involved, which is why these ship ahead of F2-F6.
+    Route::get('/lessons/{lesson}/questions',  [QuestionController::class, 'forLesson']);
+    Route::post('/lessons/{lesson}/questions', [QuestionController::class, 'submit'])->middleware('throttle:30,1');
+    Route::get('/my/weak-areas',               [QuestionController::class, 'weakAreas']);
+
     // E6 — the student's own record: classes attended, materials held.
     Route::get('/my/record',                       [StudentAchievementController::class, 'record']);
     Route::get('/my/achievements',                 [StudentAchievementController::class, 'index']);
