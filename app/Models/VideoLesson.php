@@ -20,7 +20,10 @@ class VideoLesson extends Model {
     public function playbackUrl(bool $unlocked): ?string {
         if (!$unlocked) return null;
         if ($this->provider === 'youtube') {
-            return "https://www.youtube-nocookie.com/embed/{$this->video_id}";
+            // enablejsapi lets the page pause the player by postMessage — the
+            // "stop" half of stop-and-ask (F2). Without it the iframe ignores
+            // every command and the video talks over the student's question.
+            return "https://www.youtube-nocookie.com/embed/{$this->video_id}?enablejsapi=1";
         }
         if ($this->provider === 'r2') {
             // video_id holds the R2 object key, e.g. "python-for-kids/1.mp4".

@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\PhysicalProfileController;
 use App\Http\Controllers\Api\PincodeController;
 use App\Http\Controllers\Api\PortfolioController;
 use App\Http\Controllers\Api\TuitionRequirementController;
+use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\StudentAchievementController;
 use App\Http\Controllers\Api\StudentController;
@@ -84,6 +85,8 @@ Route::post('/video-courses/{videoCourse}/lessons/{lesson}/playback', [VideoCour
 // so this is the cost ceiling as much as it is abuse protection.
 Route::post('/video-courses/{videoCourse}/lessons/{lesson}/ask',     [VideoCourseController::class, 'ask'])->middleware('throttle:10,1');
 Route::get('/video-courses/{videoCourse}/lessons/{lesson}/summary',  [VideoCourseController::class, 'summary'])->middleware('throttle:20,1');
+// F3/F4/F5 — a structured board. Same cost per call as ask(), same throttle.
+Route::post('/video-courses/{videoCourse}/lessons/{lesson}/explain', [VideoCourseController::class, 'explain'])->middleware('throttle:10,1');
 
 // Public physical-tuition endpoints. EnsurePhysicalSchema guards every route
 // that touches these tables: this host has a documented habit of killing the
@@ -129,6 +132,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // E7 — achievements a family records and credits. Private by default;
     // publication needs BOTH staff approval and the family's consent.
+    // F7 + F8 — the question ladder and the weakness it reveals. No AI provider
+    // involved, which is why these ship ahead of F2-F6.
+    Route::get('/lessons/{lesson}/questions',  [QuestionController::class, 'forLesson']);
+    Route::post('/lessons/{lesson}/questions', [QuestionController::class, 'submit'])->middleware('throttle:30,1');
+    Route::get('/my/weak-areas',               [QuestionController::class, 'weakAreas']);
+
     // E6 — the student's own record: classes attended, materials held.
     Route::get('/my/record',                       [StudentAchievementController::class, 'record']);
     Route::get('/my/achievements',                 [StudentAchievementController::class, 'index']);
@@ -270,6 +279,11 @@ Route::middleware('auth:sanctum')->group(function () {
         // A4 — a teacher's own edits reach the public listing only through here.
         Route::post('/teachers/{teacherProfile}/publish', [AdminTeacherController::class, 'publishChanges']);
         Route::post('/teachers/{teacherProfile}/discard', [AdminTeacherController::class, 'discardChanges']);
+        // F7 — question authoring. Answers travel only on these staff routes.
+        Route::get('/lessons/{lesson}/questions',        [QuestionController::class, 'adminForLesson']);
+        Route::post('/lessons/{lesson}/questions',       [QuestionController::class, 'adminStore']);
+        Route::patch('/questions/{question}',            [QuestionController::class, 'adminUpdate']);
+        Route::delete('/questions/{question}',           [QuestionController::class, 'adminDestroy']);
         Route::get('/course-materials',                  [CourseMaterialController::class, 'adminIndex']);
         Route::post('/course-materials',                 [CourseMaterialController::class, 'store']);
         Route::patch('/course-materials/{material}',     [CourseMaterialController::class, 'update']);

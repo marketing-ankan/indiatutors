@@ -19,7 +19,7 @@ const clock = s => {
   return `${m}:${String(sec).padStart(2, '0')}`;
 };
 
-export default function LessonPlayer({ src, title, lessonId }) {
+export default function LessonPlayer({ src, title, lessonId, onEnded }) {
   const videoRef = useRef(null);
   const wrapRef = useRef(null);
   const [playing, setPlaying] = useState(false);
@@ -96,6 +96,9 @@ export default function LessonPlayer({ src, title, lessonId }) {
           preload="metadata"
           controlsList="nodownload"
           onContextMenu={e => e.preventDefault()}
+          // F6 — the page decides what happens at the end; the player only
+          // reports that it got there.
+          onEnded={() => onEnded?.()}
           onClick={toggle}
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}

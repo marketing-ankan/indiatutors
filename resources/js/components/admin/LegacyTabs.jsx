@@ -5,11 +5,13 @@ import {
   fetchAdminEvents, createAdminEvent, updateAdminEvent, deleteAdminEvent,
   fetchAdminVideoCourses, createAdminVideoCourse, updateAdminVideoCourse, deleteAdminVideoCourse,
   fetchAdminLessons, createAdminLesson, updateAdminLesson, deleteAdminLesson,
+  fetchAdminQuestions, createAdminQuestion, updateAdminQuestion, deleteAdminQuestion,
   requestUploadUrl, uploadToR2,
   fetchAdminProposals, decideProposal,
   fetchAdminExamUpdates, createExamUpdate, updateExamUpdate, deleteExamUpdate,
   fetchAdminAnalytics, inr,
 } from '../../lib/api.js';
+import { errText } from './AdminUI.jsx';
 
 // Areas this platform has that the reference console does not: dated events,
 // self-paced video courses (with the direct-to-R2 upload flow), teacher course
@@ -193,12 +195,149 @@ function TranscriptEditor({ lesson, onSave, inp }) {
   );
 }
 
+/**
+ * F7 — author the question ladder for one lesson.
+ *
+ * Lives inside the lesson row because a question belongs to a lesson the way a
+ * transcript does. The form enforces the invariant the scorer stands on: the
+ * correct answer is picked FROM the options (a radio on each row), so it is
+ * impossible to author a question whose right answer is not among its choices
+ * — the server rejects that too, but the UI should not let it be expressed.
+ *
+ * Deleting shows the attempt count in the confirm: answer history dies with
+ * the question (cascade), and an author erasing evidence should know it.
+ */
+const Q_BLANK = { level: 1, topic: '', prompt: '', options: [{ key: 'a', text: '' }, { key: 'b', text: '' }, { key: 'c', text: '' }, { key: 'd', text: '' }], correct_key: 'a', explanation: '' };
+
+function QuestionsManager({ lesson }) {
+  const qc = useQueryClient();
+  const { data: questions = [], isLoading } = useQuery({ queryKey: ['admin-questions', lesson.id], queryFn: () => fetchAdminQuestions(lesson.id) });
+  const invalidate = () => qc.invalidateQueries({ queryKey: ['admin-questions', lesson.id] });
+  const [editing, setEditing] = useState(null);   // Q_BLANK copy, or a row copy with id
+  const [error, setError] = useState('');
+
+  const save = useMutation({
+    mutationFn: p => p.id ? updateAdminQuestion(p) : createAdminQuestion({ lessonId: lesson.id, ...p }),
+    onSuccess: () => { invalidate(); setEditing(null); setError(''); },
+    onError: e => setError(errText(e)),
+  });
+  const del = useMutation({ mutationFn: deleteAdminQuestion, onSuccess: invalidate });
+  const patch = useMutation({ mutationFn: updateAdminQuestion, onSuccess: invalidate });
+
+  const inp = 'w-full rounded-lg ring-1 ring-slate-200 px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500';
+  const setOpt = (i, text) => setEditing(s => ({ ...s, options: s.options.map((o, j) => j === i ? { ...o, text } : o) }));
+  // Dropping an option that was marked correct must move the mark, not strand it.
+  const dropOpt = (i) => setEditing(s => {
+    const options = s.options.filter((_, j) => j !== i);
+    const correct_key = options.some(o => o.key === s.correct_key) ? s.correct_key : options[0]?.key;
+    return { ...s, options, correct_key };
+  });
+
+  const byLevel = [1, 2, 3].map(lv => [lv, questions.filter(q => q.level === lv)]);
+
+  return (
+    <div className="mt-2 w-full rounded-lg bg-brand-50/40 p-3 ring-1 ring-brand-100">
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">
+          Question bank — levels unlock at 80%, weak-area topics come from these
+        </p>
+        {!editing && (
+          <button onClick={() => { setError(''); setEditing({ ...Q_BLANK, options: Q_BLANK.options.map(o => ({ ...o })) }); }}
+            className="text-[10px] font-bold text-brand-600 hover:text-brand-700">+ Add question</button>
+        )}
+      </div>
+
+      {isLoading ? <p className="mt-2 text-xs text-slate-400">Loading…</p> : (
+        <div className="mt-2 space-y-2">
+          {byLevel.map(([lv, rows]) => rows.length > 0 && (
+            <div key={lv}>
+              <p className="text-[10px] font-bold text-slate-400">LEVEL {lv}</p>
+              {rows.map(q => (
+                <div key={q.id} className="mt-1 flex flex-wrap items-center gap-2 rounded-md bg-white px-2.5 py-1.5 ring-1 ring-slate-100">
+                  <span className="min-w-0 flex-1 truncate text-xs text-slate-700">{q.prompt}</span>
+                  {q.topic && <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-500">{q.topic}</span>}
+                  <span className="text-[10px] text-slate-400">{q.attempts} answered</span>
+                  {!q.is_published && <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">hidden</span>}
+                  <button onClick={() => patch.mutate({ ...q, is_published: !q.is_published })}
+                    className="text-[10px] font-semibold text-slate-500 hover:text-brand-700">{q.is_published ? 'hide' : 'publish'}</button>
+                  <button onClick={() => { setError(''); setEditing({ ...q, options: (q.options || []).map(o => ({ ...o })) }); }}
+                    className="text-[10px] font-semibold text-brand-600">edit</button>
+                  <button onClick={() => {
+                    if (confirm(q.attempts > 0
+                      ? `Delete this question AND the ${q.attempts} recorded answer(s) to it? Weak-area history for those answers is lost.`
+                      : 'Delete this question?')) del.mutate(q.id);
+                  }} className="text-[10px] font-bold text-slate-500 hover:text-red-600">delete</button>
+                </div>
+              ))}
+            </div>
+          ))}
+          {!questions.length && !editing && <p className="text-xs text-slate-400">No questions yet — the quiz section stays hidden for learners until there are some.</p>}
+        </div>
+      )}
+
+      {editing && (
+        <form onSubmit={e => { e.preventDefault(); save.mutate(editing); }} className="mt-3 space-y-2 rounded-lg bg-white p-3 ring-1 ring-slate-200">
+          <div className="flex flex-wrap gap-2">
+            <label className="text-[10px] font-bold text-slate-500">LEVEL
+              <select value={editing.level} onChange={e => setEditing(s => ({ ...s, level: Number(e.target.value) }))} className={inp + ' mt-0.5'}>
+                {[1, 2, 3].map(l => <option key={l} value={l}>{l}</option>)}
+              </select>
+            </label>
+            <label className="flex-1 text-[10px] font-bold text-slate-500">TOPIC (drives weak-area detection)
+              <input value={editing.topic || ''} onChange={e => setEditing(s => ({ ...s, topic: e.target.value }))}
+                placeholder="e.g. fractions" className={inp + ' mt-0.5'} />
+            </label>
+          </div>
+          <label className="block text-[10px] font-bold text-slate-500">QUESTION *
+            <textarea required rows={2} value={editing.prompt} onChange={e => setEditing(s => ({ ...s, prompt: e.target.value }))} className={inp + ' mt-0.5'} />
+          </label>
+
+          <p className="text-[10px] font-bold text-slate-500">OPTIONS — tick the correct one *</p>
+          {editing.options.map((o, i) => (
+            <div key={o.key} className="flex items-center gap-2">
+              <input type="radio" name="correct" checked={editing.correct_key === o.key}
+                onChange={() => setEditing(s => ({ ...s, correct_key: o.key }))} />
+              <span className="w-4 text-center text-[10px] font-bold text-slate-400">{o.key}</span>
+              <input required value={o.text} onChange={e => setOpt(i, e.target.value)} className={inp} placeholder={`Option ${o.key}`} />
+              {editing.options.length > 2 && (
+                <button type="button" onClick={() => dropOpt(i)} className="text-[10px] font-bold text-slate-400 hover:text-red-600">✕</button>
+              )}
+            </div>
+          ))}
+          {editing.options.length < 6 && (
+            <button type="button" onClick={() => setEditing(s => {
+              const used = s.options.map(o => o.key);
+              const next = 'abcdef'.split('').find(k => !used.includes(k));
+              return next ? { ...s, options: [...s.options, { key: next, text: '' }] } : s;
+            })} className="text-[10px] font-semibold text-brand-600">+ option</button>
+          )}
+
+          <label className="block text-[10px] font-bold text-slate-500">EXPLANATION (shown after submitting — the teaching moment)
+            <input value={editing.explanation || ''} onChange={e => setEditing(s => ({ ...s, explanation: e.target.value }))} className={inp + ' mt-0.5'} />
+          </label>
+
+          {error && <p className="text-xs text-red-600">{error}</p>}
+          <div className="flex gap-2">
+            <button type="submit" disabled={save.isPending}
+              className="rounded-lg bg-brand-600 px-4 py-1.5 text-xs font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+              {editing.id ? 'Save' : 'Add question'}
+            </button>
+            <button type="button" onClick={() => { setEditing(null); setError(''); }}
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200">Cancel</button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+}
+
 function LessonsManager({ course }) {
   const qc = useQueryClient();
   const { data: lessons = [] } = useQuery({ queryKey:['admin-lessons', course.id], queryFn:()=>fetchAdminLessons(course.id) });
   const invalidate = () => { qc.invalidateQueries({ queryKey:['admin-lessons', course.id] }); qc.invalidateQueries({ queryKey:['admin-videos'] }); };
   const [nl, setNl] = useState({ ...LESSON_BLANK });
   const [openTranscript, setOpenTranscript] = useState(null);
+  const [openQuestions, setOpenQuestions] = useState(null);
   const add = useMutation({ mutationFn: p => createAdminLesson({ courseId: course.id, ...p }), onSuccess: () => { invalidate(); setNl({ ...LESSON_BLANK }); } });
   const patch = useMutation({ mutationFn: ({ id, ...p }) => updateAdminLesson({ courseId: course.id, id, ...p }), onSuccess: invalidate });
   const del = useMutation({ mutationFn: id => deleteAdminLesson({ courseId: course.id, id }), onSuccess: invalidate });
@@ -218,8 +357,12 @@ function LessonsManager({ course }) {
             <button onClick={()=>setOpenTranscript(t => t===l.id ? null : l.id)} className="text-[10px] font-semibold text-brand-600">
               {l.transcript ? 'transcript ✓' : 'add transcript'}
             </button>
+            <button onClick={()=>setOpenQuestions(q => q===l.id ? null : l.id)} className="text-[10px] font-semibold text-brand-600">
+              {openQuestions === l.id ? 'hide questions' : 'questions'}
+            </button>
             <button onClick={()=>{ if(confirm('Delete lesson?')) del.mutate(l.id); }} className="ml-auto text-[10px] font-bold text-slate-500 hover:text-red-600">Delete</button>
             {openTranscript === l.id && <TranscriptEditor lesson={l} onSave={patch} inp={inp} />}
+            {openQuestions === l.id && <QuestionsManager lesson={l} />}
           </div>
         ))}
       </div>

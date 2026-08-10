@@ -185,6 +185,8 @@ export const fetchLessonPlayback    = async ({ courseId, lessonId }) => { const 
 export const fetchMyVideoCourses    = async () => { const { data } = await api.get('/my/video-courses'); return data.data; };
 export const fetchLessonSummary     = async ({ courseId, lessonId }) => { const { data } = await api.get(`/video-courses/${courseId}/lessons/${lessonId}/summary`); return data.summary; };
 export const askLesson              = async ({ courseId, lessonId, question }) => { const { data } = await api.post(`/video-courses/${courseId}/lessons/${lessonId}/ask`, { question }); return data.answer; };
+// F3/F4/F5 — a structured whiteboard: steps, an optional bar diagram, an optional slider.
+export const explainLesson          = async ({ courseId, lessonId, topic }) => { const { data } = await api.post(`/video-courses/${courseId}/lessons/${lessonId}/explain`, { topic }); return data.board; };
 export const fetchAdminVideoCourses = async () => { const { data } = await api.get('/admin/video-courses'); return data.data; };
 export const createAdminVideoCourse = async (p) => { const { data } = await api.post('/admin/video-courses', p); return data; };
 export const updateAdminVideoCourse = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/video-courses/${id}`, p); return data; };
@@ -299,3 +301,8 @@ export const fetchAdminLessons      = async (courseId) => { const { data } = awa
 export const createAdminLesson      = async ({ courseId, ...p }) => { const { data } = await api.post(`/admin/video-courses/${courseId}/lessons`, p); return data; };
 export const updateAdminLesson      = async ({ courseId, id, ...p }) => { const { data } = await api.patch(`/admin/video-courses/${courseId}/lessons/${id}`, p); return data; };
 export const deleteAdminLesson      = async ({ courseId, id }) => { const { data } = await api.delete(`/admin/video-courses/${courseId}/lessons/${id}`); return data; };
+// F7 — question authoring. These admin routes are the only place answers travel.
+export const fetchAdminQuestions    = async (lessonId) => { const { data } = await api.get(`/admin/lessons/${lessonId}/questions`); return data.data; };
+export const createAdminQuestion    = async ({ lessonId, ...p }) => { const { data } = await api.post(`/admin/lessons/${lessonId}/questions`, p); return data.data; };
+export const updateAdminQuestion    = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/questions/${id}`, p); return data.data; };
+export const deleteAdminQuestion    = async (id) => { const { data } = await api.delete(`/admin/questions/${id}`); return data; };
