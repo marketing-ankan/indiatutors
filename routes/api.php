@@ -176,6 +176,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/teacher/profile',  [TeacherController::class, 'updateMine']);
     Route::get('/teacher/students', [TeacherController::class, 'students']);
     Route::get('/teacher/demos',    [TeacherController::class, 'demos']);
+    // E2 + E9 — "I cannot take this class on this date", resolved as a
+    // substitute or as an online class against the teacher's monthly allowance.
+    Route::get('/teacher/online-allowance',                          [TeacherController::class, 'onlineAllowance']);
+    Route::post('/teacher/enrollments/{enrollment}/absence',         [TeacherController::class, 'reportAbsence']);
     Route::post('/teacher/demos/{demoRequest}/slots',                [TeacherController::class, 'proposeDemoSlot']);
     Route::patch('/teacher/demos/{demoRequest}/slots/{slot}/withdraw',[TeacherController::class, 'withdrawDemoSlot']);
     Route::get('/teacher/enrollments/{enrollment}/logs',  [TeacherController::class, 'classLogs']);
@@ -219,6 +223,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/students',                          [AdminStudentController::class, 'index']);
         Route::patch('/students/{student}',              [AdminStudentController::class, 'update']);
         Route::get('/enrollments',                       [AdminController::class, 'enrollments']);
+        // E2 — cover that the system could not arrange, plus the override.
+        Route::get('/class-absences',                    [AdminController::class, 'classAbsences']);
+        Route::patch('/class-absences/{absence}',        [AdminController::class, 'updateClassAbsence']);
         // C4 — the weekly timetable that follows a converted demo.
         Route::post('/enrollments/{enrollment}/schedule',            [AdminController::class, 'addEnrollmentSchedule']);
         Route::delete('/enrollments/{enrollment}/schedule/{schedule}',[AdminController::class, 'removeEnrollmentSchedule']);

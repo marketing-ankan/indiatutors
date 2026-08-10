@@ -9,6 +9,7 @@ use App\Http\Resources\EnrollmentResource;
 use App\Http\Resources\TeacherProfileResource;
 use App\Models\AppNotification;
 use App\Models\AuditLog;
+use App\Models\ClassAbsence;
 use App\Models\ClassLog;
 use App\Models\Course;
 use App\Models\CourseProposal;
@@ -23,6 +24,7 @@ use App\Models\TeacherApplication;
 use App\Models\User;
 use App\Models\TeacherProfile;
 use App\Models\Tutor;
+use App\Support\SubstituteFinder;
 use App\Support\TeacherPerformance;
 use App\Support\TutorMatcher;
 use Illuminate\Http\Request;
@@ -334,6 +336,88 @@ class AdminController extends Controller {
             'Enrolment #' . $enrollment->id, ['weekday' => $schedule->weekday, 'start_time' => $schedule->start_time]);
 
         return new EnrollmentResource($enrollment->fresh()->load(['student:id,name', 'tutor:id,name,slug', 'course:id,name,slug', 'schedules']));
+    }
+
+    /**
+     * Classes whose teacher called in absent (E2), newest first.
+     *
+     * The owner's mandate is that this list should be nearly empty: the system
+     * assigns cover automatically and a coordinator steps in by exception. So
+     * the default view is the exceptions — `requested` and `uncovered` — and
+     * `?all=1` shows everything, including what resolved itself. Each row
+     * carries the ranked candidates, so an override is a choice from the same
+     * shortlist the system used rather than a fresh manual search.
+     */
+    public function classAbsences(Request $request) {
+        $q = ClassAbsence::query()
+            ->with(['enrollment.student:id,name', 'enrollment.course:id,name', 'originalTutor:id,name', 'substitute:id,name'])
+            ->upcoming()
+            ->orderBy('occurs_on');
+
+        if (! $request->boolean('all')) {
+            $q->needsAttention();
+        }
+
+        $rows = $q->limit(50)->get();
+
+        return response()->json([
+            'data' => $rows->map(fn (ClassAbsence $a) => [
+                'id'            => $a->id,
+                'occurs_on'     => $a->occurs_on->toDateString(),
+                'start_time'    => substr((string) $a->start_time, 0, 5),
+                'student'       => $a->enrollment?->student?->name,
+                'course'        => $a->enrollment?->course?->name,
+                'original'      => $a->originalTutor?->only(['id', 'name']),
+                'substitute'    => $a->substitute?->only(['id', 'name']),
+                'status'        => $a->status,
+                'reason'        => $a->reason,
+                'auto_assigned' => $a->auto_assigned,
+                // Only for rows a human has to act on — computing a shortlist
+                // for every settled row would be wasted work.
+                'candidates'    => in_array($a->status, ['requested', 'uncovered'], true)
+                    ? collect(SubstituteFinder::candidatesFor($a))
+                        ->map(fn ($c) => ['id' => $c['tutor']->id, 'name' => $c['tutor']->name, 'why' => $c['why']])->all()
+                    : [],
+            ])->all(),
+            'meta' => ['count' => $rows->count()],
+        ]);
+    }
+
+    /**
+     * Coordinator override: name the substitute yourself, or cancel the class.
+     *
+     * `auto_assigned` is set false here, which is the point — it is how we can
+     * later ask "how often does the automation actually hold?" rather than
+     * assuming it does.
+     */
+    public function updateClassAbsence(Request $request, ClassAbsence $absence) {
+        $data = $request->validate([
+            'substitute_tutor_id' => 'nullable|integer|exists:tutors,id',
+            'status'              => 'nullable|in:covered,uncovered,cancelled',
+        ]);
+
+        abort_if(
+            ($data['status'] ?? null) === 'covered' && empty($data['substitute_tutor_id']) && ! $absence->substitute_tutor_id,
+            422, 'Choose a substitute teacher before marking this covered.'
+        );
+        abort_if(
+            ($data['substitute_tutor_id'] ?? null) && (int) $data['substitute_tutor_id'] === (int) $absence->original_tutor_id,
+            422, 'That is the teacher who reported the absence.'
+        );
+
+        $absence->update(array_filter([
+            'substitute_tutor_id' => $data['substitute_tutor_id'] ?? $absence->substitute_tutor_id,
+            'status'              => $data['status'] ?? ($data['substitute_tutor_id'] ?? null ? 'covered' : $absence->status),
+        ]) + [
+            'auto_assigned' => false,
+            'decided_by'    => $request->user()->id,
+            'resolved_at'   => now(),
+        ]);
+
+        AuditLog::record('class_absence_override', 'enrollment', $absence->enrollment_id,
+            'Class on ' . $absence->occurs_on->toDateString(), $data);
+
+        return response()->json(['message' => 'Updated.', 'data' => ['id' => $absence->id, 'status' => $absence->fresh()->status]]);
     }
 
     /** Convert a demo request into an enrollment (student + tutor + course). */

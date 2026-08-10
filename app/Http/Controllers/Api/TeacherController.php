@@ -15,7 +15,10 @@ use App\Models\CurriculumItem;
 use App\Models\DemoRequest;
 use App\Models\DemoSlotProposal;
 use App\Models\Enrollment;
+use App\Models\ClassAbsence;
 use App\Models\RescheduleRequest;
+use App\Support\OnlineAllowance;
+use App\Support\SubstituteAssigner;
 use App\Support\TeacherProfilePublisher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -152,6 +155,86 @@ class TeacherController extends Controller {
         );
 
         return response()->json(['message' => 'Time proposed. The family will be asked to confirm.'], 201);
+    }
+
+    /**
+     * "I cannot take this class on this date."
+     *
+     * One entry point for both of the owner's features, because they are one
+     * event with two resolutions: a substitute covers it (E2) or the teacher
+     * takes it online instead (E9, spending their monthly allowance).
+     *
+     * The automation mandate is that this resolves itself — the coordinator is
+     * the exception, not the router. So a substitute request is matched and
+     * assigned immediately; only a genuinely empty candidate list becomes
+     * `uncovered` and reaches a human.
+     */
+    public function reportAbsence(Request $request, Enrollment $enrollment) {
+        $tutor = $this->tutorFor($request);
+        abort_if(! $tutor || $enrollment->tutor_id !== $tutor->id, 403, 'This class is not yours.');
+
+        $data = $request->validate([
+            'occurs_on'  => 'required|date|after_or_equal:today',
+            'resolution' => 'required|in:substitute,online',
+            'reason'     => 'nullable|string|max:300',
+        ]);
+
+        $date = \Illuminate\Support\Carbon::parse($data['occurs_on'])->startOfDay();
+
+        // The class must actually be in the standing timetable that day, or
+        // there is nothing to be absent from.
+        $slot = $enrollment->schedules()->active()->where('weekday', $date->dayOfWeekIso)->first();
+        abort_if(! $slot, 422, 'There is no class scheduled for this enrolment on that day.');
+
+        abort_if(
+            ClassAbsence::where('enrollment_id', $enrollment->id)->whereDate('occurs_on', $date->toDateString())->exists(),
+            422, 'You have already reported this class.'
+        );
+
+        $absence = ClassAbsence::create([
+            'enrollment_id'          => $enrollment->id,
+            'enrollment_schedule_id' => $slot->id,
+            'occurs_on'              => $date->toDateString(),
+            'start_time'             => $slot->start_time,
+            'original_tutor_id'      => $tutor->id,
+            'status'                 => 'requested',
+            'reason'                 => $data['reason'] ?? null,
+        ]);
+
+        if ($data['resolution'] === 'online') {
+            $quota = OnlineAllowance::forTutor($tutor->id, $date);
+            if (! $quota['eligible']) {
+                $absence->delete();
+                abort(422, 'Your classes are already online — there is nothing to move.');
+            }
+            if ($quota['remaining'] < 1) {
+                $absence->delete();
+                abort(422, "You have used all {$quota['allowed']} online classes for this month. Request a substitute instead.");
+            }
+            $absence->update(['status' => 'online', 'resolved_at' => now()]);
+            self::notifyFamily($enrollment, 'Your class will be held online',
+                $date->toFormattedDayDateString() . ' will be taken online by your usual teacher.');
+
+            return response()->json([
+                'message' => 'Class moved online. ' . ($quota['remaining'] - 1) . ' of your ' . $quota['allowed'] . ' online classes left this month.',
+            ], 201);
+        }
+
+        return response()->json(SubstituteAssigner::resolve($absence), 201);
+    }
+
+    /** What this teacher has left of their 25%-per-month online allowance (E9). */
+    public function onlineAllowance(Request $request) {
+        $tutor = $this->tutorFor($request);
+        abort_unless($tutor, 403, 'Teacher accounts only.');
+        return response()->json(['data' => OnlineAllowance::forTutor($tutor->id)]);
+    }
+
+    private static function notifyFamily(Enrollment $enrollment, string $title, string $body): void {
+        $userId = $enrollment->student?->user_id;
+        if ($userId) {
+            AppNotification::send($userId, 'class_absence', $title, $body);
+        }
     }
 
     /** Withdraw a slot you proposed and no longer want to hold. */

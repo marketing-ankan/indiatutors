@@ -228,11 +228,21 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
 recorded here in his own terms so the next reader does not re-guess them.*
 
 - ⬜ **E1. Marketing — free plans + incentives.** 🚫 **Owner: "decided later."** Not a build item yet.
-- ⬜ **E2. Backup classes — a substitute-teacher system.** *Not "extra classes for the student", which is
-  how the two words read.* After enrolment, **if the allotted teacher is not available**, that student —
-  or the whole group — is assigned **another teacher**, chosen on **demand and teacher availability**.
-  Depends on: `enrollment_schedules` (C4, what the class *should* be), the availability slots A2 now
-  publishes, and `TutorMatcher`. Needs the mechanics settled first — see the open questions below.
+- 🔨 **E2. Backup classes — a substitute-teacher system.** *Stage 5 — built, awaiting owner sign-off.*
+  *Not "extra classes for the student", which is how the two words read.* When the allotted teacher is
+  not available, another teacher covers — chosen on demand and availability.
+  **Owner, 2026-08-10: "substitute is for that one class only."** So it is a dated deviation
+  (`class_absences`) and never touches `enrollment_schedules`; the original teacher returns next week.
+  **This is the first place the platform ASSIGNS rather than suggests** — the direction change above.
+  Three things make that defensible: it is scoped to one lesson (a wrong pick costs one class and
+  self-corrects), `auto_assigned` + an audit row make "is the automation actually right?" answerable,
+  and an empty candidate list becomes `uncovered` for a human instead of silently picking the
+  least-bad option.
+  A candidate must clear three gates: *can* they teach it (subject overlap — falling back to the
+  original teacher's subjects, because plenty of enrolments carry no `course_id`), *are they free*
+  (inside declared availability, not already teaching that slot, not absent themselves, not on a
+  break), and only then *are they good* (`TeacherPerformance` breaks ties). The free-check is what
+  makes it trustworthy: offering someone already teaching at 4pm is worse than offering nobody.
 - ⬜ **E3. Materials — full access.** *Content source is WinQuest.*
 - ⬜ **E4. Teacher materials.** *WinQuest.*
 - ⬜ **E5. Terms & conditions.** *Policy pages exist; entity name still pending.*
@@ -245,8 +255,15 @@ recorded here in his own terms so the next reader does not re-guess them.*
   **offline/physical** classes may take a class **online** when they cannot attend in person, capped at
   **25% of the classes they are required to take**. The owner's words: *"something like leaves, but not
   exactly leaves."* So it is a per-teacher quota measured against their own class obligation, spent one
-  class at a time, and presumably visible to the family (an online class is a different thing to buy
-  than a home visit). Counting period is an open question below.
+  class at a time.
+  **Owner, 2026-08-10: the period is PER CALENDAR MONTH.** *Stage 5 — built, awaiting sign-off.*
+  Shares the `class_absences` trigger with E2, because both answer the same event ("I cannot take this
+  class") with different resolutions.
+  **The denominator is the obligation, not the attendance** — computed from the standing timetable, not
+  `class_logs`. Counting what actually happened would make the allowance shrink each time it is spent:
+  take a class online, teach one fewer in person, and the 25% ceiling drops with it.
+  Only teachers who visit homes are eligible; an online-only teacher has no travel to be relieved of,
+  so the option is never offered rather than offered and then confusingly refused.
 
 ## F. Video courses — AI tutor player (bottom of the page)
 
