@@ -90,6 +90,33 @@ class VideoCourseController extends Controller {
     }
 
     /**
+     * F3 + F4 + F5 — explain a topic on the board.
+     *
+     * Same entitlement and transcript gates as ask(): a board is a generated
+     * answer like any other, and it must not become a way to mine a paid
+     * lesson without buying it.
+     */
+    public function explain(Request $request, VideoCourse $videoCourse, VideoLesson $lesson) {
+        abort_unless($lesson->video_course_id === $videoCourse->id, 404);
+        if (!$this->lessonUnlocked($request, $videoCourse, $lesson)) {
+            return response()->json(['message' => 'Purchase this course to use the study assistant.'], 403);
+        }
+        if (!CourseAi::enabledForLesson($lesson->transcript)) {
+            return response()->json(['message' => 'The study assistant isn\'t available for this lesson yet.'], 404);
+        }
+
+        $data  = $request->validate(['topic' => 'required|string|min:3|max:300']);
+        $board = CourseAi::explain($lesson->transcript, $lesson->title, $data['topic']);
+
+        // null covers both "provider failed" and "the lesson does not cover
+        // this" — the student gets an honest sentence either way rather than a
+        // board of invented steps.
+        return $board === null
+            ? response()->json(['message' => 'I could not build a board for that from this lesson. Try asking about something the lesson covers.'], 422)
+            : response()->json(['board' => $board]);
+    }
+
+    /**
      * Study assistant: a recap of the lesson. Generated once and stored, so the
      * cost is one call per lesson for its lifetime rather than one per viewer.
      */

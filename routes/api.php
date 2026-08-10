@@ -85,6 +85,8 @@ Route::post('/video-courses/{videoCourse}/lessons/{lesson}/playback', [VideoCour
 // so this is the cost ceiling as much as it is abuse protection.
 Route::post('/video-courses/{videoCourse}/lessons/{lesson}/ask',     [VideoCourseController::class, 'ask'])->middleware('throttle:10,1');
 Route::get('/video-courses/{videoCourse}/lessons/{lesson}/summary',  [VideoCourseController::class, 'summary'])->middleware('throttle:20,1');
+// F3/F4/F5 — a structured board. Same cost per call as ask(), same throttle.
+Route::post('/video-courses/{videoCourse}/lessons/{lesson}/explain', [VideoCourseController::class, 'explain'])->middleware('throttle:10,1');
 
 // Public physical-tuition endpoints. EnsurePhysicalSchema guards every route
 // that touches these tables: this host has a documented habit of killing the

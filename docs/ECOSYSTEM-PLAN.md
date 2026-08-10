@@ -326,10 +326,20 @@ recorded here in his own terms so the next reader does not re-guess them.*
   the R2 `<video>` directly and YouTube/Bunny by postMessage. Voice uses the browser`s own
   SpeechRecognition (en-IN): no audio reaches our servers, only the text, exactly as if typed. The mic
   button does not render where the API is absent (Firefox) rather than sitting there dead.
-- ⬜ **F3. AI explains on a board.**
-- ⬜ **F4. Presentations + live examples + diagrams.**
-- ⬜ **F5. Openable diagram → simulator.**
-- ⬜ **F6. End → continue; ask any question.**
+- 🔨 **F3. AI explains on a board.** *Built 2026-08-10.* A validated STRUCTURED board (headline,
+  numbered steps, optional formula chips) — never model-authored markup, which in a page children use
+  is both an XSS surface and a layout lottery.
+- 🔨 **F4. Presentations + live examples + diagrams.** *Built 2026-08-10.* The board carries an
+  optional bar diagram, drawn by us from numbers the model supplies. Emitted only when the lesson
+  genuinely compares quantities; otherwise omitted rather than invented.
+- 🔨 **F5. Openable diagram → simulator.** *Built 2026-08-10, narrow but real.* A slider bound to a
+  one-variable arithmetic expression, evaluated by a hand-written shunting-yard parser — **no `eval`,
+  no `new Function`**, because the expression comes from a language model. Whitelisted server-side and
+  again in the browser, so a change on one side cannot quietly unlock the other. 18 unit cases pass,
+  including `alert(1)` and `x; window.x=1` returning null.
+- 🔨 **F6. End → continue; ask any question.** *Built 2026-08-10.* On video end: continue to the next
+  UNLOCKED lesson (never onto a padlock), or jump to the assistant. Nothing auto-advances — that would
+  drag a confused student past the thing that confused them.
 - 🔨 **F7. Question bank, Levels 1–3.** *Stage 5 — built, awaiting sign-off.*
 - 🔨 **F8. Weak-area detection with score thresholds (60% / 80% / 90%).** *Stage 5 — built, awaiting sign-off.*
 

@@ -26,6 +26,7 @@ export default function VideoCourseDetailPage() {
   const lessons = data?.lessons ?? [];
   const firstPlayable = lessons.find(l => l.unlocked);
   const [activeId, setActiveId] = useState(null);
+  const [ended, setEnded] = useState(false);
 
   // F2 "stop & ask": the moment a student engages the assistant, the video
   // stops talking over them. One function covers every provider we embed —
@@ -46,6 +47,10 @@ export default function VideoCourseDetailPage() {
     });
   }, []);
   useEffect(() => { if (firstPlayable && activeId == null) setActiveId(firstPlayable.id); }, [firstPlayable, activeId]);
+  // Clear the finished banner whenever the lesson changes — including a switch
+  // from the playlist, not just the Continue button, or it would hang over a
+  // video the student has only just started.
+  useEffect(() => { setEnded(false); }, [activeId]);
 
   if (isLoading) return <div className="container-wide py-20 text-slate-500">Loading course…</div>;
   if (isError || !data?.data) return (
@@ -58,6 +63,9 @@ export default function VideoCourseDetailPage() {
   const course = data.data;
   const owned = course.owned;
   const active = lessons.find(l => l.id === activeId);
+  // The next lesson they can actually watch — skipping locked ones, so
+  // "Continue" never lands on a padlock.
+  const nextPlayable = lessons.slice(lessons.findIndex(l => l.id === activeId) + 1).find(l => l.unlocked);
   const previews = lessons.filter(l => l.is_preview).length;
 
   const buy = () => {
@@ -78,7 +86,7 @@ export default function VideoCourseDetailPage() {
           {active?.playback && active.playback_kind === 'video' ? (
             // R2 serves a bare presigned MP4, so we supply the controls: speed,
             // ±10s and keyboard shortcuts. iframe providers keep their own.
-            <LessonPlayer src={active.playback} title={active.title} lessonId={active.id} />
+            <LessonPlayer src={active.playback} title={active.title} lessonId={active.id} onEnded={() => setEnded(true)} />
           ) : (
             <div className="overflow-hidden rounded-2xl bg-black shadow-lg">
               <div className="aspect-video">
@@ -100,8 +108,35 @@ export default function VideoCourseDetailPage() {
           )}
           {active && <h2 className="font-heading mt-4 text-xl font-extrabold text-[#0B1220]">{active.title}</h2>}
 
+          {/* F6 — the end of a lesson is a fork, not a dead stop: carry on, or
+              ask about what you just watched. Both offered, neither assumed;
+              auto-advancing would drag a confused student past the thing that
+              confused them. */}
+          {ended && active && (
+            <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-brand-100 bg-brand-50/50 p-4">
+              <CheckCircle2 className="h-5 w-5 shrink-0 text-brand-600" />
+              <p className="min-w-0 flex-1 text-sm font-semibold text-[#0B1220]">
+                Finished “{active.title}”. {nextPlayable ? 'Ready for the next one?' : 'That is the last lesson in this course.'}
+              </p>
+              {nextPlayable && (
+                <button onClick={() => { setEnded(false); setActiveId(nextPlayable.id); }}
+                  className="rounded-full bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-[#0B1220]">
+                  Continue → {nextPlayable.title.length > 28 ? nextPlayable.title.slice(0, 28) + '…' : nextPlayable.title}
+                </button>
+              )}
+              {active.has_ai && (
+                <button onClick={() => { setEnded(false); document.getElementById('lesson-assistant')?.scrollIntoView({ behavior: 'smooth' }); }}
+                  className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-brand-700 ring-1 ring-brand-200 hover:bg-brand-50">
+                  Ask anything about it
+                </button>
+              )}
+            </div>
+          )}
+
           {active?.has_ai && (
-            <LessonAssistant courseId={course.id} lessonId={active.id} lessonTitle={active.title} onEngage={pauseActiveVideo} />
+            <div id="lesson-assistant">
+              <LessonAssistant courseId={course.id} lessonId={active.id} lessonTitle={active.title} onEngage={pauseActiveVideo} />
+            </div>
           )}
 
           <div className="mt-6">

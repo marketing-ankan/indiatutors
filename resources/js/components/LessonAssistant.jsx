@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Sparkles, Send, Loader2, Mic, MicOff } from 'lucide-react';
-import { askLesson, fetchLessonSummary } from '../lib/api.js';
+import { Sparkles, Send, Loader2, Mic, MicOff, PenLine } from 'lucide-react';
+import { askLesson, fetchLessonSummary, explainLesson } from '../lib/api.js';
+import LessonBoard from './LessonBoard.jsx';
 
 // Study assistant for one lesson: a cached recap, plus questions answered from
 // that lesson's transcript. Rendered only when the API reports has_ai — which
@@ -54,10 +55,27 @@ export default function LessonAssistant({ courseId, lessonId, lessonTitle, onEng
     },
   });
 
+  // F3/F4/F5 — the same question, worked through on a board instead of in
+  // prose. Shares the thread so a student sees one conversation, not two tools.
+  const explain = useMutation({
+    mutationFn: t => explainLesson({ courseId, lessonId, topic: t }),
+    onSuccess: (board, t) => {
+      setThread(x => [...x, { q: t, board }]);
+      setQuestion('');
+    },
+  });
+
+  const busy = ask.isPending || explain.isPending;
+
   const submit = e => {
     e.preventDefault();
     const q = question.trim();
-    if (q.length >= 3 && !ask.isPending) ask.mutate(q);
+    if (q.length >= 3 && !busy) ask.mutate(q);
+  };
+
+  const onBoard = () => {
+    const q = question.trim();
+    if (q.length >= 3 && !busy) explain.mutate(q);
   };
 
   // One recognition instance per mount; a fresh one per click leaks handlers.
@@ -129,7 +147,9 @@ export default function LessonAssistant({ courseId, lessonId, lessonTitle, onEng
       {thread.map((item, i) => (
         <div key={i} className="mt-4">
           <p className="text-sm font-bold text-[#0B1220]">{item.q}</p>
-          <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-slate-700">{item.answer}</p>
+          {item.board
+            ? <LessonBoard board={item.board} />
+            : <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-slate-700">{item.answer}</p>}
         </div>
       ))}
 
@@ -150,7 +170,16 @@ export default function LessonAssistant({ courseId, lessonId, lessonTitle, onEng
             {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
           </button>
         )}
-        <button type="submit" disabled={ask.isPending || question.trim().length < 3}
+        {/* Same question, two ways to receive it: a sentence, or worked through
+            on the board. Offered side by side because which one helps depends
+            on the child, not on the question. */}
+        <button type="button" onClick={onBoard} disabled={busy || question.trim().length < 3}
+          aria-label="Explain on the board"
+          title="Explain on the board"
+          className="shrink-0 rounded-full bg-slate-100 p-2.5 text-slate-600 transition hover:bg-slate-200 disabled:opacity-50">
+          {explain.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <PenLine className="h-4 w-4" />}
+        </button>
+        <button type="submit" disabled={busy || question.trim().length < 3}
           aria-label="Send question"
           className="shrink-0 rounded-full bg-brand-600 p-2.5 text-white transition hover:bg-[#0B1220] disabled:opacity-50">
           {ask.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
@@ -158,6 +187,7 @@ export default function LessonAssistant({ courseId, lessonId, lessonTitle, onEng
       </form>
       {voiceNote && <p className="mt-2 text-xs text-slate-500">{voiceNote}</p>}
       {ask.isError && <p className="mt-2 text-xs text-red-600">{errText(ask.error)}</p>}
+      {explain.isError && <p className="mt-2 text-xs text-red-600">{errText(explain.error)}</p>}
     </section>
   );
 }
