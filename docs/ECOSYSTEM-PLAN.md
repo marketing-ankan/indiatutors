@@ -224,15 +224,29 @@ Two independent signals feed the ranking: what students **say** (reviews) and wh
 
 ## E. Student offering & retention (left column of the page)
 
-- ⬜ **E1. Marketing — free plans + incentives.**
-- ⬜ **E2. Backup classes.**
+*Explained by the owner 2026-08-10. Several of these are not what the shorthand on the page suggested —
+recorded here in his own terms so the next reader does not re-guess them.*
+
+- ⬜ **E1. Marketing — free plans + incentives.** 🚫 **Owner: "decided later."** Not a build item yet.
+- ⬜ **E2. Backup classes — a substitute-teacher system.** *Not "extra classes for the student", which is
+  how the two words read.* After enrolment, **if the allotted teacher is not available**, that student —
+  or the whole group — is assigned **another teacher**, chosen on **demand and teacher availability**.
+  Depends on: `enrollment_schedules` (C4, what the class *should* be), the availability slots A2 now
+  publishes, and `TutorMatcher`. Needs the mechanics settled first — see the open questions below.
 - ⬜ **E3. Materials — full access.** *Content source is WinQuest.*
 - ⬜ **E4. Teacher materials.** *WinQuest.*
 - ⬜ **E5. Terms & conditions.** *Policy pages exist; entity name still pending.*
 - ⬜ **E6. Student contents.**
 - ⬜ **E7. Student achievements.**
-- ⬜ **E8. Certification.**
-- ⬜ **E9. Club — 25% online class.** *Needs the owner to explain the mechanic.*
+- ⬜ **E8. Certification.** Certificates for **some** courses. 🚫 **Owner: "we haven't decided about
+  certification"** — which courses, and what the certificate asserts, are open.
+- ⬜ **E9. 25% online allowance — a TEACHER entitlement, not a student club.**
+  The page's "Club — 25% online class" is not a membership tier. A teacher who normally teaches
+  **offline/physical** classes may take a class **online** when they cannot attend in person, capped at
+  **25% of the classes they are required to take**. The owner's words: *"something like leaves, but not
+  exactly leaves."* So it is a per-teacher quota measured against their own class obligation, spent one
+  class at a time, and presumably visible to the family (an online class is a different thing to buy
+  than a home visit). Counting period is an open question below.
 
 ## F. Video courses — AI tutor player (bottom of the page)
 
@@ -259,10 +273,51 @@ Not achievements of this plan — context so we don't rebuild what exists.
 - Video player + Gemini study assistant, shipped dark pending keys.
 - Pincode directory + geocoding with no maps API.
 
+## Direction change — 2026-08-10
+
+Two owner instructions that **supersede earlier decisions in this file**. Recorded loudly because both
+contradict something already built, and a future reader following the old rule would be wrong.
+
+### 1. Assignment becomes automatic, inside this website
+
+> *"This whole thing of automatically assigning of teachers to the students and the whole operation
+> will be automated inside the website. There will be options for the admin (coordinator) to intervene,
+> but make the system so solid that coordinators hardly get into it."*
+
+**This reverses the suggest-only boundary.** Until now the console deliberately *suggested and never
+assigned*, because assignment belonged to the leads-management software — the owner confirmed that
+choice explicitly on 2026-08-07, and `AdminPhysicalController::updateRequirement` still carries a
+docblock saying a second writer of `matched_profile_id` would be a second source of truth.
+
+That reasoning held only while another system owned the decision. It no longer does. The target is now:
+**the website assigns by default; a coordinator overrides by exception.** The parts already built are
+the right foundation — `TutorMatcher` and `TeacherMatcher` decide *who fits*, `TeacherPerformance`
+decides *who is good*, `enrollment_schedules` says *when the class is* — what is missing is the step
+that commits the choice, plus an audit trail and an override path so an intervention is cheap.
+
+*Not yet done, and not to be done silently: this needs the suggest-only docblocks retired and
+`matched_profile_id` given a legitimate second writer.*
+
+### 2. The old LMS is dead
+
+> *"Coordinators will do their job using the LMS. A new LMS will be made later. The previous LMS we made
+> and connected will not be in use."*
+
+⚠️ **Live consequence to deal with before it bites.** `App\Support\LmsLeadPush` still pushes every demo
+booking (`DemoRequestController:67`), contact ticket (`ContactController:48`) and tuition requirement
+(`TuitionRequirementController:137`) into that LMS. It is gated only on `LMS_BASE_URL` +
+`LMS_INTAKE_TOKEN` being set, so **wherever those are still configured it is still firing.**
+
+The failure mode is quiet and expensive: leads keep being delivered to a system nobody is watching, and
+the `lms_lead_no` stamp marks them as already pushed, so they look handled. Unset the two env vars to
+stop it (the code fails dark by design), and treat the intake contract as frozen until the new LMS
+exists. `docs/MATCHING-DATA-CONTRACT.md` describes the export for the *old* consumer.
+
 ## Boundaries to preserve
 
-- **The console suggests; it does not assign.** Only the key-authed `/api/matching/v1` write-back sets
-  `matched_profile_id`. Owner's decision, reaffirmed 2026-08-07.
+- ~~**The console suggests; it does not assign.**~~ **SUPERSEDED 2026-08-10** — see *Direction change*
+  above. Assignment moves into this website and becomes automatic, with coordinator override. The old
+  rule existed because another system owned the decision; it no longer does.
 - **Personal data stays gated.** Teacher and student home addresses and phones are why the export needs
   a key. Any new surface that exposes them needs the same deliberate gate.
 - **No invented social proof.** Reviews, testimonials and ratings must come from real, consented,
