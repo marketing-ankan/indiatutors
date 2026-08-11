@@ -101,25 +101,27 @@ export default function FindTutorsPage({ subjectOverride = '' }) {
       <div className="bg-white border-b border-slate-100 shadow-sm">
         <div className="container-wide py-3 flex flex-wrap items-center gap-2">
           <span className="text-xs font-extrabold tracking-widest text-slate-400 uppercase mr-1">Filter:</span>
-          <select value={subject} onChange={e=>setParam('subject', e.target.value)} className={inp}>
+          {/* The only cue was the visual "Filter:" span above, which no screen
+              reader or voice-control command can associate with these. */}
+          <select aria-label="Subject" value={subject} onChange={e=>setParam('subject', e.target.value)} className={inp}>
             <option value="">All Subjects</option>
             {(filters?.subjects ?? []).map(s=><option key={s} value={s}>{s}</option>)}
           </select>
-          <select value={board} onChange={e=>setBoard(e.target.value)} className={inp}>
+          <select aria-label="Board" value={board} onChange={e=>setBoard(e.target.value)} className={inp}>
             <option value="">All Boards</option>
             {BOARDS.map(b=><option key={b}>{b}</option>)}
           </select>
-          <select value={grade} onChange={e=>setGrade(e.target.value)} className={inp}>
+          <select aria-label="Grade" value={grade} onChange={e=>setGrade(e.target.value)} className={inp}>
             <option value="">All Grades</option>
             {GRADES.map(g=><option key={g}>{g}</option>)}
           </select>
-          <select value={mode} onChange={e=>setParam('mode', e.target.value)} className={inp}>
+          <select aria-label="Teaching mode" value={mode} onChange={e=>setParam('mode', e.target.value)} className={inp}>
             <option value="">Any Mode</option>
             <option value="online">Online</option>
             <option value="home">Home Tuition</option>
           </select>
-          <input value={cityQ} onChange={e=>setCityQ(e.target.value)} onKeyDown={e=>e.key==='Enter'&&applySearch()} placeholder="City (e.g. Kolkata)" className={inp + ' w-40'}/>
-          <input value={nameQ} onChange={e=>setNameQ(e.target.value)} onKeyDown={e=>e.key==='Enter'&&applySearch()} placeholder="Name or subject…" className={inp + ' w-44'}/>
+          <input aria-label="City" value={cityQ} onChange={e=>setCityQ(e.target.value)} onKeyDown={e=>e.key==='Enter'&&applySearch()} placeholder="City (e.g. Kolkata)" className={inp + ' w-40'}/>
+          <input aria-label="Tutor name or subject" value={nameQ} onChange={e=>setNameQ(e.target.value)} onKeyDown={e=>e.key==='Enter'&&applySearch()} placeholder="Name or subject…" className={inp + ' w-44'}/>
           <button onClick={applySearch} className="rounded-md bg-brand-700 text-white px-5 py-2 text-sm font-bold hover:bg-brand-800">Search</button>
         </div>
       </div>

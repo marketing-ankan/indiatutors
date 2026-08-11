@@ -76,7 +76,7 @@ function GroupCard({ c, open, onToggle }) {
           <div className="mt-5 flex flex-wrap gap-2.5">
             <Link to="/book-demo" className="inline-block rounded-[11px] bg-brand-600 px-[22px] py-3 text-center text-[0.92rem] font-bold text-white shadow-[0_6px_16px_rgba(30,64,175,.28)] transition hover:bg-brand-800 max-[560px]:w-full">Book a Free Demo</Link>
             <Link to={`/courses/${c.slug}`} className="inline-block rounded-[11px] border-[1.5px] border-brand-600 bg-white px-[22px] py-3 text-center text-[0.92rem] font-bold text-brand-600 transition hover:bg-[#F4F7FE] max-[560px]:w-full">View Details</Link>
-            <Link to="/plans" className="inline-block rounded-[11px] border-[1.5px] bg-white px-[22px] py-3 text-center text-[0.92rem] font-bold text-[#0B1220] transition hover:border-[#0B1220] max-[560px]:w-full" style={{ borderColor: LINE }}>Book Now</Link>
+            <Link to="/plans" className="inline-block rounded-[11px] border-[1.5px] bg-white px-[22px] py-3 text-center text-[0.92rem] font-bold text-[#0B1220] transition hover:border-[#0B1220] max-[560px]:w-full" style={{ borderColor: LINE }}>See Plans & Pricing</Link>
           </div>
         </div>
       )}
@@ -100,8 +100,11 @@ export default function GroupClassesPage() {
           <h1 className="font-heading mb-3 text-[1.9rem] font-extrabold leading-[1.08] min-[561px]:text-[2.5rem]">Learn Together, Grow Faster</h1>
           <p className="mb-[22px] text-[1.05rem] leading-relaxed text-[#cbd5e1]">Expert-led small-group sessions — structured curriculum, peer learning and friendly competition, at affordable group pricing.</p>
           <div className="flex flex-wrap gap-3">
-            <Link to="/plans" className="rounded-[11px] bg-[#D4AF37] px-[22px] py-3 text-[0.92rem] font-bold text-[#0B1220] shadow-[0_8px_20px_rgba(212,175,55,.3)] transition hover:brightness-105">🚀 Book Now</Link>
-            <Link to="/book-demo" className="rounded-[11px] border-[1.5px] border-white/60 px-[22px] py-3 text-[0.92rem] font-bold text-white transition hover:bg-white/[.12]">🎯 Book a Free Demo</Link>
+            {/* Gold goes on the demo, as it does in every other hero on the site
+                (VideoCourses, Landing, Courses). It was on a link to the price
+                list, leaving the actual conversion action as the outline button. */}
+            <Link to="/book-demo" className="rounded-[11px] bg-[#D4AF37] px-[22px] py-3 text-[0.92rem] font-bold text-[#0B1220] shadow-[0_8px_20px_rgba(212,175,55,.3)] transition hover:brightness-105">🎯 Book a Free Demo</Link>
+            <Link to="/plans" className="rounded-[11px] border-[1.5px] border-white/60 px-[22px] py-3 text-[0.92rem] font-bold text-white transition hover:bg-white/[.12]">See Plans & Pricing</Link>
           </div>
         </div>
       </section>

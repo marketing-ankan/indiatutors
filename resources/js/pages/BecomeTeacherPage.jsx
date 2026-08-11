@@ -184,7 +184,12 @@ function ApplyForm() {
 
       <label className="flex items-start gap-2.5 text-sm text-slate-600">
         <input type="checkbox" checked={terms} onChange={(e) => setTerms(e.target.checked)} className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500" />
-        <span>I agree to the <a href="/terms-conditions" className="font-semibold text-brand-600 hover:underline">Terms &amp; Conditions</a> and <a href="/privacy-policy" className="font-semibold text-brand-600 hover:underline">Privacy Policy</a>, and consent to being contacted about my application.</span>
+        {/* target=_blank, not a same-tab load: this form holds the CV File, the
+            availability grid and the address with no localStorage persistence,
+            so navigating away destroyed a part-filled application — and Back
+            cannot restore a File at all. It punished exactly the applicants who
+            read the terms. */}
+        <span>I agree to the <a href="/terms-conditions" target="_blank" rel="noopener noreferrer" className="font-semibold text-brand-600 hover:underline">Terms &amp; Conditions</a> and <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="font-semibold text-brand-600 hover:underline">Privacy Policy</a>, and consent to being contacted about my application.</span>
       </label>
 
       {status.state === 'error' && <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-red-100">{status.message}</p>}

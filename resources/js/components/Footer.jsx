@@ -72,7 +72,10 @@ export default function Footer() {
 
   return (
     <footer className="bg-slate-900 text-slate-300 print:hidden">
-      <div className="container-wide py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] gap-10">
+      {/* A lg:grid-cols-3 step before the 5-track layout: jumping 2→5 at exactly
+          1024px gave each of the last four tracks 121.5px, in which "Learn &
+          Discover" wrapped to two lines and most links wrapped. */}
+      <div className="container-wide py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] gap-10">
         {/* BRAND + CONTACT + NEWSLETTER */}
         <div>
           <div className="text-xl font-extrabold text-white">IndiaTutors<span className="text-brand-400">Online</span></div>
@@ -95,13 +98,20 @@ export default function Footer() {
             {subscribe.isSuccess ? (
               <p className="text-sm text-green-400 font-semibold">✅ Subscribed — see you in your inbox!</p>
             ) : (
-              <form onSubmit={e=>{e.preventDefault(); if(email) subscribe.mutate();}} className="flex">
-                <input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="Your email address"
-                  className="min-w-0 flex-1 rounded-l-md bg-slate-800 ring-1 ring-slate-700 px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-brand-500"/>
-                <button disabled={subscribe.isPending} className="rounded-r-md bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-500 disabled:opacity-60">
-                  {subscribe.isPending ? '…' : 'Subscribe'}
-                </button>
-              </form>
+              <>
+                <form onSubmit={e=>{e.preventDefault(); if(email) subscribe.mutate();}} className="flex">
+                  <input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="Your email address"
+                    className="min-w-0 flex-1 rounded-l-md bg-slate-800 ring-1 ring-slate-700 px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-brand-500"/>
+                  <button disabled={subscribe.isPending} className="rounded-r-md bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-500 disabled:opacity-60">
+                    {subscribe.isPending ? '…' : 'Subscribe'}
+                  </button>
+                </form>
+                {/* Without this the button just re-enabled with the address still
+                    typed, which reads as "nothing happened" rather than "failed". */}
+                {subscribe.isError && (
+                  <p className="mt-2 text-xs text-red-400">Could not subscribe — please try again.</p>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -147,13 +157,13 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-slate-800">
-        <div className="container-wide py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <div className="container-wide py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
           <span>© {new Date().getFullYear()} Indiatutors Online. All rights reserved. Made with ❤️ in India.</span>
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
-            <Link to="/terms-conditions" className="hover:text-slate-300">Terms</Link>
-            <Link to="/payment-refund-policy" className="hover:text-slate-300">Payment & Refund</Link>
-            <Link to="/refer-earn-policy" className="hover:text-slate-300">Refer & Earn</Link>
-            <Link to="/privacy-policy" className="hover:text-slate-300">Privacy</Link>
+            <Link to="/terms-conditions" className="hover:text-white">Terms</Link>
+            <Link to="/payment-refund-policy" className="hover:text-white">Payment & Refund</Link>
+            <Link to="/refer-earn-policy" className="hover:text-white">Refer & Earn</Link>
+            <Link to="/privacy-policy" className="hover:text-white">Privacy</Link>
           </div>
         </div>
       </div>
