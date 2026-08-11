@@ -83,7 +83,10 @@ function CourseAccordion({ c, open, onToggle }) {
             </ul>
           </div>
           <div>
-            <div className="grid sm:grid-cols-3 gap-2.5">
+            {/* Two nested lg: column splits above this leave each box ~72px of
+                content at 1024px, while "Intermediate" renders 87px and cannot
+                break — so it spilled over its neighbour up to 1127px. */}
+            <div className="grid gap-2.5 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
               {LEVELS.map(lvl => (
                 <div key={lvl} className="rounded-xl ring-1 ring-slate-100 bg-slate-50 p-3">
                   <p className="font-bold text-sm text-slate-800">{lvl}</p>
@@ -152,8 +155,10 @@ export default function CoursesPage() {
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">All The Courses You Need In One Place</h1>
           <p className="mt-3 text-slate-300 max-w-2xl leading-relaxed">Live 1:1 and group classes across academics, coding, music, dance, languages and competitive exams — taught by expert tutors.</p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link to="/book-demo" className="rounded-xl bg-[#D4AF37] text-[#0B1220] px-6 py-3 text-sm font-bold shadow-lg shadow-[#D4AF37]/30 hover:brightness-105">🚀 Book Now</Link>
-            <Link to="/book-demo" className="rounded-xl border border-white/60 px-6 py-3 text-sm font-bold hover:bg-white/10">🎯 Book a Free Demo</Link>
+            {/* These two carried different labels and pointed at the same route,
+                so the pair read as a choice that wasn't one. */}
+            <Link to="/book-demo" className="rounded-xl bg-[#D4AF37] text-[#0B1220] px-6 py-3 text-sm font-bold shadow-lg shadow-[#D4AF37]/30 hover:brightness-105">🎯 Book a Free Demo</Link>
+            <Link to="/plans" className="rounded-xl border border-white/60 px-6 py-3 text-sm font-bold hover:bg-white/10">See Plans & Pricing</Link>
           </div>
         </section>
 

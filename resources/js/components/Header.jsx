@@ -155,7 +155,11 @@ export default function Header() {
               onError={e=>{ e.currentTarget.style.display='none'; e.currentTarget.nextSibling.style.display='flex'; }}/>
             <span className="text-xl font-extrabold tracking-tight" style={{display:'none'}}>Indiatutors <span className="text-brand-600">Online</span></span>
           </Link>
-          <nav className="hidden lg:flex items-center gap-3 xl:gap-6">
+          {/* xl, not lg: between 1024 and ~1150px this nav pushed the row 127px
+              wide, and the header carries [overflow-x:clip] so there was no
+              scrollbar to recover the burger or half of "Book Free Demo". The
+              burger below is xl:hidden, so the two now hand over at one width. */}
+          <nav className="hidden xl:flex items-center gap-6">
             {primaryNav.map(n => (
               <NavLink key={n.to} to={n.to} className={({isActive})=>`text-sm font-medium whitespace-nowrap ${isActive?'text-brand-600':'text-slate-700 hover:text-brand-600'}`}>{n.label}</NavLink>
             ))}
@@ -163,11 +167,11 @@ export default function Header() {
           <div className="flex items-center gap-2">
             {showSearch ? (
               <form onSubmit={onSearch} className="flex items-center gap-2">
-                <input autoFocus value={sq} onChange={e=>setSq(e.target.value)} placeholder="Search courses…" className="w-44 rounded-md ring-1 ring-slate-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"/>
-                <button type="button" onClick={()=>setShowSearch(false)} className="p-1.5 text-slate-500"><X className="h-4 w-4"/></button>
+                <input autoFocus aria-label="Search courses" value={sq} onChange={e=>setSq(e.target.value)} placeholder="Search courses…" className="w-44 rounded-md ring-1 ring-slate-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"/>
+                <button type="button" aria-label="Close search" onClick={()=>setShowSearch(false)} className="p-1.5 text-slate-500"><X className="h-4 w-4"/></button>
               </form>
             ):(
-              <button onClick={()=>setShowSearch(true)} className="p-2 text-slate-600 hover:text-brand-600 hidden md:inline-flex"><Search className="h-5 w-5"/></button>
+              <button aria-label="Search courses" onClick={()=>setShowSearch(true)} className="p-2 text-slate-600 hover:text-brand-600 hidden md:inline-flex"><Search className="h-5 w-5"/></button>
             )}
             <HeaderIcon to="/wishlist" label={`Wishlist (${wishItems.length})`} count={wishItems.length} Icon={Heart} />
             <HeaderIcon to="/cart" label={`Cart (${cartItems.length})`} count={cartItems.length} Icon={ShoppingCart} />
@@ -177,7 +181,7 @@ export default function Header() {
               ? <Link to="/dashboard" className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"><LayoutDashboard className="h-4 w-4"/>Dashboard</Link>
               : <Link to="/login" className="hidden sm:inline-flex rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Login</Link>}
             <Link to="/book-demo" className="rounded-md bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-700 whitespace-nowrap">Book Free Demo</Link>
-            <button className="xl:hidden p-2" onClick={()=>setOpen(!open)}>{open?<X className="h-6 w-6"/>:<Menu className="h-6 w-6"/>}</button>
+            <button className="xl:hidden p-2" aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} aria-controls="mobile-menu" onClick={()=>setOpen(!open)}>{open?<X className="h-6 w-6"/>:<Menu className="h-6 w-6"/>}</button>
           </div>
         </div>
       </div>
@@ -191,7 +195,7 @@ export default function Header() {
         </div>
       </div>
       {open && (
-        <div className="xl:hidden border-t border-slate-100 bg-white">
+        <div id="mobile-menu" className="xl:hidden border-t border-slate-100 bg-white">
           <div className="container-wide py-4 space-y-1">
             {[...primaryNav, ...CATALOG_NAV.slice(1).map(n => ({ to: n.to, label: n.label }))].map(n => (
               <NavLink key={n.to+n.label} to={n.to} onClick={()=>setOpen(false)} className={({isActive})=>`block rounded-md px-3 py-2 text-sm font-medium ${isActive?'bg-brand-50 text-brand-600':'text-slate-800 hover:bg-slate-50'}`}>{n.label}</NavLink>

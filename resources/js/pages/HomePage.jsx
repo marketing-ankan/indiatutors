@@ -81,7 +81,11 @@ function HeroSlider() {
     >
       <div className="flex h-full" style={{ transform: `translateX(-${idx * 100}%)`, transition: anim ? 'transform 650ms ease-in-out' : 'none' }}>
         {[...HERO_SLIDES, HERO_SLIDES[0]].map((s, i) => (
-          <img key={i} src={s.src} alt={s.alt} className="w-full h-full shrink-0 object-cover" loading="eager" />
+          // Only the first slide is eager. The container is `hidden lg:block`,
+          // and an eager <img> inside a display:none subtree is still fetched by
+          // every major browser — so mobile paid 705 KB for zero rendered
+          // pixels. Lazy images in a display:none subtree are not fetched.
+          <img key={i} src={s.src} alt={s.alt} className="w-full h-full shrink-0 object-cover" loading={i === 0 ? 'eager' : 'lazy'} />
         ))}
       </div>
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
