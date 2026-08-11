@@ -78,6 +78,10 @@ function HeroSlider() {
       className="hidden lg:block relative rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 h-[520px]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      // Focus pauses too, not just hover (WCAG 2.2.2). A keyboard user tabbing
+      // the dots below otherwise watched the slide move out from under them.
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
     >
       <div className="flex h-full" style={{ transform: `translateX(-${idx * 100}%)`, transition: anim ? 'transform 650ms ease-in-out' : 'none' }}>
         {[...HERO_SLIDES, HERO_SLIDES[0]].map((s, i) => (
@@ -115,7 +119,7 @@ function RichCourseCard({ c }) {
           <Link to={`/courses/${c.slug}`}>{c.title}</Link>
         </h3>
         <p className="mt-1 text-sm">
-          <Stars /> <strong className="text-[#1A1A1A]">{c.rating}</strong> <span className="text-slate-400 text-xs">({c.reviews})</span>
+          <Stars /> <strong className="text-[#1A1A1A]">{c.rating}</strong> <span className="text-slate-500 text-xs">({c.reviews})</span>
         </p>
         <p className="mt-1.5 text-[13px] text-slate-500 leading-snug line-clamp-2">{c.desc}</p>
         <ul className="mt-2 space-y-1">
@@ -125,9 +129,9 @@ function RichCourseCard({ c }) {
         </ul>
         <p className="mt-2.5 flex items-center flex-wrap gap-x-1.5 gap-y-1">
           <span className="text-[17px] font-extrabold text-brand-600">{c.now}</span>
-          <span className="text-[11px] text-slate-400 line-through">{c.was}</span>
+          <span className="text-[11px] text-slate-500 line-through">{c.was}</span>
           <span className="text-[11px] font-bold text-green-600 bg-green-100 rounded-md px-1.5 py-0.5">40% OFF</span>
-          <span className="text-[11px] text-slate-400">{c.per}</span>
+          <span className="text-[11px] text-slate-500">{c.per}</span>
         </p>
         <div className="mt-auto pt-3">
           <div className="grid grid-cols-2 gap-2">
@@ -224,7 +228,7 @@ function DemoCourseRow({ eyebrow, title, seeAllTo, cards, bg }) {
                 <p className="mt-1 text-[13px] text-slate-500 leading-snug">{c.desc}</p>
                 <p className="mt-2 flex items-center flex-wrap gap-x-1.5 gap-y-1">
                   <span className="text-[16px] font-extrabold text-brand-600">{c.now}</span>
-                  <span className="text-[11px] text-slate-400 line-through">{c.was}</span>
+                  <span className="text-[11px] text-slate-500 line-through">{c.was}</span>
                   <span className="text-[11px] font-bold text-green-600 bg-green-100 rounded-md px-1.5 py-0.5">40% OFF</span>
                 </p>
                 <div className="mt-auto pt-3">
@@ -495,7 +499,7 @@ export default function HomePage() {
                 <img src={t.img} alt={t.name} width="80" height="80" className="mx-auto w-20 h-20 rounded-full object-cover ring-2 ring-transparent transition-all duration-300 group-hover:scale-105 group-hover:ring-brand-300" loading="lazy" />
                 <h3 className="mt-3 font-heading font-bold text-slate-900">{t.name}</h3>
                 <p className="mt-1 text-[13px] text-slate-500 leading-snug min-h-[2.4rem]">{t.subj}</p>
-                <p className="mt-1 text-xs text-slate-400">{t.exp}</p>
+                <p className="mt-1 text-xs text-slate-500">{t.exp}</p>
                 <Link to={`/tutor/${t.slug}`} className="mt-4 inline-flex rounded-lg border-2 border-brand-600/35 text-brand-600 px-5 py-1.5 text-[13px] font-bold hover:bg-white">Book Trial</Link>
               </article>
             ))}

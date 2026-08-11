@@ -87,7 +87,7 @@ function CatalogTab({ item }) {
       </NavLink>
 
       {hasMega && (
-        <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition absolute left-0 right-0 top-full z-50 pt-1 hidden xl:flex justify-center">
+        <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition absolute left-0 right-0 top-full z-50 pt-1 hidden xl:flex justify-center">
           <div className="w-[min(92vw,1080px)] max-h-[70vh] overflow-y-auto rounded-xl bg-white shadow-2xl ring-1 ring-slate-200 p-5">
             <div className="grid grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-5">
               {item.mega.map(col => (
@@ -112,7 +112,7 @@ function CatalogTab({ item }) {
       )}
 
       {!item.mega?.length && item.items.length > 0 && (
-        <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition absolute left-0 top-full z-50 pt-1 hidden xl:block">
+        <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition absolute left-0 top-full z-50 pt-1 hidden xl:block">
           <div className="w-64 rounded-xl bg-white shadow-2xl ring-1 ring-slate-200 py-2">
             {item.items.map(it => (
               <Link key={it.label + it.to} to={it.to} className="block px-4 py-1.5 text-xs text-slate-700 hover:bg-slate-50 hover:text-brand-600 normal-case tracking-normal">{it.label}</Link>
