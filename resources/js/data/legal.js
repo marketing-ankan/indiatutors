@@ -10,8 +10,10 @@
 // (Have your legal counsel review these before relying on them for compliance.)
 
 // The registered operating entity, shown in the address and definition blocks.
-// TODO(owner): replace with the registered LLP / Pvt Ltd name once confirmed.
-export const ENTITY = 'Indiatutors Online';
+// Confirmed by the owner on 11 August 2026. The Consumer Protection (E-Commerce)
+// Rules 2020 require the legal name to be displayed, so this must stay the
+// registered name — not the brand, which is "Indiatutors Online".
+export const ENTITY = 'Indiatutors Online LLP';
 
 // Applied once at module load so the entity name lives in exactly one place.
 const withEntity = (v) =>

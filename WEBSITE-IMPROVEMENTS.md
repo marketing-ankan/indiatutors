@@ -239,9 +239,25 @@ These are claims the site makes that are false, unverifiable, or that the produc
 
 ## ⚡ Quick wins — under 15 minutes each
 
-**Status as of 2026-08-11.** 18 of the 22 are shipped and live, plus one found
-during the responsive sweep (item 23 / C6). **Every code-only quick win is done.**
-The 4 that remain all need an owner decision on content, not engineering.
+**Status as of 2026-08-11.** 19 of the 22 are shipped and live, plus one found
+during the responsive sweep (item 23 / C6). **Every code-only quick win is done**,
+and the entity name (item 6 / A10) was answered by the owner and shipped. The 3
+that remain all need an owner decision on content, not engineering.
+
+⚠ **New, arising from the entity fix — the policies still sell overseas service.**
+The marketing site was swept India-only (commits f386b5b, 3cb66ec: "the overseas
+claims the owner says are not true"), but `legal.js` was not part of that sweep and
+still contains, as *binding* terms: an indicative USD price shown at checkout
+(line 211) and a "$10" registration-fee equivalent (line 730); a statutory EU/UK
+cooling-off right (`overseas-cooling-off`, line 845); GDPR and UK GDPR rights
+(line 396); "Overseas & NRI Families" and "Overseas & NRI Students" clauses (lines
+272, 1415); International Data Transfers with Standard Contractual Clauses (line
+1471); and "serves students across India and abroad" in both the Terms' binding
+clause (line 40) and the Privacy Policy opener (line 1178). If overseas service is
+not real, these are promises in the most binding documents on the site — and the
+USD-at-checkout clause describes a checkout that no longer exists. Needs an owner
+decision plus counsel; do not quietly delete GDPR text, since it may be relied on
+by anyone who already enrolled under it.
 
 | # | Change | File:line | Status |
 |---|---|---|---|
@@ -250,7 +266,7 @@ The 4 that remain all need an owner decision on content, not engineering.
 | 3 | `contact@` → `connect@` in the homepage CTA | `HomePage.jsx:600` | ✅ shipped |
 | 4 | Delete the hardcoded `4.8` star on every About course card | `AboutPage.jsx:142` | ⏸ owner decision (A5) |
 | 5 | Replace "4.9 / 5 from 1,200+ reviews" with a non-numeric trust point | `resources/js/data/courseDetail.js:137` | ⏸ owner decision (A5) |
-| 6 | Set `ENTITY` to the registered LLP / Pvt Ltd name, drop the TODO | `resources/js/data/legal.js:13-14` | ⏸ owner decision (A10) |
+| 6 | Set `ENTITY` to the registered LLP / Pvt Ltd name, drop the TODO | `resources/js/data/legal.js:13-14` | ✅ shipped — "Indiatutors Online LLP" |
 | 7 | Empty the four placeholder testimonial arrays + `ACHIEVEMENT_PHOTOS` | `courseDetail.js:62, 143, 152, 196, 236` | ⏸ owner decision (A3/A4) |
 | 8 | `hidden lg:flex` → `hidden xl:flex` (recovers the off-screen hamburger) | `Header.jsx:158` | ✅ shipped |
 | 9 | Add `group-focus-within:visible group-focus-within:opacity-100` to both dropdowns | `Header.jsx:90, 115` | ✅ shipped |
@@ -271,8 +287,8 @@ The 4 that remain all need an owner decision on content, not engineering.
 
 **Nothing code-only is left in this table.**
 
-**Blocked on you:** 4, 5, 6, 7 — all content, not code. The entity name (6) is the
-one with a hard legal requirement behind it.
+**Blocked on you:** 4, 5, 7 — all content, not code. (6, the entity name, was
+answered on 11 August 2026 and is shipped.)
 
 **D6 — `TestimonialSlider` now has a real pause mechanism (2026-08-11).** It keeps
 two separate flags: `stopped` (the explicit, sticky user control) and `hovering`
