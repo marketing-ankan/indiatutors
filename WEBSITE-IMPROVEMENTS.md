@@ -303,11 +303,26 @@ foreign option anywhere in the DOM, and the sweep is clean 360-2560px. Privacy's
 "city, state and country" collection notice stays accurate, since country is still
 collected and stored.
 
-ℹ **Dead USD code left in place, not blocking:** `pricing.js` `regFee.USD: 10`, 19
-orphaned USD country entries, and the USD branches in `PlansPage.jsx` are all
-unreachable while `country` is pinned to India — but `curOf()` reads
-`PRICING.countries`, so restoring any country input would silently re-enable USD
-quoting. Worth a separate cleanup.
+✅ **Dead USD code deleted (2026-08-11).** 96 `usd` arrays, 96 `usdG` arrays,
+`regFee.USD` and the entire 20-entry `countries` list are gone from `pricing.js`;
+`curOf()` is gone from `PlansPage.jsx` and `fmt`/`grossOf`/`rateFor` no longer take
+a currency. `countries` was deleted outright rather than trimmed to India, since a
+one-entry list is the shape that invites a second entry later — reintroducing
+dollar quoting is now an explicit code change, not a config edit.
+
+Scripted with a guard rather than hand-edited across 192 keys: the script
+snapshots every non-USD value (discount, currency, gst, plans, levels, timezones,
+`regFee.INR`, and each rate row's name/cat/inr/inrG), applies the deletions,
+re-snapshots and refuses to write on any difference. Then verified empirically,
+old bundle against new, by driving the real form — Piano/Beginner/2-per-week gives
+₹4,800 / ₹12,960 / ₹46,080 on both, and Scratch as a group class gives ₹2,400 /
+₹6,480 / ₹23,040 on both, covering both branches of `rateFor` (`inr` and `inrG`).
+Bundle 1,020.00 → 1,016.40 kB.
+
+ℹ **`PRICING.timezones` is also dead** — nothing outside `pricing.js` reads it,
+the picker having gone with the country one. Left in place because it is not USD
+and was outside the instruction; remove it whenever the timezone question is
+settled.
 
 ---
 
