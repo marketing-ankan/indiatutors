@@ -162,7 +162,11 @@ export default function CoursesPage() {
           </div>
         </section>
 
-        <div className="grid lg:grid-cols-[260px_1fr] gap-6 items-start">
+        {/* [&>*]:min-w-0 — grid items default to min-width:auto, so neither
+            column could shrink below its content's min-content width. Below lg
+            this is a single shared column, which bottomed out at 511px and gave
+            every phone ~150px of horizontal scroll on the catalogue. */}
+        <div className="grid lg:grid-cols-[260px_1fr] gap-6 items-start [&>*]:min-w-0">
           {/* SIDEBAR */}
           {/* Sticky sidebar with its OWN scrollbar — taller-than-viewport
               category lists scroll inside the box (overscroll-contain keeps
