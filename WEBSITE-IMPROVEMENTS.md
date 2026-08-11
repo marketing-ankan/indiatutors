@@ -274,11 +274,25 @@ The 4 that remain all need an owner decision on content, not engineering.
 **Blocked on you:** 4, 5, 6, 7 — all content, not code. The entity name (6) is the
 one with a hard legal requirement behind it.
 
-**D6 is only half closed.** Item 21 fixed the hero slider. `TestimonialSlider`
-(`HomePage.jsx:256-259`) still auto-advances on a 6s interval with no pause on
-hover, focus or any control, and its prev/next buttons nudge the rail without
-stopping the timer — so WCAG 2.2.2 is still failed on that carousel. Fixing it is
-code-only and needs no decision; it was simply never part of the quick-win table.
+**D6 — `TestimonialSlider` now has a real pause mechanism (2026-08-11).** It keeps
+two separate flags: `stopped` (the explicit, sticky user control) and `hovering`
+(the transient courtesy pause). One shared flag would have resumed the carousel
+the instant the pointer left the Pause button the visitor had just pressed. A
+visible Pause/Play toggle sits between the prev/next buttons with `aria-pressed`,
+because 2.2.2 asks for a *mechanism*, not merely pause-on-hover. Prev/next now
+bump a nonce in the effect deps so the interval restarts — previously the timer
+could fire a fraction of a second after the visitor picked a slide themselves.
+
+Verified by spying on `setInterval`/`clearInterval` rather than by waiting, since
+hidden-tab timer throttling makes elapsed-time tests unreliable: Pause → clear 1 /
+set 0; Play → set 1; hover in → clear 1; leave hover and focus → set 1; Next →
+clear 1 / set 1.
+
+**Still open in D6:** `HeroSlider` pauses on hover and focus but has no visible
+pause control, so strictly it still lacks the 2.2.2 mechanism. Left alone
+deliberately — adding a button to the homepage hero is a visible design change to
+the most prominent element on the site, which is the owner's call, not a defect
+fix.
 
 ---
 
