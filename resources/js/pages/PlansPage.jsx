@@ -223,8 +223,12 @@ export default function PlansPage({ initialCtype = 'oneone' }) {
                     confirmed the business is India-only, so offering a country
                     list quoted every non-Indian visitor a USD price nobody can
                     actually buy, and the timezone list implied classes are
-                    scheduled outside IST. The USD data itself was deleted on
-                    2026-08-11, so there is nothing left to quote in dollars. */}
+                    scheduled outside IST. Both underlying lists were deleted on
+                    2026-08-11 — the USD rates and `countries`, then `timezones` —
+                    so there is nothing left to quote in dollars or to offer a
+                    zone from. Note the demo form's `timezone` field is unrelated
+                    and still live: it is auto-detected from the browser, not
+                    picked from a list. */}
               </div>
             </section>
 
