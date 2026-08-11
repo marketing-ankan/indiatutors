@@ -319,10 +319,23 @@ old bundle against new, by driving the real form — Piano/Beginner/2-per-week g
 ₹6,480 / ₹23,040 on both, covering both branches of `rateFor` (`inr` and `inrG`).
 Bundle 1,020.00 → 1,016.40 kB.
 
-ℹ **`PRICING.timezones` is also dead** — nothing outside `pricing.js` reads it,
-the picker having gone with the country one. Left in place because it is not USD
-and was outside the instruction; remove it whenever the timezone question is
-settled.
+✅ **`PRICING.timezones` deleted (2026-08-11)** — 12 entries including GST (Gulf),
+EST (US East), AEST and NZST, unread since the picker went with the country one.
+`PRICING` is now down to seven keys: discount, currency, gst, plans, levels,
+regFee, rates.
+
+Worth recording: **it was never in a shipped bundle.** Rollup had already
+tree-shaken the unused property, so `NZST` appears in none of the last three
+committed bundles. The rebuild after deleting it produced a byte-identical
+`main-CG78SalD.js` and `public/build` showed no diff at all — so this was a
+source-only cleanup with zero user-facing change, and it deployed with **no
+blank-page window**, since the served asset hash never moved.
+
+Do not confuse this with the demo form's `timezone` field
+(`BookDemoPage.jsx:7`), which is live, auto-detected from the browser rather than
+picked from a list, validated at `DemoRequestController.php:24`, stored on
+`demo_requests`, and pushed to the LMS as `time_zone`. It was deliberately left
+alone.
 
 ---
 

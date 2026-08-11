@@ -1194,19 +1194,5 @@ export const PRICING = {
       ],
       "inrG": null
     }
-  ],
-  "timezones": [
-    "IST (India)",
-    "GST (Gulf)",
-    "GMT/BST (UK)",
-    "CET (Europe)",
-    "EST (US East)",
-    "CST (US Central)",
-    "MST (US Mountain)",
-    "PST (US West)",
-    "AEST (Australia East)",
-    "NZST (New Zealand)",
-    "SGT (Singapore)",
-    "Other"
   ]
 };
