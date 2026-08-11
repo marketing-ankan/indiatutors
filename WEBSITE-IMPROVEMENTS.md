@@ -244,7 +244,65 @@ during the responsive sweep (item 23 / C6). **Every code-only quick win is done*
 and the entity name (item 6 / A10) was answered by the owner and shipped. The 3
 that remain all need an owner decision on content, not engineering.
 
-⚠ **New, arising from the entity fix — the policies still sell overseas service.**
+## ✅ Overseas claims removed from the policies (2026-08-11)
+
+Owner instruction: remove the service claims, keep the data-protection provisions.
+Scoped by a 7-agent inventory of all four documents plus a check of what the app
+actually charges.
+
+**Removed — things we said we sell or show but do not:** three printed dollar
+figures (the Registration Fee was defined as "₹750 (₹750 INR / $10 USD)" in the
+Terms definitions and body, and "approximately $10" in the refund policy); five
+statements that a USD price is displayed (Terms pricing, refund fee-quoting, the
+indicative-conversion sentence, the referral-reward parity sentence, and the
+Privacy opener); "serves students across India **and abroad**" in both the Terms'
+binding clause and the Privacy opener; "Families living abroad … do enrol with us
+regularly"; "You may take part from outside India"; and the pointer to "overseas
+bank and currency-conversion charges".
+
+**Kept — provisions that protect the reader, per the owner's instruction:** all
+GDPR / UK GDPR rights and legal bases, the EEA/UK rights list and supervisory-
+authority route, Art. 8 children's thresholds, Art. 33 breach notification, and
+International Data Transfers. The EU/UK cooling-off notice was also kept, though
+it is consumer-contract rather than data protection: removing the *notice* does
+not remove the *obligation*, and under Art. 10 / reg. 31 failing to give notice
+extends the withdrawal window to twelve months — so deleting it would have made
+the position worse, not cleaner.
+
+**Renamed rather than deleted, and this mattered.** "Overseas & NRI Families"
+(Terms) → "Users Resident in the EU or the UK"; "Overseas & NRI Students"
+(Privacy) → "Data Protection Outside India"; "Overseas Students & the EU / UK
+Cooling-Off Right" (Refund) → "The EU / UK Cooling-Off Right". Section `id`s were
+left untouched so no anchor or bookmark breaks. Four cross-references quote those
+headings verbatim in bold (Terms §Data Protection, Privacy opener, Privacy
+children's clause, Privacy grievance clause) and were updated in the same commit.
+
+⚠ **Deleting the refund section wholesale would have destroyed an India-only
+protection.** "Nothing in this policy limits a student's or parent's rights under
+the **Consumer Protection Act, 2019**" sits nested *inside* the overseas cooling-off
+section. A wholesale delete would have stripped an Indian customer of a protection
+during an India-only cleanup. Verified still rendered after the edit.
+
+⚠ **STILL OPEN — the checkout contradicts the policies.** `CheckoutPage.jsx:142-145`
+renders a **required** "Country / Region" select offering United States, United
+Kingdom, Canada, Australia, United Arab Emirates, Singapore and Other; it is
+validated at `OrderController.php:27` and persisted at `:60`. The India-only sweep
+never reached it. The policies now say we serve students across India while the
+page a customer actually transacts on invites a UAE billing address. Needs an owner
+decision: pin checkout to India like the Plans page, or treat a foreign *billing*
+address as a genuine exception (an NRI parent paying for a child studying in India
+is plausible, which is why this was not changed unilaterally). This also governs
+whether Privacy's "city, state and country" collection notice stays accurate.
+
+ℹ **Dead USD code left in place, not blocking:** `pricing.js` `regFee.USD: 10`, 19
+orphaned USD country entries, and the USD branches in `PlansPage.jsx` are all
+unreachable while `country` is pinned to India — but `curOf()` reads
+`PRICING.countries`, so restoring any country input would silently re-enable USD
+quoting. Worth a separate cleanup.
+
+---
+
+⚠ **Superseded — the original finding, kept for history.**
 The marketing site was swept India-only (commits f386b5b, 3cb66ec: "the overseas
 claims the owner says are not true"), but `legal.js` was not part of that sweep and
 still contains, as *binding* terms: an indicative USD price shown at checkout

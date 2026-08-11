@@ -37,7 +37,7 @@ export const LEGAL = withEntity({
         id: 'interpretation-definitions',
         h: 'Interpretation & Definitions',
         blocks: [
-          { type: 'p', text: 'These Terms form a binding agreement between you and **__ENTITY__**, which operates Indiatutors Online from New Town, Kolkata — 700161, West Bengal, India, and serves students across India and abroad.' },
+          { type: 'p', text: 'These Terms form a binding agreement between you and **__ENTITY__**, which operates Indiatutors Online from New Town, Kolkata — 700161, West Bengal, India, and serves students across India.' },
         ],
         subs: [
           {
@@ -64,7 +64,7 @@ export const LEGAL = withEntity({
                   ['“Video Course”', 'A self-paced, pre-recorded course purchased on the Platform and streamed from our hosting provider.'],
                   ['“Content”', 'All text, images, video, audio, lesson plans, worksheets, assessments, notes and other material created, uploaded or shared through the Platform.'],
                   ['“Plan”', 'A monthly, quarterly or annual package of Classes purchased in advance, as described on the [Plans & pricing](/plans) page.'],
-                  ['“Registration Fee”', 'The one-time onboarding fee of ₹750 (₹750 INR / $10 USD) payable by each new Student.'],
+                  ['“Registration Fee”', 'The one-time onboarding fee of ₹750 payable by each new Student.'],
                   ['“DPDP Act”', 'The Digital Personal Data Protection Act, 2023 (India).'],
                   ['“Consumer Protection Act”', 'The Consumer Protection Act, 2019 (India), together with the rules made under it.'],
                   ['“GDPR”', 'Regulation (EU) 2016/679, the General Data Protection Regulation, and its United Kingdom equivalent (UK GDPR), which apply only to Users resident in those territories.'],
@@ -208,7 +208,7 @@ export const LEGAL = withEntity({
           {
             h: 'Pricing & Taxes',
             blocks: [
-              { type: 'p', text: 'Prices are displayed on the [Plans & pricing](/plans) page and again at checkout before you pay. Fees are charged in Indian Rupees; an indicative United States Dollar price is also shown for overseas Students. **Goods and Services Tax at 18%** is added at checkout, and the tax charged is shown on your invoice.' },
+              { type: 'p', text: 'Prices are displayed on the [Plans & pricing](/plans) page and again at checkout before you pay. Fees are charged in Indian Rupees. **Goods and Services Tax at 18%** is added at checkout, and the tax charged is shown on your invoice.' },
               { type: 'p', text: 'Per-Class rates depend on the category, the level (Beginner, Intermediate, Advanced or Professional) and, for Academics, the class band. The ranges currently offered are:' },
               {
                 type: 'table',
@@ -231,7 +231,7 @@ export const LEGAL = withEntity({
           {
             h: 'Registration Fee',
             blocks: [
-              { type: 'p', text: 'A one-time Registration Fee of **₹750** (₹750 INR / $10 USD) is payable by each new Student at enrolment. It covers onboarding, Tutor matching and the setting up of the Student account, and is charged once per Student rather than once per subject; it is not levied again when a Plan is renewed. Being separate from Class fees, it does not form part of the automatic refund of untaken Classes, and a request for it to be refunded is considered separately under the [Payment & Refund Terms](/payment-refund-policy).' },
+              { type: 'p', text: 'A one-time Registration Fee of **₹750** is payable by each new Student at enrolment. It covers onboarding, Tutor matching and the setting up of the Student account, and is charged once per Student rather than once per subject; it is not levied again when a Plan is renewed. Being separate from Class fees, it does not form part of the automatic refund of untaken Classes, and a request for it to be refunded is considered separately under the [Payment & Refund Terms](/payment-refund-policy).' },
             ],
           },
           {
@@ -265,11 +265,15 @@ export const LEGAL = withEntity({
             h: 'Refunds',
             blocks: [
               { type: 'p', text: 'You may exit a programme at any time — there is no notice period, no exit fee and no minimum term. **Fees for Classes that you have paid for and not yet taken are always refundable, with no time limit.** Where a Class is cancelled by the Tutor or by us, you choose between a full account credit and a full refund of that Class to your original payment method. Where a Class is lost because of a technical fault on our side, it is rescheduled at no cost or credited to your account, at your choice. Approved refunds are returned to the original payment method within **7–10 business days** of approval.' },
-              { type: 'note', tone: 'info', text: 'How to request a refund, what happens to the Registration Fee and to the tax charged, the treatment of overseas bank and currency-conversion charges, the rule for Video Courses — refundable within **7 days** of purchase provided **less than 20%** of the course has been watched — and the processing timelines are all set out in the [Payment & Refund Terms](/payment-refund-policy). Please read that document before you raise a request.' },
+              { type: 'note', tone: 'info', text: 'How to request a refund, what happens to the Registration Fee and to the tax charged, the rule for Video Courses — refundable within **7 days** of purchase provided **less than 20%** of the course has been watched — and the processing timelines are all set out in the [Payment & Refund Terms](/payment-refund-policy). Please read that document before you raise a request.' },
             ],
           },
           {
-            h: 'Overseas & NRI Families',
+            // Renamed from "Overseas & NRI Families": the heading implied a
+            // service we do not offer, while the clause under it is a statutory
+            // right that exists on its own terms. Quoted by name in the Data
+            // Protection section below — keep the two in step.
+            h: 'Users Resident in the EU or the UK',
             blocks: [
               { type: 'p', text: 'If you are resident in the European Union or the United Kingdom, you have a statutory right to withdraw from your purchase within **14 days** of placing your order, without giving a reason. If you asked us to begin Classes inside that 14-day window, a proportionate amount is retained for the Classes actually delivered up to the point of withdrawal, and the balance — the fees for Classes not taken — is refunded to you in full. The right arises under the EU Consumer Rights Directive (2011/83/EU) and the UK Consumer Contracts Regulations 2013; it sits alongside, and does not reduce, our standing promise that unused pre-paid Classes are always refundable, which is set out in the [Payment & Refund Terms](/payment-refund-policy). Users resident in those territories also have the rights granted by the GDPR and UK GDPR in respect of their personal data; how to exercise them is explained in our [Privacy Policy](/privacy-policy).' },
             ],
@@ -393,7 +397,7 @@ export const LEGAL = withEntity({
         h: 'Data Protection & Privacy',
         blocks: [
           { type: 'p', text: 'How we collect, use, store, share and delete personal data is set out in our [Privacy Policy](/privacy-policy), which is incorporated into these Terms by reference. By using the Platform you agree to the practices described there.' },
-          { type: 'p', text: 'We process personal data in accordance with the **DPDP Act** and other applicable Indian law. For Users who are resident in the European Union or the United Kingdom, we also give effect to the rights available under the GDPR and UK GDPR, as described in the Overseas & NRI Families clause above and in the Privacy Policy.' },
+          { type: 'p', text: 'We process personal data in accordance with the **DPDP Act** and other applicable Indian law. For Users who are resident in the European Union or the United Kingdom, we also give effect to the rights available under the GDPR and UK GDPR, as described in the Users Resident in the EU or the UK clause above and in the Privacy Policy.' },
           { type: 'p', text: 'Many of our Students are children, so we take particular care with their data. We collect a child’s personal data only with the verifiable consent of a Parent or Guardian, we limit that data to what is needed to teach and to keep the child safe, and we do not use it for behavioural advertising or tracking. A Parent or Guardian may ask us at any time to give access to, correct or erase the data we hold about their child.' },
           { type: 'note', tone: 'warn', text: 'Recordings of live Classes contain personal data of the Student and the Tutor. They are shared only with the enrolled Student and their Parent or Guardian, and you must not publish or circulate them.' },
         ],
@@ -719,7 +723,7 @@ export const LEGAL = withEntity({
                 'A live class runs for **one hour** and is normally scheduled once a week. **Music classes run for 45 minutes.**',
                 'Group class fees are broadly half of the equivalent 1-on-1 fee for the same subject and level.',
                 'A dash in the group column means no group rate is published for that category. Write to us and we will confirm whether a group class can be arranged and at what fee.',
-                'Fees are quoted in Indian rupees. Overseas students are additionally shown an indicative amount in US dollars; the sum actually debited depends on the exchange rate applied by your own bank or card issuer on the day.',
+                'Fees are quoted and charged in Indian rupees.',
               ] },
               { type: 'p', text: 'The exact fee for your subject, level and plan is set out on [Plans & pricing](/plans) and repeated in your enrolment confirmation before any payment is taken.' },
             ],
@@ -727,7 +731,7 @@ export const LEGAL = withEntity({
           {
             h: 'One-time registration fee',
             blocks: [
-              { type: 'p', text: 'A one-time registration fee of **₹750** (shown as approximately $10 for overseas students) is payable when a student is first enrolled. It covers onboarding, tutor matching and the setting up of the student account. It is charged once and is not levied again on renewal of a plan.' },
+              { type: 'p', text: 'A one-time registration fee of **₹750** is payable when a student is first enrolled. It covers onboarding, tutor matching and the setting up of the student account. It is charged once and is not levied again on renewal of a plan.' },
               { type: 'p', text: 'The registration fee is separate from class fees and is therefore not part of the automatic refund of untaken classes described in this policy. If you would like a refund of the registration fee to be considered, say so in your written request; we will tell you in writing what will and will not be refunded before anything is processed.' },
             ],
           },
@@ -843,9 +847,14 @@ export const LEGAL = withEntity({
 
       {
         id: 'overseas-cooling-off',
-        h: 'Overseas Students & the EU / UK Cooling-Off Right',
+        // Retitled, not removed. The right below is statutory and survives our
+        // saying nothing about it — and failing to give notice of it extends the
+        // withdrawal window rather than closing it, so silence would be worse
+        // than the clause. Note the Consumer Protection Act saving clause at the
+        // end of this section is India-only and must not be swept up with it.
+        h: 'The EU / UK Cooling-Off Right',
         blocks: [
-          { type: 'p', text: 'Indiatutors Online is based in Kolkata and serves students across India, and this policy is written to Indian law. Families living abroad, including non-resident Indian families, do enrol with us, and where a student or the paying parent is resident in the **European Union** or the **United Kingdom** the following statutory right applies in addition to everything else in this document.' },
+          { type: 'p', text: 'Indiatutors Online is based in Kolkata and serves students across India, and this policy is written to Indian law. Where a student or the paying parent is nonetheless resident in the **European Union** or the **United Kingdom**, the following statutory right applies in addition to everything else in this document.' },
           { type: 'list', items: [
             'You may withdraw from a purchase within **14 days** of placing your order, without giving any reason.',
             'If you asked us to begin classes inside that 14-day window, a proportionate amount is retained for the classes actually delivered up to the point of withdrawal, and the balance — the fees for classes not taken — is refunded to you in full.',
@@ -895,7 +904,7 @@ export const LEGAL = withEntity({
         blocks: [
           { type: 'p', text: 'Fees displayed on the Platform are exclusive of tax. **Goods and Services Tax at 18%** is added at checkout for Indian customers and is shown to you as a separate line before you confirm payment, so that the total you are agreeing to is never a surprise.' },
           { type: 'p', text: 'Where a refund is issued, the service fee is refunded in accordance with this policy and the tax collected on the refunded amount is dealt with as applicable tax law requires. A tax invoice reflecting the adjustment is issued to you where one is required.' },
-          { type: 'p', text: 'Students paying from outside India are responsible for any bank charges, currency conversion costs, foreign transaction fees, withholding taxes, duties or levies imposed in their own jurisdiction. Those amounts are charged by third parties, never reach us, and cannot be refunded by us. Amounts shown in US dollars are indicative only and are converted at your bank’s or card issuer’s prevailing rate.' },
+          { type: 'p', text: 'Students paying from outside India are responsible for any bank charges, currency conversion costs, foreign transaction fees, withholding taxes, duties or levies imposed in their own jurisdiction. Those amounts are charged by third parties, never reach us, and cannot be refunded by us.' },
         ],
       },
 
@@ -986,7 +995,7 @@ export const LEGAL = withEntity({
             'You may refer any friend, relative or acquaintance who is not already enrolled with us and who has not already been referred by someone else.',
             'You must have the Referred Family’s permission before you share their contact details with us. The referral form asks you to confirm this, and the confirmation is a condition of the referral being accepted.',
             'Where the Referrer is under 18 years of age, the referral must be made by, and any Credit is held and used by, the parent or guardian in whose name the account is held. Under the Digital Personal Data Protection Act, 2023, a parent or guardian holds the account for every student under 18 in India.',
-            'You may take part from outside India. Rewards under the Programme are class credits and are identical for families billed in INR and for overseas families billed in USD; no cash equivalent is offered in any currency.',
+            'Rewards under the Programme are class credits; no cash equivalent is offered.',
           ] },
           { type: 'p', text: 'A referral is personal to you. You may not pool, sell or assign your right to refer, and you may not submit referrals on behalf of another person so that the reward is earned in your name.' },
           { type: 'note', tone: 'warn', text: 'We may ask you to confirm your registered email address, or to confirm the details of the introduction you made, before a reward is credited. If we cannot match a referral to an existing account, no reward is due.' },
@@ -1175,9 +1184,9 @@ export const LEGAL = withEntity({
         id: 'introduction',
         h: 'Introduction',
         blocks: [
-          { type: 'p', text: 'Indiatutors Online ("Indiatutors Online", "we", "us" or "our") is India’s premium online tutor marketplace, operated by __ENTITY__ from New Town, Kolkata and serving students across India and abroad. Protecting the privacy of the students, parents and guardians who use our platform is central to how we work.' },
+          { type: 'p', text: 'Indiatutors Online ("Indiatutors Online", "we", "us" or "our") is India’s premium online tutor marketplace, operated by __ENTITY__ from New Town, Kolkata and serving students across India. Protecting the privacy of the students, parents and guardians who use our platform is central to how we work.' },
           { type: 'p', text: 'This Privacy Policy explains how we collect, use, store, share, transfer and protect personal data when you visit **indiatutorsonline.com**, create an account, book a free demo class, enrol in live 1-on-1 or small-group classes, purchase a self-paced video course, take part in our referral programme, or contact us through any of our channels (together, the "Services").' },
-          { type: 'p', text: 'We act as a **Data Fiduciary** under India’s **Digital Personal Data Protection Act, 2023** (the "DPDP Act") and the rules made under it. Indian law is the spine of this policy. Where a student or family outside India uses the Services, the additional protections set out in the section on **Overseas & NRI Students** also apply.' },
+          { type: 'p', text: 'We act as a **Data Fiduciary** under India’s **Digital Personal Data Protection Act, 2023** (the "DPDP Act") and the rules made under it. Indian law is the spine of this policy. Where a student or family outside India uses the Services, the additional protections set out in the section on **Data Protection Outside India** also apply.' },
           { type: 'p', text: 'This policy should be read together with our [Terms & Conditions](/terms-conditions), our [Payment & Refund Terms](/payment-refund-policy) and, where you take part in the referral programme, our [Refer & Earn Policy](/refer-earn-policy).' },
           { type: 'note', tone: 'info', text: 'By using the Services you confirm that you have read this policy. If you do not agree with it, please do not use the Services. If you have already registered, you may ask us to close your account and delete your data at any time by writing to [connect@indiatutorsonline.com](mailto:connect@indiatutorsonline.com).' },
         ],
@@ -1413,9 +1422,13 @@ export const LEGAL = withEntity({
 
       {
         id: 'overseas-nri',
-        h: 'Overseas & NRI Students',
+        // Renamed from "Overseas & NRI Students". The section is about where
+        // data is protected, not who we sell to; the old title claimed the
+        // latter. The id stays `overseas-nri` so no anchor or bookmark breaks.
+        // Quoted by name in three other places in this document — all updated.
+        h: 'Data Protection Outside India',
         blocks: [
-          { type: 'p', text: 'Non-resident Indian families and students living outside India enrol with us regularly, and prices are shown in US dollars alongside Indian rupees for that reason. This policy and our Services are governed by Indian law, and the DPDP Act remains the primary framework. Where the EU General Data Protection Regulation or the UK GDPR applies to our processing of your Personal Data, we additionally honour the protections in this section. Nothing here reduces the rights you already hold under the DPDP Act.' },
+          { type: 'p', text: 'This policy and our Services are governed by Indian law, and the DPDP Act remains the primary framework. Where the EU General Data Protection Regulation or the UK GDPR applies to our processing of your Personal Data, we additionally honour the protections in this section. Nothing here reduces the rights you already hold under the DPDP Act.' },
         ],
         subs: [
           {
@@ -1637,7 +1650,7 @@ export const LEGAL = withEntity({
               'When the Account holder asks us to close a Child’s Account, we erase the Child’s learning records except for anything we are legally required to retain, such as invoices.',
             ],
           },
-          { type: 'p', text: 'For students in the European Economic Area and the United Kingdom, the additional age thresholds described under **Overseas & NRI Students** apply.' },
+          { type: 'p', text: 'For students in the European Economic Area and the United Kingdom, the additional age thresholds described under **Data Protection Outside India** apply.' },
           { type: 'p', text: 'If you are a Parent or Guardian and you believe that a Child has given us Personal Data without your consent, write to [connect@indiatutorsonline.com](mailto:connect@indiatutorsonline.com) with the Child’s name and the email address or phone number used. We will verify your relationship to the Child and delete the data promptly.' },
         ],
       },
@@ -1704,7 +1717,7 @@ export const LEGAL = withEntity({
             ],
           },
           { type: 'p', text: '**Grievance redressal.** Our Grievance Officer for the purposes of the DPDP Act can be reached at [connect@indiatutorsonline.com](mailto:connect@indiatutorsonline.com) or on [+91 93308 11581](tel:+919330811581). Please mark written grievances "Grievance — DPDP" and include the Account email address so that we can trace the records. We acknowledge every grievance within 7 days and aim to resolve it within 30 days.' },
-          { type: 'p', text: 'If we do not resolve your grievance to your satisfaction, you may complain to the **Data Protection Board of India**. If you are in the European Economic Area or the United Kingdom, you may instead complain to your own supervisory authority, as described under **Overseas & NRI Students**.' },
+          { type: 'p', text: 'If we do not resolve your grievance to your satisfaction, you may complain to the **Data Protection Board of India**. If you are in the European Economic Area or the United Kingdom, you may instead complain to your own supervisory authority, as described under **Data Protection Outside India**.' },
           { type: 'p', text: '**Governing law.** This Privacy Policy is governed by the laws of India, and the courts at **Kolkata, West Bengal, India** have exclusive jurisdiction over any dispute arising out of it. Nothing in this clause removes any mandatory right or remedy available to you under the law of the country in which you live.' },
           { type: 'note', tone: 'info', text: 'Related documents: [Terms & Conditions](/terms-conditions) · [Payment & Refund Terms](/payment-refund-policy) · [Refer & Earn Policy](/refer-earn-policy) · [Book a free demo](/book-demo) · [Plans & pricing](/plans)' },
         ],
