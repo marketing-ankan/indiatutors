@@ -15,15 +15,18 @@ const DISC = Number(PRICING.discount || 40);
 const inp = "w-full rounded-md ring-1 ring-slate-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
 const lbl = "block text-xs font-semibold text-slate-700 mb-1";
 
-const curOf = (country) => PRICING.countries.find(c => c.name === country)?.currency || (country === 'India' ? 'INR' : 'USD');
-const fmt = (n, cur) => cur === 'USD'
-  ? '$' + (Math.round(n * 100) / 100).toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1')
-  : '₹' + Math.round(n).toLocaleString('en-IN');
-const grossOf = (net, cur) => { const g = net / (1 - DISC / 100); return cur === 'USD' ? Math.ceil(g) : Math.ceil(g / 50) * 50; };
-const rateFor = (subject, level, ctype, cur) => {
+// No currency parameter: the business is India-only, so every quote is INR.
+// The USD branches these functions used to carry became unreachable when the
+// country picker was removed on 2026-08-10, and the data behind them (96 `usd`
+// and 96 `usdG` arrays, regFee.USD, and the 20-entry `countries` list) has now
+// been deleted from pricing.js. Reintroducing a country input would therefore
+// be an explicit change here, not a silent re-enable of dollar quoting.
+const fmt = (n) => '₹' + Math.round(n).toLocaleString('en-IN');
+const grossOf = (net) => Math.ceil((net / (1 - DISC / 100)) / 50) * 50;
+const rateFor = (subject, level, ctype) => {
   const row = PRICING.rates.find(r => r.name === subject);
   if (!row) return null;
-  const arr = ctype === 'group' ? (cur === 'USD' ? row.usdG : row.inrG) : (cur === 'USD' ? (row.usd || row.inr) : row.inr);
+  const arr = ctype === 'group' ? row.inrG : row.inr;
   if (!arr) return null;
   const li = Math.max(0, PRICING.levels.indexOf(level));
   return arr[Math.min(li, arr.length - 1)];
@@ -68,11 +71,11 @@ function PdfRequestForm() {
 function PlanCard({ plan, sel }) {
   const n = useMemo(() => {
     if (!sel.subject || !sel.level) return null;
-    const netPC = rateFor(sel.subject, sel.level, sel.ctype, sel.cur);
+    const netPC = rateFor(sel.subject, sel.level, sel.ctype);
     if (netPC == null) return { na: true };
     const totalClasses = plan.mult * sel.cpw;
     const net = Math.round(netPC * totalClasses * (1 - plan.discount / 100));
-    const gross = Math.round(grossOf(netPC, sel.cur) * totalClasses);
+    const gross = Math.round(grossOf(netPC) * totalClasses);
     return { net, gross, totalClasses, off: gross > net ? Math.round((1 - net / gross) * 100) : 0 };
   }, [plan, sel]);
 
@@ -94,9 +97,9 @@ function PlanCard({ plan, sel }) {
         ) : (
           <div>
             <div className="flex flex-wrap items-baseline gap-2">
-              <span className="text-3xl font-extrabold text-slate-900 tabular-nums">{fmt(n.net, sel.cur)}</span>
+              <span className="text-3xl font-extrabold text-slate-900 tabular-nums">{fmt(n.net)}</span>
               {n.off > 0 && <>
-                <span className="text-sm text-slate-400 line-through tabular-nums">{fmt(n.gross, sel.cur)}</span>
+                <span className="text-sm text-slate-400 line-through tabular-nums">{fmt(n.gross)}</span>
                 <span className="rounded-full bg-green-50 text-green-700 px-2 py-0.5 text-[11px] font-bold">{n.off}% OFF</span>
               </>}
             </div>
@@ -127,18 +130,16 @@ function PlanCard({ plan, sel }) {
 
 export default function PlansPage({ initialCtype = 'oneone' }) {
   const [flow, setFlow] = useState('new');
-  // country stays 'India' so every quote resolves to INR; `tz` is gone with its
-  // picker rather than left as state nothing reads.
-  const [sel, setSel] = useState({ subject:'', level:'Beginner', ctype: initialCtype, cpw:1, grade:'', country:'India' });
+  // `country` and `tz` are both gone rather than left as state nothing reads —
+  // pricing is INR-only, so there is no currency to derive from a country.
+  const [sel, setSel] = useState({ subject:'', level:'Beginner', ctype: initialCtype, cpw:1, grade:'' });
   const set = (k) => (e) => setSel(s => ({ ...s, [k]: k === 'cpw' ? Number(e.target.value) : e.target.value }));
-  const cur = curOf(sel.country);
-  const fullSel = { ...sel, cur };
   const cats = useMemo(() => {
     const m = new Map();
     PRICING.rates.forEach(r => { if (!m.has(r.cat)) m.set(r.cat, []); m.get(r.cat).push(r.name); });
     return [...m.entries()];
   }, []);
-  const regFee = PRICING.regFee[cur] || 0;
+  const regFee = PRICING.regFee.INR || 0;
 
   return (
     <div className="bg-slate-50">
@@ -222,8 +223,8 @@ export default function PlansPage({ initialCtype = 'oneone' }) {
                     confirmed the business is India-only, so offering a country
                     list quoted every non-Indian visitor a USD price nobody can
                     actually buy, and the timezone list implied classes are
-                    scheduled outside IST. `sel.country` stays 'India', so
-                    curOf() resolves to INR for every quote. */}
+                    scheduled outside IST. The USD data itself was deleted on
+                    2026-08-11, so there is nothing left to quote in dollars. */}
               </div>
             </section>
 
@@ -232,16 +233,16 @@ export default function PlansPage({ initialCtype = 'oneone' }) {
               <section className="rounded-2xl bg-white ring-1 ring-slate-100 p-8 text-center">
                 <h3 className="text-lg font-extrabold">🎁 FREE CLASSES — Try a full free course</h3>
                 <p className="text-sm text-slate-500 mt-2 max-w-xl mx-auto">Minimum 5 / maximum 10 students · once a week · up to 3 months. A one-time registration fee applies — no hidden charges, no class fees.</p>
-                <p className="mt-4 text-sm font-semibold text-slate-700">One-time registration fee: <span className="text-2xl font-extrabold text-brand-700 tabular-nums">{fmt(regFee, cur)}</span></p>
+                <p className="mt-4 text-sm font-semibold text-slate-700">One-time registration fee: <span className="text-2xl font-extrabold text-brand-700 tabular-nums">{fmt(regFee)}</span></p>
                 <Link to={`/book-demo${sel.subject?`?subject=${encodeURIComponent(sel.subject)}`:''}`} className="mt-5 inline-flex rounded-lg bg-brand-600 text-white px-8 py-3 text-sm font-bold hover:bg-brand-700">Register for Free Classes</Link>
               </section>
             ) : (
               <>
                 {!(sel.subject) && <p className="text-center text-sm text-slate-500">👆 Pick a subject and level above to see live prices for every plan.</p>}
                 <div className="grid md:grid-cols-3 gap-6 pt-2">
-                  {PRICING.plans.map(p => <PlanCard key={p.key} plan={p} sel={fullSel}/>)}
+                  {PRICING.plans.map(p => <PlanCard key={p.key} plan={p} sel={sel}/>)}
                 </div>
-                <p className="text-center text-xs text-slate-400">Prices shown before GST ({PRICING.gst}%) where applicable · One-time registration fee {fmt(regFee, cur)} · Online payment & cart arrive soon — enrolment currently starts with a free demo class.</p>
+                <p className="text-center text-xs text-slate-400">Prices shown before GST ({PRICING.gst}%) where applicable · One-time registration fee {fmt(regFee)} · Online payment & cart arrive soon — enrolment currently starts with a free demo class.</p>
               </>
             )}
           </>

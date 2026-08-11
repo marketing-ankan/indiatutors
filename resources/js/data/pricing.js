@@ -121,8 +121,7 @@ export const PRICING = {
     "Professional"
   ],
   "regFee": {
-    "INR": 750,
-    "USD": 10
+    "INR": 750
   },
   "rates": [
     {
@@ -133,13 +132,7 @@ export const PRICING = {
         1000,
         1500
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Guitar",
@@ -149,13 +142,7 @@ export const PRICING = {
         1000,
         1500
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Ukulele",
@@ -165,13 +152,7 @@ export const PRICING = {
         1000,
         1500
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Keyboard",
@@ -181,13 +162,7 @@ export const PRICING = {
         1000,
         1500
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Drums",
@@ -197,13 +172,7 @@ export const PRICING = {
         1000,
         1500
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Violin",
@@ -213,13 +182,7 @@ export const PRICING = {
         1500,
         2000
       ],
-      "usd": [
-        15,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Veena",
@@ -229,13 +192,7 @@ export const PRICING = {
         1000,
         1500
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Cello",
@@ -245,13 +202,7 @@ export const PRICING = {
         2000,
         2500
       ],
-      "usd": [
-        20,
-        30,
-        40
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Viola",
@@ -261,13 +212,7 @@ export const PRICING = {
         1500,
         2000
       ],
-      "usd": [
-        15,
-        20,
-        30
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Clarinet",
@@ -277,13 +222,7 @@ export const PRICING = {
         2000,
         2500
       ],
-      "usd": [
-        20,
-        30,
-        40
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Tabla",
@@ -293,13 +232,7 @@ export const PRICING = {
         1000,
         1500
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Indian Flute",
@@ -309,13 +242,7 @@ export const PRICING = {
         1000,
         1500
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Western Flute",
@@ -325,13 +252,7 @@ export const PRICING = {
         1500,
         2000
       ],
-      "usd": [
-        15,
-        20,
-        30
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Saxophone",
@@ -341,13 +262,7 @@ export const PRICING = {
         1500,
         2000
       ],
-      "usd": [
-        15,
-        20,
-        30
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Music Theory",
@@ -357,13 +272,7 @@ export const PRICING = {
         1000,
         1500
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Trumpet",
@@ -373,13 +282,7 @@ export const PRICING = {
         2000,
         2500
       ],
-      "usd": [
-        20,
-        30,
-        40
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Sitar",
@@ -389,13 +292,7 @@ export const PRICING = {
         1000,
         1500
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Recorder",
@@ -405,13 +302,7 @@ export const PRICING = {
         1000,
         1500
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Carnatic Violin",
@@ -421,13 +312,7 @@ export const PRICING = {
         1500,
         2000
       ],
-      "usd": [
-        15,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Carnatic Vocal Music",
@@ -437,13 +322,7 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Hindustani Vocal Music",
@@ -453,13 +332,7 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Western Vocal Music",
@@ -469,13 +342,7 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Scratch",
@@ -485,20 +352,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        12.5,
-        15
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        6.25,
-        7.5
       ]
     },
     {
@@ -509,20 +366,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        12.5,
-        15
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        6.25,
-        7.5
       ]
     },
     {
@@ -533,20 +380,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        12.5,
-        15
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        6.25,
-        7.5
       ]
     },
     {
@@ -557,20 +394,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        12.5,
-        15
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        6.25,
-        7.5
       ]
     },
     {
@@ -581,20 +408,10 @@ export const PRICING = {
         1200,
         1500
       ],
-      "usd": [
-        15,
-        20,
-        25
-      ],
       "inrG": [
         425,
         600,
         750
-      ],
-      "usdG": [
-        7.5,
-        10,
-        12.5
       ]
     },
     {
@@ -605,20 +422,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        12.5,
-        15
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        6.25,
-        7.5
       ]
     },
     {
@@ -629,20 +436,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        12.5,
-        15
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        6.25,
-        7.5
       ]
     },
     {
@@ -653,20 +450,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        12.5,
-        15
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        6.25,
-        7.5
       ]
     },
     {
@@ -677,20 +464,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        12.5,
-        15
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        6.25,
-        7.5
       ]
     },
     {
@@ -701,20 +478,10 @@ export const PRICING = {
         1200,
         1200
       ],
-      "usd": [
-        15,
-        15,
-        15
-      ],
       "inrG": [
         600,
         600,
         600
-      ],
-      "usdG": [
-        7.5,
-        7.5,
-        7.5
       ]
     },
     {
@@ -725,20 +492,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        15,
-        15,
-        15
-      ],
       "inrG": [
         450,
         450,
         600
-      ],
-      "usdG": [
-        7.5,
-        7.5,
-        7.5
       ]
     },
     {
@@ -749,20 +506,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        12.5,
-        15
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        6.25,
-        7.5
       ]
     },
     {
@@ -773,20 +520,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        12.5,
-        15
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        6.25,
-        7.5
       ]
     },
     {
@@ -797,20 +534,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        12.5,
-        12.5,
-        15
-      ],
       "inrG": [
         450,
         450,
         600
-      ],
-      "usdG": [
-        6.25,
-        6.25,
-        7.5
       ]
     },
     {
@@ -821,20 +548,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        12.5,
-        12.5,
-        15
-      ],
       "inrG": [
         450,
         450,
         600
-      ],
-      "usdG": [
-        6.25,
-        6.25,
-        7.5
       ]
     },
     {
@@ -845,20 +562,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        12.5,
-        12.5,
-        15
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        6.25,
-        6.25,
-        7.5
       ]
     },
     {
@@ -869,20 +576,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        15,
-        15,
-        20
-      ],
       "inrG": [
         450,
         450,
         600
-      ],
-      "usdG": [
-        7.5,
-        7.5,
-        10
       ]
     },
     {
@@ -893,20 +590,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        15,
-        15,
-        20
-      ],
       "inrG": [
         450,
         450,
         600
-      ],
-      "usdG": [
-        7.5,
-        7.5,
-        10
       ]
     },
     {
@@ -917,20 +604,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        7.5,
-        10
       ]
     },
     {
@@ -941,20 +618,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        7.5,
-        10
       ]
     },
     {
@@ -965,20 +632,10 @@ export const PRICING = {
         800,
         1200
       ],
-      "usd": [
-        10,
-        12.5,
-        20
-      ],
       "inrG": [
         200,
         300,
         500
-      ],
-      "usdG": [
-        3,
-        5,
-        7.5
       ]
     },
     {
@@ -989,13 +646,11 @@ export const PRICING = {
         800,
         1200
       ],
-      "usd": null,
       "inrG": [
         200,
         300,
         500
-      ],
-      "usdG": null
+      ]
     },
     {
       "name": "Creative Writing",
@@ -1005,20 +660,10 @@ export const PRICING = {
         800,
         1200
       ],
-      "usd": [
-        10,
-        12.5,
-        20
-      ],
       "inrG": [
         300,
         400,
         600
-      ],
-      "usdG": [
-        5,
-        6.25,
-        10
       ]
     },
     {
@@ -1029,20 +674,10 @@ export const PRICING = {
         400,
         600
       ],
-      "usd": [
-        5,
-        7.5,
-        10
-      ],
       "inrG": [
         150,
         200,
         300
-      ],
-      "usdG": [
-        2.5,
-        3.75,
-        5
       ]
     },
     {
@@ -1053,20 +688,10 @@ export const PRICING = {
         800,
         1200
       ],
-      "usd": [
-        10,
-        12.5,
-        20
-      ],
       "inrG": [
         300,
         400,
         600
-      ],
-      "usdG": [
-        5,
-        6.25,
-        10
       ]
     },
     {
@@ -1077,20 +702,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        7.5,
-        10
       ]
     },
     {
@@ -1101,20 +716,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        7.5,
-        10
       ]
     },
     {
@@ -1125,20 +730,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        7.5,
-        10
       ]
     },
     {
@@ -1149,20 +744,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        7.5,
-        10
       ]
     },
     {
@@ -1173,20 +758,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        7.5,
-        10
       ]
     },
     {
@@ -1197,20 +772,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        7.5,
-        10
       ]
     },
     {
@@ -1221,20 +786,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        7.5,
-        10
       ]
     },
     {
@@ -1245,20 +800,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        7.5,
-        10
       ]
     },
     {
@@ -1269,20 +814,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        7.5,
-        10
       ]
     },
     {
@@ -1293,20 +828,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        7.5,
-        10
       ]
     },
     {
@@ -1317,20 +842,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        7.5,
-        10
       ]
     },
     {
@@ -1341,20 +856,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        10,
-        15,
-        20
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        5,
-        7.5,
-        10
       ]
     },
     {
@@ -1365,20 +870,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        8,
-        12,
-        16
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        4,
-        6,
-        8
       ]
     },
     {
@@ -1389,20 +884,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        8,
-        12,
-        16
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        4,
-        6,
-        8
       ]
     },
     {
@@ -1413,20 +898,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        8,
-        12,
-        16
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        4,
-        6,
-        8
       ]
     },
     {
@@ -1437,20 +912,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        8,
-        12,
-        16
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        4,
-        6,
-        8
       ]
     },
     {
@@ -1461,20 +926,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        8,
-        12,
-        16
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        4,
-        6,
-        8
       ]
     },
     {
@@ -1485,20 +940,10 @@ export const PRICING = {
         900,
         1200
       ],
-      "usd": [
-        8,
-        12,
-        16
-      ],
       "inrG": [
         300,
         450,
         600
-      ],
-      "usdG": [
-        4,
-        6,
-        8
       ]
     },
     {
@@ -1507,11 +952,7 @@ export const PRICING = {
       "inr": [
         600
       ],
-      "usd": [
-        10
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Mathematics Grade 1-7",
@@ -1519,11 +960,7 @@ export const PRICING = {
       "inr": [
         600
       ],
-      "usd": [
-        10
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Mathematics Grade 8",
@@ -1531,11 +968,7 @@ export const PRICING = {
       "inr": [
         750
       ],
-      "usd": [
-        12.5
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Vedic Maths (Grade 3-6)",
@@ -1543,11 +976,7 @@ export const PRICING = {
       "inr": [
         600
       ],
-      "usd": [
-        10
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Vedic Maths (Advanced)",
@@ -1555,11 +984,7 @@ export const PRICING = {
       "inr": [
         1000
       ],
-      "usd": [
-        15
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "English Grade 1-7",
@@ -1567,11 +992,7 @@ export const PRICING = {
       "inr": [
         600
       ],
-      "usd": [
-        10
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "English Grade 8",
@@ -1579,11 +1000,7 @@ export const PRICING = {
       "inr": [
         750
       ],
-      "usd": [
-        12.5
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Science Grade 1-7",
@@ -1591,11 +1008,7 @@ export const PRICING = {
       "inr": [
         600
       ],
-      "usd": [
-        10
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Science Grade 8",
@@ -1603,11 +1016,7 @@ export const PRICING = {
       "inr": [
         750
       ],
-      "usd": [
-        12.5
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Social Science Grade 1-7",
@@ -1615,11 +1024,7 @@ export const PRICING = {
       "inr": [
         600
       ],
-      "usd": [
-        10
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Social Science Grade 8",
@@ -1627,11 +1032,7 @@ export const PRICING = {
       "inr": [
         750
       ],
-      "usd": [
-        12.5
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Abacus",
@@ -1639,11 +1040,7 @@ export const PRICING = {
       "inr": [
         600
       ],
-      "usd": [
-        10
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Mathematics Grade 9-10",
@@ -1651,11 +1048,7 @@ export const PRICING = {
       "inr": [
         1000
       ],
-      "usd": [
-        15
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Mathematics Grade 11-12",
@@ -1663,11 +1056,7 @@ export const PRICING = {
       "inr": [
         1200
       ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "English Grade 9-10",
@@ -1675,11 +1064,7 @@ export const PRICING = {
       "inr": [
         1000
       ],
-      "usd": [
-        15
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "English Grade 11-12",
@@ -1687,11 +1072,7 @@ export const PRICING = {
       "inr": [
         1200
       ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Science Grade 9-10",
@@ -1699,11 +1080,7 @@ export const PRICING = {
       "inr": [
         1000
       ],
-      "usd": [
-        15
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Physics Grade 11-12",
@@ -1711,11 +1088,7 @@ export const PRICING = {
       "inr": [
         1200
       ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Chemistry Grade 11-12",
@@ -1723,11 +1096,7 @@ export const PRICING = {
       "inr": [
         1200
       ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Biology Grade 11-12",
@@ -1735,11 +1104,7 @@ export const PRICING = {
       "inr": [
         1200
       ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Social Science Grade 9-10",
@@ -1747,11 +1112,7 @@ export const PRICING = {
       "inr": [
         1000
       ],
-      "usd": [
-        15
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Essay Writing",
@@ -1759,11 +1120,7 @@ export const PRICING = {
       "inr": [
         1000
       ],
-      "usd": [
-        15
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Economics",
@@ -1771,11 +1128,7 @@ export const PRICING = {
       "inr": [
         1200
       ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "History Grade 11-12",
@@ -1783,11 +1136,7 @@ export const PRICING = {
       "inr": [
         1200
       ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Political Science Grade 11-12",
@@ -1795,11 +1144,7 @@ export const PRICING = {
       "inr": [
         1200
       ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Geography Grade 11-12",
@@ -1807,11 +1152,7 @@ export const PRICING = {
       "inr": [
         1200
       ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Accountancy Grade 11-12",
@@ -1819,11 +1160,7 @@ export const PRICING = {
       "inr": [
         1200
       ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Business Studies Grade 11-12",
@@ -1831,11 +1168,7 @@ export const PRICING = {
       "inr": [
         1200
       ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Applied Mathematics Grade 11-12",
@@ -1843,11 +1176,7 @@ export const PRICING = {
       "inr": [
         1200
       ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Computer Science Grade 11-12",
@@ -1855,11 +1184,7 @@ export const PRICING = {
       "inr": [
         1200
       ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
+      "inrG": null
     },
     {
       "name": "Informatics Practices Grade 11-12",
@@ -1867,93 +1192,7 @@ export const PRICING = {
       "inr": [
         1200
       ],
-      "usd": [
-        20
-      ],
-      "inrG": null,
-      "usdG": null
-    }
-  ],
-  "countries": [
-    {
-      "name": "India",
-      "currency": "INR"
-    },
-    {
-      "name": "United States",
-      "currency": "USD"
-    },
-    {
-      "name": "United Kingdom",
-      "currency": "USD"
-    },
-    {
-      "name": "Canada",
-      "currency": "USD"
-    },
-    {
-      "name": "Australia",
-      "currency": "USD"
-    },
-    {
-      "name": "United Arab Emirates",
-      "currency": "USD"
-    },
-    {
-      "name": "Singapore",
-      "currency": "USD"
-    },
-    {
-      "name": "Saudi Arabia",
-      "currency": "USD"
-    },
-    {
-      "name": "Qatar",
-      "currency": "USD"
-    },
-    {
-      "name": "Kuwait",
-      "currency": "USD"
-    },
-    {
-      "name": "Germany",
-      "currency": "USD"
-    },
-    {
-      "name": "France",
-      "currency": "USD"
-    },
-    {
-      "name": "Netherlands",
-      "currency": "USD"
-    },
-    {
-      "name": "New Zealand",
-      "currency": "USD"
-    },
-    {
-      "name": "Ireland",
-      "currency": "USD"
-    },
-    {
-      "name": "Malaysia",
-      "currency": "USD"
-    },
-    {
-      "name": "Hong Kong",
-      "currency": "USD"
-    },
-    {
-      "name": "South Africa",
-      "currency": "USD"
-    },
-    {
-      "name": "Nigeria",
-      "currency": "USD"
-    },
-    {
-      "name": "Other",
-      "currency": "USD"
+      "inrG": null
     }
   ],
   "timezones": [
