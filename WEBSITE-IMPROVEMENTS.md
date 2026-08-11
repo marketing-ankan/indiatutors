@@ -288,11 +288,16 @@ hidden-tab timer throttling makes elapsed-time tests unreliable: Pause → clear
 set 0; Play → set 1; hover in → clear 1; leave hover and focus → set 1; Next →
 clear 1 / set 1.
 
-**Still open in D6:** `HeroSlider` pauses on hover and focus but has no visible
-pause control, so strictly it still lacks the 2.2.2 mechanism. Left alone
-deliberately — adding a button to the homepage hero is a visible design change to
-the most prominent element on the site, which is the owner's call, not a defect
-fix.
+**D6 is fully closed (2026-08-11).** `HeroSlider` now carries the same two-flag
+model and its own Pause/Play toggle, added to the existing dot row at the owner's
+request. `items-center` on that row keeps the 20px control aligned with the 2px
+dots (measured: button centre 722px, dot centre 722px). Choosing a dot bumps the
+nonce too, so the visitor gets a full 5s on the slide they picked.
+
+Verified the same way: Pause → clear 1 / set 0, label flips to "Play slideshow",
+`aria-pressed="true"`; Play → set 1; dot click → clear 1 / set 1. Sweep clean
+360–2560px. Both carousels on the site now satisfy 2.2.2 with a real mechanism
+rather than hover alone.
 
 ---
 

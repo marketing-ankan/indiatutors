@@ -49,13 +49,20 @@ function HeroSlider() {
   const n = HERO_SLIDES.length;
   const [idx, setIdx] = useState(0);
   const [anim, setAnim] = useState(true);
-  const [paused, setPaused] = useState(false);
+  // Same split as TestimonialSlider: `stopped` is the explicit, sticky control,
+  // `hovering` the transient courtesy pause. One shared flag would let a
+  // mouseleave resume the slideshow the visitor had just pressed pause on.
+  const [stopped, setStopped] = useState(false);
+  const [hovering, setHovering] = useState(false);
+  // Restarts the interval when a dot is chosen, so the visitor gets a full 5s on
+  // the slide they picked rather than however much was left on the clock.
+  const [nudge, setNudge] = useState(0);
 
   useEffect(() => {
-    if (paused) return;
+    if (stopped || hovering) return;
     const t = setInterval(() => setIdx(i => (i >= n ? i : i + 1)), 5000);
     return () => clearInterval(t);
-  }, [paused]);
+  }, [stopped, hovering, nudge]);
 
   // Seamless forward loop: an appended clone of slide 0 lets last→first slide
   // forward, then we snap back to the real slide 0 without a transition.
@@ -70,18 +77,18 @@ function HeroSlider() {
     }
   }, [idx, anim, n]);
 
-  const go = i => { setAnim(true); setIdx(i); };
+  const go = i => { setAnim(true); setIdx(i); setNudge(v => v + 1); };
   const active = idx % n;
 
   return (
     <div
       className="hidden lg:block relative rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 h-[520px]"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      // Focus pauses too, not just hover (WCAG 2.2.2). A keyboard user tabbing
-      // the dots below otherwise watched the slide move out from under them.
-      onFocus={() => setPaused(true)}
-      onBlur={() => setPaused(false)}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+      // Focus pauses too, not just hover. A keyboard user tabbing the dots below
+      // otherwise watched the slide move out from under them.
+      onFocus={() => setHovering(true)}
+      onBlur={() => setHovering(false)}
     >
       <div className="flex h-full" style={{ transform: `translateX(-${idx * 100}%)`, transition: anim ? 'transform 650ms ease-in-out' : 'none' }}>
         {[...HERO_SLIDES, HERO_SLIDES[0]].map((s, i) => (
@@ -92,11 +99,20 @@ function HeroSlider() {
           <img key={i} src={s.src} alt={s.alt} className="w-full h-full shrink-0 object-cover" loading={i === 0 ? 'eager' : 'lazy'} />
         ))}
       </div>
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
         {HERO_SLIDES.map((_, i) => (
           <button key={i} onClick={() => go(i)} aria-label={`Go to slide ${i + 1}`}
             className={`h-2 rounded-full transition-all ${active === i ? 'w-6 bg-white' : 'w-2 bg-white/60 hover:bg-white/90'}`} />
         ))}
+        {/* The actual 2.2.2 mechanism. Pausing on hover/focus does nothing for a
+            visitor who is simply looking at the slide, which is who the criterion
+            exists for. items-center above keeps the 5px control aligned with the
+            2px dots instead of letting the row top-align them. */}
+        <button type="button" onClick={() => setStopped(s => !s)} aria-pressed={stopped}
+          aria-label={stopped ? 'Play slideshow' : 'Pause slideshow'}
+          className="ml-1 grid h-5 w-5 place-items-center rounded-full bg-white/70 text-[#0B1220] transition-colors hover:bg-white">
+          {stopped ? <Play className="h-3 w-3" /> : <Pause className="h-3 w-3" />}
+        </button>
       </div>
     </div>
   );
