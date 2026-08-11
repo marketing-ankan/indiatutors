@@ -51,7 +51,8 @@ function CourseAccordion({ c, open, onToggle }) {
 
   return (
     <article className={`rounded-2xl bg-white ring-1 overflow-hidden ${open ? 'ring-brand-200 shadow-md' : 'ring-slate-100 shadow-sm'}`}>
-      <button onClick={onToggle} className="w-full text-left px-5 py-4 flex items-start justify-between gap-4 hover:bg-slate-50">
+      <button onClick={onToggle} aria-expanded={open} aria-controls={`course-panel-${c.slug}`}
+        className="w-full text-left px-5 py-4 flex items-start justify-between gap-4 hover:bg-slate-50">
         <div className="min-w-0">
           <h3 className="font-extrabold text-slate-900">{c.name}</h3>
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
@@ -73,7 +74,7 @@ function CourseAccordion({ c, open, onToggle }) {
       </button>
 
       {open && (
-        <div className="px-5 pb-5 border-t border-slate-100 pt-4 grid lg:grid-cols-[1fr_1fr] gap-6">
+        <div id={`course-panel-${c.slug}`} className="px-5 pb-5 border-t border-slate-100 pt-4 grid lg:grid-cols-[1fr_1fr] gap-6">
           <div>
             <h4 className="text-sm font-bold text-slate-800 mb-1.5">About This Course</h4>
             <p className="text-sm text-slate-600 leading-relaxed">{c.short_description || c.subtitle || `Live, expert-led ${c.name} classes with a structured curriculum, regular practice and personalised feedback.`}</p>

@@ -21,10 +21,10 @@ export default function TutorCard({ tutor }) {
           {subjects.slice(0,3).map(s=>(
             <span key={s} className="rounded-full bg-brand-50 text-brand-700 px-2 py-0.5 text-[11px] font-semibold">{s}</span>
           ))}
-          {subjects.length>3 && <span className="text-[11px] text-slate-400 px-1 py-0.5">+{subjects.length-3}</span>}
+          {subjects.length>3 && <span className="text-[11px] text-slate-500 px-1 py-0.5">+{subjects.length-3}</span>}
         </div>
         <div className="mt-3 flex items-center justify-between">
-          <span className="text-xs text-slate-400 flex items-center gap-1"><MapPin className="h-3 w-3"/>{tutor.city}</span>
+          <span className="text-xs text-slate-500 flex items-center gap-1"><MapPin className="h-3 w-3"/>{tutor.city}</span>
           <span className="text-sm font-bold text-brand-700">₹{Number(tutor.fee_hourly).toLocaleString('en-IN')}/hr</span>
         </div>
       </div>

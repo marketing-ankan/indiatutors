@@ -239,8 +239,9 @@ These are claims the site makes that are false, unverifiable, or that the produc
 
 ## ⚡ Quick wins — under 15 minutes each
 
-**Status as of 2026-08-11.** 14 of the 22 are shipped and live. The 8 that remain
-are listed after the table: 4 need an owner decision on content, 4 are code.
+**Status as of 2026-08-11.** 18 of the 22 are shipped and live, plus one found
+during the responsive sweep (item 23 / C6). **Every code-only quick win is done.**
+The 4 that remain all need an owner decision on content, not engineering.
 
 | # | Change | File:line | Status |
 |---|---|---|---|
@@ -252,28 +253,32 @@ are listed after the table: 4 need an owner decision on content, 4 are code.
 | 6 | Set `ENTITY` to the registered LLP / Pvt Ltd name, drop the TODO | `resources/js/data/legal.js:13-14` | ⏸ owner decision (A10) |
 | 7 | Empty the four placeholder testimonial arrays + `ACHIEVEMENT_PHOTOS` | `courseDetail.js:62, 143, 152, 196, 236` | ⏸ owner decision (A3/A4) |
 | 8 | `hidden lg:flex` → `hidden xl:flex` (recovers the off-screen hamburger) | `Header.jsx:158` | ✅ shipped |
-| 9 | Add `group-focus-within:visible group-focus-within:opacity-100` to both dropdowns | `Header.jsx:90, 115` | ⬜ open |
+| 9 | Add `group-focus-within:visible group-focus-within:opacity-100` to both dropdowns | `Header.jsx:90, 115` | ✅ shipped |
 | 10 | Add `aria-label` to the three icon buttons + search input, `aria-expanded` on the burger | `Header.jsx:166, 167, 170, 180` | ✅ shipped |
 | 11 | Add `aria-label` to the six filter controls | `FindTutorsPage.jsx:104-122` | ✅ shipped |
-| 12 | Add `aria-expanded={open}` to the courses accordion | `CoursesPage.jsx:54` | ⬜ open |
+| 12 | Add `aria-expanded={open}` + `aria-controls` to the courses accordion | `CoursesPage.jsx:54` | ✅ shipped |
 | 13 | `text-slate-500` on the footer bottom bar, `hover:text-white` on the policy links | `Footer.jsx:150-156` | ✅ shipped |
-| 14 | `text-slate-400` → `text-slate-500` on content text | `TutorCard.jsx:24, 27`; `HomePage.jsx:123, 133, 135, 508` | ⬜ open |
+| 14 | `text-slate-400` → `text-slate-500` on content text | `TutorCard.jsx:24, 27`; `HomePage.jsx:118, 128, 130, 227, 498` | ✅ shipped |
 | 15 | Add the `lg:grid-cols-3` step to the footer grid | `Footer.jsx:75` | ✅ shipped |
 | 16 | Add the two missing `isError` messages | `Footer.jsx:98`, `PlansPage.jsx:48` | ✅ shipped (PlansPage was already done) |
 | 17 | `target="_blank" rel="noopener noreferrer"` on the two policy links | `BecomeTeacherPage.jsx:187` | ✅ shipped |
 | 18 | `loading={i === 0 ? 'eager' : 'lazy'}` on hero slides (−705 KB on mobile) | `HomePage.jsx:84` | ✅ shipped |
 | 19 | Swap the Group Classes hero CTA destinations; repoint the duplicate "Book Now" | `GroupClassesPage.jsx:103-104, 79`; `CoursesPage.jsx:155` | ✅ shipped |
 | 20 | Add the skip link + `id="main"` | `Layout.jsx:34` | ✅ shipped |
-| 21 | Add `onFocus`/`onBlur` pause to the hero slider | `HomePage.jsx:79-80` | ⬜ open |
+| 21 | Add `onFocus`/`onBlur` pause to the hero slider | `HomePage.jsx:79-80` | ✅ shipped |
 | 22 | Fix the level-box grid breakpoint | `CoursesPage.jsx:86` | ✅ shipped |
 | 23 | `[&>*]:min-w-0` on the catalogue layout grid — see C6 below | `CoursesPage.jsx:160` | ✅ shipped |
 
-**Still open, no decision needed:** 9 (keyboard access to the catalog dropdowns),
-12 (`aria-expanded` on the courses accordion), 14 (contrast on tutor/price text),
-21 (pause the hero slider on focus).
+**Nothing code-only is left in this table.**
 
 **Blocked on you:** 4, 5, 6, 7 — all content, not code. The entity name (6) is the
 one with a hard legal requirement behind it.
+
+**D6 is only half closed.** Item 21 fixed the hero slider. `TestimonialSlider`
+(`HomePage.jsx:256-259`) still auto-advances on a 6s interval with no pause on
+hover, focus or any control, and its prev/next buttons nudge the rail without
+stopping the timer — so WCAG 2.2.2 is still failed on that carousel. Fixing it is
+code-only and needs no decision; it was simply never part of the quick-win table.
 
 ---
 
