@@ -5,7 +5,7 @@ import {
   Laptop, Home as HomeIcon, CalendarCheck, Rocket, Video, MessagesSquare,
   RotateCcw, CalendarX, Award, IndianRupee, Calculator, Code2, Music, Brain,
   Bot, Atom, Dna, PenTool, Radical, Castle, PersonStanding, Phone, Mail,
-  ShieldCheck, Info,
+  ShieldCheck, Info, Pause, Play,
 } from 'lucide-react';
 import {
   COURSE_TABS, COURSE_PANELS, GROUP_TABS, GROUP_PANELS, TRENDING, VIDEO_COURSES,
@@ -246,18 +246,37 @@ function DemoCourseRow({ eyebrow, title, seeAllTo, cards, bg }) {
 // ------------------------------------------------------- TESTIMONIAL SLIDER -
 function TestimonialSlider() {
   const railRef = useRef(null);
+  // Two separate pauses, deliberately. `stopped` is the explicit control WCAG
+  // 2.2.2 actually asks for and it is sticky; `hovering` is the transient
+  // courtesy pause. One shared flag would have resumed the carousel the moment
+  // the pointer left the Pause button the visitor had just pressed.
+  const [stopped, setStopped] = useState(false);
+  const [hovering, setHovering] = useState(false);
+  // Bumped on a manual prev/next so the interval restarts — otherwise the timer
+  // could fire a fraction of a second after the visitor chose a slide themselves.
+  const [nudge, setNudge] = useState(0);
   const scroll = dir => {
     const el = railRef.current; if (!el) return;
     const step = el.querySelector('blockquote')?.parentElement?.offsetWidth + 20 || 400;
     const atEnd = dir > 0 && el.scrollLeft + el.clientWidth >= el.scrollWidth - 10;
     el.scrollTo({ left: atEnd ? 0 : el.scrollLeft + dir * step, behavior: 'smooth' });
   };
+  const go = dir => { scroll(dir); setNudge(n => n + 1); };
   useEffect(() => {
+    if (stopped || hovering) return;
     const t = setInterval(() => scroll(1), 6000);
     return () => clearInterval(t);
-  }, []);
+  }, [stopped, hovering, nudge]);
   return (
-    <>
+    // onFocus/onBlur are focusin/focusout in React, so they bubble — focusing
+    // any control or card inside the group pauses, which is what a keyboard
+    // user needs while reading.
+    <div
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+      onFocus={() => setHovering(true)}
+      onBlur={() => setHovering(false)}
+    >
       <div ref={railRef} className="flex gap-5 overflow-x-auto snap-x pb-2 scrollbar-hide">
         {TESTIMONIALS.map(t => (
           <div key={t.name} className="flex-shrink-0 snap-start w-[86%] sm:w-[46%] lg:w-[31.5%]">
@@ -277,10 +296,15 @@ function TestimonialSlider() {
         ))}
       </div>
       <div className="mt-5 flex justify-center gap-3">
-        <button type="button" onClick={() => scroll(-1)} aria-label="Previous testimonials" className="w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center hover:border-brand-400"><ChevronLeft className="h-4 w-4" /></button>
-        <button type="button" onClick={() => scroll(1)} aria-label="Next testimonials" className="w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center hover:border-brand-400"><ChevronRight className="h-4 w-4" /></button>
+        <button type="button" onClick={() => go(-1)} aria-label="Previous testimonials" className="w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center hover:border-brand-400"><ChevronLeft className="h-4 w-4" /></button>
+        <button type="button" onClick={() => setStopped(s => !s)} aria-pressed={stopped}
+          aria-label={stopped ? 'Play testimonials' : 'Pause testimonials'}
+          className="w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center hover:border-brand-400">
+          {stopped ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+        </button>
+        <button type="button" onClick={() => go(1)} aria-label="Next testimonials" className="w-9 h-9 rounded-full bg-white border border-slate-200 text-slate-600 flex items-center justify-center hover:border-brand-400"><ChevronRight className="h-4 w-4" /></button>
       </div>
-    </>
+    </div>
   );
 }
 
