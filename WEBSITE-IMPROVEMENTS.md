@@ -283,16 +283,25 @@ the **Consumer Protection Act, 2019**" sits nested *inside* the overseas cooling
 section. A wholesale delete would have stripped an Indian customer of a protection
 during an India-only cleanup. Verified still rendered after the edit.
 
-⚠ **STILL OPEN — the checkout contradicts the policies.** `CheckoutPage.jsx:142-145`
-renders a **required** "Country / Region" select offering United States, United
-Kingdom, Canada, Australia, United Arab Emirates, Singapore and Other; it is
-validated at `OrderController.php:27` and persisted at `:60`. The India-only sweep
-never reached it. The policies now say we serve students across India while the
-page a customer actually transacts on invites a UAE billing address. Needs an owner
-decision: pin checkout to India like the Plans page, or treat a foreign *billing*
-address as a genuine exception (an NRI parent paying for a child studying in India
-is plausible, which is why this was not changed unilaterally). This also governs
-whether Privacy's "city, state and country" collection notice stays accurate.
+✅ **Checkout pinned to India (2026-08-11), on the owner's instruction.** The
+required "Country / Region" select offering the US, UK, Canada, Australia, the UAE
+and Singapore is gone from `CheckoutPage.jsx`; the row stays visible but read-only
+so the buyer can still see what is recorded against the order, and `country` stays
+in form state so the payload is unchanged.
+
+Pinned server-side as well, which is the part that matters: `/api/orders` is a
+public route, so the form no longer offering a choice would not have stopped a
+direct POST from recording a foreign billing country. `OrderController.php` now
+writes `'country' => 'India'` unconditionally instead of defaulting. It
+**overwrites rather than rejects** deliberately — the PWA service worker can serve
+an older bundle that still sends a country, and that buyer should be able to
+complete checkout rather than hit a 422.
+
+Verified end-to-end: a POST carrying `"country":"United Arab Emirates"` was
+accepted and stored as `India`. Zero `<select>` elements left on the page, no
+foreign option anywhere in the DOM, and the sweep is clean 360-2560px. Privacy's
+"city, state and country" collection notice stays accurate, since country is still
+collected and stored.
 
 ℹ **Dead USD code left in place, not blocking:** `pricing.js` `regFee.USD: 10`, 19
 orphaned USD country entries, and the USD branches in `PlansPage.jsx` are all
