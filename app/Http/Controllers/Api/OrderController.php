@@ -57,7 +57,13 @@ class OrderController extends Controller {
                 'last_name'   => $data['last_name'] ?? null,
                 'email'       => $data['email'],
                 'phone'       => $data['phone'] ?? null,
-                'country'     => $data['country'] ?? 'India',
+                // Pinned, not defaulted. The checkout form no longer offers a
+                // choice, but this route is public, so a direct POST could still
+                // record a foreign billing country and recreate the conflict with
+                // the policies. Overwritten rather than rejected on purpose: the
+                // PWA service worker can serve an older bundle that still sends a
+                // country, and that buyer should complete checkout, not get a 422.
+                'country'     => 'India',
                 'address_1'   => $data['address_1'],
                 'address_2'   => $data['address_2'] ?? null,
                 'city'        => $data['city'],

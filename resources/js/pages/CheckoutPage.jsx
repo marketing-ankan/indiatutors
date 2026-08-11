@@ -139,11 +139,18 @@ export default function CheckoutPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="First name *"><input required value={f.first_name} onChange={set('first_name')} className={inputCls} /></Field>
               <Field label="Last name"><input value={f.last_name} onChange={set('last_name')} className={inputCls} /></Field>
-              <Field label="Country / Region *" span>
-                <select required value={f.country} onChange={set('country')} className={inputCls}>
-                  {['India', 'United States (US)', 'United Kingdom (UK)', 'Canada', 'Australia', 'United Arab Emirates', 'Singapore', 'Other'].map(c => <option key={c}>{c}</option>)}
-                </select>
-              </Field>
+              {/* Pinned to India, matching the Plans page (which dropped its own
+                  country picker on 2026-08-10) and the policies, which say we
+                  serve students across India. Offering a UAE or US billing
+                  address here contradicted the Terms on the one page where the
+                  customer actually pays. Shown read-only rather than hidden so
+                  they can still see what is recorded against the order; `country`
+                  stays in form state, so the payload is unchanged. Not a <label>:
+                  there is no control to label. */}
+              <div className="sm:col-span-2">
+                <span className="mb-1 block text-[0.83rem] font-semibold text-slate-700">Country / Region</span>
+                <p className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-600">India</p>
+              </div>
               <Field label="Address *" span><input required value={f.address_1} onChange={set('address_1')} className={inputCls} placeholder="House number and street name" /></Field>
               <Field label="Apartment, suite, etc. (optional)" span><input value={f.address_2} onChange={set('address_2')} className={inputCls} /></Field>
               <Field label="City *"><input required value={f.city} onChange={set('city')} className={inputCls} /></Field>
