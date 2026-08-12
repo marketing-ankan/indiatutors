@@ -18,6 +18,25 @@ class AdminCourseResource extends JsonResource {
             'is_featured'   => (bool) $this->is_featured,
             'position'      => $this->position,
             'image_url'     => $this->image_url,
+            // Every field the console's edit form can write must also be read
+            // back here. This one was missing, so the form loaded it as "" and
+            // an ordinary "Save changes" silently wiped the course's
+            // description — no error, no warning, the text simply gone.
+            'short_description' => $this->short_description,
+            'subtitle'          => $this->subtitle,
+            'age'               => $this->age,
+
+            // Group-class fields, edited in the same form.
+            'is_group'              => (bool) $this->is_group,
+            'group_about'           => $this->group_about,
+            'group_highlights'      => $this->group_highlights ?? [],
+            'group_age_range'       => $this->group_age_range,
+            'group_duration_weeks'  => $this->group_duration_weeks,
+            'group_batches_done'    => $this->group_batches_done,
+            'group_ongoing_batches' => $this->group_ongoing_batches,
+            'batches'               => $this->whenLoaded('batches', fn () => $this->batches->map->only(
+                ['id', 'name', 'schedule_days', 'schedule_time', 'timezone', 'seats_total', 'position']
+            )),
             'categories'    => $this->whenLoaded('categories', fn () => $this->categories->map->only(['id', 'name'])),
             'reviews_count' => $this->whenCounted('reviews'),
             'created_at'    => optional($this->created_at)->toDateString(),

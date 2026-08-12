@@ -6,10 +6,12 @@ use App\Http\Controllers\Api\AdminSettingController;
 use App\Http\Controllers\Api\AdminStudentController;
 use App\Http\Controllers\Api\AdminSupportController;
 use App\Http\Controllers\Api\AdminMediaController;
+use App\Http\Controllers\Api\AdminPostController;
 use App\Http\Controllers\Api\AdminTeacherController;
 use App\Http\Controllers\Api\SupportController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BlogController;
+use App\Http\Controllers\Api\GroupClassController;
 use App\Http\Controllers\Api\EnrollmentController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CityController;
@@ -43,6 +45,8 @@ Route::get('/categories/tree',   [CategoryController::class, 'tree']);
 Route::get('/categories/{slug}', [CategoryController::class, 'show']);
 
 Route::get('/courses',           [CourseController::class, 'index']);
+// /group-classes, from the database rather than a build-time JSON import.
+Route::get('/group-classes',     [GroupClassController::class, 'index']);
 Route::get('/courses/{slug}',    [CourseController::class, 'show'])->name('api.courses.show');
 // Two segments, so these never shadow /courses/{slug} above.
 Route::get('/courses/{course:slug}/reviews',  [ReviewController::class, 'index']);
@@ -291,6 +295,12 @@ Route::middleware('auth:sanctum')->group(function () {
         // creates accounts and returns their passwords once.
         // Images already shipped with the site, for the admin picker.
         Route::get ('/media/images', [AdminMediaController::class, 'images']);
+        // Blog. The public /posts endpoints and /blog pages already existed;
+        // there was simply no way to write a post without a database client.
+        Route::get   ('/posts',         [AdminPostController::class, 'index']);
+        Route::post  ('/posts',         [AdminPostController::class, 'store']);
+        Route::patch ('/posts/{post}',  [AdminPostController::class, 'update']);
+        Route::delete('/posts/{post}',  [AdminPostController::class, 'destroy']);
         Route::get ('/teachers/provision-status', [AdminTeacherController::class, 'provisionStatus']);
         Route::post('/teachers/provision',        [AdminTeacherController::class, 'provisionAccounts'])->middleware('throttle:6,1');
         // F7 — question authoring. Answers travel only on these staff routes.
@@ -312,6 +322,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/courses',                          [AdminCourseController::class, 'store']);
         Route::patch('/courses/{course}',                [AdminCourseController::class, 'update']);
         Route::delete('/courses/{course}',               [AdminCourseController::class, 'destroy']);
+        // Group-class batches (the levels shown on a /group-classes card).
+        Route::post  ('/courses/{course}/batches',          [GroupClassController::class, 'storeBatch']);
+        Route::patch ('/courses/{course}/batches/{batch}',  [GroupClassController::class, 'updateBatch']);
+        Route::delete('/courses/{course}/batches/{batch}',  [GroupClassController::class, 'destroyBatch']);
         // Physical / home tuition queues
         Route::middleware(\App\Http\Middleware\EnsurePhysicalSchema::class)->group(function () {
             Route::get('/physical/profiles',                     [AdminPhysicalController::class, 'profiles']);

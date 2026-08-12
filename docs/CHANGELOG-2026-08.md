@@ -170,6 +170,61 @@ and group paths.
 **Indiatutors Online LLP** across all 14 slots in the four policies. The
 E-Commerce Rules require the legal name and principal address to be displayed.
 
+### Group classes moved onto the database, and the blog became publishable
+
+`/group-classes` read a **committed JSON file**, so the 19 cards — prices,
+descriptions, schedules — could not be changed without a developer and a deploy.
+They are now `Course` rows behind an `is_group` flag, edited in the Staff Console
+like any other course, with their levels ("Beginner / Intermediate / Advanced")
+as `course_batches`.
+
+Verified end to end: edited a group class in the console, and the change appeared
+on the public page. 19 cards, 57 batches, 5 sidebar filters, no horizontal
+overflow from 360px to 2560px.
+
+What deliberately did **not** come across is every invented figure: the
+"119 Batches done" and "16 Ongoing" chips, the 57 per-level student counts, and
+the 19 strike-through prices with their "40% OFF" badges. Those numbers existed
+nowhere but the JSON file. The fields exist and are blank; each chip renders only
+once a real number is typed, and the discount badge is now **computed** from the
+actual sale price, so it cannot claim a saving that is not being given.
+
+The badge and the counters remain the owner decisions recorded below — the
+difference is that answering them is now a typing job, not a code change.
+
+**The homepage had a second, independent copy of the same 19 cards.** Its prices
+are now overlaid from the same endpoint, so editing a price cannot update
+`/group-classes` and leave the homepage quoting the old figure. Layout, blurbs
+and sub-tabs there are still static.
+
+**Blog publishing** was added to the Content tab. The `Post` model, the API and
+the public `/blog` pages all already existed; the only missing piece was any way
+to write one without a database client, so the blog was frozen at whatever the
+seeder inserted. Drafts stay private, publishing stamps the date once, and
+unpublishing to fix a typo and republishing does not move the post in the feed.
+Slugs are permanent, and every action is recorded in the audit log with the
+actor. All verified against a running server.
+
+### A silent data-loss bug in the course editor
+
+Opening any course in the console and pressing **Save changes** wiped its short
+description. The admin API never returned `short_description`, so the edit form
+loaded it as empty and saved that empty value back — no error, no warning, the
+text simply gone. Reproduced, then fixed by returning every field the form can
+write. Confirmed: the description now survives a save.
+
+Two further traps were found and closed before they could ship:
+
+- The migration imported the group data from the JSON file **that the same commit
+  deleted**, and a missing file returned quietly — production would have migrated
+  cleanly and served an empty `/group-classes` with nothing in any log. The seed
+  data now lives in `database/data/`, where a frontend refactor cannot reach it.
+- On a **fresh** install the import produced nothing, because `migrate:fresh`
+  runs every migration before the first seeder, so the catalogue was empty when
+  the import looked for courses to match. Now covered by `GroupClassSeeder`,
+  running after `CourseSeeder`. Proved on a scratch database: 0 → 19 courses and
+  57 batches, and re-running it adds nothing.
+
 ---
 
 ## Open — needs an owner decision
@@ -184,15 +239,13 @@ E-Commerce Rules require the legal name and principal address to be displayed.
 
 ## Open — engineering, no decision needed
 
-- **Group & free classes are still static.** `/group-classes` reads a committed
-  JSON file; `/free-classes` is three entries hardcoded in the page. Neither is
-  editable from the console. Plan agreed: extend the existing **Course** model
-  with an `is_group` flag plus group-only columns and a `course_batches` child
-  table — 19/19 group classes already exist as Course rows with matching prices
-  and categories. Roughly a day's work across ~12 files.
-- **`homeLive.js` holds a second copy of 18 of those cards** with its own prices,
-  feeding the homepage. It must be repointed in the same pass, or editing a price
-  in the console will update `/group-classes` and not the homepage.
+- ~~**Group classes are static.**~~ **Done** — see above. `/free-classes` is still
+  three entries hardcoded in `FreeClassesPage.jsx`, one of them ("Hand Writing")
+  with no matching course, so its link goes nowhere. Same treatment applies.
+- **The homepage group cards are only half dynamic.** Prices come from the
+  database; the titles, blurbs, feature bullets and sub-tabs are still the static
+  list in `homeLive.js`. Adding a group class in the console puts it on
+  `/group-classes` but **not** on the homepage.
 - **`CourseSeeder` overwrites admin edits.** It `updateOrCreate`s name, price,
   description, image and position from `courses.json`, and forces
   `is_published => true` — so **unpublishing a course does not stick**. Gated on a
@@ -231,3 +284,18 @@ E-Commerce Rules require the legal name and principal address to be displayed.
   Settle with `el.getAnimations().forEach(a => a.finish())` before measuring.
 - **Sweep 360→2560px before deploying any UI change** — owner mandate, and 768
   and 1024 in particular have caught real breakage.
+- **The `:803x` preview servers run on SQLite**, not the MySQL in `.env` — see
+  `.claude/launch.json`. An API token minted with plain `artisan tinker` goes into
+  MySQL and the preview server rejects it as unauthenticated. Pass
+  `DB_CONNECTION=sqlite DB_DATABASE=storage/app/preview.sqlite` when setting up
+  data for anything served on those ports.
+- **Anything the console's edit form writes must also be returned by its API
+  resource.** A field the form can save but cannot read back loads as empty and
+  is silently erased on the next save — this is how the course descriptions were
+  being wiped.
+- **A migration must never read a file outside `database/`.** Frontend data files
+  get deleted by the very refactors that motivate the migration, and a
+  quietly-skipped import fails invisibly in production.
+- **Seeding that matches existing rows cannot live only in a migration.**
+  `migrate:fresh --seed` runs all migrations before the first seeder, so the
+  table it wants to match against is still empty.

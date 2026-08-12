@@ -10,6 +10,7 @@ import {
   fetchAdminProposals, decideProposal,
   fetchAdminExamUpdates, createExamUpdate, updateExamUpdate, deleteExamUpdate,
   fetchAdminAnalytics, inr,
+  fetchAdminPosts, createAdminPost, updateAdminPost, deleteAdminPost,
 } from '../../lib/api.js';
 import { errText } from './AdminUI.jsx';
 import { ImagePicker, CategorySelect } from './FormPickers.jsx';
@@ -648,6 +649,13 @@ export function ContentTab() {
         <p className="text-sm text-slate-500">Published to the exam-updates feed on every learner's dashboard.</p>
         <ExamUpdatesPanel />
       </div>
+      <div className="border-t border-slate-100 pt-6">
+        <h3 className="font-heading text-lg font-extrabold text-[#0B1220]">Blog</h3>
+        <p className="text-sm text-slate-500">
+          Write and publish posts to <a href="/blog" target="_blank" rel="noreferrer" className="font-semibold text-brand-600 hover:underline">/blog</a>. Drafts are visible here only.
+        </p>
+        <BlogPanel />
+      </div>
     </div>
   );
 }
@@ -736,6 +744,112 @@ function ExamUpdatesPanel() {
             </div>
           </div>
         )) : <p className="text-slate-500 py-8 text-center">No exam updates yet.</p>}
+      </div>
+    </div>
+  );
+}
+
+// ---- Blog -------------------------------------------------------------------
+
+// The Post model, the /posts API and the public /blog pages all already existed;
+// the only missing piece was any way to write one without a database client, so
+// the blog was frozen at whatever the seeder inserted.
+//
+// Publishing is a toggle, not a one-way door: a live post can be pulled back to
+// draft to fix a typo and republished without moving in the feed, because
+// `published_at` is stamped once, on the first publish, and kept.
+
+const POST_BLANK = { title:'', excerpt:'', body:'', image_url:'', author:'', is_published:false };
+
+function BlogPanel() {
+  const qc = useQueryClient();
+  const [form, setForm] = useState(POST_BLANK);
+  const [editing, setEditing] = useState(null);   // post id, or null while writing a new one
+  const [err, setErr] = useState('');
+
+  const { data: posts = [], isLoading } = useQuery({ queryKey:['admin-posts'], queryFn: fetchAdminPosts });
+  // Both keys: the console list and whatever the public /blog page has cached.
+  const invalidate = () => { qc.invalidateQueries({queryKey:['admin-posts']}); qc.invalidateQueries({queryKey:['posts']}); };
+  const reset = () => { setForm(POST_BLANK); setEditing(null); setErr(''); };
+
+  const save = useMutation({
+    mutationFn: () => {
+      const payload = { ...form, excerpt: form.excerpt || null, body: form.body || null,
+                        image_url: form.image_url || null, author: form.author || null };
+      return editing ? updateAdminPost({ id: editing, ...payload }) : createAdminPost(payload);
+    },
+    onSuccess: () => { reset(); invalidate(); },
+    onError: e => setErr(errText(e)),
+  });
+  const toggle = useMutation({ mutationFn: ({id, pub}) => updateAdminPost({ id, is_published: pub }), onSuccess: invalidate, onError: e => setErr(errText(e)) });
+  const remove = useMutation({ mutationFn: deleteAdminPost, onSuccess: () => { reset(); invalidate(); }, onError: e => setErr(errText(e)) });
+
+  const edit = p => {
+    setEditing(p.id);
+    setErr('');
+    setForm({ title:p.title??'', excerpt:p.excerpt??'', body:p.body??'', image_url:p.image_url??'',
+              author:p.author??'', is_published:!!p.is_published });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const inp = "w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
+
+  return (
+    <div className="mt-4 space-y-5">
+      <form onSubmit={e=>{e.preventDefault();save.mutate();}} className="rounded-xl ring-1 ring-slate-100 bg-white p-4 space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <h4 className="font-bold text-sm">{editing ? 'Edit post' : 'Write a post'}</h4>
+          {editing && <button type="button" onClick={reset} className="text-xs font-semibold text-slate-500 hover:text-slate-800">Cancel — write a new one instead</button>}
+        </div>
+
+        <F label="Title"><input required value={form.title} onChange={e=>setForm({...form,title:e.target.value})} placeholder="How to choose a home tutor" className={inp}/></F>
+        <F label="Summary — shown on the blog index and in link previews">
+          <textarea rows={2} value={form.excerpt} onChange={e=>setForm({...form,excerpt:e.target.value})} className={inp}/>
+        </F>
+        <F label="Post"><textarea rows={10} value={form.body} onChange={e=>setForm({...form,body:e.target.value})} placeholder="Write the post. Blank lines separate paragraphs." className={inp}/></F>
+
+        <div className="grid sm:grid-cols-2 gap-3">
+          {/* Same picker the courses use — typing a path by hand was how broken
+              images got saved. */}
+          <ImagePicker label="Cover image" value={form.image_url} onChange={v=>setForm({...form,image_url:v})}/>
+          <F label="Author (optional)"><input value={form.author} onChange={e=>setForm({...form,author:e.target.value})} placeholder="IndiaTutors Online" className={inp}/></F>
+        </div>
+
+        <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+          <input type="checkbox" checked={form.is_published} onChange={e=>setForm({...form,is_published:e.target.checked})} className="h-4 w-4 rounded"/>
+          Publish now — visible to everyone at /blog
+        </label>
+
+        {err && <p className="text-sm font-semibold text-red-600">{err}</p>}
+
+        <button disabled={save.isPending} className="rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">
+          {save.isPending ? 'Saving…' : editing ? 'Save changes' : form.is_published ? 'Publish post' : 'Save as draft'}
+        </button>
+      </form>
+
+      <div className="space-y-2">
+        {isLoading && <p className="text-slate-500 py-8 text-center">Loading posts…</p>}
+        {!isLoading && (posts.length ? posts.map(p => (
+          <div key={p.id} className="rounded-xl ring-1 ring-slate-100 bg-white p-4 flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="font-semibold text-sm text-slate-800">{p.title}</div>
+              <div className="text-xs text-slate-500 mt-0.5">
+                {[p.published_at ? `published ${p.published_at}` : 'never published', p.author, `/blog/${p.slug}`].filter(Boolean).join(' · ')}
+              </div>
+              {p.excerpt && <p className="text-sm text-slate-600 mt-1 line-clamp-2">{p.excerpt}</p>}
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button onClick={()=>toggle.mutate({id:p.id, pub:!p.is_published})}
+                title={p.is_published ? 'Unpublish' : 'Publish'}
+                className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${p.is_published?'bg-green-50 text-green-700':'bg-slate-100 text-slate-500'}`}>
+                {p.is_published?'Published':'Draft'}
+              </button>
+              <button onClick={()=>edit(p)} className="rounded-lg ring-1 ring-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50">Edit</button>
+              <button onClick={()=>{ if (confirm(`Delete “${p.title}”? This cannot be undone.`)) remove.mutate(p.id); }}
+                className="p-1.5 text-slate-400 hover:text-red-600" title="Delete"><X className="h-4 w-4"/></button>
+            </div>
+          </div>
+        )) : <p className="text-slate-500 py-8 text-center">No posts yet. Write the first one above.</p>)}
       </div>
     </div>
   );

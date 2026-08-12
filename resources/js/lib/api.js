@@ -331,3 +331,16 @@ export const fetchAdminQuestions    = async (lessonId) => { const { data } = awa
 export const createAdminQuestion    = async ({ lessonId, ...p }) => { const { data } = await api.post(`/admin/lessons/${lessonId}/questions`, p); return data.data; };
 export const updateAdminQuestion    = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/questions/${id}`, p); return data.data; };
 export const deleteAdminQuestion    = async (id) => { const { data } = await api.delete(`/admin/questions/${id}`); return data; };
+
+// Group classes. Public read is the /group-classes page AND the homepage's
+// price overlay, so both bill the same source and cannot drift apart.
+export const fetchGroupClasses      = async () => { const { data } = await api.get('/group-classes'); return data; };
+export const createAdminBatch       = async ({ courseId, ...p }) => { const { data } = await api.post(`/admin/courses/${courseId}/batches`, p); return data; };
+export const updateAdminBatch       = async ({ courseId, id, ...p }) => { const { data } = await api.patch(`/admin/courses/${courseId}/batches/${id}`, p); return data; };
+export const deleteAdminBatch       = async ({ courseId, id }) => { const { data } = await api.delete(`/admin/courses/${courseId}/batches/${id}`); return data; };
+
+// Blog. Admin index returns drafts too — the public /posts endpoint never does.
+export const fetchAdminPosts        = async () => { const { data } = await api.get('/admin/posts'); return data.data; };
+export const createAdminPost        = async (p) => { const { data } = await api.post('/admin/posts', p); return data; };
+export const updateAdminPost        = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/posts/${id}`, p); return data; };
+export const deleteAdminPost        = async (id) => { const { data } = await api.delete(`/admin/posts/${id}`); return data; };

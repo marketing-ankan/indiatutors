@@ -1,5 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { fetchGroupClasses, inr } from '../lib/api';
 import {
   Search, Heart, ChevronLeft, ChevronRight, UserRound, Users, PlayCircle,
   Laptop, Home as HomeIcon, CalendarCheck, Rocket, Video, MessagesSquare,
@@ -145,8 +147,12 @@ function RichCourseCard({ c }) {
         </ul>
         <p className="mt-2.5 flex items-center flex-wrap gap-x-1.5 gap-y-1">
           <span className="text-[17px] font-extrabold text-brand-600">{c.now}</span>
-          <span className="text-[11px] text-slate-500 line-through">{c.was}</span>
-          <span className="text-[11px] font-bold text-green-600 bg-green-100 rounded-md px-1.5 py-0.5">40% OFF</span>
+          {/* No sale price, no strike-through and no badge — see the note on the
+              other card renderer below. */}
+          {c.was && <>
+            <span className="text-[11px] text-slate-500 line-through">{c.was}</span>
+            <span className="text-[11px] font-bold text-green-600 bg-green-100 rounded-md px-1.5 py-0.5">{c.off ?? 40}% OFF</span>
+          </>}
           <span className="text-[11px] text-slate-500">{c.per}</span>
         </p>
         <div className="mt-auto pt-3">
@@ -244,8 +250,13 @@ function DemoCourseRow({ eyebrow, title, seeAllTo, cards, bg }) {
                 <p className="mt-1 text-[13px] text-slate-500 leading-snug">{c.desc}</p>
                 <p className="mt-2 flex items-center flex-wrap gap-x-1.5 gap-y-1">
                   <span className="text-[16px] font-extrabold text-brand-600">{c.now}</span>
-                  <span className="text-[11px] text-slate-500 line-through">{c.was}</span>
-                  <span className="text-[11px] font-bold text-green-600 bg-green-100 rounded-md px-1.5 py-0.5">40% OFF</span>
+                  {/* No sale price, no strike-through and no badge. Cards fed by
+                      the live catalogue carry a computed `off`; the ones still
+                      on static data keep the 40% the live site shows. */}
+                  {c.was && <>
+                    <span className="text-[11px] text-slate-500 line-through">{c.was}</span>
+                    <span className="text-[11px] font-bold text-green-600 bg-green-100 rounded-md px-1.5 py-0.5">{c.off ?? 40}% OFF</span>
+                  </>}
                 </p>
                 <div className="mt-auto pt-3">
                   <Link to={`/courses/${c.slug}`} className="block text-center rounded-lg bg-brand-600 text-white text-[13px] font-bold py-2 hover:bg-brand-700">View course</Link>
@@ -330,6 +341,37 @@ export default function HomePage() {
   const nav = useNavigate();
   const teacherRail = useRef(null);
   const scrollTeachers = dir => teacherRail.current?.scrollBy({ left: dir * 280, behavior: 'smooth' });
+
+  // The Group Classes browser below draws its own copy of the same cards that
+  // /group-classes draws, with its own hardcoded prices. Editing a price in the
+  // console would have updated that page and left the homepage — the page
+  // people actually land on — quoting the old figure.
+  //
+  // Layout, blurbs and sub-tabs stay static; only the prices are overlaid, by
+  // slug. A failed request simply leaves the static prices in place, so the
+  // homepage never renders blank or price-less because of an API hiccup.
+  const { data: liveGroups } = useQuery({
+    queryKey: ['group-classes'],
+    queryFn: fetchGroupClasses,
+    staleTime: 5 * 60_000,
+  });
+  const groupPanels = useMemo(() => {
+    const byslug = new Map((liveGroups?.data ?? []).map(c => [c.slug, c]));
+    if (!byslug.size) return GROUP_PANELS;
+    return Object.fromEntries(Object.entries(GROUP_PANELS).map(([cat, p]) => [cat, {
+      ...p,
+      cards: p.cards.map(card => {
+        const live = byslug.get(card.slug);
+        if (!live) return card;
+        return {
+          ...card,
+          now: inr(live.price),
+          was: live.compare_at != null ? inr(live.compare_at) : null,
+          off: live.discount_pct,
+        };
+      }),
+    }]));
+  }, [liveGroups]);
 
   const FORMATS = [
     { Icon: UserRound, chip: 'bg-[#F3F6FC] text-brand-600', title: '1-on-1 Live Classes',
@@ -425,12 +467,12 @@ export default function HomePage() {
       {/* POPULAR VIDEO COURSES */}
       <DemoCourseRow eyebrow="Self-paced · Watch anytime" title="Popular Video Courses" seeAllTo="/video-courses" cards={VIDEO_COURSES} bg="#fff" />
 
-      {/* GROUP CLASSES */}
+      {/* GROUP CLASSES — layout and copy are static, prices are not. */}
       <CourseBrowser
         title="Group Classes"
         sub="Learn together in small, interactive batches — expert-led, affordable, and fun."
         viewAll="/group-classes" viewAllLabel="View all Group Classes →"
-        tabs={GROUP_TABS} panels={GROUP_PANELS}
+        tabs={GROUP_TABS} panels={groupPanels}
       />
 
       {/* ABOUT + HOW IT WORKS */}

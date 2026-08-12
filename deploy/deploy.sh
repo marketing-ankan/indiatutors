@@ -146,6 +146,8 @@ if [ "$(read_mark "$DB_MARK")" != "$HEAD" ]; then
   # Each seeder now skips itself when its source data is unchanged
   # (App\Support\SeedFingerprint), so in the steady state these are near-free.
   artisan 300 db:seed --class=CourseSeeder  --force || DB_OK=0
+  # After CourseSeeder: it flags group classes on courses matched by slug.
+  artisan 120 db:seed --class=GroupClassSeeder --force || DB_OK=0
   artisan 120 db:seed --class=TutorSeeder   --force || DB_OK=0
   artisan 120 db:seed --class=PostSeeder    --force || DB_OK=0
   artisan 120 db:seed --class=AdminSeeder   --force || DB_OK=0

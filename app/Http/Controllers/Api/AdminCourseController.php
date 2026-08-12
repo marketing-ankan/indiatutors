@@ -16,7 +16,7 @@ class AdminCourseController extends Controller
     public function index(Request $request)
     {
         $q = Course::query()
-            ->with('categories:id,name')
+            ->with(['categories:id,name', 'batches'])
             ->withCount('reviews')
             ->orderBy('position')->orderBy('name');
 
@@ -43,7 +43,7 @@ class AdminCourseController extends Controller
 
         AuditLog::record('course_added', 'course', $course->id, $course->name);
 
-        return (new AdminCourseResource($course->load('categories:id,name')->loadCount('reviews')))
+        return (new AdminCourseResource($course->load(['categories:id,name','batches'])->loadCount('reviews')))
             ->response()->setStatusCode(201);
     }
 
@@ -58,7 +58,7 @@ class AdminCourseController extends Controller
             'to'   => $course->only(['regular_price', 'sale_price', 'is_published']),
         ]);
 
-        return new AdminCourseResource($course->fresh()->load('categories:id,name')->loadCount('reviews'));
+        return new AdminCourseResource($course->fresh()->load(['categories:id,name','batches'])->loadCount('reviews'));
     }
 
     public function destroy(Course $course)
@@ -91,6 +91,20 @@ class AdminCourseController extends Controller
             'position'          => 'nullable|integer|min:0|max:9999',
             'category_ids'      => 'nullable|array',
             'category_ids.*'    => 'integer|exists:categories,id',
+
+            // Group-class fields. These drive /group-classes, which had no
+            // backing store at all before — it read a committed JSON file.
+            'is_group'              => 'nullable|boolean',
+            'group_about'           => 'nullable|string|max:2000',
+            'group_highlights'      => 'nullable|array',
+            'group_highlights.*'    => 'string|max:200',
+            'group_age_range'       => 'nullable|string|max:40',
+            'group_duration_weeks'  => 'nullable|integer|min:1|max:104',
+            // Nullable on purpose: blank hides the chip. The figures these
+            // replace were invented and frozen, so an empty field is the honest
+            // default and a typed one is the owner's own claim.
+            'group_batches_done'    => 'nullable|integer|min:0|max:100000',
+            'group_ongoing_batches' => 'nullable|integer|min:0|max:100000',
         ]);
     }
 
