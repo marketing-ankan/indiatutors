@@ -382,8 +382,33 @@ by anyone who already enrolled under it.
 
 **Nothing code-only is left in this table.**
 
-**Blocked on you:** 4, 5, 7 — all content, not code. (6, the entity name, was
-answered on 11 August 2026 and is shipped.)
+**Owner decisions, 11 August 2026 — do not re-raise these as defects:**
+
+- **Items 5 and 7 (testimonials, achievement photos): KEEP AS THEY ARE for now.**
+  The owner's plan is to replace them with testimonials students actually submit,
+  which an admin approves in the admin panel before they appear on the home page.
+  Until that pipeline exists, the current content stays. Treat the placeholder
+  arrays as intentional, not as an oversight.
+- **Item 4 and the rating figures: KEEP THE HARDCODED VALUES for now.** Same
+  reasoning — once clients submit real ratings, the displayed figure becomes the
+  real aggregate. Do not delete the numbers in the meantime.
+
+Both imply a future build: **an admin moderation queue** — a student or parent
+submits a testimonial or rating, it sits unapproved, an admin approves it, and it
+then appears on the home page automatically. Nothing on the public side should be
+changed until that exists.
+
+⚠ The one part of item 3 (A3) still worth a cheap fix independent of all this: the
+placeholder quotes are published under the heading **"Real, verified results from
+Indiatutors students this year"** with named students and specific exam marks, and
+the aggregate "4.9 / 5 from 1,200+ reviews" sits on the same page as "No reviews
+yet". Softening those two labels costs nothing, keeps every piece of content in
+place, and removes the part that is actually a claim rather than a placeholder.
+Offered once; not actioned, because the owner's instruction was to leave this area
+alone.
+
+**Still blocked on you:** item 2 / A2 — the fabricated "40% OFF" badge and the
+back-calculated struck-through price. Not covered by the decisions above.
 
 **D6 — `TestimonialSlider` now has a real pause mechanism (2026-08-11).** It keeps
 two separate flags: `stopped` (the explicit, sticky user control) and `hovering`
