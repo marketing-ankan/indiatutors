@@ -91,7 +91,7 @@ export default function GroupClassesPage() {
   const visible = gc.cards.map((c, i) => ({ ...c, i })).filter(c => cat === 'all' || c.cat === cat);
 
   return (
-    <div className="mx-auto max-w-[1440px] px-[clamp(16px,4vw,40px)] pb-20 pt-7 text-slate-900">
+    <div className="w-full px-[clamp(16px,4vw,40px)] pb-20 pt-7 text-slate-900">
       {/* HERO */}
       <section className="relative mb-7 overflow-hidden rounded-[22px] px-[clamp(24px,5vw,56px)] py-[46px] text-white" style={{ background: `linear-gradient(135deg,${NAVY},#1E40AF)` }}>
         <div aria-hidden="true" className="absolute -right-[50px] -top-[50px] h-[220px] w-[220px]" style={{ background: 'radial-gradient(circle,rgba(212,175,55,.32),transparent 70%)' }} />

@@ -221,7 +221,7 @@ export default function BookDemoPage() {
   );
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12">
+    <div className="container-wide py-12">
       {/* Booking-flow pills, like the live page */}
       <div className="flex flex-wrap gap-1.5 mb-6">
         {BOOKING_TYPES.map(t => (
@@ -248,15 +248,14 @@ export default function BookDemoPage() {
             </select>
           </div>
         )}
-        <div className="grid sm:grid-cols-2 gap-4">
+        {/* One flowing grid, not four fixed two-field rows: the page is now
+            full-bleed, and rows of two would have stretched each field across
+            half a wide monitor. Flowing lets the columns multiply instead. */}
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           <div><label className="block text-xs font-semibold text-slate-700 mb-1">Full name*</label><input required value={form.name} onChange={set('name')} className={inp}/></div>
           <div><label className="block text-xs font-semibold text-slate-700 mb-1">Email*</label><input required type="email" value={form.email} onChange={set('email')} className={inp}/></div>
-        </div>
-        <div className="grid sm:grid-cols-2 gap-4">
           <div><label className="block text-xs font-semibold text-slate-700 mb-1">Phone*</label><input required value={form.phone} onChange={set('phone')} className={inp}/></div>
           <div><label className="block text-xs font-semibold text-slate-700 mb-1">Subject</label><input value={form.subject} onChange={set('subject')} placeholder="e.g. Class 10 Math" className={inp}/></div>
-        </div>
-        <div className="grid sm:grid-cols-2 gap-4">
           <div><label className="block text-xs font-semibold text-slate-700 mb-1">Grade</label>
             <select value={form.grade} onChange={set('grade')} className={inp}>
               <option value="">Select…</option>
@@ -267,8 +266,6 @@ export default function BookDemoPage() {
               <option value="">Select…</option>
               {['CBSE','ICSE','IB','IGCSE','State','US','UK','Other'].map(b=><option key={b}>{b}</option>)}
             </select></div>
-        </div>
-        <div className="grid sm:grid-cols-2 gap-4">
           <div><label className="block text-xs font-semibold text-slate-700 mb-1">Mode</label>
             <select value={form.mode} onChange={set('mode')} className={inp}><option value="online">Online</option><option value="home">Home tutor</option></select></div>
           <div><label className="block text-xs font-semibold text-slate-700 mb-1">City</label><input value={form.city} onChange={set('city')} className={inp}/></div>
