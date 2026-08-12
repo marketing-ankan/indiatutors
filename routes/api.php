@@ -286,6 +286,10 @@ Route::middleware('auth:sanctum')->group(function () {
         // A4 — a teacher's own edits reach the public listing only through here.
         Route::post('/teachers/{teacherProfile}/publish', [AdminTeacherController::class, 'publishChanges']);
         Route::post('/teachers/{teacherProfile}/discard', [AdminTeacherController::class, 'discardChanges']);
+        // Logins for the teachers listed before accounts existed. Throttled: it
+        // creates accounts and returns their passwords once.
+        Route::get ('/teachers/provision-status', [AdminTeacherController::class, 'provisionStatus']);
+        Route::post('/teachers/provision',        [AdminTeacherController::class, 'provisionAccounts'])->middleware('throttle:6,1');
         // F7 — question authoring. Answers travel only on these staff routes.
         Route::get('/lessons/{lesson}/questions',        [QuestionController::class, 'adminForLesson']);
         Route::post('/lessons/{lesson}/questions',       [QuestionController::class, 'adminStore']);
