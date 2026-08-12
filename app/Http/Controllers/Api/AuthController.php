@@ -3,8 +3,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Models\UserEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller {
@@ -37,7 +39,15 @@ class AuthController extends Controller {
             'email'    => 'required|email',
             'password' => 'required|string',
         ]);
-        $user = User::where('email', $data['email'])->first();
+        // Any address on the account signs in, not just the primary. That is
+        // what makes adding a new address safe: both work while the switch is
+        // in progress, so a typo in the new one cannot lock anybody out.
+        //
+        // Guarded on the table existing because this deploy's migrate step is
+        // known to die on the shared host: an un-run migration must cost the
+        // alternate addresses, never the ability to sign in at all.
+        $user = User::where('email', $data['email'])->first()
+            ?? (self::altEmailsAvailable() ? UserEmail::where('email', $data['email'])->first()?->user : null);
         if (!$user || !Hash::check($data['password'], $user->password)) {
             throw ValidationException::withMessages(['email' => ['These credentials do not match our records.']]);
         }
@@ -81,6 +91,95 @@ class AuthController extends Controller {
      * token so the change actually ends access on other devices — while
      * keeping this session signed in.
      */
+    /* ---------------------------------------------------------------------
+     * Sign-in addresses.
+     *
+     * Add a new address, then remove the old one — never a swap in place. With
+     * no SMTP there is nothing to verify a new address against, so the account
+     * must never be left holding only an address that might be a typo. Both
+     * addresses sign in throughout (see login above), so the changeover cannot
+     * strand anyone.
+     *
+     * Every one of these asks for the current password. Without that, anyone
+     * who got hold of a live session could bolt their own address onto the
+     * account and keep signing in after the real owner changed their password.
+     * ------------------------------------------------------------------- */
+
+    /**
+     * Whether the alternates table is actually present. Cached per request; the
+     * deploy's migrate step dies often enough on this host that every read has
+     * to survive it missing.
+     */
+    private static function altEmailsAvailable(): bool {
+        static $has = null;
+        return $has ??= Schema::hasTable('user_emails');
+    }
+
+    /** Reject anything already claimed, as a primary or as somebody's alternate. */
+    private function assertEmailFree(string $email): void {
+        $taken = User::where('email', $email)->exists()
+              || (self::altEmailsAvailable() && UserEmail::where('email', $email)->exists());
+        if ($taken) {
+            throw ValidationException::withMessages([
+                'email' => ['That email is already in use on an account.'],
+            ]);
+        }
+    }
+
+    private function assertPassword(Request $request, string $field = 'current_password'): void {
+        if (!Hash::check((string) $request->input($field), $request->user()->password)) {
+            throw ValidationException::withMessages([
+                $field => ['That password is not correct.'],
+            ]);
+        }
+    }
+
+    public function emails(Request $request) {
+        return response()->json([
+            'primary'    => $request->user()->email,
+            'additional' => self::altEmailsAvailable()
+                ? $request->user()->emails()->orderBy('id')->get(['id', 'email'])
+                : [],
+        ]);
+    }
+
+    public function addEmail(Request $request) {
+        $data = $request->validate([
+            'email'            => 'required|email|max:180',
+            'current_password' => 'required|string',
+        ]);
+        $this->assertPassword($request);
+        $this->assertEmailFree($data['email']);
+        $request->user()->emails()->create(['email' => $data['email']]);
+        return $this->emails($request);
+    }
+
+    /**
+     * Swap an alternate with the primary. The old primary is kept as an
+     * alternate rather than discarded — removing it stays a separate, deliberate
+     * step, which is the whole point of the add-then-remove order.
+     */
+    public function makeEmailPrimary(Request $request, UserEmail $userEmail) {
+        $request->validate(['current_password' => 'required|string']);
+        $this->assertPassword($request);
+        $user = $request->user();
+        abort_unless($userEmail->user_id === $user->id, 404);
+
+        $oldPrimary = $user->email;
+        $user->forceFill(['email' => $userEmail->email])->save();
+        $userEmail->update(['email' => $oldPrimary]);
+
+        return $this->emails($request);
+    }
+
+    public function removeEmail(Request $request, UserEmail $userEmail) {
+        $request->validate(['current_password' => 'required|string']);
+        $this->assertPassword($request);
+        abort_unless($userEmail->user_id === $request->user()->id, 404);
+        $userEmail->delete();
+        return $this->emails($request);
+    }
+
     public function changePassword(Request $request) {
         $data = $request->validate([
             'current_password' => 'required|string',

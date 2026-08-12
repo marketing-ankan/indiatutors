@@ -218,6 +218,12 @@ export const uploadToR2             = async ({ uploadUrl, file, onProgress }) =>
 // Account self-service (Account & Orders page)
 export const updateMe         = async (p) => { const { data } = await api.put('/auth/me', p); return data.data; };
 export const changeMyPassword = async (p) => { const { data } = await api.post('/auth/password', p); return data.message; };
+// Sign-in addresses. Each returns the whole {primary, additional} set, so the
+// caller never has to reconcile a partial update.
+export const fetchMyEmails    = async ()      => { const { data } = await api.get('/auth/emails'); return data; };
+export const addMyEmail       = async (p)     => { const { data } = await api.post('/auth/emails', p); return data; };
+export const makeMyEmailPrimary = async (id, p) => { const { data } = await api.post(`/auth/emails/${id}/primary`, p); return data; };
+export const removeMyEmail    = async (id, p) => { const { data } = await api.post(`/auth/emails/${id}/remove`, p); return data; };
 export const fetchMyOrders    = async () => { const { data } = await api.get('/my/orders'); return data.data; };
 
 // Public course reviews

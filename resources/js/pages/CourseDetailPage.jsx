@@ -200,7 +200,7 @@ function ReviewForm({ slug }) {
   if (send.isSuccess) return <div className="rounded-2xl bg-green-50 ring-1 ring-green-100 p-6 text-center text-green-800 font-semibold">Thanks! Your review has been submitted for moderation.</div>;
 
   return (
-    <div className="rounded-2xl bg-white ring-1 ring-slate-100 p-6 max-w-2xl mx-auto">
+    <div className="rounded-2xl bg-white ring-1 ring-slate-100 p-6 w-full">
       <h3 className="font-heading font-bold text-lg mb-4">Write a Review</h3>
       <form onSubmit={e => { e.preventDefault(); if (rating) send.mutate(); }} className="space-y-4">
         <div>
