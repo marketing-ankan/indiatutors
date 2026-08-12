@@ -12,6 +12,9 @@ use App\Http\Controllers\Api\SupportController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\GroupClassController;
+use App\Http\Controllers\Api\LegalController;
+use App\Http\Controllers\Api\AdminLegalController;
+use App\Http\Controllers\Api\SiteSettingController;
 use App\Http\Controllers\Api\EnrollmentController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CityController;
@@ -47,6 +50,12 @@ Route::get('/categories/{slug}', [CategoryController::class, 'show']);
 Route::get('/courses',           [CourseController::class, 'index']);
 // /group-classes, from the database rather than a build-time JSON import.
 Route::get('/group-classes',     [GroupClassController::class, 'index']);
+
+// Policy pages and the site-wide contact details, both admin-editable. Public
+// because the footer links the policies from every page, signed in or not.
+Route::get('/legal',             [LegalController::class, 'index']);
+Route::get('/legal/{slug}',      [LegalController::class, 'show']);
+Route::get('/site-settings',     [SiteSettingController::class, 'index']);
 Route::get('/courses/{slug}',    [CourseController::class, 'show'])->name('api.courses.show');
 // Two segments, so these never shadow /courses/{slug} above.
 Route::get('/courses/{course:slug}/reviews',  [ReviewController::class, 'index']);
@@ -348,6 +357,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/audit',                             [AdminAuditController::class, 'index']);
         Route::get('/settings',                          [AdminSettingController::class, 'index']);
         Route::put('/settings',                          [AdminSettingController::class, 'update']);
+        Route::get('/legal',                             [AdminLegalController::class, 'index']);
+        Route::get('/legal/{document}',                  [AdminLegalController::class, 'show']);
+        Route::patch('/legal/{document}',                [AdminLegalController::class, 'update']);
         Route::get('/proposals',                         [AdminController::class, 'proposals']);
         Route::patch('/proposals/{proposal}',            [AdminController::class, 'decideProposal']);
         Route::get('/analytics',                         [AdminController::class, 'analytics']);

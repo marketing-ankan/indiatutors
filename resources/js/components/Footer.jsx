@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Facebook, Instagram, Youtube, Linkedin, Twitter, MessageCircle, ChevronRight } from 'lucide-react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { submitContact } from '../lib/api.js';
 import { LEGAL_NAV } from '../data/legal.js';
+import { useSiteSettings } from '../lib/siteSettings.js';
+import { fetchLegalNav } from '../lib/api.js';
 
 // Footer ported from the live site: brand block (tagline, socials, contact,
 // newsletter) + Quick Links · Our Courses · Learn & Discover · Support.
@@ -34,17 +36,17 @@ const SUPPORT = [
   ['❓ FAQ', '/faqs'], ['🆘 Help Centre', '/contact'],
 ];
 // The four policies live in their own chevron list (sister-site parity) rather
-// than mixed into Support — LEGAL_NAV is derived from legal.js so the labels and
+// than mixed into Support — the list is derived from the documents so labels and
 // paths can't drift from the documents themselves.
 const SOCIALS = [
-  [MessageCircle, 'https://wa.me/919330811581', 'WhatsApp'],
-  [Facebook, 'https://www.facebook.com/indiatutorsonline', 'Facebook'],
-  [Instagram, 'https://www.instagram.com/indiatutorsonline', 'Instagram'],
-  // Real channel (the @indiatutorsonline handle on the live site 404s;
-  // user-approved correction — the business's channel is WinQuest's).
-  [Youtube, 'https://www.youtube.com/channel/UC9wzhXEl8sdHenhC_ZuYpgw', 'YouTube'],
-  [Linkedin, 'https://www.linkedin.com/company/indiatutorsonline', 'LinkedIn'],
-  [Twitter, 'https://twitter.com/indiatutorsonline', 'X (Twitter)'],
+  [MessageCircle, 'whatsapp',  'WhatsApp'],
+  [Facebook,      'facebook',  'Facebook'],
+  [Instagram,     'instagram', 'Instagram'],
+  // The @indiatutorsonline YouTube handle on the live site 404s; the business's
+  // real channel is the default in SiteSettings, and it is now editable.
+  [Youtube,       'youtube',   'YouTube'],
+  [Linkedin,      'linkedin',  'LinkedIn'],
+  [Twitter,       'twitter',   'X (Twitter)'],
 ];
 
 function FooterCol({ title, links }) {
@@ -61,6 +63,11 @@ function FooterCol({ title, links }) {
 }
 
 export default function Footer() {
+  const site = useSiteSettings();
+  // The policy list follows the documents themselves, so a renamed or reordered
+  // policy in the console updates every page's footer.
+  const { data: liveNav } = useQuery({ queryKey: ['legal-nav'], queryFn: fetchLegalNav, staleTime: 10 * 60_000, retry: 1 });
+  const legalNav = liveNav?.length ? liveNav.map(d => [d.title, '/' + d.slug]) : LEGAL_NAV;
   const [email, setEmail] = useState('');
   const subscribe = useMutation({
     mutationFn: () => submitContact({
@@ -79,19 +86,25 @@ export default function Footer() {
         {/* BRAND + CONTACT + NEWSLETTER */}
         <div>
           <div className="text-xl font-extrabold text-white">IndiaTutors<span className="text-brand-400">Online</span></div>
-          <p className="mt-3 text-sm leading-relaxed text-slate-400">India's premium online tutor marketplace — connecting students with verified experts across academics, music, coding, languages, and the arts. Based in New Town, Kolkata & serving pan-India.</p>
+          <p className="mt-3 text-sm leading-relaxed text-slate-400">{site.footer_blurb}</p>
           <div className="mt-4 flex gap-2">
-            {SOCIALS.map(([Icon, href, label]) => (
-              <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+            {SOCIALS.map(([Icon, key, label]) => site.socials[key] && (
+              <a key={label} href={site.socials[key]} target="_blank" rel="noopener noreferrer" aria-label={label}
                  className="w-8 h-8 rounded-md bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700">
                 <Icon className="h-4 w-4"/>
               </a>
             ))}
           </div>
           <ul className="mt-4 space-y-2 text-sm text-slate-400">
-            <li className="flex gap-2 items-center"><Phone className="h-4 w-4 shrink-0"/><a href="tel:+919330811581" className="hover:text-white">+91 93308 11581</a></li>
-            <li className="flex gap-2 items-center"><Mail className="h-4 w-4 shrink-0"/><a href="mailto:connect@indiatutorsonline.com" className="hover:text-white break-all">connect@indiatutorsonline.com</a></li>
-            <li className="flex gap-2 items-start"><MapPin className="h-4 w-4 mt-0.5 shrink-0"/>New Town, Kolkata — 700161</li>
+            {site.contact_phone && (
+              <li className="flex gap-2 items-center"><Phone className="h-4 w-4 shrink-0"/><a href={site.contact_phone_href} className="hover:text-white">{site.contact_phone}</a></li>
+            )}
+            {site.contact_email && (
+              <li className="flex gap-2 items-center"><Mail className="h-4 w-4 shrink-0"/><a href={`mailto:${site.contact_email}`} className="hover:text-white break-all">{site.contact_email}</a></li>
+            )}
+            {site.contact_address && (
+              <li className="flex gap-2 items-start"><MapPin className="h-4 w-4 mt-0.5 shrink-0"/>{site.contact_address}</li>
+            )}
           </ul>
           <div className="mt-5">
             <p className="text-xs font-bold text-white mb-2">✉️ Get free study tips & offers</p>
@@ -127,7 +140,7 @@ export default function Footer() {
           </ul>
           <h4 className="text-white font-bold mt-7 mb-4 text-xs uppercase tracking-widest">Policies</h4>
           <ul className="space-y-2 text-sm">
-            {LEGAL_NAV.map(([label, href]) => (
+            {legalNav.map(([label, href]) => (
               <li key={href}>
                 <Link to={href} className="flex items-center gap-1.5 hover:text-white">
                   <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-500"/>{label}

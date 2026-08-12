@@ -344,3 +344,10 @@ export const fetchAdminPosts        = async () => { const { data } = await api.g
 export const createAdminPost        = async (p) => { const { data } = await api.post('/admin/posts', p); return data; };
 export const updateAdminPost        = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/posts/${id}`, p); return data; };
 export const deleteAdminPost        = async (id) => { const { data } = await api.delete(`/admin/posts/${id}`); return data; };
+
+// Policy pages and site-wide details, both editable in the console.
+export const fetchSiteSettings     = async () => { const { data } = await api.get('/site-settings'); return data.data; };
+export const fetchLegalNav         = async () => { const { data } = await api.get('/legal'); return data.data; };
+export const fetchLegalDoc         = async (slug) => { const { data } = await api.get(`/legal/${slug}`); return data.data; };
+export const fetchAdminLegal       = async () => { const { data } = await api.get('/admin/legal'); return data.data; };
+export const updateAdminLegal      = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/legal/${id}`, p); return data.data; };

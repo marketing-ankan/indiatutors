@@ -225,6 +225,45 @@ Two further traps were found and closed before they could ship:
   running after `CourseSeeder`. Proved on a scratch database: 0 → 19 courses and
   57 batches, and re-running it adds nothing.
 
+### The policy pages and the site's contact details became editable
+
+Two more pieces of the site that could only be changed by a developer.
+
+**The four policies** — Terms, Payment & Refund, Refer & Earn, Privacy — were
+158KB of JavaScript compiled into the frontend bundle. Correcting a refund window
+meant a code change, a build and a deploy. They are now database records edited
+in a new **Settings** tab, section by section, with all seven content types the
+pages use (paragraphs, bulleted and numbered lists, callouts, definition tables,
+data tables and step lists).
+
+Nothing was retyped and nothing was reformatted. The content was exported
+programmatically and the page renders it through the *same* renderer as before —
+verified by comparing all four documents field by field against the shipped
+version: **byte-identical**, 58 sections, 81 subsections, 286 blocks.
+
+Two safeguards, because these are the documents a customer is told to read
+before paying:
+
+- The bundled copy stays in the app as a **fallback**. Proved by making the API
+  return 404 for a document: the page still rendered all 20 sections and 7,300
+  words. A backend problem cannot blank a policy page.
+- The API **rejects content the page could not draw**. Its renderer silently
+  skips a block it does not recognise, so a typo could have dropped a clause out
+  of a live policy with no error anywhere. A bad block type, a missing heading, an
+  empty list or a table row that does not match its header is now refused with a
+  message naming the section.
+
+**Site details** — the phone number, email, address, footer description and six
+social links were hardcoded in three components *and* repeated throughout the
+policy text. All are now in the Settings tab and take effect immediately in the
+header and footer. The registered entity name is a single setting substituted
+into the policies wherever the legal name appears, so it stays correct in all 14
+places at once.
+
+Every field falls back to the value that was hardcoded, so this shipped without
+changing a single thing on the site until someone edits it. Clearing a social
+link hides its icon; clearing a contact field hides that line.
+
 ---
 
 ## Open — needs an owner decision
@@ -296,6 +335,11 @@ Two further traps were found and closed before they could ship:
 - **A migration must never read a file outside `database/`.** Frontend data files
   get deleted by the very refactors that motivate the migration, and a
   quietly-skipped import fails invisibly in production.
+- **Policy pages are deliberately not unpublishable from the console.** The
+  column exists and the public API honours it, but no toggle is offered: there is
+  no legitimate state where the footer of every page links a Terms page that
+  404s, and because the frontend falls back to its bundled copy, "unpublished"
+  would look like "still there" anyway.
 - **Seeding that matches existing rows cannot live only in a migration.**
   `migrate:fresh --seed` runs all migrations before the first seeder, so the
   table it wants to match against is still empty.

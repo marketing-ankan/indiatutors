@@ -6,6 +6,7 @@ import { useAuth } from '../lib/auth.jsx';
 import { fetchNotifications, markNotificationRead, markAllNotificationsRead, fetchVideoCourses } from '../lib/api.js';
 import { useCart, useWishlist } from '../lib/cart.js';
 import { CATALOG_NAV } from '../data/nav.js';
+import { useSiteSettings } from '../lib/siteSettings.js';
 
 /** Live-header parity: ♡ wishlist and 🛒 cart icons with a count bubble that
  *  appears only when non-empty (the live count spans are `hidden` at 0). */
@@ -138,6 +139,7 @@ const mobileRow = ({ isActive }) =>
   `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-brand-50 text-brand-600' : 'text-slate-800 hover:bg-slate-50'}`;
 
 export default function Header() {
+  const site = useSiteSettings();
   const [open, setOpen] = useState(false);
   // Which catalog tab is expanded in the mobile menu. One at a time, so a long
   // list never buries the tabs below it.
@@ -171,10 +173,19 @@ export default function Header() {
     <header className="sticky top-0 z-40 bg-white shadow-sm [overflow-x:clip] print:hidden">
       <div className="bg-slate-900 text-slate-300 text-xs">
         <div className="container-wide flex items-center justify-between py-2">
+          {/* Contact details come from the Settings tab. Each falls back to the
+              value that used to be hardcoded here, so a failed request or a
+              cleared field never leaves the bar empty. */}
           <div className="flex flex-wrap items-center gap-4">
-            <a href="tel:+919330811581" className="inline-flex items-center gap-1.5 hover:text-white"><Phone className="h-3.5 w-3.5"/>+91 93308 11581</a>
-            <a href="mailto:connect@indiatutorsonline.com" className="hidden sm:inline-flex items-center gap-1.5 hover:text-white"><Mail className="h-3.5 w-3.5"/>connect@indiatutorsonline.com</a>
-            <span className="hidden md:inline-flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5"/>New Town, Kolkata</span>
+            {site.contact_phone && (
+              <a href={site.contact_phone_href} className="inline-flex items-center gap-1.5 hover:text-white"><Phone className="h-3.5 w-3.5"/>{site.contact_phone}</a>
+            )}
+            {site.contact_email && (
+              <a href={`mailto:${site.contact_email}`} className="hidden sm:inline-flex items-center gap-1.5 hover:text-white"><Mail className="h-3.5 w-3.5"/>{site.contact_email}</a>
+            )}
+            {site.contact_locality && (
+              <span className="hidden md:inline-flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5"/>{site.contact_locality}</span>
+            )}
           </div>
         </div>
       </div>
