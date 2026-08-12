@@ -498,11 +498,13 @@ export const CATALOG_NAV = [
   "label": "Video Courses",
   "to": "/video-courses",
   "mega": null,
-  "items": [
-   { "label": "🐍 Python for Kids", "to": "/video-courses/python-for-kids-self-paced" },
-   { "label": "🎨 Arts & Painting Fundamentals", "to": "/video-courses/arts-painting-fundamentals-video" },
-   { "label": "🧮 NCERT Class 10 Maths", "to": "/video-courses/ncert-class-10-maths-video" }
-  ],
+  // Filled at runtime from the published video courses — see `source` below.
+  // It used to be three hand-copied slugs, and they had already drifted: the
+  // third pointed at ncert-class-10-maths-video, which no longer exists, so
+  // that menu item was a live 404. A list of products cannot be maintained by
+  // hand in a nav file.
+  "items": [],
+  "source": "video-courses",
   "footer": [
    { "label": "🎬 All video courses →", "to": "/video-courses" }
   ]

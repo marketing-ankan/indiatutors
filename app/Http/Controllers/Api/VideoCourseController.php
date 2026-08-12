@@ -304,7 +304,14 @@ class VideoCourseController extends Controller {
             'price'        => 'nullable|integer|min:0',
             'level'        => 'nullable|string|max:40',
             'category'     => 'nullable|string|max:80',
-            'thumbnail_url'=> 'nullable|url|max:500',
+            // string, not url: the site's own images are site-relative
+            // (/build/images/...), and `url` rejects those, leaving hotlinking
+            // to an external host as the only option. AdminCourseController
+            // uses the same rule for the same reason. It also closes a trap —
+            // the admin form PATCHes the whole row, so once any course held a
+            // relative path, every later save of any field would have 422'd
+            // with an error the form had no field to correct.
+            'thumbnail_url'=> 'nullable|string|max:500',
             'position'     => 'nullable|integer',
             'is_published' => 'nullable|boolean',
         ]);
