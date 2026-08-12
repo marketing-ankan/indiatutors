@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchCategoriesTree, fetchCourses } from '../lib/api.js';
 import { cart, cartItemOf } from '../lib/cart.js';
 import SocialProofSections from '../components/SocialProofSections.jsx';
+import ListLoadError from '../components/ListLoadError.jsx';
 
 // Sidebar emoji per top-level category (WinQuest shop parity); 📘 fallback.
 const CAT_EMOJI = {
@@ -118,7 +119,7 @@ export default function CoursesPage() {
   const [openSlug, setOpenSlug] = useState(null);
 
   const { data: categories = [] } = useQuery({ queryKey:['categories','tree'], queryFn: fetchCategoriesTree });
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch, isFetching } = useQuery({
     queryKey: ['courses', { category, search, page }],
     queryFn: () => fetchCourses({ category, search, page, per_page:24 }),
   });
@@ -238,6 +239,8 @@ export default function CoursesPage() {
                   </div>
                 )}
               </>
+            ) : isError ? (
+              <ListLoadError what="courses" onRetry={refetch} retrying={isFetching} />
             ) : (
               <div className="text-center py-20 text-slate-500 bg-white rounded-2xl ring-1 ring-slate-100">
                 No courses found.

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchTutors, fetchTutorFilters } from '../lib/api.js';
+import ListLoadError from '../components/ListLoadError.jsx';
 
 // Ported from the live /tutors/ page: hero with marketplace stats, a single
 // horizontal filter bar (Subjects · Boards · Grades · Mode · City · Name/subject),
@@ -56,7 +57,7 @@ export default function FindTutorsPage({ subjectOverride = '' }) {
   const [applied, setApplied] = useState({ city: params.get('city') || '', q: params.get('search') || '', board:'', grade:'' });
 
   const { data: filters } = useQuery({ queryKey:['tutor-filters'], queryFn: fetchTutorFilters });
-  const { data: tutors = [], isLoading } = useQuery({
+  const { data: tutors = [], isLoading, isError, refetch, isFetching } = useQuery({
     queryKey: ['tutors', { subject, mode }],
     queryFn: () => fetchTutors({ subject, mode }),
   });
@@ -133,6 +134,8 @@ export default function FindTutorsPage({ subjectOverride = '' }) {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">{Array.from({length:8}).map((_,i)=><div key={i} className="rounded-2xl bg-slate-100 h-64 animate-pulse"/>)}</div>
           ) : results.length ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">{results.map(t=><LiveTutorCard key={t.id} t={t}/>)}</div>
+          ) : isError ? (
+            <ListLoadError what="tutors" onRetry={refetch} retrying={isFetching} />
           ) : (
             <div className="text-center py-20 text-slate-500">No tutors match those filters. Try clearing them.</div>
           )}

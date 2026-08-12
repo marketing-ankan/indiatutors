@@ -5,7 +5,7 @@
     "isEntry": true
   },
   "resources/js/components/admin/AdminConsole.jsx": {
-    "file": "assets/AdminConsole-CQQBezkq.js",
+    "file": "assets/AdminConsole--IYPAMut.js",
     "name": "AdminConsole",
     "src": "resources/js/components/admin/AdminConsole.jsx",
     "isDynamicEntry": true,
@@ -14,7 +14,7 @@
     ]
   },
   "resources/js/main.jsx": {
-    "file": "assets/main-Bn2p7Vxr.js",
+    "file": "assets/main-7U4SGUad.js",
     "name": "main",
     "src": "resources/js/main.jsx",
     "isEntry": true,
