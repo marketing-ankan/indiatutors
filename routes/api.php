@@ -120,6 +120,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me',       [AuthController::class, 'me']);
     Route::put('/auth/me',       [AuthController::class, 'updateMe']);
     Route::post('/auth/password',[AuthController::class, 'changePassword'])->middleware('throttle:10,1');
+    // Sign-in addresses: add a new one, then remove the old. Throttled like the
+    // password route — each one takes the current password, so they are as
+    // guessable a target as a login.
+    Route::get   ('/auth/emails',                    [AuthController::class, 'emails']);
+    Route::post  ('/auth/emails',                    [AuthController::class, 'addEmail'])->middleware('throttle:10,1');
+    Route::post  ('/auth/emails/{userEmail}/primary', [AuthController::class, 'makeEmailPrimary'])->middleware('throttle:10,1');
+    Route::post  ('/auth/emails/{userEmail}/remove',  [AuthController::class, 'removeEmail'])->middleware('throttle:10,1');
     Route::post('/auth/logout',  [AuthController::class, 'logout']);
     Route::get('/my/video-courses', [VideoCourseController::class, 'myCourses']);
     Route::get('/my/orders',        [OrderController::class, 'myIndex']);

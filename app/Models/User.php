@@ -37,6 +37,8 @@ class User extends Authenticatable
 
     // Relationships
     public function students() { return $this->hasMany(Student::class); }
+    /** Alternate sign-in addresses. The primary is users.email, not in here. */
+    public function emails() { return $this->hasMany(UserEmail::class); }
     public function videoEntitlements() { return $this->hasMany(VideoEntitlement::class); }
     public function teacherProfile() { return $this->hasOne(TeacherProfile::class); }
     public function tutor() { return $this->hasOne(Tutor::class); }
