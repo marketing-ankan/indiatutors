@@ -1,11 +1,11 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-DF3MOv_B.css",
+    "file": "assets/app-DvlR0ygF.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/components/admin/AdminConsole.jsx": {
-    "file": "assets/AdminConsole-BVKc2x0A.js",
+    "file": "assets/AdminConsole-iQD8e3ec.js",
     "name": "AdminConsole",
     "src": "resources/js/components/admin/AdminConsole.jsx",
     "isDynamicEntry": true,
@@ -14,7 +14,7 @@
     ]
   },
   "resources/js/main.jsx": {
-    "file": "assets/main-EKnK9rgB.js",
+    "file": "assets/main-CRsZ2m5D.js",
     "name": "main",
     "src": "resources/js/main.jsx",
     "isEntry": true,
@@ -23,7 +23,7 @@
       "resources/js/components/admin/AdminConsole.jsx"
     ],
     "css": [
-      "assets/app-DF3MOv_B.css"
+      "assets/app-DvlR0ygF.css"
     ]
   }
 }

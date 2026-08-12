@@ -6,6 +6,7 @@ use App\Models\AppNotification;
 use App\Models\AuditLog;
 use App\Models\TeacherApplication;
 use App\Models\TeacherProfile;
+use App\Support\TeacherAccountProvisioner;
 use App\Support\TeacherProfilePublisher;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -123,6 +124,43 @@ class AdminTeacherController extends Controller
      * tutor directory, which is tutors.is_published. Labelled "Listed" in the
      * UI so it says what it does.
      */
+    /**
+     * Give the teachers who are listed but have no login a way in.
+     *
+     * The passwords come back in the response, which is deliberate and is the
+     * whole reason this exists alongside the artisan command: the command writes
+     * them to a file on the server, and an owner who cannot reach a shell cannot
+     * fetch that file. There is no mail configured to send them either. So they
+     * are returned once, over HTTPS, to an already-authenticated admin, shown
+     * once, and never stored anywhere this app can read back — the audit entry
+     * records the address and never the password.
+     */
+    public function provisionAccounts(Request $request)
+    {
+        $data = $request->validate([
+            'domain'  => 'nullable|string|max:120',
+            'dry_run' => 'nullable|boolean',
+        ]);
+
+        $dry    = (bool) ($data['dry_run'] ?? false);
+        $domain = trim($data['domain'] ?? 'indiatutorsonline.com');
+
+        $result = TeacherAccountProvisioner::run($domain, $dry);
+
+        return response()->json([
+            'dry_run'   => $dry,
+            'created'   => $result['created'],
+            'skipped'   => $result['skipped'],
+            'remaining' => TeacherAccountProvisioner::pendingCount(),
+        ]);
+    }
+
+    /** How many listings still have no login — drives the button's label. */
+    public function provisionStatus()
+    {
+        return response()->json(['pending' => TeacherAccountProvisioner::pendingCount()]);
+    }
+
     public function toggleListing(Request $request, TeacherProfile $teacherProfile)
     {
         $data  = $request->validate(['is_listed' => 'required|boolean']);

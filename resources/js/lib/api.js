@@ -220,6 +220,10 @@ export const updateMe         = async (p) => { const { data } = await api.put('/
 export const changeMyPassword = async (p) => { const { data } = await api.post('/auth/password', p); return data.message; };
 // Sign-in addresses. Each returns the whole {primary, additional} set, so the
 // caller never has to reconcile a partial update.
+// Teacher logins for the pre-account listings. provisionTeacherAccounts returns
+// plaintext passwords ONCE — show them, let the admin copy them, never cache.
+export const fetchProvisionStatus   = async ()  => { const { data } = await api.get('/admin/teachers/provision-status'); return data; };
+export const provisionTeacherLogins = async (p) => { const { data } = await api.post('/admin/teachers/provision', p); return data; };
 export const fetchMyEmails    = async ()      => { const { data } = await api.get('/auth/emails'); return data; };
 export const addMyEmail       = async (p)     => { const { data } = await api.post('/auth/emails', p); return data; };
 export const makeMyEmailPrimary = async (id, p) => { const { data } = await api.post(`/auth/emails/${id}/primary`, p); return data; };
