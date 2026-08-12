@@ -2,8 +2,10 @@
 
 namespace App\Support;
 
+use App\Models\AuditLog;
 use App\Models\TeacherProfile;
 use App\Models\Tutor;
+use App\Models\User;
 use Illuminate\Support\Str;
 
 /**
@@ -55,6 +57,16 @@ class TeacherProfilePublisher
         // service_areas is the teacher's pincode list; the physical-matching
         // column reads it too (see linkTutor's original note).
         $out['pincodes']   = $profile->service_areas;
+
+        // A field the teacher has never filled in is absent, not blank. Copying
+        // the null through wrote it straight into columns the tutors table
+        // declares NOT NULL with a default — teaching_mode is the one that bit —
+        // so publishing a profile that had not been filled in yet threw an
+        // integrity violation on BOTH the create and the update path, and
+        // approving such a teacher 500'd. Dropping nulls also stops a
+        // half-filled profile blanking details already live on the listing.
+        // '' is kept: that is a field deliberately cleared, not one never set.
+        $out = array_filter($out, static fn ($v) => $v !== null);
         // A null fee would render as "₹0 per hour" on the public card, which is
         // a price nobody offered.
         $out['fee_hourly'] = $profile->fee_hourly ?? 0;
@@ -96,7 +108,7 @@ class TeacherProfilePublisher
             return null;
         }
 
-        $tutor = $user->tutor()->first();
+        $tutor = $user->tutor()->first() ?? self::adoptExistingListing($user);
 
         if ($tutor) {
             $tutor->update(self::payload($profile));
@@ -112,6 +124,52 @@ class TeacherProfilePublisher
         }
 
         $profile->forceFill(['changes_submitted_at' => null, 'published_at' => now()])->save();
+
+        return $tutor;
+    }
+
+    /**
+     * Claim the teacher's EXISTING public listing instead of building a second one.
+     *
+     * The listings seeded before accounts existed carry user_id = NULL, so when
+     * one of those teachers got an account, $user->tutor() found nothing and a
+     * duplicate row was created — "angeline-2" — while the original listing, the
+     * one parents had been visiting and search engines had indexed, was left
+     * orphaned and frozen. Adopting keeps the original row AND its slug, so the
+     * public URL does not change.
+     *
+     * Deliberately conservative. It adopts only when EXACTLY ONE unclaimed
+     * listing carries that name, because the failure modes are not symmetrical:
+     * creating a spare listing is untidy and an admin can merge it, whereas
+     * attaching the wrong person hands one teacher control of another teacher's
+     * public page. On any ambiguity it declines and lets the old create path run.
+     */
+    private static function adoptExistingListing(User $user): ?Tutor
+    {
+        $name = trim((string) $user->name);
+        if ($name === '') {
+            return null;
+        }
+
+        $candidates = Tutor::whereNull('user_id')
+            ->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower($name)])
+            ->limit(2)
+            ->get();
+
+        if ($candidates->count() !== 1) {
+            return null;
+        }
+
+        $tutor = $candidates->first();
+        $tutor->forceFill(['user_id' => $user->id])->save();
+
+        // Logged because this is the one step that happens without anyone asking
+        // for it — if it ever binds the wrong pair, this is how it gets noticed.
+        AuditLog::record('tutor_listing_adopted', 'tutor', $tutor->id, $tutor->slug, [
+            'user_id'   => $user->id,
+            'user_name' => $user->name,
+            'matched_on' => 'exact name, single unclaimed listing',
+        ]);
 
         return $tutor;
     }

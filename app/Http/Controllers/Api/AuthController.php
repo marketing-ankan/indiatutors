@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\UserEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller {
@@ -41,8 +42,12 @@ class AuthController extends Controller {
         // Any address on the account signs in, not just the primary. That is
         // what makes adding a new address safe: both work while the switch is
         // in progress, so a typo in the new one cannot lock anybody out.
+        //
+        // Guarded on the table existing because this deploy's migrate step is
+        // known to die on the shared host: an un-run migration must cost the
+        // alternate addresses, never the ability to sign in at all.
         $user = User::where('email', $data['email'])->first()
-            ?? UserEmail::where('email', $data['email'])->first()?->user;
+            ?? (self::altEmailsAvailable() ? UserEmail::where('email', $data['email'])->first()?->user : null);
         if (!$user || !Hash::check($data['password'], $user->password)) {
             throw ValidationException::withMessages(['email' => ['These credentials do not match our records.']]);
         }
@@ -100,10 +105,20 @@ class AuthController extends Controller {
      * account and keep signing in after the real owner changed their password.
      * ------------------------------------------------------------------- */
 
+    /**
+     * Whether the alternates table is actually present. Cached per request; the
+     * deploy's migrate step dies often enough on this host that every read has
+     * to survive it missing.
+     */
+    private static function altEmailsAvailable(): bool {
+        static $has = null;
+        return $has ??= Schema::hasTable('user_emails');
+    }
+
     /** Reject anything already claimed, as a primary or as somebody's alternate. */
     private function assertEmailFree(string $email): void {
         $taken = User::where('email', $email)->exists()
-              || UserEmail::where('email', $email)->exists();
+              || (self::altEmailsAvailable() && UserEmail::where('email', $email)->exists());
         if ($taken) {
             throw ValidationException::withMessages([
                 'email' => ['That email is already in use on an account.'],
@@ -122,7 +137,9 @@ class AuthController extends Controller {
     public function emails(Request $request) {
         return response()->json([
             'primary'    => $request->user()->email,
-            'additional' => $request->user()->emails()->orderBy('id')->get(['id', 'email']),
+            'additional' => self::altEmailsAvailable()
+                ? $request->user()->emails()->orderBy('id')->get(['id', 'email'])
+                : [],
         ]);
     }
 
