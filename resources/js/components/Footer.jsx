@@ -101,6 +101,7 @@ export default function Footer() {
               <>
                 <form onSubmit={e=>{e.preventDefault(); if(email) subscribe.mutate();}} className="flex">
                   <input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="Your email address"
+                    aria-label="Your email address"
                     className="min-w-0 flex-1 rounded-l-md bg-slate-800 ring-1 ring-slate-700 px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-brand-500"/>
                   <button disabled={subscribe.isPending} className="rounded-r-md bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-500 disabled:opacity-60">
                     {subscribe.isPending ? '…' : 'Subscribe'}
