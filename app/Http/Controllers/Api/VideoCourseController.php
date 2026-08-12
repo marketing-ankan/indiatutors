@@ -5,8 +5,10 @@ use App\Models\VideoCourse;
 use App\Models\VideoLesson;
 use App\Support\CourseAi;
 use App\Support\R2Video;
+use App\Support\VideoSource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class VideoCourseController extends Controller {
     /** Public catalog. */
@@ -217,26 +219,62 @@ class VideoCourseController extends Controller {
         return response()->json(['data' => $videoCourse->lessons]);
     }
 
+    /**
+     * A YouTube lesson may be given as any watch / share / embed URL — that is
+     * what the admin actually has in their hand. Normalise it to the bare id
+     * before validation so `video_id` always holds what playbackUrl() embeds.
+     */
+    private function normaliseYouTube(Request $request): void {
+        if ($request->input('provider') !== 'youtube') return;
+        $raw = trim((string) $request->input('video_id', ''));
+        if ($raw === '') return;
+        $id = VideoSource::youtubeId($raw);
+        if ($id === null) {
+            throw ValidationException::withMessages([
+                'video_id' => 'That does not look like a YouTube link or video id.',
+            ]);
+        }
+        $request->merge(['video_id' => $id]);
+    }
+
+    /**
+     * A YouTube video is public to anyone holding its id — "unlisted" is not
+     * private. Selling a lesson hosted there would give the course away for
+     * free, so YouTube is only ever allowed for a free preview.
+     *
+     * Forced rather than rejected, and applied on update as well as create:
+     * rejecting would still let someone save a YouTube lesson as a preview and
+     * then flip the flag off afterwards, which is the same leak by two steps.
+     */
+    private function forcePreviewForYouTube(array $data, ?VideoLesson $lesson = null): array {
+        $provider = $data['provider'] ?? $lesson?->provider;
+        if ($provider === 'youtube') $data['is_preview'] = true;
+        return $data;
+    }
+
     public function storeLesson(Request $request, VideoCourse $videoCourse) {
+        $this->normaliseYouTube($request);
         $data = $request->validate([
             'title'            => 'required|string|max:190',
             'provider'         => 'required|in:bunny,youtube,r2',
-            'video_id'         => 'required|string|max:120',
+            'video_id'         => 'required|string|max:255',
             'duration_seconds' => 'nullable|integer|min:0',
             'transcript'       => 'nullable|string|max:200000',
             'is_preview'       => 'nullable|boolean',
             'position'         => 'nullable|integer',
         ]);
+        $data = $this->forcePreviewForYouTube($data);
         $data['position'] ??= ($videoCourse->lessons()->max('position') ?? -1) + 1;
         return response()->json($videoCourse->lessons()->create($data), 201);
     }
 
     public function updateLesson(Request $request, VideoCourse $videoCourse, VideoLesson $lesson) {
         abort_unless($lesson->video_course_id === $videoCourse->id, 404);
+        $this->normaliseYouTube($request);
         $data = $request->validate([
             'title'            => 'sometimes|required|string|max:190',
             'provider'         => 'sometimes|required|in:bunny,youtube,r2',
-            'video_id'         => 'sometimes|required|string|max:120',
+            'video_id'         => 'sometimes|required|string|max:255',
             'duration_seconds' => 'nullable|integer|min:0',
             'transcript'       => 'nullable|string|max:200000',
             'is_preview'       => 'nullable|boolean',
@@ -247,6 +285,7 @@ class VideoCourseController extends Controller {
         if (array_key_exists('transcript', $data) && $data['transcript'] !== $lesson->transcript) {
             $data['ai_summary'] = null;
         }
+        $data = $this->forcePreviewForYouTube($data, $lesson);
         $lesson->update($data);
         return response()->json($lesson->fresh());
     }

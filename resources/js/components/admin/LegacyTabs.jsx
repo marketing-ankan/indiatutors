@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Check, X } from 'lucide-react';
 import {
@@ -107,9 +107,14 @@ export function EventsTab() {
 
 const VC_BLANK = { title:'', subtitle:'', description:'', price:0, level:'Beginner', category:'', is_published:true };
 const LESSON_BLANK = { title:'', provider:'r2', video_id:'', duration_seconds:0, is_preview:false };
-// What to type into the video_id box, per provider. R2 takes the object key of
-// the uploaded MP4; the other two take the host's own id.
-const VIDEO_ID_HINT = { r2:'key e.g. python-for-kids/1.mp4', bunny:'Bunny GUID', youtube:'YouTube id' };
+// The first two lessons of a course are the free previews and come from YouTube;
+// everything after is an uploaded file behind the paywall. Encoded here so the
+// add form opens in the right mode instead of making the admin remember.
+const FREE_PREVIEW_COUNT = 2;
+const blankLesson = (existingCount) => {
+  const free = existingCount < FREE_PREVIEW_COUNT;
+  return { ...LESSON_BLANK, provider: free ? 'youtube' : 'r2', is_preview: free };
+};
 
 // Reads a video file's duration in the browser so the admin doesn't have to
 // count seconds by hand. Resolves 0 rather than rejecting — a missing duration
@@ -168,6 +173,48 @@ function VideoUploader({ courseId, onUploaded }) {
       )}
       {done && <p className="mt-1 text-[10px] text-green-700">Uploaded → <span className="font-mono">{done}</span></p>}
       {error && <p className="mt-1 text-[10px] text-red-600">{error}</p>}
+    </div>
+  );
+}
+
+// Two ways to give a lesson its video, matching how the courses are actually
+// made: the free previews are YouTube links pasted in, the paid lessons are
+// files we upload. Bunny stays supported by the API but is off this form — it
+// has no credentials configured and offering a third choice only invites the
+// wrong one. `onChange` takes a patch; the caller merges it.
+function SourcePicker({ courseId, value, onChange, inp }) {
+  const isLink = value.provider === 'youtube';
+  const tab = on => `rounded-lg px-2.5 py-1 text-[11px] font-bold ${on ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`;
+  return (
+    <div className="w-full basis-full rounded-lg bg-white p-3 ring-1 ring-slate-100">
+      <div className="mb-2 flex gap-1.5">
+        <button type="button" className={tab(isLink)}
+          onClick={() => onChange({ provider: 'youtube', video_id: '', is_preview: true })}>Paste a link</button>
+        <button type="button" className={tab(!isLink)}
+          onClick={() => onChange({ provider: 'r2', video_id: '' })}>Upload a file</button>
+      </div>
+
+      {isLink ? (
+        <>
+          <input value={value.video_id} onChange={e => onChange({ video_id: e.target.value })}
+            placeholder="https://www.youtube.com/watch?v=…" className={inp + ' w-full'} />
+          <p className="mt-1 text-[10px] leading-relaxed text-slate-500">
+            Any YouTube link works — watch, share, embed or Shorts. It is saved as a free
+            preview: a YouTube video is public to anyone holding the link, so paid lessons
+            must be uploaded as files instead.
+          </p>
+        </>
+      ) : (
+        <>
+          <VideoUploader courseId={courseId}
+            onUploaded={({ key, duration }) => onChange(
+              duration ? { provider: 'r2', video_id: key, duration_seconds: duration }
+                       : { provider: 'r2', video_id: key })} />
+          {value.video_id
+            ? <p className="mt-1 break-all font-mono text-[10px] text-slate-500">{value.video_id}</p>
+            : <p className="mt-1 text-[10px] text-slate-500">Uploaded files play only for people who have bought the course.</p>}
+        </>
+      )}
     </div>
   );
 }
@@ -335,20 +382,47 @@ function LessonsManager({ course }) {
   const qc = useQueryClient();
   const { data: lessons = [] } = useQuery({ queryKey:['admin-lessons', course.id], queryFn:()=>fetchAdminLessons(course.id) });
   const invalidate = () => { qc.invalidateQueries({ queryKey:['admin-lessons', course.id] }); qc.invalidateQueries({ queryKey:['admin-videos'] }); };
-  const [nl, setNl] = useState({ ...LESSON_BLANK });
+  const [nl, setNl] = useState(() => blankLesson(0));
   const [openTranscript, setOpenTranscript] = useState(null);
   const [openQuestions, setOpenQuestions] = useState(null);
-  const add = useMutation({ mutationFn: p => createAdminLesson({ courseId: course.id, ...p }), onSuccess: () => { invalidate(); setNl({ ...LESSON_BLANK }); } });
+  // Lessons arrive after the first render, so the opening mode is only correct
+  // once they land. Re-defaulting a PRISTINE form is safe; a form the admin has
+  // already typed into is left alone.
+  useEffect(() => {
+    setNl(s => (s.title || s.video_id) ? s : blankLesson(lessons.length));
+  }, [lessons.length]);
+  const add = useMutation({ mutationFn: p => createAdminLesson({ courseId: course.id, ...p }), onSuccess: () => { invalidate(); setNl(blankLesson(lessons.length + 1)); } });
   const patch = useMutation({ mutationFn: ({ id, ...p }) => updateAdminLesson({ courseId: course.id, id, ...p }), onSuccess: invalidate });
   const del = useMutation({ mutationFn: id => deleteAdminLesson({ courseId: course.id, id }), onSuccess: invalidate });
   const inp = 'rounded-lg ring-1 ring-slate-200 px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500';
+  const previewCount = lessons.filter(l => l.is_preview).length;
+  // Which lesson is "first" decides which are free, so order has to be editable.
+  // Swaps the two rows' stored positions; the list re-sorts on invalidate.
+  const move = (i, dir) => {
+    const j = i + dir;
+    if (j < 0 || j >= lessons.length) return;
+    const a = lessons[i], b = lessons[j];
+    patch.mutate({ id: a.id, position: b.position });
+    patch.mutate({ id: b.id, position: a.position });
+  };
 
   return (
     <div className="mt-3 rounded-xl bg-slate-50 p-4">
-      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">Playlist ({lessons.length} lessons)</p>
+      <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Playlist ({lessons.length} lessons)</p>
+      <p className="mb-2 text-[11px] text-slate-500">
+        {previewCount === FREE_PREVIEW_COUNT
+          ? `First ${FREE_PREVIEW_COUNT} are free previews — everything else needs a purchase.`
+          : `${previewCount} free ${previewCount === 1 ? 'preview' : 'previews'} — the plan is ${FREE_PREVIEW_COUNT}. Use the arrows to reorder.`}
+      </p>
       <div className="space-y-1.5">
-        {lessons.map(l => (
+        {lessons.map((l, i) => (
           <div key={l.id} className="flex flex-wrap items-center gap-2 rounded-lg bg-white px-3 py-2 ring-1 ring-slate-100">
+            <span className="flex flex-col leading-none">
+              <button type="button" onClick={()=>move(i,-1)} disabled={i===0} title="Move up"
+                className="text-[9px] text-slate-400 hover:text-brand-600 disabled:opacity-25">▲</button>
+              <button type="button" onClick={()=>move(i,1)} disabled={i===lessons.length-1} title="Move down"
+                className="text-[9px] text-slate-400 hover:text-brand-600 disabled:opacity-25">▼</button>
+            </span>
             <span className="text-xs font-semibold text-slate-700">{l.position + 1}. {l.title}</span>
             <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-500">{l.provider}:{l.video_id}</span>
             {l.is_preview ? <span className="rounded bg-green-50 px-1.5 py-0.5 text-[10px] font-bold text-green-700">FREE</span>
@@ -366,17 +440,20 @@ function LessonsManager({ course }) {
           </div>
         ))}
       </div>
-      <form onSubmit={e=>{e.preventDefault(); add.mutate(nl);}} className="mt-2 flex flex-wrap items-center gap-2">
-        {/* Upload first: it fills in the key and duration, so the admin only
-            types a title. Pasting a key by hand still works for Bunny/YouTube. */}
-        <VideoUploader courseId={course.id}
-          onUploaded={({ key, duration }) => setNl(s => ({ ...s, provider:'r2', video_id:key, duration_seconds: duration || s.duration_seconds }))} />
+      <form onSubmit={e=>{e.preventDefault(); add.mutate(nl);}} className="mt-3 flex flex-wrap items-center gap-2">
+        <p className="w-full basis-full text-[11px] font-bold uppercase tracking-wide text-slate-500">Add video</p>
+        <SourcePicker courseId={course.id} value={nl} inp={inp}
+          onChange={patch => setNl(s => ({ ...s, ...patch }))} />
         <input required value={nl.title} onChange={e=>setNl(s=>({...s,title:e.target.value}))} placeholder="Lesson title" className={inp+' flex-1 min-w-[140px]'} />
-        <select value={nl.provider} onChange={e=>setNl(s=>({...s,provider:e.target.value}))} className={inp}><option value="r2">R2 (secure)</option><option value="bunny">Bunny (secure)</option><option value="youtube">YouTube (public only)</option></select>
-        <input required value={nl.video_id} onChange={e=>setNl(s=>({...s,video_id:e.target.value}))} placeholder={VIDEO_ID_HINT[nl.provider]} className={inp+(nl.provider==='r2'?' w-56':' w-32')} />
         <input type="number" min="0" value={nl.duration_seconds} onChange={e=>setNl(s=>({...s,duration_seconds:Number(e.target.value)}))} placeholder="sec" className={inp+' w-16'} />
-        <label className="flex items-center gap-1 text-xs text-slate-600"><input type="checkbox" checked={nl.is_preview} onChange={e=>setNl(s=>({...s,is_preview:e.target.checked}))} className="accent-brand-600" />preview</label>
-        <button type="submit" disabled={add.isPending} className="rounded-lg bg-brand-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-brand-700 disabled:opacity-60">+ Add</button>
+        {/* Forced on for YouTube — the server does the same, this only stops the
+            box looking editable when it is not. */}
+        <label className="flex items-center gap-1 text-xs text-slate-600" title={nl.provider==='youtube' ? 'YouTube lessons are always free previews' : ''}>
+          <input type="checkbox" checked={nl.provider==='youtube' ? true : nl.is_preview} disabled={nl.provider==='youtube'}
+            onChange={e=>setNl(s=>({...s,is_preview:e.target.checked}))} className="accent-brand-600" />free preview
+        </label>
+        <button type="submit" disabled={add.isPending || !nl.video_id} className="rounded-lg bg-brand-600 text-white px-3 py-1.5 text-xs font-bold hover:bg-brand-700 disabled:opacity-60">+ Add</button>
+        {add.isError && <p className="w-full basis-full text-[10px] text-red-600">{add.error?.response?.data?.message || 'Could not add that lesson.'}</p>}
       </form>
     </div>
   );
