@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { PlayCircle, Clock } from 'lucide-react';
 import { fetchVideoCourses } from '../lib/api.js';
+import ListLoadError from '../components/ListLoadError.jsx';
 
 // Self-paced video-course catalog (point #4). Udemy-style: buy once, watch the
 // whole playlist anytime. Free preview lessons hook the sale; paid lessons are
@@ -33,7 +34,11 @@ function VideoCard({ c }) {
 }
 
 export default function VideoCoursesPage() {
-  const { data: courses = [], isLoading } = useQuery({ queryKey: ['video-courses'], queryFn: fetchVideoCourses });
+  // isError matters here: without it a failed request fell through to the empty
+  // state and told the visitor "coming soon" — i.e. that we sell no video
+  // courses at all — when the truth was that the request did not complete.
+  const { data: courses = [], isLoading, isError, refetch, isFetching } =
+    useQuery({ queryKey: ['video-courses'], queryFn: fetchVideoCourses });
 
   return (
     <div className="w-full px-[clamp(16px,4vw,40px)] pb-20 pt-7 text-slate-900">
@@ -58,6 +63,8 @@ export default function VideoCoursesPage() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {courses.map(c => <VideoCard key={c.slug} c={c} />)}
         </div>
+      ) : isError ? (
+        <ListLoadError what="video courses" onRetry={refetch} retrying={isFetching} />
       ) : (
         <p className="rounded-xl bg-[#F4F7FE] px-6 py-10 text-center text-slate-500">New video courses are coming soon — <Link to="/book-demo" className="font-semibold text-brand-600">book a free demo</Link> to learn live in the meantime.</p>
       )}

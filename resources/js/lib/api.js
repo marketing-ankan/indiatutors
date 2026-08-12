@@ -222,6 +222,8 @@ export const changeMyPassword = async (p) => { const { data } = await api.post('
 // caller never has to reconcile a partial update.
 // Teacher logins for the pre-account listings. provisionTeacherAccounts returns
 // plaintext passwords ONCE — show them, let the admin copy them, never cache.
+// Images committed to the site, for the admin image picker.
+export const fetchMediaImages       = async ()  => { const { data } = await api.get('/admin/media/images'); return data.data; };
 export const fetchProvisionStatus   = async ()  => { const { data } = await api.get('/admin/teachers/provision-status'); return data; };
 export const provisionTeacherLogins = async (p) => { const { data } = await api.post('/admin/teachers/provision', p); return data; };
 export const fetchMyEmails    = async ()      => { const { data } = await api.get('/auth/emails'); return data; };

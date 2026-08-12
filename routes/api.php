@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AdminCourseController;
 use App\Http\Controllers\Api\AdminSettingController;
 use App\Http\Controllers\Api\AdminStudentController;
 use App\Http\Controllers\Api\AdminSupportController;
+use App\Http\Controllers\Api\AdminMediaController;
 use App\Http\Controllers\Api\AdminTeacherController;
 use App\Http\Controllers\Api\SupportController;
 use App\Http\Controllers\Api\AuthController;
@@ -288,6 +289,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/teachers/{teacherProfile}/discard', [AdminTeacherController::class, 'discardChanges']);
         // Logins for the teachers listed before accounts existed. Throttled: it
         // creates accounts and returns their passwords once.
+        // Images already shipped with the site, for the admin picker.
+        Route::get ('/media/images', [AdminMediaController::class, 'images']);
         Route::get ('/teachers/provision-status', [AdminTeacherController::class, 'provisionStatus']);
         Route::post('/teachers/provision',        [AdminTeacherController::class, 'provisionAccounts'])->middleware('throttle:6,1');
         // F7 — question authoring. Answers travel only on these staff routes.

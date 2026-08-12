@@ -12,6 +12,7 @@ import {
   fetchAdminAnalytics, inr,
 } from '../../lib/api.js';
 import { errText } from './AdminUI.jsx';
+import { ImagePicker, CategorySelect } from './FormPickers.jsx';
 
 // Areas this platform has that the reference console does not: dated events,
 // self-paced video courses (with the direct-to-R2 upload flow), teacher course
@@ -490,18 +491,17 @@ export function VideoCoursesTab() {
           <F label="Title *"><input required value={editing.title} onChange={set('title')} className={inp}/></F>
           <F label="Price (₹)"><input type="number" min="0" value={editing.price} onChange={set('price')} className={inp}/></F>
           <F label="Level"><input value={editing.level||''} onChange={set('level')} className={inp} placeholder="Beginner"/></F>
-          <F label="Category"><input value={editing.category||''} onChange={set('category')} className={inp}/></F>
+          {/* Was a free-text box. Typing a category by hand produced near
+              duplicates that then filtered as two different things. */}
+          <CategorySelect value={editing.category} onChange={v => setEditing(s => ({ ...s, category: v }))} />
           <div className="sm:col-span-2"><F label="Subtitle"><input value={editing.subtitle||''} onChange={set('subtitle')} className={inp}/></F></div>
           <div className="sm:col-span-2"><F label="Description"><textarea rows={2} value={editing.description||''} onChange={set('description')} className={inp}/></F></div>
-          {/* A path, not an upload: the deploy wipes and re-copies the image
-              directories on every pull, so a file written at runtime would not
-              survive the next one. Commit the image to public/images/… and the
-              build ships it to /build/images/…. */}
+          {/* Was a free-text path nobody could be expected to remember, where a
+              typo silently rendered a broken image. Now a picker over what the
+              site actually ships. */}
           <div className="sm:col-span-2">
-            <F label="Thumbnail">
-              <input value={editing.thumbnail_url||''} onChange={set('thumbnail_url')} className={inp}
-                placeholder="/build/images/video-courses/python.jpg" />
-            </F>
+            <ImagePicker label="Thumbnail" value={editing.thumbnail_url}
+              onChange={v => setEditing(s => ({ ...s, thumbnail_url: v }))} />
             <p className="mt-1 text-[11px] text-slate-500">
               Shown on the course card. Leave blank for the default play icon.
             </p>
