@@ -133,8 +133,15 @@ function CatalogTab({ item }) {
   );
 }
 
+/** One row of the mobile menu — shared by the primary links and the catalog tabs. */
+const mobileRow = ({ isActive }) =>
+  `block rounded-md px-3 py-2 text-sm font-medium ${isActive ? 'bg-brand-50 text-brand-600' : 'text-slate-800 hover:bg-slate-50'}`;
+
 export default function Header() {
   const [open, setOpen] = useState(false);
+  // Which catalog tab is expanded in the mobile menu. One at a time, so a long
+  // list never buries the tabs below it.
+  const [openSection, setOpenSection] = useState(null);
   const [sq, setSq] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const nav = useNavigate();
@@ -223,9 +230,43 @@ export default function Header() {
       {open && (
         <div id="mobile-menu" className="xl:hidden border-t border-slate-100 bg-white">
           <div className="container-wide py-4 space-y-1">
-            {[...primaryNav, ...CATALOG_NAV.slice(1).map(n => ({ to: n.to, label: n.label }))].map(n => (
-              <NavLink key={n.to+n.label} to={n.to} onClick={()=>setOpen(false)} className={({isActive})=>`block rounded-md px-3 py-2 text-sm font-medium ${isActive?'bg-brand-50 text-brand-600':'text-slate-800 hover:bg-slate-50'}`}>{n.label}</NavLink>
+            {primaryNav.map(n => (
+              <NavLink key={n.to+n.label} to={n.to} onClick={()=>setOpen(false)} className={mobileRow}>{n.label}</NavLink>
             ))}
+            {/* Catalog tabs used to collapse to a bare top-level link here, so
+                every child destination — the video courses, the exam and free-class
+                pages — was reachable on desktop only. They expand now.
+                The two mega tabs stay plain links on purpose: "Our Courses" alone
+                holds 108 of them, which is a category page, not a menu. */}
+            {CATALOG_NAV.slice(1).map(n => {
+              const kids = n.source === 'video-courses' ? videoItems : (n.items || []);
+              const expandable = !n.mega?.length && kids.length > 0;
+              const isOpen = openSection === n.label;
+              return (
+                <div key={n.to+n.label}>
+                  <div className="flex items-center">
+                    <NavLink to={n.to} onClick={()=>setOpen(false)} className={({isActive}) => mobileRow({isActive}) + ' flex-1'}>{n.label}</NavLink>
+                    {expandable && (
+                      <button type="button" onClick={()=>setOpenSection(s => s === n.label ? null : n.label)}
+                        aria-label={`${isOpen ? 'Hide' : 'Show'} ${n.label}`} aria-expanded={isOpen}
+                        className="rounded-md p-2 text-slate-400 hover:bg-slate-50 hover:text-brand-600">
+                        <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                    )}
+                  </div>
+                  {expandable && isOpen && (
+                    <div className="mb-1 ml-3 space-y-0.5 border-l border-slate-100 pl-3">
+                      {kids.map(it => (
+                        <NavLink key={it.to+it.label} to={it.to} onClick={()=>setOpen(false)}
+                          className={({isActive})=>`block rounded-md px-3 py-1.5 text-[13px] ${isActive?'text-brand-600 font-semibold':'text-slate-600 hover:bg-slate-50'}`}>
+                          {it.label}
+                        </NavLink>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
