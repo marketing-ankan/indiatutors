@@ -333,9 +333,22 @@ export default function TutorProfilePage() {
               <span style={{ color: MUTED }}>Trial Class</span>
               <span className="font-bold text-green-600">{trialFree ? 'FREE' : `₹${Number(tutor.fee_trial).toLocaleString('en-IN')}`}</span>
             </div>
+            {/* Both of these used to be href="#enquiry-form", which threw the
+                visitor to the bottom of the page and recorded nothing — reading
+                a profile and pressing Book is the most deliberate choice a
+                parent makes, and it was being thrown away. /book-demo?tutor=
+                already resolves the tutor and stores requested_tutor_id, so the
+                choice now survives into the booking. */}
             <div className="mt-5 space-y-2.5">
-              <a href="#enquiry-form" className="font-heading block rounded-lg bg-brand-600 px-8 py-3.5 text-center font-semibold text-white transition hover:bg-brand-800">Book a Trial Class</a>
-              <a href="#enquiry-form" className="font-heading block rounded-lg border-2 border-brand-600 px-6 py-[11px] text-center text-[0.88rem] font-semibold text-brand-600 transition hover:bg-[#F3F6FC]">Schedule Online Session</a>
+              <Link to={`/book-demo?tutor=${tutor.slug}`}
+                className="font-heading block rounded-lg bg-brand-600 px-8 py-3.5 text-center font-semibold text-white transition hover:bg-brand-800">Book a Trial Class</Link>
+              {/* NOTE: this lands on the same flow as the button above. There is
+                  no separate "paid ongoing session" booking type — the types are
+                  demo / group / workshop / free / physical — so the two labels
+                  promise a distinction the system does not make. Left for the
+                  owner to decide: drop one, or add a real type behind it. */}
+              <Link to={`/book-demo?tutor=${tutor.slug}`}
+                className="font-heading block rounded-lg border-2 border-brand-600 px-6 py-[11px] text-center text-[0.88rem] font-semibold text-brand-600 transition hover:bg-[#F3F6FC]">Schedule Online Session</Link>
             </div>
           </div>
 
