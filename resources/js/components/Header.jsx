@@ -3,7 +3,7 @@ import { Phone, Mail, MapPin, Search, Menu, X, LayoutDashboard, Bell, ChevronDow
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../lib/auth.jsx';
-import { fetchNotifications, markNotificationRead, markAllNotificationsRead } from '../lib/api.js';
+import { fetchNotifications, markNotificationRead, markAllNotificationsRead, fetchVideoCourses } from '../lib/api.js';
 import { useCart, useWishlist } from '../lib/cart.js';
 import { CATALOG_NAV } from '../data/nav.js';
 
@@ -75,7 +75,11 @@ const primaryNav = [
 /** One tab of the live site's category bar: plain link, flat dropdown, or mega menu. */
 function CatalogTab({ item }) {
   const hasMega = !!(item.mega && item.mega.length);
-  const hasPanel = hasMega || item.items.length > 0;
+  // `item.items` can be an empty array on a data-driven tab whose fetch has not
+  // landed (or failed). Keeping the chevron for those stops it popping in a
+  // moment after paint; the panel below still only renders once there is
+  // something to put in it, so no empty white card appears.
+  const hasPanel = hasMega || item.items.length > 0 || !!item.source;
   return (
     // Mega tabs are NOT position-relative: their panel anchors to the full-width
     // category-bar container (which is `relative`) so a wide 1080px panel stays
@@ -113,7 +117,9 @@ function CatalogTab({ item }) {
 
       {!item.mega?.length && item.items.length > 0 && (
         <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition absolute left-0 top-full z-50 pt-1 hidden xl:block">
-          <div className="w-64 rounded-xl bg-white shadow-2xl ring-1 ring-slate-200 py-2">
+          {/* max-h: this list is now data-driven and unbounded on the server
+              side, so without it a long catalogue would run off the screen. */}
+          <div className="w-64 max-h-[70vh] overflow-y-auto rounded-xl bg-white shadow-2xl ring-1 ring-slate-200 py-2">
             {item.items.map(it => (
               <Link key={it.label + it.to} to={it.to} className="block px-4 py-1.5 text-xs text-slate-700 hover:bg-slate-50 hover:text-brand-600 normal-case tracking-normal">{it.label}</Link>
             ))}
@@ -136,6 +142,23 @@ export default function Header() {
   const cartItems = useCart();
   const wishItems = useWishlist();
   const onSearch = e => { e.preventDefault(); if(sq.trim()) { nav(`/courses?search=${encodeURIComponent(sq.trim())}`); setShowSearch(false); setSq(''); }};
+
+  // The Video Courses menu is the one tab whose contents are products, so it
+  // reads them instead of hardcoding them. One query HERE, not in CatalogTab:
+  // that renders once per tab, so a query inside it would fire ~9 requests a
+  // page, and making it conditional would break the rules of hooks.
+  //
+  // Same queryKey as VideoCoursesPage, so a visitor who opens the catalogue
+  // pays nothing extra, and the Staff Console already invalidates this key on
+  // every save — editing a course updates the menu with no extra wiring.
+  const { data: videoCourses } = useQuery({
+    queryKey: ['video-courses'], queryFn: fetchVideoCourses, staleTime: 5 * 60_000,
+  });
+  // `?? []` is load-bearing: CatalogTab dereferences item.items.length with no
+  // guard, so an undefined here would white-screen the header on every route
+  // while the request is in flight. Empty degrades the tab to a plain link.
+  const videoItems = (videoCourses ?? []).slice(0, 8)
+    .map(c => ({ label: c.title, to: `/video-courses/${c.slug}` }));
 
   return (
     <header className="sticky top-0 z-40 bg-white shadow-sm [overflow-x:clip] print:hidden">
@@ -190,7 +213,10 @@ export default function Header() {
       <div className="hidden xl:block border-b border-slate-100">
         <div className="container-wide relative">
           <ul className="flex items-center [justify-content:safe_center] gap-3 2xl:gap-6">
-            {CATALOG_NAV.map(item => <CatalogTab key={item.label} item={item} />)}
+            {CATALOG_NAV.map(item => (
+              <CatalogTab key={item.label}
+                item={item.source === 'video-courses' ? { ...item, items: videoItems } : item} />
+            ))}
           </ul>
         </div>
       </div>

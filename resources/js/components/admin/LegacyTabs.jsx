@@ -105,7 +105,7 @@ export function EventsTab() {
 
 // ---- Video courses ----------------------------------------------------------
 
-const VC_BLANK = { title:'', subtitle:'', description:'', price:0, level:'Beginner', category:'', is_published:true };
+const VC_BLANK = { title:'', subtitle:'', description:'', price:0, level:'Beginner', category:'', thumbnail_url:'', position:0, is_published:true };
 const LESSON_BLANK = { title:'', provider:'r2', video_id:'', duration_seconds:0, is_preview:false };
 // The first two lessons of a course are the free previews and come from YouTube;
 // everything after is an uploaded file behind the paywall. Encoded here so the
@@ -461,14 +461,22 @@ function LessonsManager({ course }) {
 
 export function VideoCoursesTab() {
   const qc = useQueryClient();
-  const { data: courses = [], isLoading } = useQuery({ queryKey:['admin-videos'], queryFn: fetchAdminVideoCourses });
+  // isError matters: without it a 401 or a 500 rendered the same "No video
+  // courses yet." as a genuinely empty table, which is exactly how an auth
+  // failure got mistaken for missing data.
+  const { data: courses = [], isLoading, isError, error } = useQuery({ queryKey:['admin-videos'], queryFn: fetchAdminVideoCourses });
   const invalidate = () => { qc.invalidateQueries({ queryKey:['admin-videos'] }); qc.invalidateQueries({ queryKey:['video-courses'] }); };
   const [editing, setEditing] = useState(null);
   const [openId, setOpenId] = useState(null);
   const save = useMutation({ mutationFn: p => p.id ? updateAdminVideoCourse(p) : createAdminVideoCourse(p), onSuccess: () => { invalidate(); setEditing(null); } });
   const del = useMutation({ mutationFn: deleteAdminVideoCourse, onSuccess: invalidate });
   const inp = 'w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500';
-  const set = k => e => setEditing(s => ({ ...s, [k]: k==='price' ? Number(e.target.value) : e.target.value }));
+  const set = k => e => setEditing(s => ({
+    ...s,
+    [k]: k === 'is_published' ? e.target.checked
+       : (k === 'price' || k === 'position') ? Number(e.target.value)
+       : e.target.value,
+  }));
 
   return (
     <div className="mt-5">
@@ -485,7 +493,26 @@ export function VideoCoursesTab() {
           <F label="Category"><input value={editing.category||''} onChange={set('category')} className={inp}/></F>
           <div className="sm:col-span-2"><F label="Subtitle"><input value={editing.subtitle||''} onChange={set('subtitle')} className={inp}/></F></div>
           <div className="sm:col-span-2"><F label="Description"><textarea rows={2} value={editing.description||''} onChange={set('description')} className={inp}/></F></div>
-          <div className="flex items-end gap-2">
+          {/* A path, not an upload: the deploy wipes and re-copies the image
+              directories on every pull, so a file written at runtime would not
+              survive the next one. Commit the image to public/images/… and the
+              build ships it to /build/images/…. */}
+          <div className="sm:col-span-2">
+            <F label="Thumbnail">
+              <input value={editing.thumbnail_url||''} onChange={set('thumbnail_url')} className={inp}
+                placeholder="/build/images/video-courses/python.jpg" />
+            </F>
+            <p className="mt-1 text-[11px] text-slate-500">
+              Shown on the course card. Leave blank for the default play icon.
+            </p>
+          </div>
+          <F label="Order"><input type="number" value={editing.position ?? 0} onChange={set('position')} className={inp}
+            placeholder="0" /></F>
+          <label className="flex items-end gap-2 pb-2 text-sm text-slate-700">
+            <input type="checkbox" checked={!!editing.is_published} onChange={set('is_published')} className="accent-brand-600" />
+            Published — visible on the site and in the header menu
+          </label>
+          <div className="flex items-end gap-2 sm:col-span-2">
             <button type="submit" disabled={save.isPending} className="rounded-lg bg-brand-600 text-white px-5 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">{editing.id?'Save':'Create'}</button>
             <button type="button" onClick={()=>setEditing(null)} className="rounded-lg ring-1 ring-slate-200 px-4 py-2 text-sm font-semibold text-slate-600">Cancel</button>
           </div>
@@ -493,6 +520,12 @@ export function VideoCoursesTab() {
       )}
 
       {isLoading ? <p className="text-slate-500 py-10 text-center">Loading…</p>
+      : isError ? (
+        <p className="py-10 text-center text-red-600">
+          Could not load video courses ({error?.response?.status || 'network error'}).
+          {error?.response?.status === 401 ? ' Your session expired — sign in again.' : ' Try reloading.'}
+        </p>
+      )
       : !courses.length ? <p className="text-slate-500 py-10 text-center">No video courses yet.</p>
       : (
         <div className="space-y-3">
