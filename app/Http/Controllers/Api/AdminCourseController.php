@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AdminCourseResource;
 use App\Models\AuditLog;
 use App\Models\Course;
+use App\Support\ConsoleOwned;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -41,6 +42,11 @@ class AdminCourseController extends Controller
         $course = Course::create($data);
         if ($request->filled('category_ids')) $course->categories()->sync($request->input('category_ids'));
 
+        // The console owns this row from now on. Without the marker CourseSeeder
+        // prunes every slug not in courses.json — which would hard-delete a
+        // course created here on the next deploy.
+        ConsoleOwned::mark($course);
+
         AuditLog::record('course_added', 'course', $course->id, $course->name);
 
         return (new AdminCourseResource($course->load(['categories:id,name','batches'])->loadCount('reviews')))
@@ -52,6 +58,11 @@ class AdminCourseController extends Controller
         $before = $course->only(['regular_price', 'sale_price', 'is_published']);
         $course->update($this->rules($request, $course));
         if ($request->has('category_ids')) $course->categories()->sync($request->input('category_ids', []));
+
+        // Stops CourseSeeder reverting this edit on the next deploy — and on the
+        // next product-page visit, which can re-run it via the curriculum
+        // self-heal in CourseController.
+        ConsoleOwned::mark($course);
 
         AuditLog::record('course_updated', 'course', $course->id, $course->name, [
             'from' => $before,

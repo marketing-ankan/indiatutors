@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\Post;
+use App\Support\ConsoleOwned;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -38,6 +39,10 @@ class AdminPostController extends Controller
         }
 
         $post = Post::create($data);
+        // Without this the next deploy deletes it: PostSeeder prunes every post
+        // whose slug is not in its own one-item source list.
+        ConsoleOwned::mark($post);
+
         AuditLog::record('post_created', 'post', $post->id, $post->title, [
             'published' => (bool) $post->is_published,
         ]);
@@ -56,6 +61,8 @@ class AdminPostController extends Controller
         }
 
         $post->update($data);
+        ConsoleOwned::mark($post);
+
         AuditLog::record('post_updated', 'post', $post->id, $post->title, array_keys($data));
 
         return response()->json($post->fresh());

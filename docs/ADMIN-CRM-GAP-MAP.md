@@ -21,6 +21,15 @@ These were re-checked directly against HEAD:
 The audit's own section 0 lists what it got wrong about work that landed while it was
 running — the Settings tab and the policy editor both exist as of commit `2b1654f`.
 
+## Status
+
+| Item | State |
+|---|---|
+| **B1** deploy deletes blog posts | **FIXED** — `console_edited_at` ownership marker; seeders skip marked rows and prune only their own |
+| **B2** deploy reverts course edits / deletes console-created courses | **FIXED** — same mechanism, backfilled from the audit log so earlier edits are protected too |
+| **B3** empty-SKU 500 | **REFUTED** — not a defect, do not act on it |
+| Everything else below | open |
+
 ---
 
 Verification complete. The tree has moved past the audit in ways that materially change the answer, and every bug I lead with is confirmed in current code.

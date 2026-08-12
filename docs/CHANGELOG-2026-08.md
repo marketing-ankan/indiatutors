@@ -264,6 +264,35 @@ Every field falls back to the value that was hardcoded, so this shipped without
 changing a single thing on the site until someone edits it. Clearing a social
 link hides its icon; clearing a contact field hides that line.
 
+### The deploy no longer destroys work done in the console
+
+Found by the console audit and confirmed by running it: **a blog post written in
+the Staff Console was deleted by the next deploy.** `PostSeeder` pruned every
+post whose slug was not in its own one-item source list. A fingerprint kept it
+dormant, but any edit to that seeder file re-armed it — including an edit made to
+add a post.
+
+The same pattern was reverting the catalogue. `CourseSeeder` pruned every slug not
+in `courses.json` — hard-deleting a course created in the console — then
+overwrote name, prices, description, image and position on the rest and forced
+`is_published => true`, so a price edit silently reverted and a deliberately
+unpublished course republished itself. That one is not only a deploy risk: an
+ordinary visitor can trigger it, because the curriculum self-heal re-runs the
+seeder from a product page with the fingerprint bypassed.
+
+Both now respect a single rule: **the console owns a row the moment a human edits
+it.** A `console_edited_at` marker is stamped by the admin controllers on every
+write; seeders skip marked rows entirely and prune only their own. Rows edited
+*before* this shipped are protected too — the marker is backfilled from the audit
+log, which has recorded every console write all along.
+
+Verified end to end: wrote a post and created a course in the console, ran both
+seeders (including with the fingerprint bypassed and with the seeder file
+changed) — the post survived, the new course survived, the edited price held at
+₹444 and the unpublished course stayed unpublished. And the seeders still do
+their job: a course nobody has touched, drifted to ₹1 and unpublished by hand,
+was correctly repaired from `courses.json` on the next run.
+
 ---
 
 ## Open — needs an owner decision

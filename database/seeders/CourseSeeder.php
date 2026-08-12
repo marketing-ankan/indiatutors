@@ -2,6 +2,7 @@
 namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Course;
+use App\Support\ConsoleOwned;
 use App\Support\SeedFingerprint;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Seeder;
@@ -57,8 +58,13 @@ class CourseSeeder extends Seeder {
         // Prune stale courses FIRST so old rows release their unique keys (sku)
         // before we upsert. Non-destructive: demo_requests.course_id is
         // nullOnDelete, so any linked requests are preserved.
-        $pruned = Course::whereNotIn('slug', $sourceSlugs)->count();
-        if ($pruned > 0) Course::whereNotIn('slug', $sourceSlugs)->delete();
+        //
+        // Restricted to rows the console has never touched: a course CREATED in
+        // the Staff Console has no slug in courses.json, so this used to delete
+        // it outright on the next deploy.
+        $stale  = ConsoleOwned::scopeSeederOwned(Course::whereNotIn('slug', $sourceSlugs));
+        $pruned = $stale->count();
+        if ($pruned > 0) $stale->delete();
 
         $categoryCache = [];
         foreach ($courses as $data) {
@@ -82,7 +88,18 @@ class CourseSeeder extends Seeder {
             // Only write curriculum_variants when the column is present (see the
             // self-heal above) so a missing column can never abort the seed.
             if ($hasVariants) $attrs['curriculum_variants'] = $data['curriculum_variants'] ?? null;
-            $course = Course::updateOrCreate(['slug' => $slug], $attrs);
+
+            $course = Course::where('slug', $slug)->first();
+
+            // Once someone edits a course in the Staff Console it is theirs. This
+            // block used to overwrite name, prices, description, image, position
+            // and force is_published => true, so a price edit silently reverted
+            // on the next deploy and an unpublished course republished itself.
+            // Category links are still synced below: those ARE console-editable,
+            // but they are additive here and re-syncing them costs nothing.
+            if (!ConsoleOwned::isOwned($course)) {
+                $course = Course::updateOrCreate(['slug' => $slug], $attrs);
+            }
 
             // Resolve hierarchical categories from "Parent > Child" chains
             $ids = [];
