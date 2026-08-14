@@ -96,18 +96,23 @@ function BuyCard({ course }) {
           </div>
         )}
 
-        {/* Level selector */}
-        <div>
-          <p className="text-xs font-semibold text-slate-500 mb-2">Choose level</p>
-          <div className="grid grid-cols-3 gap-2">
-            {levels.map((lv, i) => (
-              <button key={lv} type="button" onClick={() => setLevel(i)}
-                className={`rounded-[9px] py-2 text-xs font-bold border transition ${level === i ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-[#E7E7EF] hover:border-brand-300'}`}>
-                {lv}
-              </button>
-            ))}
+        {/* Level selector — hidden when the course is priced at one rate, since
+            a single chip labelled "All levels" is a control with no choice in
+            it. Those courses now quote one price rather than an invented
+            per-level ladder the cart would not honour. */}
+        {levels.length > 1 && (
+          <div>
+            <p className="text-xs font-semibold text-slate-500 mb-2">Choose level</p>
+            <div className="grid grid-cols-3 gap-2">
+              {levels.map((lv, i) => (
+                <button key={lv} type="button" onClick={() => setLevel(i)}
+                  className={`rounded-[9px] py-2 text-xs font-bold border transition ${level === i ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-[#E7E7EF] hover:border-brand-300'}`}>
+                  {lv}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Live price */}
         <div className="flex items-center flex-wrap gap-x-2 gap-y-1">

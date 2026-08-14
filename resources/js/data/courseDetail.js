@@ -290,6 +290,9 @@ function rateRowFor(name) {
 // course name — Group appears exactly when the PDF lists a group rate.
 // Fallback (unmatched names, e.g. Spoken English): the previous synthetic
 // ladder from the catalog base price (base ×1 / ×1.5 / ×2; Group = half).
+// Shown instead of level chips when the sheet prices a course at one rate.
+export const SINGLE_LEVEL = 'All levels';
+
 export function buildPriceMatrix(base, slug, name) {
   const LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
   const grossOf = net => Math.round((net / 0.6) / 10) * 10; // ~40% off, rounded
@@ -304,19 +307,27 @@ export function buildPriceMatrix(base, slug, name) {
     }
     return { matrix, plans: Object.keys(matrix), levels: LEVELS };
   }
+  // No rate in the sheet — quote ONE price, the catalogue one, and no levels.
+  //
+  // This used to invent a ×1 / ×1.5 / ×2 ladder from the base price. Six live
+  // courses fall here and they are the dearest on the site: JEE Main, JEE
+  // Advanced, NEET (UG), CUET (UG), Olympiad Preparation and Spoken English. The
+  // page therefore advertised ₹3,000 for "JEE Main — Advanced" against a figure
+  // the business never set, and since the cart now honours the level a buyer
+  // picks, that gap became visible: the server prices from the same sheet, finds
+  // no row, and bills the catalogue ₹1,500. Page and cart disagreed again.
+  //
+  // Quoting one real price is the honest resolution. To offer per-level pricing
+  // on these, add their rows to database/data/rates.json — the page and the
+  // invoice both read it, so they cannot drift.
   const isGroup = GROUP_SLUGS.has(slug);
-  const mult = [1, 1.5, 2];
-  const tier = (unit, m) => { const net = Math.round(unit * m); return { net, gross: grossOf(net) }; };
-  // For group-enabled courses base = Group-Beginner and One-to-One is 2×.
-  const groupUnit = isGroup ? base : base / 2;
-  const oneUnit = isGroup ? base * 2 : base;
-  const matrix = { 'One-to-One': {} };
-  LEVELS.forEach((lv, i) => { matrix['One-to-One'][lv] = tier(oneUnit, mult[i]); });
+  const one = { net: Math.round(base), gross: grossOf(Math.round(base)) };
+  const matrix = { 'One-to-One': { [SINGLE_LEVEL]: one } };
   if (isGroup) {
-    matrix['Group'] = {};
-    LEVELS.forEach((lv, i) => { matrix['Group'][lv] = tier(groupUnit, mult[i]); });
+    const half = Math.round(base / 2);
+    matrix['Group'] = { [SINGLE_LEVEL]: { net: half, gross: grossOf(half) } };
   }
-  return { matrix, plans: Object.keys(matrix), levels: LEVELS };
+  return { matrix, plans: Object.keys(matrix), levels: [SINGLE_LEVEL] };
 }
 
 // --- cache-busting -----------------------------------------------------------
