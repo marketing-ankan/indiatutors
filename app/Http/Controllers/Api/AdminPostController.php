@@ -35,6 +35,13 @@ class AdminPostController extends Controller
         $data = $this->rules($request);
         $data['slug'] = $this->uniqueSlug($data['title']);
 
+        // Omit a blank author rather than writing null. The column is nullable
+        // now, but this deploy's assets go live before its migrate step runs —
+        // and inside that window an explicit null still hits the old NOT NULL
+        // constraint, which is the exact bug that made the form's first submit
+        // die. Omitting the column is valid against both schemas.
+        if (array_key_exists('author', $data) && $data['author'] === null) unset($data['author']);
+
         if (($data['is_published'] ?? false) && empty($data['published_at'])) {
             $data['published_at'] = now();
         }
