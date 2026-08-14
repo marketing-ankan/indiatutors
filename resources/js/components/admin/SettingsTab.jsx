@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Trash2, ChevronUp, ChevronDown, ExternalLink } from 'lucide-react';
 import {
-  fetchAdminSettings, saveAdminSettings, fetchAdminLegal, updateAdminLegal,
+  fetchAdminSettings, fetchAdminSettingsFull, saveAdminSettings, fetchAdminLegal, updateAdminLegal,
 } from '../../lib/api.js';
 import { errText, inp, inpSm, btnPrimary, btnGhost } from './AdminUI.jsx';
 
@@ -38,6 +38,13 @@ export default function SettingsTab() {
         <SiteDetailsPanel />
       </div>
       <div className="border-t border-slate-100 pt-6">
+        <h3 className="font-heading text-lg font-extrabold text-[#0B1220]">Database backup</h3>
+        <p className="text-sm text-slate-500">
+          Taken automatically before each deploy applies database changes.
+        </p>
+        <BackupStatus />
+      </div>
+      <div className="border-t border-slate-100 pt-6">
         <h3 className="font-heading text-lg font-extrabold text-[#0B1220]">Policy pages</h3>
         <p className="text-sm text-slate-500">
           Terms, Payment &amp; Refund, Refer &amp; Earn and Privacy. Changes go live immediately —
@@ -53,7 +60,8 @@ export default function SettingsTab() {
 
 function SiteDetailsPanel() {
   const qc = useQueryClient();
-  const { data, isLoading } = useQuery({ queryKey: ['admin-settings'], queryFn: fetchAdminSettings });
+  const { data: payload, isLoading } = useQuery({ queryKey: ['admin-settings-full'], queryFn: fetchAdminSettingsFull });
+  const data = payload?.data;
   const [form, setForm] = useState(null);
   const [err, setErr] = useState('');
 
@@ -67,6 +75,7 @@ function SiteDetailsPanel() {
     onSuccess: () => {
       setForm(null); setErr('');
       qc.invalidateQueries({ queryKey: ['admin-settings'] });
+      qc.invalidateQueries({ queryKey: ['admin-settings-full'] });
       qc.invalidateQueries({ queryKey: ['site-settings'] });   // header + footer
     },
     onError: e => setErr(errText(e)),
@@ -458,4 +467,68 @@ function BlockEditor({ block, onChange }) {
     default:
       return <p className="text-xs text-slate-400">This block type has no editor yet.</p>;
   }
+}
+
+/* -------------------------------------------------------------- backups */
+
+/**
+ * Whether the deploy's database backup is actually working.
+ *
+ * The deploy reports this only into storage/logs/deploy.log, which is not
+ * web-readable — correctly, but it meant that on a host with no practical shell
+ * access nobody could tell a working backup from one failing silently on a
+ * missing mysqldump. A backup nobody can verify is barely a backup.
+ *
+ * Metadata only, and no download: a SQL dump is every customer's name, email and
+ * phone number, and putting that behind a URL is how it ends up somewhere it
+ * should not be.
+ */
+function BackupStatus() {
+  const { data: payload, isLoading } = useQuery({
+    queryKey: ['admin-settings-full'], queryFn: fetchAdminSettingsFull,
+  });
+  if (isLoading) return <p className="py-6 text-center text-slate-500">Checking…</p>;
+
+  const b = payload?.backups;
+  // Always shown, never rounded away: a suspiciously small dump is how a
+  // truncated one looks, and hiding sizes under 1KB would hide exactly that.
+  const size = b?.newest_size == null ? null
+    : b.newest_size >= 1048576 ? (b.newest_size / 1048576).toFixed(1) + ' MB'
+    : b.newest_size >= 1024 ? Math.round(b.newest_size / 1024) + ' KB'
+    : b.newest_size + ' bytes';
+  const when = b?.newest_at ? new Date(b.newest_at) : null;
+  const ageDays = when ? Math.floor((Date.now() - when.getTime()) / 86400000) : null;
+
+  if (!b || !b.count) {
+    return (
+      <div className="mt-4 rounded-xl bg-amber-50 p-4 text-sm text-amber-900 ring-1 ring-amber-200">
+        <p className="font-bold">No backup has been taken yet.</p>
+        <p className="mt-1">
+          If a deploy has run since this was set up, the dump is failing — most likely
+          <code className="mx-1 rounded bg-white px-1">mysqldump</code> is not available on the server.
+          The reason is logged in <code className="rounded bg-white px-1">storage/logs/deploy.log</code>.
+        </p>
+      </div>
+    );
+  }
+
+  // Stale is worth flagging: deploys are frequent, so a backup older than a week
+  // usually means the dump started failing rather than that nothing shipped.
+  const stale = ageDays !== null && ageDays > 7;
+
+  return (
+    <div className={`mt-4 rounded-xl p-4 text-sm ring-1 ${stale ? 'bg-amber-50 text-amber-900 ring-amber-200' : 'bg-green-50 text-green-900 ring-green-200'}`}>
+      <p className="font-bold">
+        {stale ? 'Last backup is over a week old' : 'Backups are working'}
+      </p>
+      <p className="mt-1">
+        Most recent: <strong>{when ? when.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : 'unknown'}</strong>
+        {size ? ` · ${size}` : ''}
+        {' · '}{b.count} kept
+      </p>
+      <p className="mt-1 text-xs opacity-80">
+        Stored outside the web root and never downloadable — ask your host for a copy if you need to restore.
+      </p>
+    </div>
+  );
 }
