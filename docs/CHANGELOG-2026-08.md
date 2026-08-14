@@ -412,6 +412,57 @@ A `DB::transaction` closure quietly caused a false negative while testing this:
 the lookup was outside its `use` list, so every price silently fell back and the
 fix appeared not to work. Worth remembering — it fails silently, not loudly.
 
+### An approved review can now reach the home page
+
+The condition the owner attached to keeping the placeholder testimonials: a
+parent submits one, it sits unapproved, staff approve it, and it appears on the
+site — with the invented ones retiring **one by one** as real ones arrive.
+Moderation was already built; the second half was not. An approved review had
+nowhere to go, because the carousel renders a hardcoded array.
+
+Reviews now carry `is_featured` and `author_role`. Staff approve as before, then
+press **Feature** to put one on the home page. Approval alone deliberately does
+NOT publish there — every approved review already shows on its own course page,
+and the front page is a shortlist somebody chooses, not wherever the next
+routine 5-star review lands.
+
+The carousel fills from the front with real testimonials and tops up with
+placeholders, so the invented ones retire as real ones arrive. Verified: with
+three featured reviews the home page showed **three real cards and five
+placeholders**, real ones first, and the count held at eight.
+
+Also verified: featuring an unapproved review is refused; un-approving one pulls
+it off the home page automatically; and with nothing featured the placeholders
+render exactly as before, so this shipped changing nothing.
+
+**An adversarial review of this change found eight real defects, all fixed:**
+
+- `author_role` was accepted on edit but **silently dropped on create** — the
+  exact round-trip failure the field existed to prevent.
+- The migration added its index guarded on the *column*, not the index. This
+  host kills `migrate` partway through, so a retry would have hit "Duplicate key
+  name" and **wedged every migration behind it**. Now uses the same `hasIndex`
+  helper as the previous migration on this table, which documents the hazard.
+- Giving `Stars` a rating **removed its `aria-hidden`**, so all 14 course-card
+  star rows started announcing a false "5 out of 5" beside their real figure.
+  Decorative by default again; only a genuine rating is labelled.
+- Filled and empty stars were the same glyph in different colours, so a 3-star
+  review would read as 5 in greyscale, print or high contrast. Empty stars are
+  now ☆.
+- Featuring wrote **no audit record** — no way to establish who put someone's
+  words on the busiest page. Both transitions are logged now.
+- `Approve` / `Unpublish` / `Feature` shared one mutation with **no error sink**,
+  so a rejected request looked like a dead button.
+- An explicit `"status": null` defeated its own `?? 'approved'` fallback (PHP's
+  `+` keeps the left-hand value) and handed NULL to a NOT NULL column.
+- A featured review whose course was later deleted rendered a name above a blank
+  line.
+
+One finding was recorded but **not** fixed, because it is pre-existing and wider
+than this change: deleting a user account leaves their review — name, words and
+all — published, since `user_id` is nulled rather than the row scrubbed. Worth a
+decision, as it is a data-erasure question rather than a bug in this path.
+
 ---
 
 ## Open — needs an owner decision

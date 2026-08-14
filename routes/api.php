@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\GroupClassController;
 use App\Http\Controllers\Api\LegalController;
 use App\Http\Controllers\Api\AdminLegalController;
 use App\Http\Controllers\Api\SiteSettingController;
+use App\Http\Controllers\Api\TestimonialController;
 use App\Http\Controllers\Api\EnrollmentController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CityController;
@@ -56,6 +57,8 @@ Route::get('/group-classes',     [GroupClassController::class, 'index']);
 Route::get('/legal',             [LegalController::class, 'index']);
 Route::get('/legal/{slug}',      [LegalController::class, 'show']);
 Route::get('/site-settings',     [SiteSettingController::class, 'index']);
+// Home-page testimonials: reviews a human approved AND shortlisted.
+Route::get('/testimonials',      [TestimonialController::class, 'index']);
 Route::get('/courses/{slug}',    [CourseController::class, 'show'])->name('api.courses.show');
 // Two segments, so these never shadow /courses/{slug} above.
 Route::get('/courses/{course:slug}/reviews',  [ReviewController::class, 'index']);

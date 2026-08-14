@@ -46,7 +46,16 @@ export default function ReviewsTab() {
     qc.invalidateQueries({ queryKey: ['admin-reviews'] });
     qc.invalidateQueries({ queryKey: ['admin-overview'] });
   };
-  const setStatusMut = useMutation({ mutationFn: updateAdminReview, onSuccess: refresh });
+  // Approve / Unpublish / Feature all run through this one mutation. Without an
+  // error sink a rejected request was indistinguishable from a dead button —
+  // e.g. two staff with the queue open, one un-approves, the other's cached row
+  // still says "approved" so Feature is still offered and the API 422s.
+  const [rowError, setRowError] = useState('');
+  const setStatusMut = useMutation({
+    mutationFn: updateAdminReview,
+    onSuccess: () => { setRowError(''); refresh(); },
+    onError: e => setRowError(errText(e)),
+  });
   const remove = useMutation({ mutationFn: deleteAdminReview, onSuccess: () => { setDeleting(null); refresh(); } });
 
   const rows = data?.data ?? [];
@@ -59,6 +68,10 @@ export default function ReviewsTab() {
         <SearchBox value={q} onChange={v => { setQ(v); setPage(1); }} placeholder="Search author or text…" className="sm:max-w-xs" />
         <AskForReviewLink />
       </div>
+
+      {rowError && (
+        <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">{rowError}</p>
+      )}
 
       <AdminTable
         cols={['Author', 'Course', 'Rating', 'Review', 'Status', 'Date', 'Actions']}
@@ -90,6 +103,17 @@ export default function ReviewsTab() {
                   <button onClick={() => setStatusMut.mutate({ id: r.id, status: 'approved' })}
                     className="inline-flex items-center gap-1 rounded-lg bg-green-600 px-2.5 py-1.5 text-xs font-bold text-white hover:bg-green-700">
                     <Check className="h-3.5 w-3.5" />Approve
+                  </button>
+                )}
+                {/* Shortlists it for the home-page carousel, where it displaces
+                    one of the placeholder testimonials. Only offered once the
+                    review is approved — the API refuses otherwise. */}
+                {r.status === 'approved' && (
+                  <button onClick={() => setStatusMut.mutate({ id: r.id, is_featured: !r.is_featured })}
+                    title={r.is_featured ? 'Remove from the home page' : 'Show this on the home page'}
+                    className={btnGhost + (r.is_featured ? ' text-amber-700 ring-amber-200' : '')}>
+                    <Star className={`h-3.5 w-3.5 ${r.is_featured ? 'fill-amber-500 text-amber-500' : ''}`} />
+                    {r.is_featured ? 'On home page' : 'Feature'}
                   </button>
                 )}
                 <button onClick={() => setDeleting(r)} className={btnGhost + ' hover:text-red-600 hover:ring-red-200'}>
@@ -128,6 +152,7 @@ function ReviewForm({ review, onClose, onSaved }) {
   const [form, setForm] = useState({
     course_id: '', tutor_id: '', author_name: review?.author_name ?? '', author_email: review?.author_email ?? '',
     rating: review?.rating ?? 5, body: review?.body ?? '', status: review?.status ?? 'approved',
+    author_role: review?.author_role ?? '',
   });
   const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
 
@@ -147,7 +172,7 @@ function ReviewForm({ review, onClose, onSaved }) {
 
   const save = useMutation({
     mutationFn: () => editingExisting
-      ? updateAdminReview({ id: review.id, rating: Number(form.rating), body: form.body, status: form.status })
+      ? updateAdminReview({ id: review.id, rating: Number(form.rating), body: form.body, status: form.status, author_role: form.author_role || null })
       : createAdminReview({
         ...form,
         course_id: subjectKind === 'course' && form.course_id ? Number(form.course_id) : null,
@@ -228,6 +253,15 @@ function ReviewForm({ review, onClose, onSaved }) {
         <label className="block">
           <span className="mb-1 block text-xs font-semibold text-slate-600">Review *</span>
           <textarea required rows={4} value={form.body} onChange={set('body')} className={inp} />
+        </label>
+
+        {/* The line under the name on the home-page carousel. A reviewer never
+            supplies one, and the placeholder cards it sits beside all have it —
+            without this a real testimonial looks poorer than the invented ones
+            it is replacing. */}
+        <label className="block">
+          <span className="mb-1 block text-xs font-semibold text-slate-600">Who they are — shown under the name on the home page</span>
+          <input value={form.author_role} onChange={set('author_role')} placeholder="Parent, Kolkata · Class 8 Maths" className={inp} />
         </label>
 
         {save.isError && <p className="text-xs text-red-600">{errText(save.error)}</p>}

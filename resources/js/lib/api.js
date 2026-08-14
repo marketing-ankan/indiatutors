@@ -354,3 +354,7 @@ export const updateAdminLegal      = async ({ id, ...p }) => { const { data } = 
 // The "Verified" badge on a public tutor card. It was granted by a schema
 // default (tutors.verified defaults to true) with no way to withdraw it.
 export const toggleTeacherVerified = async ({ id, verified }) => { const { data } = await api.patch(`/admin/teachers/${id}/verified`, { verified }); return data.data; };
+
+// Home-page testimonials — reviews staff have approved AND shortlisted. Empty
+// until there are real ones, which is when the placeholders start retiring.
+export const fetchTestimonials = async () => { const { data } = await api.get('/testimonials'); return data.data; };

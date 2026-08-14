@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { fetchGroupClasses, inr } from '../lib/api';
+import { fetchGroupClasses, fetchTestimonials, inr } from '../lib/api';
 import {
   Search, Heart, ChevronLeft, ChevronRight, UserRound, Users, PlayCircle,
   Laptop, Home as HomeIcon, CalendarCheck, Rocket, Video, MessagesSquare,
@@ -36,9 +36,32 @@ const Eyebrow = ({ children, center }) => (
 const H2 = ({ children, center, id }) => (
   <h2 id={id} className={`font-heading text-[26px] sm:text-[30px] lg:text-[34px] font-bold text-[#1A1A1A] tracking-tight ${center ? 'text-center' : ''}`}>{children}</h2>
 );
-const Stars = ({ className = '' }) => (
-  <span aria-hidden="true" className={`text-[#D4AF37] text-sm tracking-tight ${className}`}>★★★★★</span>
-);
+// `n` so a real review shows the rating it was actually given.
+//
+// With no `n` this stays exactly what it was: five stars, and aria-hidden. The
+// course cards print the real figure right beside it ("4.6 (128)"), so exposing
+// the glyphs there would make a screen reader announce "5 out of 5, 4.6" — a
+// rating the card is not claiming.
+//
+// Empty stars are ☆, not a grey ★. Every card used to be five-of-five, so the
+// colour-only distinction never showed; now a genuine 3-star review reaches
+// this, and in greyscale, in high-contrast mode or in print, five identical
+// glyphs would read as five stars whatever the rating.
+const Stars = ({ className = '', n }) => {
+  const decorative = n == null;
+  const filled = decorative ? 5 : Math.max(0, Math.min(5, Math.round(Number(n) || 0)));
+  const a11y = decorative ? { 'aria-hidden': 'true' } : { role: 'img', 'aria-label': `${filled} out of 5` };
+  return (
+    <span {...a11y} className={`text-[#D4AF37] text-sm tracking-tight ${className}`}>
+      {'★'.repeat(filled)}<span className="text-slate-300">{'☆'.repeat(5 - filled)}</span>
+    </span>
+  );
+};
+
+// The placeholders each carry a colour for the initial disc; a real review has
+// no such field, so one is picked deterministically from its id — the same
+// reviewer keeps the same colour between visits.
+const TESTIMONIAL_COLORS = ['#1E40AF', '#D4AF37', '#0E7490', '#7C3AED', '#B45309', '#0F766E'];
 
 // ---------------------------------------------------------------- HERO ------
 const HERO_SLIDES = [
@@ -273,6 +296,31 @@ function DemoCourseRow({ eyebrow, title, seeAllTo, cards, bg }) {
 // ------------------------------------------------------- TESTIMONIAL SLIDER -
 function TestimonialSlider() {
   const railRef = useRef(null);
+
+  // Real testimonials, once staff have approved and shortlisted any.
+  //
+  // The owner kept the invented cards on the condition that a genuine review
+  // could be approved and then appear here, with the placeholders retiring "one
+  // by one" as real ones arrive. That is exactly what this does: approved and
+  // featured reviews fill the rail from the front, and the placeholders only
+  // top it up to a full carousel. Once there are enough real ones, none of the
+  // invented cards is reachable.
+  //
+  // A failed request simply leaves the placeholders, so the section can never
+  // render empty.
+  const { data: live } = useQuery({
+    queryKey: ['testimonials'],
+    queryFn: fetchTestimonials,
+    staleTime: 5 * 60_000,
+    retry: 1,
+  });
+
+  const real = (live ?? []).map(t => ({
+    key: `r${t.id}`, init: t.init, color: TESTIMONIAL_COLORS[t.id % TESTIMONIAL_COLORS.length],
+    name: t.name, role: t.role, text: t.text, rating: t.rating, real: true,
+  }));
+  const placeholders = TESTIMONIALS.map(t => ({ ...t, key: t.name, rating: 5, real: false }));
+  const cards = [...real, ...placeholders].slice(0, Math.max(TESTIMONIALS.length, real.length));
   // Two separate pauses, deliberately. `stopped` is the explicit control WCAG
   // 2.2.2 actually asks for and it is sticky; `hovering` is the transient
   // courtesy pause. One shared flag would have resumed the carousel the moment
@@ -305,17 +353,22 @@ function TestimonialSlider() {
       onBlur={() => setHovering(false)}
     >
       <div ref={railRef} className="flex gap-5 overflow-x-auto snap-x pb-2 scrollbar-hide">
-        {TESTIMONIALS.map(t => (
-          <div key={t.name} className="flex-shrink-0 snap-start w-[86%] sm:w-[46%] lg:w-[31.5%]">
+        {cards.map(t => (
+          <div key={t.key} className="flex-shrink-0 snap-start w-[86%] sm:w-[46%] lg:w-[31.5%]">
             <blockquote className="h-full rounded-[18px] bg-white border border-[#EEF1F6] shadow-[0_10px_30px_rgba(11,18,32,.06)] p-6 flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(11,18,32,.12)] hover:border-brand-200">
               <span aria-hidden="true" className="font-heading text-4xl leading-none text-brand-200">“</span>
-              <Stars className="mt-1" />
+              {/* A real review carries its own rating; the placeholders are all
+                  five stars, which is what Stars renders by default. */}
+              <Stars className="mt-1" n={t.rating} />
               <p className="mt-3 text-sm text-slate-600 leading-relaxed flex-1">{t.text}</p>
               <footer className="mt-4 flex items-center gap-3">
                 <span aria-hidden="true" className="w-9 h-9 rounded-full text-white flex items-center justify-center font-bold text-sm" style={{ background: t.color }}>{t.init}</span>
                 <span>
                   <strong className="block text-sm text-slate-900">{t.name}</strong>
-                  <span className="block text-xs text-slate-500">{t.role}</span>
+                  {/* Only when there is one. A review whose course was later
+                      deleted has no role and no subject to fall back to, and an
+                      empty span leaves the name floating above a blank line. */}
+                  {t.role && <span className="block text-xs text-slate-500">{t.role}</span>}
                 </span>
               </footer>
             </blockquote>
