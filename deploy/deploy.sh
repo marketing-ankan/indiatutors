@@ -142,6 +142,71 @@ if [ "$(read_mark "$DB_MARK")" != "$HEAD" ]; then
   set +e
   DB_OK=1
 
+  # --- BACKUP FIRST -------------------------------------------------------
+  #
+  # Nothing protected this database. `migrate` and five seeders ran against
+  # live data with no copy taken, so a bad migration had no undo — and the
+  # seeders delete rows (CourseSeeder and PostSeeder both prune), which is
+  # exactly the kind of mistake you only notice afterwards.
+  #
+  # Deliberately OUTSIDE the web root: a SQL dump under public/ would be every
+  # customer's name, email and phone number available to anyone who guessed the
+  # filename. storage/ is not served.
+  #
+  # A failed dump WARNS but does not stop the deploy. Blocking every future
+  # release on, say, a missing mysqldump binary would be a worse failure than
+  # the one this guards against, and it would be silent — the site would simply
+  # stop updating. The warning goes in the same log as everything else.
+  backup_database() {
+    local dir="$LARAVEL_DIR/storage/app/backups"
+    mkdir -p "$dir" || return 1
+    # Belt and braces in case storage is ever exposed by a misconfiguration.
+    [ -f "$dir/.gitignore" ] || printf '*\n!.gitignore\n' > "$dir/.gitignore"
+
+    # Read the connection out of Laravel rather than parsing .env: the deploy
+    # runs config:cache, so .env is not the source of truth here.
+    local cfg host port db user pass
+    cfg="$(php -r '
+      require "vendor/autoload.php";
+      $app = require "bootstrap/app.php";
+      $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+      $c = config("database.default");
+      if ($c !== "mysql") { exit(3); }
+      $d = config("database.connections.$c");
+      echo implode("\n", [$d["host"] ?? "", $d["port"] ?? 3306, $d["database"] ?? "", $d["username"] ?? "", $d["password"] ?? ""]);
+    ' 2>/dev/null)" || return 2
+
+    host="$(echo "$cfg" | sed -n 1p)"; port="$(echo "$cfg" | sed -n 2p)"
+    db="$(echo "$cfg" | sed -n 3p)";   user="$(echo "$cfg" | sed -n 4p)"
+    pass="$(echo "$cfg" | sed -n 5p)"
+    [ -n "$db" ] || return 2
+
+    command -v mysqldump >/dev/null 2>&1 || return 4
+
+    local out="$dir/db-$(date '+%Y%m%d-%H%M%S')-${HEAD:0:8}.sql"
+    # MYSQL_PWD, not --password=: command lines are visible to other users on a
+    # shared host.
+    if MYSQL_PWD="$pass" mysqldump --host="$host" --port="$port" --user="$user" \
+         --single-transaction --quick --no-tablespaces "$db" > "$out" 2>/dev/null; then
+      gzip -f "$out" 2>/dev/null || true
+      # Keep the last 7. Shared hosting has a disk quota, and an unbounded
+      # backup directory would eventually take the site down by filling it.
+      ls -1t "$dir"/db-*.sql.gz "$dir"/db-*.sql 2>/dev/null | tail -n +8 | while read -r old; do rm -f "$old"; done
+      log "db: backup written ($(basename "$out")$( [ -f "$out.gz" ] && echo .gz ))"
+      return 0
+    fi
+    rm -f "$out"
+    return 5
+  }
+
+  backup_database
+  case $? in
+    0) ;;
+    3) log "db: backup skipped — not a mysql connection" ;;
+    4) log "db: WARNING — mysqldump not found; migrating WITHOUT a backup" ;;
+    *) log "db: WARNING — backup failed; migrating WITHOUT a backup" ;;
+  esac
+
   artisan 300 migrate --force            || DB_OK=0
   # Each seeder now skips itself when its source data is unchanged
   # (App\Support\SeedFingerprint), so in the steady state these are near-free.

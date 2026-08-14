@@ -493,6 +493,49 @@ content licence a user grants for their own uploads. The course-page social
 proof — parents, family notes, WhatsApp cards, student wins — was already
 India-only.
 
+### Tutor photos come off WordPress, and the deploy takes a backup
+
+**Photos.** All 13 seeded tutors hotlinked their portrait from
+`indiatutorsonline.com/wp-content/uploads/…`, so the day WordPress is switched
+off every face in the directory would have become a coloured initial — on a
+tutoring site, where the faces are the product.
+
+Nothing had to be downloaded: the repo already ships all 13 photographs under
+`public/images/teachers/`, they were simply never linked to the tutor records
+(only the homepage carousel used them). Each is now matched to its tutor by
+slug, in **TutorSeeder** as well as the database — the seeder rewrites every
+column on each deploy, so fixing only the rows would have restored the hotlinks
+on the next cron pull.
+
+Verified: 0 tutors hotlinking WordPress, 13 rendering from local files, 0 broken.
+The remaining 4 fall back to initials — they are demo rows that never had a
+photo.
+
+**Backup.** `migrate` and five seeders ran against live data with nothing taken
+first, and two of those seeders delete rows. A bad migration had no undo.
+
+The deploy now dumps the database before any DB work, into
+`storage/app/backups` — deliberately outside the web root, since a SQL dump in
+`public/` is every customer's name, email and phone available to anyone who
+guesses the filename. Seven are kept, because an unbounded backup directory
+would eventually fill a shared-hosting quota and take the site down by itself.
+The password goes via `MYSQL_PWD` rather than the command line, which is visible
+to other users on a shared host.
+
+A failed dump **warns and continues** rather than aborting. Blocking every future
+release on a missing `mysqldump` would be a worse and quieter failure than the
+one this guards against — the site would simply stop updating.
+
+Tested: the connection is read correctly out of Laravel's config (not `.env`,
+which `config:cache` makes irrelevant at deploy time); a non-MySQL connection
+skips cleanly; retention keeps exactly the newest 7 of 10; dumps are gitignored;
+and a dump against an unreachable server fails cleanly, removes its stub file and
+leaves the deploy running. **Not** exercised end to end: the successful
+`mysqldump` itself, because MySQL was not running locally — that path runs for
+the first time on the next production deploy, where the warn-and-continue
+behaviour makes a failure visible in `storage/logs/deploy.log` rather than
+harmful.
+
 ---
 
 ## Open — needs an owner decision
