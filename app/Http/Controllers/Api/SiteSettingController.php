@@ -13,6 +13,34 @@ use App\Support\SiteSettings;
  */
 class SiteSettingController extends Controller
 {
+    /**
+     * What is actually deployed and configured — the observable facts, because
+     * this host has no shell and every question about production state has had
+     * to be answered by guesswork against bundle hashes and served files.
+     *
+     * The deploy writes two markers: assets.sha when the front-end copy for a
+     * commit completed, db.sha when its migrations and seeders all succeeded.
+     * Reading both here answers "which commit is live" AND "has the DB work for
+     * it finished" — the two halves advance independently by design.
+     *
+     * Config values are reported as BOOLEANS only. Whether an admin password is
+     * configured is not a secret; the password is, and it never leaves here.
+     */
+    public function deployInfo()
+    {
+        $mark = fn (string $f) => trim((string) @file_get_contents(
+            storage_path('app/deploy-state/' . $f)
+        )) ?: null;
+
+        return response()->json(['data' => [
+            'assets_commit' => $mark('assets.sha'),
+            'db_commit'     => $mark('db.sha'),
+            'admin_password_configured' => (bool) config('app.admin_password'),
+            'mail_mailer'   => (string) config('mail.default'),
+            'ga_configured' => (bool) config('app.ga_id'),
+        ]]);
+    }
+
     public function index()
     {
         $all = SiteSettings::all();

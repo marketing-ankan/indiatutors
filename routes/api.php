@@ -57,6 +57,9 @@ Route::get('/group-classes',     [GroupClassController::class, 'index']);
 Route::get('/legal',             [LegalController::class, 'index']);
 Route::get('/legal/{slug}',      [LegalController::class, 'show']);
 Route::get('/site-settings',     [SiteSettingController::class, 'index']);
+// Deploy markers + config BOOLEANS (never values). Public because it exists
+// precisely for when nobody can sign in and there is no shell.
+Route::get('/deploy-info',       [SiteSettingController::class, 'deployInfo']);
 // Home-page testimonials: reviews a human approved AND shortlisted.
 Route::get('/testimonials',      [TestimonialController::class, 'index']);
 Route::get('/courses/{slug}',    [CourseController::class, 'show'])->name('api.courses.show');
