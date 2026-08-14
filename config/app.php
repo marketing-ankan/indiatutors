@@ -141,4 +141,10 @@ return [
     'admin_email'    => env('ADMIN_EMAIL', 'admin@indiatutorsonline.com'),
     'admin_password' => env('ADMIN_PASSWORD'),
 
+    // Where "you have a new lead" emails go. Falls back to the admin address.
+    // Read through config (never env()) because the deploy runs config:cache,
+    // under which .env is never loaded — the same trap that silently stopped
+    // AdminSeeder from ever creating an admin on the server.
+    'lead_notify_email' => env('LEAD_NOTIFY_EMAIL'),
+
 ];

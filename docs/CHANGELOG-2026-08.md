@@ -339,6 +339,39 @@ One audit finding was **rejected**: the claimed empty-SKU crash does not happen 
 Laravel converts the empty string to null before validation, so the unique index
 is never touched. Both test saves returned 200.
 
+### Somebody is finally told when a lead arrives
+
+The most important gap before a lead-generation launch, found by tracing the
+funnel end to end: **nothing announced a new enquiry.** A parent could book a
+demo at 9pm, be answered *"our team will contact you within 24 hours"*, and the
+only trace was a table row. No email — `MAIL_MAILER=log` and not one Mailable
+existed in the codebase — and not even an in-app notification. The lead was
+found whenever somebody next happened to open the console.
+
+All three entry points now announce: the demo booking, the contact form and the
+home-tuition requirement (the highest-intent lead on the site, which promises a
+call back). Each raises an in-app notification for **every** admin, carrying the
+name, phone, email and subject plus the console tab to open, and sends an email
+to `LEAD_NOTIFY_EMAIL`.
+
+The in-app half needs no credentials, so it works the moment this deploys and
+drives the header bell that already polls every minute. The email half waits on
+SMTP; until `MAIL_MAILER` moves off `log` it is skipped rather than written into
+a log file nobody reads. Newsletter signups deliberately do **not** alert — the
+footer box posts to the same endpoint, and it would drown the real enquiries.
+
+Nothing here can break a submission: every failure is caught and logged, because
+a lead that was saved but not announced is recoverable while a 500 on the
+booking form loses it outright.
+
+Verified: two leads raised 8 notifications across 4 admins, the newsletter
+signup raised none, the bell read "4 unread" with full contact details, and the
+email renders with the details, omits blank fields and links to the right tab.
+
+**Admin accounts**: an admin can already create another admin and promote users,
+with guards against demoting yourself or removing the last admin — confirmed by
+creating one and signing in as it. The owner's own admin login is set.
+
 ---
 
 ## Open — needs an owner decision

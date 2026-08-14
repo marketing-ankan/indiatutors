@@ -136,6 +136,19 @@ class TuitionRequirementController extends Controller
         // but latency, never their submission.
         \App\Support\LmsLeadPush::tuitionRequirement($requirement->fresh());
 
+        // The highest-intent lead on the site — a parent asking for a tutor at
+        // their address — and the reply below promises a call back.
+        $fresh = $requirement->fresh();
+        \App\Support\LeadNotifier::announce('tuition', 'New home-tuition requirement: ' . ($fresh->contact_name ?: $fresh->code), [
+            'Reference' => $fresh->code,
+            'Name'      => $fresh->contact_name,
+            'Phone'     => $fresh->contact_phone,
+            'Email'     => $fresh->contact_email,
+            'Subjects'  => is_array($fresh->subjects) ? implode(', ', $fresh->subjects) : $fresh->subjects,
+            'Grade'     => $fresh->grade,
+            'Area'      => trim(($fresh->locality ?? '') . ' ' . ($fresh->city ?? '') . ' ' . ($fresh->pincode ?? '')),
+        ], '/admin#ac-physical');
+
         return (new TuitionRequirementResource($requirement))
             ->additional(['message' => "Requirement {$requirement->fresh()->code} received — our team will match a tutor near you and call you back."])
             ->response()->setStatusCode(201);

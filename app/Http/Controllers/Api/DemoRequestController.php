@@ -66,6 +66,21 @@ class DemoRequestController extends Controller {
             : null;
         \App\Support\LmsLeadPush::demoRequest($demo, $courseName);
 
+        // Tell a human. Nothing did until now: the reply below promises contact
+        // within 24 hours, and the only trace of the lead was a table row that
+        // someone had to go looking for.
+        \App\Support\LeadNotifier::announce('demo', 'New demo request: ' . $demo->name, [
+            'Name'    => $demo->name,
+            'Phone'   => trim(($demo->phone_country_code ?? '') . ' ' . ($demo->phone ?? '')),
+            'Email'   => $demo->email,
+            'Subject' => $courseName ?: $demo->subject,
+            'Grade'   => $demo->grade,
+            'Board'   => $demo->board,
+            'Mode'    => $demo->mode,
+            'City'    => $demo->city,
+            'Message' => $demo->message,
+        ], '/admin#ac-bookings');
+
         return response()->json(['message' => 'Demo request received. Our team will contact you within 24 hours.', 'id' => $demo->id], 201);
     }
 
