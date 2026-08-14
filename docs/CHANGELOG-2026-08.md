@@ -607,6 +607,14 @@ parts, and both are fixed:
 - **CSS transitions do not advance when the browser pane is not compositing**, so
   `getComputedStyle` reports animated properties pinned at their start value.
   Settle with `el.getAnimations().forEach(a => a.finish())` before measuring.
+- **Editing the server `.env` does nothing on its own.** `config:cache` runs
+  inside the deploy's ASSETS block, which is gated on a NEW COMMIT
+  (`ASSET_MARK != HEAD`). Laravel ignores `.env` entirely once the config is
+  cached, so a value added between deploys is invisible until either
+  `php artisan config:cache` is run by hand or a commit lands. The same gate
+  covers `AdminSeeder`, so a newly-set `ADMIN_PASSWORD` does not create the
+  admin account until a deploy runs — which is exactly how "I set it in the
+  server env" can be true while the login still fails.
 - **Sweep 360→2560px before deploying any UI change** — owner mandate, and 768
   and 1024 in particular have caught real breakage.
 - **The `:803x` preview servers run on SQLite**, not the MySQL in `.env` — see
