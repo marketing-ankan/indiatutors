@@ -26,6 +26,25 @@ class AdminSeeder extends Seeder {
         );
         if ($admin->role !== 'admin') $admin->update(['role' => 'admin']);
 
+        // One-shot password reset, for the case firstOrCreate cannot solve.
+        //
+        // If that address already exists as a user — likely, since it is the
+        // owner's own and may have registered as a parent long before the
+        // console existed — the line above finds it and leaves the password
+        // alone. That is the right default: a deploy must never silently reset a
+        // password someone has since changed. But it also means a correctly-set
+        // ADMIN_PASSWORD can appear to do nothing, with no way in and no shell
+        // on this host to fix it.
+        //
+        // So the reset is explicit and opt-in. Set ADMIN_PASSWORD_RESET=true in
+        // the server .env, let one deploy run, sign in, then REMOVE the flag —
+        // while it is set, every deploy overwrites the password, which would
+        // undo a change made in the console.
+        if (filter_var(config('app.admin_password_reset'), FILTER_VALIDATE_BOOLEAN)) {
+            $admin->forceFill(['password' => $password])->save();
+            $this->command->warn('AdminSeeder: password RESET for '.$admin->email.' — remove ADMIN_PASSWORD_RESET from .env now.');
+        }
+
         $this->command->info('Admin user ensured: ' . $admin->email);
     }
 }

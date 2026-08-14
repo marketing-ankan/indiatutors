@@ -141,6 +141,11 @@ return [
     'admin_email'    => env('ADMIN_EMAIL', 'admin@indiatutorsonline.com'),
     'admin_password' => env('ADMIN_PASSWORD'),
 
+    // One-shot: makes AdminSeeder overwrite the admin's password on the next
+    // deploy, for when the account already exists and firstOrCreate leaves it
+    // alone. Remove it once you are in — while set, every deploy resets it.
+    'admin_password_reset' => env('ADMIN_PASSWORD_RESET', false),
+
     // Where "you have a new lead" emails go. Falls back to the admin address.
     // Read through config (never env()) because the deploy runs config:cache,
     // under which .env is never loaded — the same trap that silently stopped
