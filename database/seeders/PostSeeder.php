@@ -1,6 +1,7 @@
 <?php
 namespace Database\Seeders;
 use App\Models\Post;
+use App\Support\ConsoleOwned;
 use App\Support\SeedFingerprint;
 use Illuminate\Database\Seeder;
 
@@ -27,12 +28,23 @@ class PostSeeder extends Seeder {
             ],
         ];
 
-        // Prune posts that are not in the source list (mirrors CourseSeeder).
-        $slugs = array_column($posts, 'slug');
-        $pruned = Post::whereNotIn('slug', $slugs)->count();
-        if ($pruned > 0) Post::whereNotIn('slug', $slugs)->delete();
+        // Prune only posts this seeder owns.
+        //
+        // This used to be whereNotIn('slug', ['hello-world'])->delete(), which
+        // deleted every post written in the Staff Console on the next cron pull —
+        // silently, and re-armed by any edit to this file, since the fingerprint
+        // above is a hash of it. The blog is an authored feature now, not a
+        // one-row parity import.
+        $slugs  = array_column($posts, 'slug');
+        $stale  = ConsoleOwned::scopeSeederOwned(Post::whereNotIn('slug', $slugs));
+        $pruned = $stale->count();
+        if ($pruned > 0) $stale->delete();
 
         foreach ($posts as $data) {
+            // A post someone has edited here belongs to them, even if it shares a
+            // slug with the seeded one.
+            if (ConsoleOwned::isOwned(Post::where('slug', $data['slug'])->first())) continue;
+
             Post::updateOrCreate(['slug' => $data['slug']], $data + ['is_published' => true]);
         }
         $fp->stamp();

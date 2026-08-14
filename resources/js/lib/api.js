@@ -331,3 +331,30 @@ export const fetchAdminQuestions    = async (lessonId) => { const { data } = awa
 export const createAdminQuestion    = async ({ lessonId, ...p }) => { const { data } = await api.post(`/admin/lessons/${lessonId}/questions`, p); return data.data; };
 export const updateAdminQuestion    = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/questions/${id}`, p); return data.data; };
 export const deleteAdminQuestion    = async (id) => { const { data } = await api.delete(`/admin/questions/${id}`); return data; };
+
+// Group classes. Public read is the /group-classes page AND the homepage's
+// price overlay, so both bill the same source and cannot drift apart.
+export const fetchGroupClasses      = async () => { const { data } = await api.get('/group-classes'); return data; };
+export const createAdminBatch       = async ({ courseId, ...p }) => { const { data } = await api.post(`/admin/courses/${courseId}/batches`, p); return data; };
+export const updateAdminBatch       = async ({ courseId, id, ...p }) => { const { data } = await api.patch(`/admin/courses/${courseId}/batches/${id}`, p); return data; };
+export const deleteAdminBatch       = async ({ courseId, id }) => { const { data } = await api.delete(`/admin/courses/${courseId}/batches/${id}`); return data; };
+
+// Blog. Admin index returns drafts too — the public /posts endpoint never does.
+export const fetchAdminPosts        = async () => { const { data } = await api.get('/admin/posts'); return data.data; };
+export const createAdminPost        = async (p) => { const { data } = await api.post('/admin/posts', p); return data; };
+export const updateAdminPost        = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/posts/${id}`, p); return data; };
+export const deleteAdminPost        = async (id) => { const { data } = await api.delete(`/admin/posts/${id}`); return data; };
+
+// Policy pages and site-wide details, both editable in the console.
+export const fetchSiteSettings     = async () => { const { data } = await api.get('/site-settings'); return data.data; };
+export const fetchLegalNav         = async () => { const { data } = await api.get('/legal'); return data.data; };
+export const fetchLegalDoc         = async (slug) => { const { data } = await api.get(`/legal/${slug}`); return data.data; };
+export const fetchAdminLegal       = async () => { const { data } = await api.get('/admin/legal'); return data.data; };
+export const updateAdminLegal      = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/legal/${id}`, p); return data.data; };
+// The "Verified" badge on a public tutor card. It was granted by a schema
+// default (tutors.verified defaults to true) with no way to withdraw it.
+export const toggleTeacherVerified = async ({ id, verified }) => { const { data } = await api.patch(`/admin/teachers/${id}/verified`, { verified }); return data.data; };
+
+// Home-page testimonials — reviews staff have approved AND shortlisted. Empty
+// until there are real ones, which is when the placeholders start retiring.
+export const fetchTestimonials = async () => { const { data } = await api.get('/testimonials'); return data.data; };

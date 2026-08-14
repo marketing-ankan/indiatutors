@@ -170,6 +170,386 @@ and group paths.
 **Indiatutors Online LLP** across all 14 slots in the four policies. The
 E-Commerce Rules require the legal name and principal address to be displayed.
 
+### Group classes moved onto the database, and the blog became publishable
+
+`/group-classes` read a **committed JSON file**, so the 19 cards — prices,
+descriptions, schedules — could not be changed without a developer and a deploy.
+They are now `Course` rows behind an `is_group` flag, edited in the Staff Console
+like any other course, with their levels ("Beginner / Intermediate / Advanced")
+as `course_batches`.
+
+Verified end to end: edited a group class in the console, and the change appeared
+on the public page. 19 cards, 57 batches, 5 sidebar filters, no horizontal
+overflow from 360px to 2560px.
+
+What deliberately did **not** come across is every invented figure: the
+"119 Batches done" and "16 Ongoing" chips, the 57 per-level student counts, and
+the 19 strike-through prices with their "40% OFF" badges. Those numbers existed
+nowhere but the JSON file. The fields exist and are blank; each chip renders only
+once a real number is typed, and the discount badge is now **computed** from the
+actual sale price, so it cannot claim a saving that is not being given.
+
+The badge and the counters remain the owner decisions recorded below — the
+difference is that answering them is now a typing job, not a code change.
+
+**The homepage had a second, independent copy of the same 19 cards.** Its prices
+are now overlaid from the same endpoint, so editing a price cannot update
+`/group-classes` and leave the homepage quoting the old figure. Layout, blurbs
+and sub-tabs there are still static.
+
+**Blog publishing** was added to the Content tab. The `Post` model, the API and
+the public `/blog` pages all already existed; the only missing piece was any way
+to write one without a database client, so the blog was frozen at whatever the
+seeder inserted. Drafts stay private, publishing stamps the date once, and
+unpublishing to fix a typo and republishing does not move the post in the feed.
+Slugs are permanent, and every action is recorded in the audit log with the
+actor. All verified against a running server.
+
+### A silent data-loss bug in the course editor
+
+Opening any course in the console and pressing **Save changes** wiped its short
+description. The admin API never returned `short_description`, so the edit form
+loaded it as empty and saved that empty value back — no error, no warning, the
+text simply gone. Reproduced, then fixed by returning every field the form can
+write. Confirmed: the description now survives a save.
+
+Two further traps were found and closed before they could ship:
+
+- The migration imported the group data from the JSON file **that the same commit
+  deleted**, and a missing file returned quietly — production would have migrated
+  cleanly and served an empty `/group-classes` with nothing in any log. The seed
+  data now lives in `database/data/`, where a frontend refactor cannot reach it.
+- On a **fresh** install the import produced nothing, because `migrate:fresh`
+  runs every migration before the first seeder, so the catalogue was empty when
+  the import looked for courses to match. Now covered by `GroupClassSeeder`,
+  running after `CourseSeeder`. Proved on a scratch database: 0 → 19 courses and
+  57 batches, and re-running it adds nothing.
+
+### The policy pages and the site's contact details became editable
+
+Two more pieces of the site that could only be changed by a developer.
+
+**The four policies** — Terms, Payment & Refund, Refer & Earn, Privacy — were
+158KB of JavaScript compiled into the frontend bundle. Correcting a refund window
+meant a code change, a build and a deploy. They are now database records edited
+in a new **Settings** tab, section by section, with all seven content types the
+pages use (paragraphs, bulleted and numbered lists, callouts, definition tables,
+data tables and step lists).
+
+Nothing was retyped and nothing was reformatted. The content was exported
+programmatically and the page renders it through the *same* renderer as before —
+verified by comparing all four documents field by field against the shipped
+version: **byte-identical**, 58 sections, 81 subsections, 286 blocks.
+
+Two safeguards, because these are the documents a customer is told to read
+before paying:
+
+- The bundled copy stays in the app as a **fallback**. Proved by making the API
+  return 404 for a document: the page still rendered all 20 sections and 7,300
+  words. A backend problem cannot blank a policy page.
+- The API **rejects content the page could not draw**. Its renderer silently
+  skips a block it does not recognise, so a typo could have dropped a clause out
+  of a live policy with no error anywhere. A bad block type, a missing heading, an
+  empty list or a table row that does not match its header is now refused with a
+  message naming the section.
+
+**Site details** — the phone number, email, address, footer description and six
+social links were hardcoded in three components *and* repeated throughout the
+policy text. All are now in the Settings tab and take effect immediately in the
+header and footer. The registered entity name is a single setting substituted
+into the policies wherever the legal name appears, so it stays correct in all 14
+places at once.
+
+Every field falls back to the value that was hardcoded, so this shipped without
+changing a single thing on the site until someone edits it. Clearing a social
+link hides its icon; clearing a contact field hides that line.
+
+### The deploy no longer destroys work done in the console
+
+Found by the console audit and confirmed by running it: **a blog post written in
+the Staff Console was deleted by the next deploy.** `PostSeeder` pruned every
+post whose slug was not in its own one-item source list. A fingerprint kept it
+dormant, but any edit to that seeder file re-armed it — including an edit made to
+add a post.
+
+The same pattern was reverting the catalogue. `CourseSeeder` pruned every slug not
+in `courses.json` — hard-deleting a course created in the console — then
+overwrote name, prices, description, image and position on the rest and forced
+`is_published => true`, so a price edit silently reverted and a deliberately
+unpublished course republished itself. That one is not only a deploy risk: an
+ordinary visitor can trigger it, because the curriculum self-heal re-runs the
+seeder from a product page with the fingerprint bypassed.
+
+Both now respect a single rule: **the console owns a row the moment a human edits
+it.** A `console_edited_at` marker is stamped by the admin controllers on every
+write; seeders skip marked rows entirely and prune only their own. Rows edited
+*before* this shipped are protected too — the marker is backfilled from the audit
+log, which has recorded every console write all along.
+
+Verified end to end: wrote a post and created a course in the console, ran both
+seeders (including with the fingerprint bypassed and with the seeder file
+changed) — the post survived, the new course survived, the edited price held at
+₹444 and the unpublished course stayed unpublished. And the seeders still do
+their job: a course nobody has touched, drifted to ₹1 and unpublished by hand,
+was correctly repaired from `courses.json` on the next run.
+
+### The rest of the console bugs
+
+Nine more controls that looked wired, reported success, and did the wrong thing.
+All found by the audit, all reproduced before being fixed and re-tested after.
+
+- **Saving a course corrupted its own image path.** The API returned the
+  cache-busting `?v=…` suffix, the form posted it straight back, and the column
+  ended up holding a path with a query string that `is_file()` cannot resolve —
+  killing cache-busting for that course permanently.
+- **The image picker did nothing for 107 of the 110 courses.** A bundled photo
+  was consulted before the database value. That precedence was deliberate — many
+  courses still carry old WordPress image URLs that break at domain cutover — so
+  the test is now "is the stored image one of ours", not "is there one at all".
+  A picture chosen in the console wins; a legacy hotlink still loses to the
+  bundled photo.
+- **Editing an event moved it 5.5 hours earlier.** Fixing the display was not
+  enough: the form submits its state, so a field nobody touched still posted the
+  raw UTC string back, and an event shifted on a save that changed only its mode.
+  Reads and writes turned out to disagree — the column holds a naive datetime
+  that reads treat as IST, while a write keeps whatever wall-clock it is handed —
+  so the form now speaks IST wall-clock in both directions. Verified by saving
+  only the mode (time held) and by changing the time itself (round-tripped).
+- **Three fields the API accepted but no form ever sent**: an event's mode (so
+  every event was permanently "Online" and an in-person workshop could not be
+  described as one), a blog post's publish date (no backdating), and a blog
+  post's web address (a typo in a title was permanent).
+- **Exam updates had no edit form**, so a typo could only be fixed by deleting
+  and retyping — next to the console's only delete button that did not ask first.
+- **"Add a review" defaulted to creating an invisible review.** Both subject
+  fields were optional and the picker defaulted to "no specific course", so the
+  default action stored a review that was approvable, counted in the badge, and
+  appeared on no page. A subject is now required. The same form also could not
+  record a review about a *teacher*, though the table and the public site have
+  always supported it.
+- **Every tutor was badged "✓ Verified" by a schema default** and nothing in the
+  platform could withdraw it — a trust claim shown to parents choosing a tutor.
+  Staff can now grant and withdraw it, with a confirmation before removal.
+- **A setting with two editors and no reader.** The Google review link was
+  editable in two places under help text promising it was "shown to parents when
+  we ask for a review", and nothing read it. It is edited in Settings now and
+  read in the Reviews tab, where staff actually ask.
+
+One audit finding was **rejected**: the claimed empty-SKU crash does not happen —
+Laravel converts the empty string to null before validation, so the unique index
+is never touched. Both test saves returned 200.
+
+### Somebody is finally told when a lead arrives
+
+The most important gap before a lead-generation launch, found by tracing the
+funnel end to end: **nothing announced a new enquiry.** A parent could book a
+demo at 9pm, be answered *"our team will contact you within 24 hours"*, and the
+only trace was a table row. No email — `MAIL_MAILER=log` and not one Mailable
+existed in the codebase — and not even an in-app notification. The lead was
+found whenever somebody next happened to open the console.
+
+All three entry points now announce: the demo booking, the contact form and the
+home-tuition requirement (the highest-intent lead on the site, which promises a
+call back). Each raises an in-app notification for **every** admin, carrying the
+name, phone, email and subject plus the console tab to open, and sends an email
+to `LEAD_NOTIFY_EMAIL`.
+
+The in-app half needs no credentials, so it works the moment this deploys and
+drives the header bell that already polls every minute. The email half waits on
+SMTP; until `MAIL_MAILER` moves off `log` it is skipped rather than written into
+a log file nobody reads. Newsletter signups deliberately do **not** alert — the
+footer box posts to the same endpoint, and it would drown the real enquiries.
+
+Nothing here can break a submission: every failure is caught and logged, because
+a lead that was saved but not announced is recoverable while a 500 on the
+booking form loses it outright.
+
+Verified: two leads raised 8 notifications across 4 admins, the newsletter
+signup raised none, the bell read "4 unread" with full contact details, and the
+email renders with the details, omits blank fields and links to the right tab.
+
+**Admin accounts**: an admin can already create another admin and promote users,
+with guards against demoting yourself or removing the last admin — confirmed by
+creating one and signing in as it. The owner's own admin login is set.
+
+### An order is billed at the price the page quoted
+
+It was not. The product page lets a buyer choose **One-to-One vs Group** and a
+level, and quotes the owner's official rate for that combination. "Add to Cart"
+threw the choice away and the server priced the order from the catalogue column
+— which holds the *cheapest* rate, i.e. the group rate wherever a course has one.
+
+Proved before fixing: an order placed for Chess from a page advertising **₹600**
+was created and totalled at **₹300**. That needs no payment keys — the order
+simply stands `pending` for staff, so the site could take a booking at half the
+advertised rate today.
+
+The rates now live in `database/data/rates.json` — the owner's "IN Plan and
+Pricing" sheet, 96 rows — and **both** sides read it: `pricing.js` imports it for
+the pages, and `App\Support\RateCard` reads it when pricing an order. They can no
+longer disagree, because there is only one copy.
+
+The cart line carries the buyer's **choice**, never an amount: the browser sends
+the plan and level, and the server resolves the price. Verified across the cases
+that matter:
+
+| Sent | Billed |
+|---|---|
+| One-to-One / Beginner (page says ₹600) | **₹600** |
+| One-to-One / Advanced (page says ₹1,200) | **₹1,200** |
+| Group / Intermediate (page says ₹450) | **₹450** |
+| no choice — other pages, old clients | ₹300, the catalogue "from" price |
+| a tampered `price: 1` alongside a valid choice | **₹600** — the price is ignored |
+| an invented plan ("Free") | ₹300 — safe fallback, not an error |
+| Group for Piano, which the sheet gives no group rate | ₹600 — falls back rather than inventing one |
+
+The invoice line now names what was bought — "Chess — One-to-One, Advanced" —
+instead of a bare course name at a number the customer cannot account for.
+End to end in the browser: choosing One-to-One/Advanced quoted ₹1,200 and the
+cart charged ₹1,200.
+
+A `DB::transaction` closure quietly caused a false negative while testing this:
+the lookup was outside its `use` list, so every price silently fell back and the
+fix appeared not to work. Worth remembering — it fails silently, not loudly.
+
+### An approved review can now reach the home page
+
+The condition the owner attached to keeping the placeholder testimonials: a
+parent submits one, it sits unapproved, staff approve it, and it appears on the
+site — with the invented ones retiring **one by one** as real ones arrive.
+Moderation was already built; the second half was not. An approved review had
+nowhere to go, because the carousel renders a hardcoded array.
+
+Reviews now carry `is_featured` and `author_role`. Staff approve as before, then
+press **Feature** to put one on the home page. Approval alone deliberately does
+NOT publish there — every approved review already shows on its own course page,
+and the front page is a shortlist somebody chooses, not wherever the next
+routine 5-star review lands.
+
+The carousel fills from the front with real testimonials and tops up with
+placeholders, so the invented ones retire as real ones arrive. Verified: with
+three featured reviews the home page showed **three real cards and five
+placeholders**, real ones first, and the count held at eight.
+
+Also verified: featuring an unapproved review is refused; un-approving one pulls
+it off the home page automatically; and with nothing featured the placeholders
+render exactly as before, so this shipped changing nothing.
+
+**An adversarial review of this change found eight real defects, all fixed:**
+
+- `author_role` was accepted on edit but **silently dropped on create** — the
+  exact round-trip failure the field existed to prevent.
+- The migration added its index guarded on the *column*, not the index. This
+  host kills `migrate` partway through, so a retry would have hit "Duplicate key
+  name" and **wedged every migration behind it**. Now uses the same `hasIndex`
+  helper as the previous migration on this table, which documents the hazard.
+- Giving `Stars` a rating **removed its `aria-hidden`**, so all 14 course-card
+  star rows started announcing a false "5 out of 5" beside their real figure.
+  Decorative by default again; only a genuine rating is labelled.
+- Filled and empty stars were the same glyph in different colours, so a 3-star
+  review would read as 5 in greyscale, print or high contrast. Empty stars are
+  now ☆.
+- Featuring wrote **no audit record** — no way to establish who put someone's
+  words on the busiest page. Both transitions are logged now.
+- `Approve` / `Unpublish` / `Feature` shared one mutation with **no error sink**,
+  so a rejected request looked like a dead button.
+- An explicit `"status": null` defeated its own `?? 'approved'` fallback (PHP's
+  `+` keeps the left-hand value) and handed NULL to a NOT NULL column.
+- A featured review whose course was later deleted rendered a name above a blank
+  line.
+
+One finding was recorded but **not** fixed, because it is pre-existing and wider
+than this change: deleting a user account leaves their review — name, words and
+all — published, since `user_id` is nulled rather than the row scrubbed. Worth a
+decision, as it is a data-erasure question rather than a bug in this path.
+
+### The overseas testimonials are gone
+
+The owner confirmed on 10 August that the business serves India only, and the
+overseas *service* claims were stripped from the policy pages that day. The
+home-page testimonials were missed: **six of the eight** placed the customer
+abroad — New Jersey USA, Singapore, Dubai UAE, London UK, Sydney Australia and
+Lisbon Portugal. Left up, they made the same claim in a more persuasive form
+than the policy wording ever did: not "we serve the USA" but "here is a happy
+parent in New Jersey".
+
+Deleted rather than relocated. Rewriting "Parent, Singapore" as "Parent, Pune"
+would be a different fiction, and a real approved review now displaces these
+with one click.
+
+Two placeholders remain (Pune and Delhi). The carousel was checked at 360, 768
+and 1440px with only two cards: no overflow, controls intact.
+
+One more overseas claim was found and fixed while checking, in the course-page
+FAQ — *"We are providing classes in the USA, Canada, UK, Europe, Australia,
+Dubai, Singapore etc."* It had survived the 10 August sweep because it is phrased
+as an answer about time zones rather than about where the company operates. It
+now answers the question a parent in India is actually asking, about class times
+around school hours.
+
+Checked and deliberately left: the Trinity College **London** exam is an
+examination board, not an overseas branch; "worldwide" in the Terms is the
+content licence a user grants for their own uploads. The course-page social
+proof — parents, family notes, WhatsApp cards, student wins — was already
+India-only.
+
+### Tutor photos come off WordPress, and the deploy takes a backup
+
+**Photos.** All 13 seeded tutors hotlinked their portrait from
+`indiatutorsonline.com/wp-content/uploads/…`, so the day WordPress is switched
+off every face in the directory would have become a coloured initial — on a
+tutoring site, where the faces are the product.
+
+Nothing had to be downloaded: the repo already ships all 13 photographs under
+`public/images/teachers/`, they were simply never linked to the tutor records
+(only the homepage carousel used them). Each is now matched to its tutor by
+slug, in **TutorSeeder** as well as the database — the seeder rewrites every
+column on each deploy, so fixing only the rows would have restored the hotlinks
+on the next cron pull.
+
+Verified: 0 tutors hotlinking WordPress, 13 rendering from local files, 0 broken.
+The remaining 4 fall back to initials — they are demo rows that never had a
+photo.
+
+**Backup.** `migrate` and five seeders ran against live data with nothing taken
+first, and two of those seeders delete rows. A bad migration had no undo.
+
+The deploy now dumps the database before any DB work, into
+`storage/app/backups` — deliberately outside the web root, since a SQL dump in
+`public/` is every customer's name, email and phone available to anyone who
+guesses the filename. Seven are kept, because an unbounded backup directory
+would eventually fill a shared-hosting quota and take the site down by itself.
+The password goes via `MYSQL_PWD` rather than the command line, which is visible
+to other users on a shared host.
+
+A failed dump **warns and continues** rather than aborting. Blocking every future
+release on a missing `mysqldump` would be a worse and quieter failure than the
+one this guards against — the site would simply stop updating.
+
+**Verified end to end** once MySQL came back up locally: the deploy's own
+function produced a real dump — 36 tables, 321KB, valid `mysqldump` header — and
+that dump **restored into a throwaway database with matching row counts** (36
+tables, 114 courses, 105 categories, 2 users). An unrestorable backup is worth
+nothing, so restoring it is the only test that counts.
+
+Also tested: the connection is read out of Laravel's config (not `.env`, which
+`config:cache` makes irrelevant at deploy time); retention keeps exactly the
+newest 7 of 10; dumps are gitignored; a dump against an unreachable server fails
+cleanly, removes its stub file and leaves the deploy running.
+
+Two defects were found by re-testing the shell function itself rather than its
+parts, and both are fixed:
+
+- **The "not MySQL" case was unreachable.** `cfg="$(php …)" || return 2` caught
+  the deliberate `exit(3)` along with real failures, so a healthy SQLite install
+  would have logged "backup failed" and implied the database was unprotected when
+  there was simply nothing to dump. The exit code is now captured and 3 is
+  distinguished from an error.
+- **A failing deploy would have destroyed the backup worth keeping.** The DB step
+  retries every 5 minutes until it succeeds; the dump ran on each retry, so at
+  seven kept, a persistent failure would have rotated the pre-change copy out of
+  the window within the hour. One backup per commit now.
+
 ---
 
 ## Open — needs an owner decision
@@ -184,15 +564,13 @@ E-Commerce Rules require the legal name and principal address to be displayed.
 
 ## Open — engineering, no decision needed
 
-- **Group & free classes are still static.** `/group-classes` reads a committed
-  JSON file; `/free-classes` is three entries hardcoded in the page. Neither is
-  editable from the console. Plan agreed: extend the existing **Course** model
-  with an `is_group` flag plus group-only columns and a `course_batches` child
-  table — 19/19 group classes already exist as Course rows with matching prices
-  and categories. Roughly a day's work across ~12 files.
-- **`homeLive.js` holds a second copy of 18 of those cards** with its own prices,
-  feeding the homepage. It must be repointed in the same pass, or editing a price
-  in the console will update `/group-classes` and not the homepage.
+- ~~**Group classes are static.**~~ **Done** — see above. `/free-classes` is still
+  three entries hardcoded in `FreeClassesPage.jsx`, one of them ("Hand Writing")
+  with no matching course, so its link goes nowhere. Same treatment applies.
+- **The homepage group cards are only half dynamic.** Prices come from the
+  database; the titles, blurbs, feature bullets and sub-tabs are still the static
+  list in `homeLive.js`. Adding a group class in the console puts it on
+  `/group-classes` but **not** on the homepage.
 - **`CourseSeeder` overwrites admin edits.** It `updateOrCreate`s name, price,
   description, image and position from `courses.json`, and forces
   `is_published => true` — so **unpublishing a course does not stick**. Gated on a
@@ -231,3 +609,23 @@ E-Commerce Rules require the legal name and principal address to be displayed.
   Settle with `el.getAnimations().forEach(a => a.finish())` before measuring.
 - **Sweep 360→2560px before deploying any UI change** — owner mandate, and 768
   and 1024 in particular have caught real breakage.
+- **The `:803x` preview servers run on SQLite**, not the MySQL in `.env` — see
+  `.claude/launch.json`. An API token minted with plain `artisan tinker` goes into
+  MySQL and the preview server rejects it as unauthenticated. Pass
+  `DB_CONNECTION=sqlite DB_DATABASE=storage/app/preview.sqlite` when setting up
+  data for anything served on those ports.
+- **Anything the console's edit form writes must also be returned by its API
+  resource.** A field the form can save but cannot read back loads as empty and
+  is silently erased on the next save — this is how the course descriptions were
+  being wiped.
+- **A migration must never read a file outside `database/`.** Frontend data files
+  get deleted by the very refactors that motivate the migration, and a
+  quietly-skipped import fails invisibly in production.
+- **Policy pages are deliberately not unpublishable from the console.** The
+  column exists and the public API honours it, but no toggle is offered: there is
+  no legitimate state where the footer of every page links a Terms page that
+  404s, and because the frontend falls back to its bundled copy, "unpublished"
+  would look like "still there" anyway.
+- **Seeding that matches existing rows cannot live only in a migration.**
+  `migrate:fresh --seed` runs all migrations before the first seeder, so the
+  table it wants to match against is still empty.

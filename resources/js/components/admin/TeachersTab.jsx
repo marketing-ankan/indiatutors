@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Check, X, Eye, FileDown, Video, Radio, KeyRound } from 'lucide-react';
+import { Check, X, Eye, FileDown, Video, Radio, KeyRound, ShieldCheck } from 'lucide-react';
 import {
   fetchAdminTeacherRows, approveTeacher, updateTeacherApplication,
-  toggleTeacherListing, downloadTeacherCv, publishTeacherChanges, discardTeacherChanges,
+  toggleTeacherListing, toggleTeacherVerified, downloadTeacherCv, publishTeacherChanges, discardTeacherChanges,
   fetchProvisionStatus, provisionTeacherLogins,
 } from '../../lib/api.js';
 import { AdminTable, Chips, SearchBox, Pager, StatusBadge, btnGhost, errText } from './AdminUI.jsx';
@@ -242,7 +242,8 @@ export default function TeachersTab() {
   const setProfileStatus = useMutation({ mutationFn: ({ id, status }) => approveTeacher(id, status), onSuccess: refresh, onError });
   const setAppStatus     = useMutation({ mutationFn: updateTeacherApplication, onSuccess: refresh, onError });
   const setListing       = useMutation({ mutationFn: toggleTeacherListing, onSuccess: refresh, onError });
-  const busy = setProfileStatus.isPending || setAppStatus.isPending || setListing.isPending
+  const setVerified      = useMutation({ mutationFn: toggleTeacherVerified, onSuccess: refresh, onError });
+  const busy = setProfileStatus.isPending || setAppStatus.isPending || setListing.isPending || setVerified.isPending
     || publish.isPending || discard.isPending;
 
   const rows = data?.data ?? [];
@@ -275,6 +276,7 @@ export default function TeachersTab() {
                   {r.kind === 'application' ? 'Applicant' : 'Registered'}
                 </span>
                 {r.is_listed && <span className="rounded bg-green-50 px-1.5 py-0.5 text-[10px] font-bold uppercase text-green-700">Listed</span>}
+                {r.is_listed && r.verified && <span className="rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-bold uppercase text-blue-700">Verified</span>}
                 {Object.keys(r.pending_changes || {}).length > 0 && (
                   <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold uppercase text-amber-700">Edits to review</span>
                 )}
@@ -325,10 +327,25 @@ export default function TeachersTab() {
                 {/* The reference's "Active": on this platform that means the
                     public tutor directory listing. */}
                 {r.kind === 'profile' && (
-                  <button disabled={busy} onClick={() => setListing.mutate({ id: r.id, is_listed: !r.is_listed })}
-                    className={btnGhost + (r.is_listed ? ' text-green-700 ring-green-200' : '')}>
-                    <Radio className="h-3.5 w-3.5" />{r.is_listed ? 'Unlist' : 'List'}
-                  </button>
+                  <>
+                    {/* The public card's green "✓ Verified" badge. It came from a
+                        schema default, so every teacher who ever appeared in the
+                        directory carried it and nothing could take it away. */}
+                    {r.is_listed && (
+                      <button disabled={busy}
+                        onClick={() => {
+                          if (r.verified && !confirm(`Remove the “Verified” badge from ${r.name}? It is a trust claim shown to parents.`)) return;
+                          setVerified.mutate({ id: r.id, verified: !r.verified });
+                        }}
+                        className={btnGhost + (r.verified ? ' text-blue-700 ring-blue-200' : '')}>
+                        <ShieldCheck className="h-3.5 w-3.5" />{r.verified ? 'Unverify' : 'Verify'}
+                      </button>
+                    )}
+                    <button disabled={busy} onClick={() => setListing.mutate({ id: r.id, is_listed: !r.is_listed })}
+                      className={btnGhost + (r.is_listed ? ' text-green-700 ring-green-200' : '')}>
+                      <Radio className="h-3.5 w-3.5" />{r.is_listed ? 'Unlist' : 'List'}
+                    </button>
+                  </>
                 )}
               </div>
             </td>

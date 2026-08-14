@@ -58,7 +58,11 @@ class LmsLeadPush
 
     public static function enabled(): bool
     {
-        return config('services.lms.base_url') !== ''
+        // The explicit flag comes first: see the note in config/services.php.
+        // Leads were still being posted to the retired LMS on every host that
+        // had once had LMS_BASE_URL set.
+        return (bool) config('services.lms.enabled')
+            && config('services.lms.base_url') !== ''
             && config('services.lms.intake_token') !== '';
     }
 

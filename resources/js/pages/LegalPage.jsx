@@ -1,12 +1,20 @@
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { LEGAL, LEGAL_NAV } from '../data/legal.js';
+import { fetchLegalDoc, fetchLegalNav } from '../lib/api';
 
 // Legal document template, ported from the sister site's policy pages: navy hero
 // with the "Legal" eyebrow and an updated/effective line, then a sticky sidebar
 // (auto-generated Contents + the Related Policies chevron list) beside the body.
-// Sections and subsections are numbered by the renderer, so legal.js never bakes
-// a number into a heading — renumbering is a matter of reordering the array.
+// Sections and subsections are numbered by the renderer, so the source never
+// bakes a number into a heading — renumbering is a matter of reordering.
+//
+// The documents come from the database so an admin can correct a clause without
+// a deploy, and legal.js stays bundled as the fallback. Deliberate: these are
+// the documents a visitor is told to read before paying, linked from the footer
+// of every page, so a failed request must show the last shipped text rather than
+// an error or an empty page.
 
 // The only inline markup legal.js may use: **bold** and [label](/path).
 function Inline({ text }) {
@@ -129,7 +137,7 @@ function Blocks({ blocks }) {
 }
 
 // Contents + Related Policies. Sticky on desktop, plain stacked card on mobile.
-function Sidebar({ doc, activeSlug }) {
+function Sidebar({ doc, activeSlug, nav }) {
   return (
     <aside className="lg:sticky lg:top-24 lg:self-start">
       <nav aria-label="Contents" className="rounded-2xl border border-[#E7E7EF] bg-white p-5">
@@ -149,7 +157,7 @@ function Sidebar({ doc, activeSlug }) {
       <nav aria-label="Related policies" className="mt-4 rounded-2xl border border-[#E7E7EF] bg-white p-5">
         <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-500">Related Policies</h2>
         <ul className="space-y-2">
-          {LEGAL_NAV.map(([label, href]) => (
+          {nav.map(([label, href]) => (
             <li key={href}>
               <Link to={href} aria-current={href === `/${activeSlug}` ? 'page' : undefined}
                 className={`flex items-center gap-1.5 text-sm ${href === `/${activeSlug}` ? 'font-bold text-brand-700' : 'text-slate-600 hover:text-brand-600'}`}>
@@ -165,8 +173,27 @@ function Sidebar({ doc, activeSlug }) {
 }
 
 export default function LegalPage({ doc: key }) {
-  const doc = LEGAL[key];
+  const fallback = LEGAL[key];
+
+  // The bundled copy renders immediately; the database copy replaces it when it
+  // arrives. No spinner: a policy page that flashes empty is worse than one that
+  // shows the last shipped wording for a moment.
+  const { data: live } = useQuery({
+    queryKey: ['legal', key],
+    queryFn: () => fetchLegalDoc(fallback?.slug ?? key),
+    enabled: Boolean(fallback?.slug ?? key),
+    staleTime: 10 * 60_000,
+    retry: 1,
+  });
+
+  const { data: liveNav } = useQuery({
+    queryKey: ['legal-nav'], queryFn: fetchLegalNav, staleTime: 10 * 60_000, retry: 1,
+  });
+
+  const doc = live ?? fallback;
   if (!doc) return null;
+
+  const nav = liveNav?.length ? liveNav.map(d => [d.title, '/' + d.slug]) : LEGAL_NAV;
 
   return (
     <div className="bg-[#f9f9fc]">
@@ -187,7 +214,7 @@ export default function LegalPage({ doc: key }) {
       </section>
 
       <div className="container-wide grid gap-8 py-12 lg:grid-cols-[17rem_minmax(0,1fr)]">
-        <Sidebar doc={doc} activeSlug={doc.slug} />
+        <Sidebar doc={doc} activeSlug={doc.slug} nav={nav} />
 
         <main className="min-w-0">
           {/* AT A GLANCE */}
@@ -248,7 +275,7 @@ export default function LegalPage({ doc: key }) {
 
           {/* FOOT NAV — the same four policies, inline for readers who scrolled past the sidebar */}
           <nav aria-label="All policies" className="mt-10 flex flex-wrap gap-x-5 gap-y-2 border-t border-[#E7E7EF] pt-6">
-            {LEGAL_NAV.map(([label, href]) => (
+            {nav.map(([label, href]) => (
               <Link key={href} to={href}
                 className={`flex items-center gap-1 text-sm ${href === `/${doc.slug}` ? 'font-bold text-slate-400' : 'font-semibold text-brand-600 hover:underline'}`}>
                 <ChevronRight className="h-3.5 w-3.5 shrink-0" />{label}

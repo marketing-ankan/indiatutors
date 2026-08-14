@@ -32,7 +32,7 @@ class TutorSeeder extends Seeder {
                 'verified' => true,
                 'is_published' => true,
                 'bio' => 'Angeline is an accomplished musician with comprehensive classical training in both piano and violin, having completed all 8 grades through Trinity College London examinations. She holds the ATCL diploma in Piano and brings deep technical knowledge and a nurturing teaching style to every session.',
-                'image_url' => 'https://indiatutorsonline.com/wp-content/uploads/2026/05/Untitled-design-63-760x1024-1.png',
+                'image_url' => '/build/images/teachers/angeline.png',
                 'position' => 0,
             ],
             [
@@ -52,7 +52,7 @@ class TutorSeeder extends Seeder {
                 'verified' => true,
                 'is_published' => true,
                 'bio' => 'Anney is a seasoned language educator with over 15 years of expertise in training, storytelling, and IELTS preparation. Holding an MBA from Mahatma Gandhi University and IDP IELTS certification, she crafts engaging, personalised lessons that build both fluency and exam confidence in her students.',
-                'image_url' => 'https://indiatutorsonline.com/wp-content/uploads/2026/05/Untitled-design-59-760x1024-1.png',
+                'image_url' => '/build/images/teachers/anney.png',
                 'position' => 1,
             ],
             [
@@ -72,7 +72,7 @@ class TutorSeeder extends Seeder {
                 'verified' => true,
                 'is_published' => true,
                 'bio' => 'Anubrato is a formally trained music educator with German pedagogical credentials from the University of Wuerzburg and ABRSM certification. His structured yet creative teaching method helps students build a strong musical foundation while developing a genuine love for the craft.',
-                'image_url' => 'https://indiatutorsonline.com/wp-content/uploads/2026/05/Untitled-design-64-760x1024-1.png',
+                'image_url' => '/build/images/teachers/anubrato.png',
                 'position' => 2,
             ],
             [
@@ -92,7 +92,7 @@ class TutorSeeder extends Seeder {
                 'verified' => true,
                 'is_published' => true,
                 'bio' => 'Deana combines advanced academic credentials with formal conservatory training, having completed Grade 6 in Piano through Trinity College London. Her lessons are structured, encouraging, and tailored to each student\'s pace — whether they are a complete beginner or looking to advance to performance level.',
-                'image_url' => 'https://indiatutorsonline.com/wp-content/uploads/2026/05/Untitled-design-65-760x1024-1.png',
+                'image_url' => '/build/images/teachers/deana.png',
                 'position' => 3,
             ],
             [
@@ -112,7 +112,7 @@ class TutorSeeder extends Seeder {
                 'verified' => true,
                 'is_published' => true,
                 'bio' => 'Kainaaz holds a Masters in Performing Arts with a Gold Medal in Bharatnatyam and has trained in Ballet, Tap, and Contemporary dance at the prestigious Broadway Dance Center in New York. Her multi-disciplinary background enables her to teach classical Indian and Western dance forms with equal depth and artistry.',
-                'image_url' => 'https://indiatutorsonline.com/wp-content/uploads/2026/05/Untitled-design-60-760x1024-1.png',
+                'image_url' => '/build/images/teachers/kainaaz.png',
                 'position' => 4,
             ],
             [
@@ -132,7 +132,7 @@ class TutorSeeder extends Seeder {
                 'verified' => true,
                 'is_published' => true,
                 'bio' => 'Nisitha holds an Advanced Diploma in Spanish at the C2 (proficiency) level and brings over 7 years of experience teaching Spanish to school and college students. Her lessons focus on real-world conversational fluency alongside grammar mastery and exam preparation.',
-                'image_url' => 'https://indiatutorsonline.com/wp-content/uploads/2026/05/Untitled-design-66-760x1024-1.png',
+                'image_url' => '/build/images/teachers/nisitha.png',
                 'position' => 5,
             ],
             [
@@ -152,7 +152,7 @@ class TutorSeeder extends Seeder {
                 'verified' => true,
                 'is_published' => true,
                 'bio' => 'Pinki is an internationally decorated yoga practitioner holding a Master\'s degree in Yoga and Naturopathy from Punjab University. A Gold Medallist at both the World and Asian Yoga Championships with over 20 years of teaching experience, she guides students of all levels toward physical and mental wellness through structured, safe, and inspiring sessions.',
-                'image_url' => 'https://indiatutorsonline.com/wp-content/uploads/2026/05/Untitled-design-61-760x1024-1.png',
+                'image_url' => '/build/images/teachers/pinki.png',
                 'position' => 6,
             ],
             [
@@ -172,7 +172,7 @@ class TutorSeeder extends Seeder {
                 'verified' => true,
                 'is_published' => true,
                 'bio' => 'Prashasti studied at the University of Mumbai and has completed Grade 6 in Piano through Trinity College London. She creates a warm, encouraging learning environment that helps students progress from fundamentals to confident performance at their own pace.',
-                'image_url' => 'https://indiatutorsonline.com/wp-content/uploads/2026/05/Untitled-design-67-760x1024-1.png',
+                'image_url' => '/build/images/teachers/home/prashasti.png',
                 'position' => 7,
             ],
             [
@@ -192,7 +192,7 @@ class TutorSeeder extends Seeder {
                 'verified' => true,
                 'is_published' => true,
                 'bio' => 'Rahul holds a B.Tech from Dr M.G.R University and brings over 5 years of professional experience spanning software development and technology education. He specialises in Python, AI/ML fundamentals, and web development, making complex concepts accessible and engaging for students at every level.',
-                'image_url' => 'https://indiatutorsonline.com/wp-content/uploads/2026/05/Untitled-design-68-760x1024-1.png',
+                'image_url' => '/build/images/teachers/home/rahul.png',
                 'position' => 8,
             ],
             [
@@ -212,7 +212,7 @@ class TutorSeeder extends Seeder {
                 'verified' => true,
                 'is_published' => true,
                 'bio' => 'Shamim holds a Bachelor of Music Arts from the Georgia State Conservatoire and has achieved Grade 8 in both Violin and Music Theory and Grade 6 in Piano through ABRSM. As a classically trained multi-instrumentalist, she delivers rigorous yet inspiring lessons that nurture technical precision and genuine musicality.',
-                'image_url' => 'https://indiatutorsonline.com/wp-content/uploads/2026/05/Untitled-design-62-760x1024-2.png',
+                'image_url' => '/build/images/teachers/shamim.png',
                 'position' => 9,
             ],
             [
@@ -232,7 +232,7 @@ class TutorSeeder extends Seeder {
                 'verified' => true,
                 'is_published' => true,
                 'bio' => 'Surajit is a skilled percussion specialist with nearly a decade of professional experience across live performance and music education. He teaches a full range of drumming styles — from beginners learning basic rhythm to advanced students working on complex patterns and fills — in an energetic and methodical way.',
-                'image_url' => 'https://indiatutorsonline.com/wp-content/uploads/2026/05/Untitled-design-69-760x1024-2.png',
+                'image_url' => '/build/images/teachers/home/surajit.png',
                 'position' => 10,
             ],
             [
@@ -252,7 +252,7 @@ class TutorSeeder extends Seeder {
                 'verified' => true,
                 'is_published' => true,
                 'bio' => 'Vijayalakshmi is an accomplished vocalist who graduated with a Gold Medal in Music. She is trained across Carnatic, Hindustani, and Western vocal traditions, enabling her to guide students in whichever style they wish to pursue. Her lessons combine rigorous raga training with expressive performance coaching.',
-                'image_url' => 'https://indiatutorsonline.com/wp-content/uploads/2026/05/Untitled-design-70-760x1024-2.png',
+                'image_url' => '/build/images/teachers/home/vijayalakshmi.png',
                 'position' => 11,
             ],
             [
@@ -272,7 +272,7 @@ class TutorSeeder extends Seeder {
                 'verified' => true,
                 'is_published' => true,
                 'bio' => 'Vipul holds a Bachelor of Computer Science from the University of Delhi and brings extensive hands-on industry experience to his teaching. He covers Python, Java, web development, and data science fundamentals, breaking down complex technical concepts into clear, project-based lessons that build real-world skills.',
-                'image_url' => 'https://indiatutorsonline.com/wp-content/uploads/2026/05/Untitled-design-71-760x1024-2.png',
+                'image_url' => '/build/images/teachers/home/vipul.png',
                 'position' => 12,
             ],
         ];

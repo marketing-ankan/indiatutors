@@ -15,6 +15,11 @@ class ReviewResource extends JsonResource {
             'rating'      => (int) $this->rating,
             'body'        => $this->body,
             'status'      => $this->when($isAdmin, $this->status),
+            // Returned because the console writes them. A field the form can
+            // save but cannot read back loads empty and is erased on the next
+            // save — the bug that was silently wiping course descriptions.
+            'is_featured' => $this->when($isAdmin, (bool) $this->is_featured),
+            'author_role' => $this->when($isAdmin, $this->author_role),
             'subject'     => [
                 'kind' => $this->tutor_id ? 'teacher' : ($this->video_course_id ? 'video' : 'course'),
                 'name' => $this->whenLoaded('course', fn () => $this->course?->name)

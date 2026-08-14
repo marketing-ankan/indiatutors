@@ -38,12 +38,22 @@ export const wishlist = makeStore('ito_wishlist', 'ito:wishlist');
 export const useCart = () => useSyncExternalStore(cart.subscribe, cart.get);
 export const useWishlist = () => useSyncExternalStore(wishlist.subscribe, wishlist.get);
 
-export const cartItemOf = c => ({
+// `choice` is the plan and level the buyer picked on the product page's buy
+// card. It has to travel with the line: the card quotes the owner's rate for
+// that combination, while the catalogue column holds the CHEAPEST rate (the
+// group rate wherever a course has one). Without it, a Chess order placed from
+// a page advertising ₹600 was billed at ₹300.
+//
+// `price` here is for display only — the server re-prices every line from the
+// same rate card, so a tampered price never reaches an invoice.
+export const cartItemOf = (c, choice = null) => ({
   slug: c.slug,
   name: c.name,
-  price: Number(c.effective_price ?? c.price ?? 0),
+  price: Number(choice?.price ?? c.effective_price ?? c.price ?? 0),
   image_url: c.image_url || null,
   kind: 'course',
+  plan: choice?.plan ?? null,
+  level: choice?.level ?? null,
 });
 
 // A self-paced video course as a cart line (kind drives server-side re-pricing).

@@ -47,6 +47,20 @@ class ContactController extends Controller {
         // it skips newsletter signups and tickets with no phone AND no email).
         \App\Support\LmsLeadPush::contactTicket($ticket->fresh());
 
+        // The footer's newsletter box posts here too, with a fixed subject. That
+        // is a subscription, not somebody waiting for a reply, so it does not
+        // raise a lead alert — it would drown the real enquiries.
+        if (($data['subject'] ?? null) !== 'Newsletter signup') {
+            \App\Support\LeadNotifier::announce('contact', 'New enquiry: ' . $ticket->name, [
+                'Name'    => $ticket->name,
+                'Phone'   => $ticket->phone,
+                'Email'   => $ticket->email,
+                'Subject' => $ticket->subject,
+                'Message' => $data['message'],
+                'Ref'     => $ticket->fresh()->code,
+            ], '/admin#ac-support');
+        }
+
         return response()->json([
             'message' => "Thanks — we'll be in touch soon.",
             'id'      => $ticket->id,

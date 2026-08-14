@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AdminCourseResource;
 use App\Models\AuditLog;
 use App\Models\Course;
+use App\Support\ConsoleOwned;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -16,7 +17,7 @@ class AdminCourseController extends Controller
     public function index(Request $request)
     {
         $q = Course::query()
-            ->with('categories:id,name')
+            ->with(['categories:id,name', 'batches'])
             ->withCount('reviews')
             ->orderBy('position')->orderBy('name');
 
@@ -41,9 +42,14 @@ class AdminCourseController extends Controller
         $course = Course::create($data);
         if ($request->filled('category_ids')) $course->categories()->sync($request->input('category_ids'));
 
+        // The console owns this row from now on. Without the marker CourseSeeder
+        // prunes every slug not in courses.json — which would hard-delete a
+        // course created here on the next deploy.
+        ConsoleOwned::mark($course);
+
         AuditLog::record('course_added', 'course', $course->id, $course->name);
 
-        return (new AdminCourseResource($course->load('categories:id,name')->loadCount('reviews')))
+        return (new AdminCourseResource($course->load(['categories:id,name','batches'])->loadCount('reviews')))
             ->response()->setStatusCode(201);
     }
 
@@ -53,12 +59,17 @@ class AdminCourseController extends Controller
         $course->update($this->rules($request, $course));
         if ($request->has('category_ids')) $course->categories()->sync($request->input('category_ids', []));
 
+        // Stops CourseSeeder reverting this edit on the next deploy — and on the
+        // next product-page visit, which can re-run it via the curriculum
+        // self-heal in CourseController.
+        ConsoleOwned::mark($course);
+
         AuditLog::record('course_updated', 'course', $course->id, $course->name, [
             'from' => $before,
             'to'   => $course->only(['regular_price', 'sale_price', 'is_published']),
         ]);
 
-        return new AdminCourseResource($course->fresh()->load('categories:id,name')->loadCount('reviews'));
+        return new AdminCourseResource($course->fresh()->load(['categories:id,name','batches'])->loadCount('reviews'));
     }
 
     public function destroy(Course $course)
@@ -76,6 +87,20 @@ class AdminCourseController extends Controller
     {
         $required = $course ? 'sometimes|required' : 'required';
 
+        $data = $this->validated($request, $required);
+
+        // Belt and braces alongside AdminCourseResource returning the raw column:
+        // never store a cache-busting query string in the column itself, whatever
+        // the client posts. is_file() cannot resolve a path with "?v=…" on it.
+        if (!empty($data['image_url'])) {
+            $data['image_url'] = strtok($data['image_url'], '?') ?: null;
+        }
+
+        return $data;
+    }
+
+    private function validated(Request $request, string $required): array
+    {
         return $request->validate([
             'name'              => "{$required}|string|max:190",
             'sku'               => 'nullable|string|max:120',
@@ -91,6 +116,20 @@ class AdminCourseController extends Controller
             'position'          => 'nullable|integer|min:0|max:9999',
             'category_ids'      => 'nullable|array',
             'category_ids.*'    => 'integer|exists:categories,id',
+
+            // Group-class fields. These drive /group-classes, which had no
+            // backing store at all before — it read a committed JSON file.
+            'is_group'              => 'nullable|boolean',
+            'group_about'           => 'nullable|string|max:2000',
+            'group_highlights'      => 'nullable|array',
+            'group_highlights.*'    => 'string|max:200',
+            'group_age_range'       => 'nullable|string|max:40',
+            'group_duration_weeks'  => 'nullable|integer|min:1|max:104',
+            // Nullable on purpose: blank hides the chip. The figures these
+            // replace were invented and frozen, so an empty field is the honest
+            // default and a typed one is the owner's own claim.
+            'group_batches_done'    => 'nullable|integer|min:0|max:100000',
+            'group_ongoing_batches' => 'nullable|integer|min:0|max:100000',
         ]);
     }
 

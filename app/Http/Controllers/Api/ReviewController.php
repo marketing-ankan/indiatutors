@@ -180,20 +180,41 @@ class ReviewController extends Controller
     {
         $data = $request->validate([
             'course_id'    => 'nullable|integer|exists:courses,id',
+            // The table has always had tutor_id and the public site accepts tutor
+            // reviews, but this endpoint had no rule for it — so a review a parent
+            // phoned in about a teacher could not be recorded at all.
+            'tutor_id'     => 'nullable|integer|exists:tutors,id',
             'author_name'  => 'required|string|max:120',
             'author_email' => 'nullable|email|max:180',
             'rating'       => 'required|integer|min:1|max:5',
             'body'         => 'required|string|max:2000',
             'status'       => 'nullable|in:pending,approved,rejected',
+            // The console's "Add a review" form sends this — without a rule here
+            // validate() strips it and the role line is silently lost, which is
+            // the exact round-trip failure this field was added to avoid.
+            'author_role'  => 'nullable|string|max:120',
         ]);
 
-        $review = Review::create($data + [
-            'status'     => $data['status'] ?? 'approved',
+        // A review about nothing renders on no page. Both fields were optional
+        // and the console's subject picker defaulted to "no specific course", so
+        // the default action created a review that counted in the Reviews badge,
+        // could be approved, and was invisible everywhere.
+        if (empty($data['course_id']) && empty($data['tutor_id'])) {
+            abort(422, 'Choose the course or the teacher this review is about — a review with neither appears on no page.');
+        }
+
+        // array_merge, not `+`: the union operator keeps the LEFT value when the
+        // key exists, so an explicit "status": null passed validation (the rule
+        // is nullable) and then defeated this very fallback, handing NULL to a
+        // NOT NULL column.
+        $review = Review::create(array_merge($data, [
+            'status'     => $data['status'] ?: 'approved',
             'created_by' => $request->user()->id,
-        ]);
+        ]));
         AuditLog::record('review_added', 'review', $review->id, $review->author_name);
 
-        return (new ReviewResource($review->load('course:id,name,slug')))->response()->setStatusCode(201);
+        return (new ReviewResource($review->load(['course:id,name,slug', 'tutor:id,name,slug'])))
+            ->response()->setStatusCode(201);
     }
 
     public function update(Request $request, Review $review)
@@ -204,14 +225,42 @@ class ReviewController extends Controller
             // "Unpublish" in the console sends status: pending — the review goes
             // back into the queue rather than being destroyed.
             'status' => 'sometimes|required|in:pending,approved,rejected',
+            // Shortlists it for the home-page carousel.
+            'is_featured' => 'sometimes|boolean',
+            // "Parent, Kolkata · Class 8 Maths" — the line under the name on the
+            // carousel card. Staff write it, because a reviewer does not supply
+            // one and the placeholders it sits beside all have it.
+            'author_role' => 'sometimes|nullable|string|max:120',
         ]);
 
-        $before = $review->status;
+        // Featuring something unapproved would put it on the front page while it
+        // is still in the moderation queue.
+        if (($data['is_featured'] ?? false) && ($data['status'] ?? $review->status) !== 'approved') {
+            abort(422, 'Approve the review before showing it on the home page.');
+        }
+
+        $before         = $review->status;
+        $featuredBefore = (bool) $review->is_featured;
         $review->update($data);
+
+        // Un-approving pulls it off the home page too, rather than leaving a
+        // withdrawn review featured and invisible in the queue.
+        if (($data['status'] ?? $review->status) !== 'approved' && $review->is_featured) {
+            $review->update(['is_featured' => false]);
+        }
 
         if (isset($data['status']) && $data['status'] !== $before) {
             AuditLog::record('review_status', 'review', $review->id, $review->author_name, [
                 'from' => $before, 'to' => $data['status'],
+            ]);
+        }
+
+        // Publishing somebody's words to the busiest page on the site is a
+        // decision worth a name against it — including the automatic unfeature
+        // above, so a card vanishing from the home page is explainable.
+        if ((bool) $review->fresh()->is_featured !== $featuredBefore) {
+            AuditLog::record('review_featured', 'review', $review->id, $review->author_name, [
+                'on_home_page' => !$featuredBefore,
             ]);
         }
 

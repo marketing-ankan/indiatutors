@@ -113,6 +113,16 @@ return [
     // is off and enquiries are stored locally only — the site must never
     // depend on the LMS being up. One env edit per side moves either domain.
     'lms' => [
+        // OFF unless switched on deliberately. The owner retired that LMS on
+        // 10 Aug 2026 ("the previous LMS we made and connected will not be in
+        // use"), but the push was gated on the URL and token alone — so any
+        // host where those were once set kept delivering every demo booking,
+        // contact ticket and home-tuition requirement to a system nobody
+        // watches, and LmsLeadPush stamped each one with an lms_lead_no that
+        // makes it look already handled. A leftover env var should not be able
+        // to route leads into a dead system; requiring this flag means the
+        // adapter stays ready for the new LMS without firing by accident.
+        'enabled'      => env('LMS_ENABLED', false),
         'base_url'     => env('LMS_BASE_URL', ''),
         'intake_token' => env('LMS_INTAKE_TOKEN', ''),
         'brand'        => env('LMS_BRAND', 'indiatutors-online'),

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight, MessageCircle, Instagram } from 'lucide-react';
 import { fetchSocialInstagram } from '../lib/api.js';
+import { useSiteSettings } from '../lib/siteSettings.js';
 import {
   TEACHERS, STUDENT_WINS, ACHIEVEMENT_PHOTOS, PARENTS, FAMILY_NOTES,
   WHATSAPP_TESTIMONIALS, BLOG_POSTS, INSTAGRAM,
@@ -148,6 +149,7 @@ function FamiliesSay() {
 }
 
 function WhatsAppTestimonials() {
+  const site = useSiteSettings();
   return (
     <section className="py-14 bg-white">
       <div className="container-wide">
@@ -172,7 +174,7 @@ function WhatsAppTestimonials() {
           ))}
         </div>
         <div className="mt-8 text-center">
-          <a href="https://wa.me/919330811581" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-6 py-2.5 text-sm font-bold text-white hover:brightness-105">
+          <a href={site.socials.whatsapp} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-6 py-2.5 text-sm font-bold text-white hover:brightness-105">
             <MessageCircle className="h-4 w-4" /> Chat with us on WhatsApp
           </a>
         </div>

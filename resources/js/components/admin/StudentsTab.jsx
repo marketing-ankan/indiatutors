@@ -1,12 +1,15 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Eye, UserPlus } from 'lucide-react';
-import { fetchAdminStudents, fetchAdminSettings, saveAdminSettings } from '../../lib/api.js';
-import { AdminTable, SearchBox, Pager, btnGhost, btnPrimary, inp, errText } from './AdminUI.jsx';
+import { fetchAdminStudents } from '../../lib/api.js';
+import { AdminTable, SearchBox, Pager, btnGhost } from './AdminUI.jsx';
 import UserDashDrawer from './UserDashDrawer.jsx';
 
-// Every child profile on the platform, plus the one setting that belongs to
-// them: the Google review link staff hand to happy parents.
+// Every child profile on the platform.
+//
+// The Google review link used to be edited here as well as in Settings — two
+// editors for one value, and nothing read it. It now lives in Settings only,
+// and the Reviews tab surfaces it where staff actually ask for a review.
 
 export default function StudentsTab() {
   const [q, setQ] = useState('');
@@ -22,8 +25,6 @@ export default function StudentsTab() {
 
   return (
     <div className="mt-5">
-      <GoogleReviewSetting />
-
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <SearchBox value={q} onChange={v => { setQ(v); setPage(1); }} placeholder="Search by name, code, parent…" className="sm:max-w-sm" />
       </div>
@@ -75,35 +76,3 @@ export default function StudentsTab() {
   );
 }
 
-function GoogleReviewSetting() {
-  const qc = useQueryClient();
-  const { data: settings } = useQuery({ queryKey: ['admin-settings'], queryFn: fetchAdminSettings });
-  const [value, setValue] = useState(null);
-  const current = value ?? settings?.google_review_url ?? '';
-
-  const save = useMutation({
-    mutationFn: () => saveAdminSettings({ google_review_url: current || null }),
-    onSuccess: () => { setValue(null); qc.invalidateQueries({ queryKey: ['admin-settings'] }); },
-  });
-
-  return (
-    <form onSubmit={e => { e.preventDefault(); save.mutate(); }}
-      className="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-100">
-      <label className="block text-xs font-bold uppercase tracking-wide text-slate-500">
-        Google Business “write a review” URL
-      </label>
-      <div className="mt-2 flex flex-wrap gap-2">
-        <input value={current} onChange={e => setValue(e.target.value)} placeholder="https://g.page/r/…/review"
-          className={inp + ' flex-1 min-w-[220px] bg-white'} />
-        <button type="submit" disabled={save.isPending} className={btnPrimary}>
-          {save.isPending ? 'Saving…' : 'Save'}
-        </button>
-      </div>
-      <p className="mt-2 text-xs text-slate-500">
-        Shown to parents when we ask for a review. Find it in Google Business Profile → “Ask for reviews”.
-      </p>
-      {save.isError && <p className="mt-2 text-xs text-red-600">{errText(save.error)}</p>}
-      {save.isSuccess && <p className="mt-2 text-xs text-green-700">Saved.</p>}
-    </form>
-  );
-}

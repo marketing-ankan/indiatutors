@@ -124,7 +124,22 @@ export const COURSE_IMAGES = {
 import { ASSET_V } from './assetVersion.js';
 const v = (p) => (p && p.startsWith('/build/') ? `${p}?v=${ASSET_V}` : p);
 
-export const imageFor = (course) => (course && (v(COURSE_IMAGES[course.slug]) || course.image_url)) || null;
+// A picture chosen in the Staff Console wins.
+//
+// This used to be `COURSE_IMAGES[slug] || course.image_url`, so the static map
+// won for 107 of the 110 courses: the admin picked an image, the save succeeded,
+// the audit log recorded it, and the card never changed.
+//
+// The old precedence was not arbitrary — the catalogue's image_url still points
+// at the old WordPress uploads for many courses, and those break at domain
+// cutover, which is exactly what the note above describes. So the test is not
+// "is there a DB value" but "is the DB value one of OUR self-hosted files":
+// anything the console's picker writes is a /build/ path, while the legacy
+// hotlinks are absolute http(s) URLs and still lose to the bundled photo.
+const selfHosted = (u) => typeof u === 'string' && u.startsWith('/build/');
+
+export const imageFor = (course) =>
+  (course && (selfHosted(course.image_url) ? course.image_url : (v(COURSE_IMAGES[course.slug]) || course.image_url))) || null;
 
 // WinQuest hero-banner photos (distinct from the buy-card og:image) —
 // extracted per product page and self-hosted. heroImageFor() falls back to
@@ -231,4 +246,10 @@ export const HERO_IMAGES = {
   "olympiad-preparation": "/build/images/courses/hero/olympiad-preparation.jpg",
 };
 
-export const heroImageFor = (course) => (course && (v(HERO_IMAGES[course.slug]) || v(COURSE_IMAGES[course.slug]) || course.image_url)) || null;
+// A dedicated hero crop still wins — it is wide banner art, not a card photo,
+// and the console's picker offers no equivalent. Below that, the same rule as
+// imageFor: a self-hosted image chosen in the console beats the generic card
+// photo, and legacy external hotlinks stay last.
+export const heroImageFor = (course) =>
+  (course && (v(HERO_IMAGES[course.slug])
+    || (selfHosted(course.image_url) ? course.image_url : (v(COURSE_IMAGES[course.slug]) || course.image_url)))) || null;

@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Order;
 use App\Models\VideoCourse;
 use App\Models\VideoEntitlement;
+use App\Support\RateCard;
 use App\Support\Razorpay;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +35,10 @@ class OrderController extends Controller {
             'items'        => 'required|array|min:1|max:50',
             'items.*.slug' => 'required|string|max:190',
             'items.*.kind' => 'nullable|in:course,video',
+            // The plan and level the buyer chose on the product page. The
+            // AMOUNT is never accepted from the browser — only the choice.
+            'items.*.plan'  => 'nullable|string|max:20',
+            'items.*.level' => 'nullable|string|max:20',
         ]);
 
         // Split cart items by kind and re-price each from its own table.
@@ -50,7 +55,7 @@ class OrderController extends Controller {
         // Public route: capture the buyer from a bearer token if one is present,
         // so video-course entitlements can attach to their account on payment.
         $userId = $request->user('sanctum')?->id;
-        $order = DB::transaction(function () use ($data, $courses, $videos, $userId) {
+        $order = DB::transaction(function () use ($data, $courses, $videos, $userId, $bySlug) {
             $order = Order::create([
                 'user_id'     => $userId,
                 'first_name'  => $data['first_name'],
@@ -74,8 +79,27 @@ class OrderController extends Controller {
             ]);
             $total = 0;
             foreach ($courses as $c) {
-                $price = (float) $c->effective_price;
-                $order->items()->create(['course_id' => $c->id, 'name' => $c->name, 'price' => $price, 'qty' => 1]);
+                // Price the line the way the page quoted it: the owner's rate for
+                // the plan and level the buyer chose. `effective_price` is the
+                // catalogue "from" figure — the CHEAPEST rate, i.e. the group rate
+                // wherever a course has one — so using it for a One-to-One
+                // purchase billed half the advertised amount.
+                //
+                // The browser sends the CHOICE, never the amount.
+                $line  = $bySlug[$c->slug] ?? [];
+                $plan  = $line['plan']  ?? null;
+                $level = $line['level'] ?? null;
+
+                $rate = (RateCard::isValidPlan($plan) && RateCard::isValidLevel($level))
+                    ? RateCard::price($c->name, $plan, $level)
+                    : null;
+
+                $price = (float) ($rate ?? $c->effective_price);
+                // Name the line so the invoice says what was bought, not just
+                // "Chess" at a number the customer cannot account for.
+                $label = $rate !== null ? "{$c->name} — {$plan}, {$level}" : $c->name;
+
+                $order->items()->create(['course_id' => $c->id, 'name' => $label, 'price' => $price, 'qty' => 1]);
                 $total += $price;
             }
             foreach ($videos as $v) {

@@ -4,10 +4,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Course extends Model {
-    protected $fillable = ['sku','name','slug','subtitle','short_description','description','age','pills','curriculum','curriculum_variants','regular_price','sale_price','image_url','is_featured','is_published','position'];
-    protected $casts = ['pills'=>'array','curriculum'=>'array','curriculum_variants'=>'array','regular_price'=>'decimal:2','sale_price'=>'decimal:2','is_featured'=>'boolean','is_published'=>'boolean'];
+    protected $fillable = ['sku','name','slug','subtitle','short_description','description','age','pills','curriculum','curriculum_variants','regular_price','sale_price','image_url','is_featured','is_published','position',
+        // Group-class fields. NOTE: these are deliberately absent from
+        // CourseSeeder's $attrs — that seeder upserts from courses.json and
+        // would otherwise revert whatever the owner edits here.
+        'is_group','group_about','group_highlights','group_age_range','group_duration_weeks','group_batches_done','group_ongoing_batches'];
+    protected $casts = ['pills'=>'array','curriculum'=>'array','curriculum_variants'=>'array','regular_price'=>'decimal:2','sale_price'=>'decimal:2','is_featured'=>'boolean','is_published'=>'boolean',
+        'is_group'=>'boolean','group_highlights'=>'array'];
 
     public function categories(): BelongsToMany { return $this->belongsToMany(Category::class); }
+    public function batches() { return $this->hasMany(CourseBatch::class)->orderBy('position'); }
+    /** The /group-classes listing. Nothing else can identify these rows. */
+    public function scopeGroup($q) { return $q->where('is_group', true); }
     public function reviews() { return $this->hasMany(Review::class); }
     public function approvedReviews() { return $this->hasMany(Review::class)->where('status', 'approved'); }
     public function scopePublished($q) { return $q->where('is_published', true); }

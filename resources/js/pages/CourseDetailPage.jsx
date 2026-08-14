@@ -96,18 +96,23 @@ function BuyCard({ course }) {
           </div>
         )}
 
-        {/* Level selector */}
-        <div>
-          <p className="text-xs font-semibold text-slate-500 mb-2">Choose level</p>
-          <div className="grid grid-cols-3 gap-2">
-            {levels.map((lv, i) => (
-              <button key={lv} type="button" onClick={() => setLevel(i)}
-                className={`rounded-[9px] py-2 text-xs font-bold border transition ${level === i ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-[#E7E7EF] hover:border-brand-300'}`}>
-                {lv}
-              </button>
-            ))}
+        {/* Level selector — hidden when the course is priced at one rate, since
+            a single chip labelled "All levels" is a control with no choice in
+            it. Those courses now quote one price rather than an invented
+            per-level ladder the cart would not honour. */}
+        {levels.length > 1 && (
+          <div>
+            <p className="text-xs font-semibold text-slate-500 mb-2">Choose level</p>
+            <div className="grid grid-cols-3 gap-2">
+              {levels.map((lv, i) => (
+                <button key={lv} type="button" onClick={() => setLevel(i)}
+                  className={`rounded-[9px] py-2 text-xs font-bold border transition ${level === i ? 'bg-brand-600 text-white border-brand-600' : 'bg-white text-slate-600 border-[#E7E7EF] hover:border-brand-300'}`}>
+                  {lv}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Live price */}
         <div className="flex items-center flex-wrap gap-x-2 gap-y-1">
@@ -126,7 +131,10 @@ function BuyCard({ course }) {
 
         {/* Actions — Add to Cart adds the catalog product (base price, qty 1,
             like the live Woo store) and opens the cart. */}
-        <button type="button" onClick={() => { cart.add(cartItemOf(course)); nav('/cart'); }}
+        {/* Carries the plan and level chosen above. It used to add the catalogue
+            base price and silently discard the choice, so the cart charged the
+            cheapest rate for whatever was displayed. */}
+        <button type="button" onClick={() => { cart.add(cartItemOf(course, { plan, level: levels[level], price: cell.net })); nav('/cart'); }}
           className="w-full flex items-center justify-center gap-2 rounded-[10px] bg-brand-600 text-white py-3 text-sm font-bold hover:bg-brand-700">
           <ShoppingCart className="h-4 w-4" /> Add to Cart
         </button>

@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutGrid, GraduationCap, Users, CalendarClock, ReceiptText, Star,
   BookOpen, UserCog, ScrollText, CalendarDays, Video, Megaphone, Wrench, TrendingUp, Home, LifeBuoy,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { fetchAdminOverview } from '../../lib/api.js';
 import OverviewTab from './OverviewTab.jsx';
@@ -17,6 +18,7 @@ import AuditTab from './AuditTab.jsx';
 import PhysicalTab from './PhysicalTab.jsx';
 import SupportTab from './SupportTab.jsx';
 import { EventsTab, VideoCoursesTab, ContentTab, AnalyticsTab } from './LegacyTabs.jsx';
+import SettingsTab from './SettingsTab.jsx';
 
 // The console. Tabs are addressed by hash (#ac-orders) so a tab can be linked,
 // bookmarked and reloaded into — and so the same component serves both
@@ -45,6 +47,9 @@ const TABS = [
   { key: 'videos',   label: 'Video courses', Icon: Video,        Panel: VideoCoursesTab },
   { key: 'content',  label: 'Content',       Icon: Megaphone,    Panel: ContentTab },
   { key: 'analytics', label: 'Analytics',    Icon: TrendingUp,   Panel: AnalyticsTab },
+  // Site-wide contact details and the four policy pages, both of which used to
+  // be code — see SettingsTab.jsx.
+  { key: 'settings', label: 'Settings',     Icon: SlidersHorizontal, Panel: SettingsTab },
 ];
 
 export default function AdminConsole() {

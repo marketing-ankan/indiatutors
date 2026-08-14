@@ -39,7 +39,11 @@ export const FAQS = [
   { q: 'Is previous experience required?', a: 'No, the course is designed to accommodate complete beginners.' },
   { q: 'Will I get a certificate after the course completion?', a: 'Yes, We provide certificates after completion of the course. We also encourage students to participate in various competitions which are Internationally recognised.' },
   { q: 'Where are the teachers from?', a: 'Most of our teachers are from India with Masters in their subject or relevant experience teaching International Curriculum.' },
-  { q: 'How does the scheduling work with different time zones?', a: 'We are providing classes in the USA, Canada, UK, Europe, Australia, Dubai, Singapore etc. We schedule sessions accordingly to the time comfortable to kids in their respective time zones.' },
+  // Was: "We are providing classes in the USA, Canada, UK, Europe, Australia,
+  // Dubai, Singapore etc." — a direct service claim, contradicting the India-only
+  // position the owner confirmed on 10 Aug and which was already stripped from
+  // the policy pages. It survived here because it reads as a scheduling answer.
+  { q: 'What times are classes available?', a: 'We teach families across India, and sessions are scheduled around school hours — early mornings, evenings and weekends are all available. Tell us the times that suit your child when you book a free demo and we will match a tutor to them.' },
   { q: 'How are the classes conducted?', a: 'Classes are conducted online via Google Meet or Zoom on the scheduled time, whether the classes be 1:1 or in a group.' },
   { q: 'What are the requirements for this course?', a: 'A device (laptop/desktop) and a stable internet connection. Specific tools/accounts (e.g., a free Scratch / MIT App Inventor account, a Python interpreter and an IDE) are listed under the Requirements tab for each course.' },
   { q: 'What if my child is below minimum age?', a: "We'll recommend you to check out our other courses for your kid's age group." },
@@ -286,6 +290,9 @@ function rateRowFor(name) {
 // course name — Group appears exactly when the PDF lists a group rate.
 // Fallback (unmatched names, e.g. Spoken English): the previous synthetic
 // ladder from the catalog base price (base ×1 / ×1.5 / ×2; Group = half).
+// Shown instead of level chips when the sheet prices a course at one rate.
+export const SINGLE_LEVEL = 'All levels';
+
 export function buildPriceMatrix(base, slug, name) {
   const LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
   const grossOf = net => Math.round((net / 0.6) / 10) * 10; // ~40% off, rounded
@@ -300,19 +307,27 @@ export function buildPriceMatrix(base, slug, name) {
     }
     return { matrix, plans: Object.keys(matrix), levels: LEVELS };
   }
+  // No rate in the sheet — quote ONE price, the catalogue one, and no levels.
+  //
+  // This used to invent a ×1 / ×1.5 / ×2 ladder from the base price. Six live
+  // courses fall here and they are the dearest on the site: JEE Main, JEE
+  // Advanced, NEET (UG), CUET (UG), Olympiad Preparation and Spoken English. The
+  // page therefore advertised ₹3,000 for "JEE Main — Advanced" against a figure
+  // the business never set, and since the cart now honours the level a buyer
+  // picks, that gap became visible: the server prices from the same sheet, finds
+  // no row, and bills the catalogue ₹1,500. Page and cart disagreed again.
+  //
+  // Quoting one real price is the honest resolution. To offer per-level pricing
+  // on these, add their rows to database/data/rates.json — the page and the
+  // invoice both read it, so they cannot drift.
   const isGroup = GROUP_SLUGS.has(slug);
-  const mult = [1, 1.5, 2];
-  const tier = (unit, m) => { const net = Math.round(unit * m); return { net, gross: grossOf(net) }; };
-  // For group-enabled courses base = Group-Beginner and One-to-One is 2×.
-  const groupUnit = isGroup ? base : base / 2;
-  const oneUnit = isGroup ? base * 2 : base;
-  const matrix = { 'One-to-One': {} };
-  LEVELS.forEach((lv, i) => { matrix['One-to-One'][lv] = tier(oneUnit, mult[i]); });
+  const one = { net: Math.round(base), gross: grossOf(Math.round(base)) };
+  const matrix = { 'One-to-One': { [SINGLE_LEVEL]: one } };
   if (isGroup) {
-    matrix['Group'] = {};
-    LEVELS.forEach((lv, i) => { matrix['Group'][lv] = tier(groupUnit, mult[i]); });
+    const half = Math.round(base / 2);
+    matrix['Group'] = { [SINGLE_LEVEL]: { net: half, gross: grossOf(half) } };
   }
-  return { matrix, plans: Object.keys(matrix), levels: LEVELS };
+  return { matrix, plans: Object.keys(matrix), levels: [SINGLE_LEVEL] };
 }
 
 // --- cache-busting -----------------------------------------------------------
