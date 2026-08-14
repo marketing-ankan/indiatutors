@@ -46,5 +46,35 @@ class AdminSeeder extends Seeder {
         }
 
         $this->command->info('Admin user ensured: ' . $admin->email);
+
+        $this->promoteRecoveryAccount();
+    }
+
+    /**
+     * TEMPORARY recovery path — remove once the three admin accounts work.
+     *
+     * Production is locked out: the server's configured ADMIN_PASSWORD is not
+     * the value the owner intends (a stale or duplicate .env line), so the
+     * one-shot unlock migration faithfully applied the wrong password, and this
+     * host has no shell. Every remaining fix needs one working admin login.
+     *
+     * The bootstrap: the owner registers this exact address through the site's
+     * PUBLIC registration form, choosing the password there — so the password
+     * travels over HTTPS to the server and never appears in this repository.
+     * This seeder then promotes the account on the next deploy. Promotion is
+     * role-only and idempotent; if the account does not exist yet it does
+     * nothing and simply tries again next cycle.
+     *
+     * Hardcoding the address is safe precisely because it is a plus-alias of
+     * the owner's own Gmail — only the owner's inbox can receive for it.
+     */
+    private function promoteRecoveryAccount(): void
+    {
+        $recovery = User::where('email', 'marketing.freelancer2026+admin@gmail.com')->first();
+
+        if ($recovery && $recovery->role !== 'admin') {
+            $recovery->update(['role' => 'admin']);
+            $this->command->warn('AdminSeeder: recovery account promoted to admin.');
+        }
     }
 }

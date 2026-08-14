@@ -36,6 +36,10 @@ class SiteSettingController extends Controller
             'assets_commit' => $mark('assets.sha'),
             'db_commit'     => $mark('db.sha'),
             'admin_password_configured' => (bool) config('app.admin_password'),
+            // If true, every deploy re-forces the configured password — with a
+            // wrong value in .env that would silently clobber any password fixed
+            // through the console, so it must be visible.
+            'admin_password_reset_active' => (bool) config('app.admin_password_reset'),
             'mail_mailer'   => (string) config('mail.default'),
             'ga_configured' => (bool) config('app.ga_id'),
         ]]);
