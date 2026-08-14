@@ -13,20 +13,18 @@ class PostSeeder extends Seeder {
             return;
         }
 
-        // Live parity: indiatutorsonline.com has exactly one post — the WP
-        // default "Hello world!" (April 16, 2026). Its permalink is top-level
-        // (/hello-world/), which the SPA resolves via the 404 post fallback.
-        $posts = [
-            [
-                'title'        => 'Hello world!',
-                'slug'         => 'hello-world',
-                'excerpt'      => 'Welcome to WordPress. This is your first post. Edit or delete it, then start writing!',
-                'image_url'    => null,
-                'author'       => 'Indiatutors Online',
-                'published_at' => '2026-04-16 10:00:00',
-                'body'         => '<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>',
-            ],
-        ];
+        // Empty on purpose.
+        //
+        // This used to seed the WordPress default — "Hello world! Welcome to
+        // WordPress. This is your first post." — because the goal then was an
+        // exact clone of the WP site, and that was its only post. That goal is
+        // met and the site is now the business's own: a live tutoring company
+        // whose entire blog reads "Welcome to WordPress" is worse than a blog
+        // with nothing in it, and staff can write a real post in the console.
+        //
+        // The prune below removes it on the next deploy. Anything written in the
+        // console is marked console-owned and is NOT touched.
+        $posts = [];
 
         // Prune only posts this seeder owns.
         //
