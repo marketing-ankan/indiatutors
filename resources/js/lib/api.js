@@ -358,3 +358,8 @@ export const toggleTeacherVerified = async ({ id, verified }) => { const { data 
 // Home-page testimonials — reviews staff have approved AND shortlisted. Empty
 // until there are real ones, which is when the placeholders start retiring.
 export const fetchTestimonials = async () => { const { data } = await api.get('/testimonials'); return data.data; };
+
+// The whole settings payload — values plus the deploy's backup status. Separate
+// from fetchAdminSettings because the Reviews tab depends on that returning the
+// settings object itself.
+export const fetchAdminSettingsFull = async () => { const { data } = await api.get('/admin/settings'); return data; };
