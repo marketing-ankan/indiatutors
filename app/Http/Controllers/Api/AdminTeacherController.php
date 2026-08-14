@@ -50,6 +50,9 @@ class AdminTeacherController extends Controller
                 'city'       => $p->city,
                 'status'     => $p->status,
                 'is_listed'  => (bool) $p->user?->tutor?->is_published,
+                // The green "✓ Verified" badge on the public card. Returned so
+                // the console can show and withdraw it — see toggleVerified.
+                'verified'   => (bool) $p->user?->tutor?->verified,
                 'tutor_slug' => $p->user?->tutor?->slug,
                 'has_cv'     => false,
                 'video_url'  => null,
@@ -79,6 +82,7 @@ class AdminTeacherController extends Controller
                 'city'       => $a->city,
                 'status'     => $a->status,
                 'is_listed'  => false,
+                'verified'   => false,       // an applicant has no listing yet
                 'tutor_slug' => null,
                 'has_cv'     => (bool) $a->cv_path,
                 'video_url'  => $a->video_url,
@@ -178,6 +182,34 @@ class AdminTeacherController extends Controller
         ]);
 
         return response()->json(['data' => ['id' => $teacherProfile->id, 'is_listed' => (bool) $data['is_listed']]]);
+    }
+
+    /**
+     * Grant or withdraw the green "✓ Verified" badge on a public tutor card.
+     *
+     * `tutors.verified` is `default(true)` in the schema and the live creation
+     * path never assigns it, so every teacher who has ever appeared in the
+     * directory has carried this badge by default — and nothing in the platform
+     * could take it away. It is a trust claim shown to parents choosing a tutor
+     * for their child, so staff need to be able to withdraw it.
+     */
+    public function toggleVerified(Request $request, TeacherProfile $teacherProfile)
+    {
+        $data  = $request->validate(['verified' => 'required|boolean']);
+        $tutor = $teacherProfile->user?->tutor;
+
+        if (!$tutor) {
+            return response()->json([
+                'message' => 'This teacher has no directory listing yet — approve their application first.',
+            ], 422);
+        }
+
+        $tutor->update(['verified' => $data['verified']]);
+        AuditLog::record('teacher_verified', 'teacher_profile', $teacherProfile->id, $teacherProfile->user?->name, [
+            'verified' => $data['verified'],
+        ]);
+
+        return response()->json(['data' => ['id' => $teacherProfile->id, 'verified' => (bool) $data['verified']]]);
     }
 
     /**

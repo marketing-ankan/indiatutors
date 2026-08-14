@@ -41,7 +41,45 @@ export function EventsTab() {
   const remove = useMutation({ mutationFn: deleteAdminEvent, onSuccess: invalidate });
 
   const inp = 'w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500';
-  const toLocal = v => v ? String(v).replace(' ', 'T').slice(0, 16) : '';
+
+  // Render the stored instant in IST, which is what the server stores and what
+  // the list row beside this form displays.
+  //
+  // This was `String(v).replace(' ','T').slice(0,16)`, which chopped the API's
+  // UTC ISO string and presented it as if it were local: a 10:00 IST event
+  // opened showing 04:30, and saving that back moved the event 5.5 hours
+  // earlier. The same screen showed 04:30 in the field and 10:00 in the row
+  // next to it. Pinned to Asia/Kolkata rather than the browser's zone so a
+  // staff member travelling does not silently reschedule an event.
+  const toIst = v => {
+    if (!v) return '';
+    const d = new Date(v);
+    if (Number.isNaN(d.getTime())) return String(v).replace(' ', 'T').slice(0, 16);
+    const p = Object.fromEntries(
+      new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Kolkata', hour12: false,
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit',
+      }).formatToParts(d).map(x => [x.type, x.value]),
+    );
+    // en-CA gives 24-hour time, but midnight can come back as "24".
+    const hour = p.hour === '24' ? '00' : p.hour;
+    return `${p.year}-${p.month}-${p.day}T${hour}:${p.minute}`;
+  };
+
+  // Back out in the format the API stores: a plain IST wall-clock string.
+  //
+  // Correcting only the DISPLAY was not enough. The form submits its state, so a
+  // field the admin never touched still posted the raw UTC string the API had
+  // returned, and the event moved 5.5 hours on a save that changed only the mode.
+  //
+  // Nor is an ISO instant right here: reads and writes are asymmetric. The column
+  // holds a naive datetime that reads interpret as IST (the seeder writes
+  // '2026-07-29 08:00:00' and the API serialises it as 02:30Z), but a write keeps
+  // whatever wall-clock it is handed — so posting "…T02:30:00Z" stored 02:30 and
+  // shifted the event again. Passing IST wall-clock in and out is the only
+  // representation both halves agree on.
+  const fromIst = v => (v ? `${v.replace('T', ' ')}:00` : null);
   const set = k => e => setEditing(s => ({ ...s, [k]: e.target.value }));
 
   return (
@@ -52,14 +90,14 @@ export function EventsTab() {
       </div>
 
       {editing && (
-        <form onSubmit={e=>{e.preventDefault(); save.mutate(editing);}} className="mb-6 rounded-2xl ring-1 ring-brand-100 bg-brand-50/40 p-5 grid gap-3 sm:grid-cols-2">
+        <form onSubmit={e=>{e.preventDefault(); save.mutate({ ...editing, starts_at: fromIst(editing.starts_at), ends_at: fromIst(editing.ends_at) });}} className="mb-6 rounded-2xl ring-1 ring-brand-100 bg-brand-50/40 p-5 grid gap-3 sm:grid-cols-2">
           <F label="Title *"><input required value={editing.title} onChange={set('title')} className={inp}/></F>
           <div className="grid grid-cols-[80px_1fr] gap-3">
             <F label="Icon"><input value={editing.icon||''} onChange={set('icon')} className={inp}/></F>
             <F label="Category"><input value={editing.category||''} onChange={set('category')} className={inp} placeholder="e.g. Mind Sports"/></F>
           </div>
-          <F label="Starts"><input type="datetime-local" value={toLocal(editing.starts_at)} onChange={set('starts_at')} className={inp}/></F>
-          <F label="Ends"><input type="datetime-local" value={toLocal(editing.ends_at)} onChange={set('ends_at')} className={inp}/></F>
+          <F label="Starts (IST)"><input type="datetime-local" value={editing.starts_at || ''} onChange={set('starts_at')} className={inp}/></F>
+          <F label="Ends (IST)"><input type="datetime-local" value={editing.ends_at || ''} onChange={set('ends_at')} className={inp}/></F>
           <F label="Batch size"><input value={editing.batch_size||''} onChange={set('batch_size')} className={inp} placeholder="10–15 students"/></F>
           <F label="Session duration"><input value={editing.session_duration||''} onChange={set('session_duration')} className={inp} placeholder="1 hour per session"/></F>
           <F label="Schedule note"><input value={editing.schedule_note||''} onChange={set('schedule_note')} className={inp}/></F>
@@ -68,6 +106,14 @@ export function EventsTab() {
           <F label="Status">
             <select value={editing.status||'upcoming'} onChange={set('status')} className={inp}>
               {['upcoming','completed','draft'].map(s=><option key={s}>{s}</option>)}
+            </select>
+          </F>
+          {/* The API validated this and the public event page displayed it, but
+              no form ever sent it — so every event was permanently "Online" and
+              an in-person workshop could not be described as one. */}
+          <F label="Mode">
+            <select value={editing.mode||'Online'} onChange={set('mode')} className={inp}>
+              {['Online','In person','Hybrid'].map(s=><option key={s}>{s}</option>)}
             </select>
           </F>
           <div className="flex items-end gap-2">
@@ -92,7 +138,7 @@ export function EventsTab() {
             </div>
             {ev.description && <p className="mt-1.5 text-sm text-slate-600 line-clamp-2">{ev.description}</p>}
             <div className="mt-3 flex flex-wrap gap-2">
-              <button onClick={()=>setEditing({ ...ev })} className="rounded-lg ring-1 ring-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:ring-brand-300">Edit</button>
+              <button onClick={()=>setEditing({ ...ev, starts_at: toIst(ev.starts_at), ends_at: toIst(ev.ends_at) })} className="rounded-lg ring-1 ring-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:ring-brand-300">Edit</button>
               {ev.status !== 'completed' && <button onClick={()=>patch.mutate({ id:ev.id, status:'completed' })} className="rounded-lg ring-1 ring-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-green-700">Mark completed</button>}
               {ev.status !== 'upcoming' && <button onClick={()=>patch.mutate({ id:ev.id, status:'upcoming' })} className="rounded-lg ring-1 ring-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-green-700">Mark upcoming</button>}
               {ev.status !== 'draft' && <button onClick={()=>patch.mutate({ id:ev.id, status:'draft' })} className="rounded-lg ring-1 ring-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:text-amber-700">Unpublish</button>}
@@ -699,31 +745,49 @@ function ProposalsPanel() {
   );
 }
 
+const EXAM_BLANK = { title:'', body:'', exam_date:'', link_url:'' };
+
 function ExamUpdatesPanel() {
   const qc = useQueryClient();
   const { data: items = [] } = useQuery({ queryKey:['admin-exam-updates'], queryFn: fetchAdminExamUpdates });
-  const [form, setForm] = useState({ title:'', body:'', exam_date:'', link_url:'' });
+  const [form, setForm] = useState(EXAM_BLANK);
+  // The API has always accepted every field on update; only the publish toggle
+  // ever used it, so a typo in a published update could be fixed only by
+  // deleting and retyping it — beside an unconfirmed delete button.
+  const [editingId, setEditingId] = useState(null);
+  const reset = () => { setForm(EXAM_BLANK); setEditingId(null); };
   const invalidate = () => { qc.invalidateQueries({queryKey:['admin-exam-updates']}); qc.invalidateQueries({queryKey:['exam-updates']}); };
-  const create = useMutation({
-    mutationFn: () => createExamUpdate({ ...form, exam_date: form.exam_date || null, link_url: form.link_url || null }),
-    onSuccess: () => { setForm({title:'',body:'',exam_date:'',link_url:''}); invalidate(); },
+
+  const payload = () => ({ ...form, exam_date: form.exam_date || null, link_url: form.link_url || null });
+  const save = useMutation({
+    mutationFn: () => editingId ? updateExamUpdate(editingId, payload()) : createExamUpdate(payload()),
+    onSuccess: () => { reset(); invalidate(); },
   });
   const toggle = useMutation({ mutationFn: ({id, pub}) => updateExamUpdate(id, { is_published: pub }), onSuccess: invalidate });
-  const remove = useMutation({ mutationFn: deleteExamUpdate, onSuccess: invalidate });
+  const remove = useMutation({ mutationFn: deleteExamUpdate, onSuccess: () => { reset(); invalidate(); } });
   const inp = "w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
+
+  const edit = u => {
+    setEditingId(u.id);
+    setForm({ title:u.title ?? '', body:u.body ?? '', exam_date:(u.exam_date ?? '').slice(0,10), link_url:u.link_url ?? '' });
+  };
 
   return (
     <div className="mt-4 space-y-5">
-      <form onSubmit={e=>{e.preventDefault();create.mutate();}} className="rounded-xl ring-1 ring-slate-100 bg-white p-4 space-y-2">
-        <h4 className="font-bold text-sm">Publish an exam update</h4>
+      <form onSubmit={e=>{e.preventDefault();save.mutate();}} className="rounded-xl ring-1 ring-slate-100 bg-white p-4 space-y-2">
+        <div className="flex items-center justify-between gap-3">
+          <h4 className="font-bold text-sm">{editingId ? 'Edit exam update' : 'Publish an exam update'}</h4>
+          {editingId && <button type="button" onClick={reset} className="text-xs font-semibold text-slate-500 hover:text-slate-800">Cancel — write a new one instead</button>}
+        </div>
         <input required value={form.title} onChange={e=>setForm({...form,title:e.target.value})} placeholder="Title (e.g. JEE Main 2027 registration opens)" className={inp}/>
         <textarea rows={2} value={form.body} onChange={e=>setForm({...form,body:e.target.value})} placeholder="Details (optional)" className={inp}/>
         <div className="grid sm:grid-cols-2 gap-2">
           <input type="date" value={form.exam_date} onChange={e=>setForm({...form,exam_date:e.target.value})} className={inp}/>
           <input value={form.link_url} onChange={e=>setForm({...form,link_url:e.target.value})} placeholder="Link (optional)" className={inp}/>
         </div>
-        <button disabled={create.isPending} className="rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">
-          {create.isPending?'Publishing…':'Publish update'}
+        {save.isError && <p className="text-xs text-red-600">{errText(save.error)}</p>}
+        <button disabled={save.isPending} className="rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">
+          {save.isPending ? 'Saving…' : editingId ? 'Save changes' : 'Publish update'}
         </button>
       </form>
 
@@ -740,7 +804,10 @@ function ExamUpdatesPanel() {
                 className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${u.is_published?'bg-green-50 text-green-700':'bg-slate-100 text-slate-500'}`}>
                 {u.is_published?'Published':'Draft'}
               </button>
-              <button onClick={()=>remove.mutate(u.id)} className="p-1.5 text-slate-400 hover:text-red-600" title="Delete"><X className="h-4 w-4"/></button>
+              <button onClick={()=>edit(u)} className="rounded-lg ring-1 ring-slate-200 px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-50">Edit</button>
+              {/* Every other destructive button in this console confirms first. */}
+              <button onClick={()=>{ if (confirm(`Delete “${u.title}”? This cannot be undone.`)) remove.mutate(u.id); }}
+                className="p-1.5 text-slate-400 hover:text-red-600" title="Delete"><X className="h-4 w-4"/></button>
             </div>
           </div>
         )) : <p className="text-slate-500 py-8 text-center">No exam updates yet.</p>}
@@ -759,7 +826,7 @@ function ExamUpdatesPanel() {
 // draft to fix a typo and republished without moving in the feed, because
 // `published_at` is stamped once, on the first publish, and kept.
 
-const POST_BLANK = { title:'', excerpt:'', body:'', image_url:'', author:'', is_published:false };
+const POST_BLANK = { title:'', slug:'', excerpt:'', body:'', image_url:'', author:'', is_published:false, published_at:'' };
 
 function BlogPanel() {
   const qc = useQueryClient();
@@ -775,7 +842,13 @@ function BlogPanel() {
   const save = useMutation({
     mutationFn: () => {
       const payload = { ...form, excerpt: form.excerpt || null, body: form.body || null,
-                        image_url: form.image_url || null, author: form.author || null };
+                        image_url: form.image_url || null, author: form.author || null,
+                        // Blank means "stamp it on first publish", which is what
+                        // the API does. Sending '' would fail date validation.
+                        published_at: form.published_at || null };
+      // The slug is generated from the title when a post is created and is
+      // rejected by the API on create, so only send it when editing.
+      if (!editing) delete payload.slug;
       return editing ? updateAdminPost({ id: editing, ...payload }) : createAdminPost(payload);
     },
     onSuccess: () => { reset(); invalidate(); },
@@ -787,8 +860,9 @@ function BlogPanel() {
   const edit = p => {
     setEditing(p.id);
     setErr('');
-    setForm({ title:p.title??'', excerpt:p.excerpt??'', body:p.body??'', image_url:p.image_url??'',
-              author:p.author??'', is_published:!!p.is_published });
+    setForm({ title:p.title??'', slug:p.slug??'', excerpt:p.excerpt??'', body:p.body??'', image_url:p.image_url??'',
+              author:p.author??'', is_published:!!p.is_published,
+              published_at:(p.published_at ?? '').slice(0,10) });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -813,6 +887,23 @@ function BlogPanel() {
               images got saved. */}
           <ImagePicker label="Cover image" value={form.image_url} onChange={v=>setForm({...form,image_url:v})}/>
           <F label="Author (optional)"><input value={form.author} onChange={e=>setForm({...form,author:e.target.value})} placeholder="IndiaTutors Online" className={inp}/></F>
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-3">
+          {/* Accepted by the API from the start, but no field ever sent it, so a
+              post could not be backdated or dated ahead of its publish click. */}
+          <F label="Publish date — leave blank to stamp it when you publish">
+            <input type="date" value={form.published_at} onChange={e=>setForm({...form,published_at:e.target.value})} className={inp}/>
+          </F>
+          {editing && (
+            <F label="Web address">
+              <input value={form.slug} onChange={e=>setForm({...form,slug:e.target.value})} className={inp}/>
+              <span className="mt-1 block text-[11px] text-slate-400">
+                /blog/{form.slug || '…'} — changing this breaks any link already shared. It is generated from the
+                title on creation and does not follow later edits, so fix a typo here.
+              </span>
+            </F>
+          )}
         </div>
 
         <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">

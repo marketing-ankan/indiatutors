@@ -28,7 +28,15 @@ running — the Settings tab and the policy editor both exist as of commit `2b16
 | **B1** deploy deletes blog posts | **FIXED** — `console_edited_at` ownership marker; seeders skip marked rows and prune only their own |
 | **B2** deploy reverts course edits / deletes console-created courses | **FIXED** — same mechanism, backfilled from the audit log so earlier edits are protected too |
 | **B3** empty-SKU 500 | **REFUTED** — not a defect, do not act on it |
-| Everything else below | open |
+| **B4** saving a course corrupts its image path | **FIXED** — resource returns the raw column; the controller strips any query string |
+| **B5** editing an event shifts it 5.5 hours | **FIXED** — IST wall-clock in and out; the display fix alone was not enough |
+| **B6** image picker no-op on 107/110 courses | **FIXED** — a self-hosted DB image wins; legacy external hotlinks still lose to the bundled photo |
+| **B7** three fields the API accepts but no form sent | **FIXED** — event mode, blog publish date, blog slug |
+| **B8** exam updates: no edit form, unconfirmed delete | **FIXED** |
+| **B9** review with no subject / no teacher reviews | **FIXED** — subject required, teacher reviews recordable |
+| **B10** Verified badge could not be withdrawn | **FIXED** — staff toggle, confirmed before removal |
+| **B11** setting with two editors and no reader | **FIXED** — one editor in Settings, read in Reviews |
+| Feature gaps in section 2 | open |
 
 ---
 

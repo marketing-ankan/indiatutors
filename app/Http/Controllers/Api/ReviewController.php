@@ -180,6 +180,10 @@ class ReviewController extends Controller
     {
         $data = $request->validate([
             'course_id'    => 'nullable|integer|exists:courses,id',
+            // The table has always had tutor_id and the public site accepts tutor
+            // reviews, but this endpoint had no rule for it — so a review a parent
+            // phoned in about a teacher could not be recorded at all.
+            'tutor_id'     => 'nullable|integer|exists:tutors,id',
             'author_name'  => 'required|string|max:120',
             'author_email' => 'nullable|email|max:180',
             'rating'       => 'required|integer|min:1|max:5',
@@ -187,13 +191,22 @@ class ReviewController extends Controller
             'status'       => 'nullable|in:pending,approved,rejected',
         ]);
 
+        // A review about nothing renders on no page. Both fields were optional
+        // and the console's subject picker defaulted to "no specific course", so
+        // the default action created a review that counted in the Reviews badge,
+        // could be approved, and was invisible everywhere.
+        if (empty($data['course_id']) && empty($data['tutor_id'])) {
+            abort(422, 'Choose the course or the teacher this review is about — a review with neither appears on no page.');
+        }
+
         $review = Review::create($data + [
             'status'     => $data['status'] ?? 'approved',
             'created_by' => $request->user()->id,
         ]);
         AuditLog::record('review_added', 'review', $review->id, $review->author_name);
 
-        return (new ReviewResource($review->load('course:id,name,slug')))->response()->setStatusCode(201);
+        return (new ReviewResource($review->load(['course:id,name,slug', 'tutor:id,name,slug'])))
+            ->response()->setStatusCode(201);
     }
 
     public function update(Request $request, Review $review)

@@ -17,7 +17,13 @@ class AdminCourseResource extends JsonResource {
             'is_published'  => (bool) $this->is_published,
             'is_featured'   => (bool) $this->is_featured,
             'position'      => $this->position,
-            'image_url'     => $this->image_url,
+            // RAW, not the accessor. Course::getImageUrlAttribute appends
+            // ?v=<filemtime> for cache-busting; the console's edit form loads
+            // this value and posts it straight back, which stored the decorated
+            // path in the column. is_file() then fails against a path carrying a
+            // query string, so cache-busting died for that course and the image
+            // picker's "currently selected" highlight stopped matching.
+            'image_url'     => $this->getRawOriginal('image_url'),
             // Every field the console's edit form can write must also be read
             // back here. This one was missing, so the form loaded it as "" and
             // an ordinary "Save changes" silently wiped the course's

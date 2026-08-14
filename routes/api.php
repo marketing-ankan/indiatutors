@@ -297,6 +297,9 @@ Route::middleware('auth:sanctum')->group(function () {
         // One merged queue over teacher_profiles + unclaimed teacher_applications.
         Route::get('/teachers-console',                  [AdminTeacherController::class, 'index']);
         Route::patch('/teachers/{teacherProfile}/listing',[AdminTeacherController::class, 'toggleListing']);
+        // The "Verified" badge was granted by a schema default and nothing could
+        // withdraw it — see AdminTeacherController::toggleVerified.
+        Route::patch('/teachers/{teacherProfile}/verified',[AdminTeacherController::class, 'toggleVerified']);
         // A4 — a teacher's own edits reach the public listing only through here.
         Route::post('/teachers/{teacherProfile}/publish', [AdminTeacherController::class, 'publishChanges']);
         Route::post('/teachers/{teacherProfile}/discard', [AdminTeacherController::class, 'discardChanges']);

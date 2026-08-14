@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Support\ConsoleOwned;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 /**
  * Blog posts from the Staff Console.
@@ -81,6 +82,15 @@ class AdminPostController extends Controller
 
         return $request->validate([
             'title'        => "{$required}|string|max:190",
+            // Editable, but only deliberately. The slug is generated from the
+            // title on creation and never follows it afterwards, so a typo
+            // published once used to be permanent; changing it here breaks any
+            // link already shared, which is why it is a separate field rather
+            // than something that silently tracks the title.
+            'slug'         => $post
+                ? ['sometimes', 'required', 'string', 'max:190', 'regex:/^[a-z0-9-]+$/',
+                   Rule::unique('posts', 'slug')->ignore($post->id)]
+                : 'prohibited',
             'excerpt'      => 'nullable|string|max:500',
             'body'         => 'nullable|string|max:200000',
             // string, not url: site images are relative (/build/images/...),

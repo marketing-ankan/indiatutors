@@ -87,6 +87,20 @@ class AdminCourseController extends Controller
     {
         $required = $course ? 'sometimes|required' : 'required';
 
+        $data = $this->validated($request, $required);
+
+        // Belt and braces alongside AdminCourseResource returning the raw column:
+        // never store a cache-busting query string in the column itself, whatever
+        // the client posts. is_file() cannot resolve a path with "?v=…" on it.
+        if (!empty($data['image_url'])) {
+            $data['image_url'] = strtok($data['image_url'], '?') ?: null;
+        }
+
+        return $data;
+    }
+
+    private function validated(Request $request, string $required): array
+    {
         return $request->validate([
             'name'              => "{$required}|string|max:190",
             'sku'               => 'nullable|string|max:120',

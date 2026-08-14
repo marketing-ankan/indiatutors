@@ -351,3 +351,6 @@ export const fetchLegalNav         = async () => { const { data } = await api.ge
 export const fetchLegalDoc         = async (slug) => { const { data } = await api.get(`/legal/${slug}`); return data.data; };
 export const fetchAdminLegal       = async () => { const { data } = await api.get('/admin/legal'); return data.data; };
 export const updateAdminLegal      = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/legal/${id}`, p); return data.data; };
+// The "Verified" badge on a public tutor card. It was granted by a schema
+// default (tutors.verified defaults to true) with no way to withdraw it.
+export const toggleTeacherVerified = async ({ id, verified }) => { const { data } = await api.patch(`/admin/teachers/${id}/verified`, { verified }); return data.data; };

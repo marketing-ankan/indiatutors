@@ -293,6 +293,52 @@ changed) — the post survived, the new course survived, the edited price held a
 their job: a course nobody has touched, drifted to ₹1 and unpublished by hand,
 was correctly repaired from `courses.json` on the next run.
 
+### The rest of the console bugs
+
+Nine more controls that looked wired, reported success, and did the wrong thing.
+All found by the audit, all reproduced before being fixed and re-tested after.
+
+- **Saving a course corrupted its own image path.** The API returned the
+  cache-busting `?v=…` suffix, the form posted it straight back, and the column
+  ended up holding a path with a query string that `is_file()` cannot resolve —
+  killing cache-busting for that course permanently.
+- **The image picker did nothing for 107 of the 110 courses.** A bundled photo
+  was consulted before the database value. That precedence was deliberate — many
+  courses still carry old WordPress image URLs that break at domain cutover — so
+  the test is now "is the stored image one of ours", not "is there one at all".
+  A picture chosen in the console wins; a legacy hotlink still loses to the
+  bundled photo.
+- **Editing an event moved it 5.5 hours earlier.** Fixing the display was not
+  enough: the form submits its state, so a field nobody touched still posted the
+  raw UTC string back, and an event shifted on a save that changed only its mode.
+  Reads and writes turned out to disagree — the column holds a naive datetime
+  that reads treat as IST, while a write keeps whatever wall-clock it is handed —
+  so the form now speaks IST wall-clock in both directions. Verified by saving
+  only the mode (time held) and by changing the time itself (round-tripped).
+- **Three fields the API accepted but no form ever sent**: an event's mode (so
+  every event was permanently "Online" and an in-person workshop could not be
+  described as one), a blog post's publish date (no backdating), and a blog
+  post's web address (a typo in a title was permanent).
+- **Exam updates had no edit form**, so a typo could only be fixed by deleting
+  and retyping — next to the console's only delete button that did not ask first.
+- **"Add a review" defaulted to creating an invisible review.** Both subject
+  fields were optional and the picker defaulted to "no specific course", so the
+  default action stored a review that was approvable, counted in the badge, and
+  appeared on no page. A subject is now required. The same form also could not
+  record a review about a *teacher*, though the table and the public site have
+  always supported it.
+- **Every tutor was badged "✓ Verified" by a schema default** and nothing in the
+  platform could withdraw it — a trust claim shown to parents choosing a tutor.
+  Staff can now grant and withdraw it, with a confirmation before removal.
+- **A setting with two editors and no reader.** The Google review link was
+  editable in two places under help text promising it was "shown to parents when
+  we ask for a review", and nothing read it. It is edited in Settings now and
+  read in the Reviews tab, where staff actually ask.
+
+One audit finding was **rejected**: the claimed empty-SKU crash does not happen —
+Laravel converts the empty string to null before validation, so the unique index
+is never touched. Both test saves returned 200.
+
 ---
 
 ## Open — needs an owner decision
