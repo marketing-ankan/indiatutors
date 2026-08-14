@@ -163,9 +163,21 @@ if [ "$(read_mark "$DB_MARK")" != "$HEAD" ]; then
     # Belt and braces in case storage is ever exposed by a misconfiguration.
     [ -f "$dir/.gitignore" ] || printf '*\n!.gitignore\n' > "$dir/.gitignore"
 
+    # One backup per commit. The DB step retries every 5 minutes until it
+    # succeeds, so without this a persistent failure would dump again on each
+    # cycle and, at seven kept, roll the pre-change backup out of the window
+    # within the hour — destroying the very copy worth keeping.
+    if ls "$dir"/db-*-"${HEAD:0:8}".sql* >/dev/null 2>&1; then
+      log "db: backup for ${HEAD:0:8} already taken"
+      return 0
+    fi
+
     # Read the connection out of Laravel rather than parsing .env: the deploy
     # runs config:cache, so .env is not the source of truth here.
-    local cfg host port db user pass
+    #
+    # `local` is declared on its own line: `local x="$(cmd)"` would report
+    # local's own exit status, not the command's, and this relies on the code.
+    local cfg rc host port db user pass
     cfg="$(php -r '
       require "vendor/autoload.php";
       $app = require "bootstrap/app.php";
@@ -174,7 +186,12 @@ if [ "$(read_mark "$DB_MARK")" != "$HEAD" ]; then
       if ($c !== "mysql") { exit(3); }
       $d = config("database.connections.$c");
       echo implode("\n", [$d["host"] ?? "", $d["port"] ?? 3306, $d["database"] ?? "", $d["username"] ?? "", $d["password"] ?? ""]);
-    ' 2>/dev/null)" || return 2
+    ' 2>/dev/null)"
+    rc=$?
+    # 3 is "not MySQL", which is a normal state, not a failure. `|| return 2`
+    # collapsed the two and reported a healthy sqlite install as a failed backup.
+    [ "$rc" -eq 3 ] && return 3
+    [ "$rc" -ne 0 ] && return 2
 
     host="$(echo "$cfg" | sed -n 1p)"; port="$(echo "$cfg" | sed -n 2p)"
     db="$(echo "$cfg" | sed -n 3p)";   user="$(echo "$cfg" | sed -n 4p)"

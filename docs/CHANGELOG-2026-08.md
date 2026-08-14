@@ -526,15 +526,29 @@ A failed dump **warns and continues** rather than aborting. Blocking every futur
 release on a missing `mysqldump` would be a worse and quieter failure than the
 one this guards against — the site would simply stop updating.
 
-Tested: the connection is read correctly out of Laravel's config (not `.env`,
-which `config:cache` makes irrelevant at deploy time); a non-MySQL connection
-skips cleanly; retention keeps exactly the newest 7 of 10; dumps are gitignored;
-and a dump against an unreachable server fails cleanly, removes its stub file and
-leaves the deploy running. **Not** exercised end to end: the successful
-`mysqldump` itself, because MySQL was not running locally — that path runs for
-the first time on the next production deploy, where the warn-and-continue
-behaviour makes a failure visible in `storage/logs/deploy.log` rather than
-harmful.
+**Verified end to end** once MySQL came back up locally: the deploy's own
+function produced a real dump — 36 tables, 321KB, valid `mysqldump` header — and
+that dump **restored into a throwaway database with matching row counts** (36
+tables, 114 courses, 105 categories, 2 users). An unrestorable backup is worth
+nothing, so restoring it is the only test that counts.
+
+Also tested: the connection is read out of Laravel's config (not `.env`, which
+`config:cache` makes irrelevant at deploy time); retention keeps exactly the
+newest 7 of 10; dumps are gitignored; a dump against an unreachable server fails
+cleanly, removes its stub file and leaves the deploy running.
+
+Two defects were found by re-testing the shell function itself rather than its
+parts, and both are fixed:
+
+- **The "not MySQL" case was unreachable.** `cfg="$(php …)" || return 2` caught
+  the deliberate `exit(3)` along with real failures, so a healthy SQLite install
+  would have logged "backup failed" and implied the database was unprotected when
+  there was simply nothing to dump. The exit code is now captured and 3 is
+  distinguished from an error.
+- **A failing deploy would have destroyed the backup worth keeping.** The DB step
+  retries every 5 minutes until it succeeds; the dump ran on each retry, so at
+  seven kept, a persistent failure would have rotated the pre-change copy out of
+  the window within the hour. One backup per commit now.
 
 ---
 
