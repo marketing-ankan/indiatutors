@@ -372,6 +372,46 @@ email renders with the details, omits blank fields and links to the right tab.
 with guards against demoting yourself or removing the last admin — confirmed by
 creating one and signing in as it. The owner's own admin login is set.
 
+### An order is billed at the price the page quoted
+
+It was not. The product page lets a buyer choose **One-to-One vs Group** and a
+level, and quotes the owner's official rate for that combination. "Add to Cart"
+threw the choice away and the server priced the order from the catalogue column
+— which holds the *cheapest* rate, i.e. the group rate wherever a course has one.
+
+Proved before fixing: an order placed for Chess from a page advertising **₹600**
+was created and totalled at **₹300**. That needs no payment keys — the order
+simply stands `pending` for staff, so the site could take a booking at half the
+advertised rate today.
+
+The rates now live in `database/data/rates.json` — the owner's "IN Plan and
+Pricing" sheet, 96 rows — and **both** sides read it: `pricing.js` imports it for
+the pages, and `App\Support\RateCard` reads it when pricing an order. They can no
+longer disagree, because there is only one copy.
+
+The cart line carries the buyer's **choice**, never an amount: the browser sends
+the plan and level, and the server resolves the price. Verified across the cases
+that matter:
+
+| Sent | Billed |
+|---|---|
+| One-to-One / Beginner (page says ₹600) | **₹600** |
+| One-to-One / Advanced (page says ₹1,200) | **₹1,200** |
+| Group / Intermediate (page says ₹450) | **₹450** |
+| no choice — other pages, old clients | ₹300, the catalogue "from" price |
+| a tampered `price: 1` alongside a valid choice | **₹600** — the price is ignored |
+| an invented plan ("Free") | ₹300 — safe fallback, not an error |
+| Group for Piano, which the sheet gives no group rate | ₹600 — falls back rather than inventing one |
+
+The invoice line now names what was bought — "Chess — One-to-One, Advanced" —
+instead of a bare course name at a number the customer cannot account for.
+End to end in the browser: choosing One-to-One/Advanced quoted ₹1,200 and the
+cart charged ₹1,200.
+
+A `DB::transaction` closure quietly caused a false negative while testing this:
+the lookup was outside its `use` list, so every price silently fell back and the
+fix appeared not to work. Worth remembering — it fails silently, not loudly.
+
 ---
 
 ## Open — needs an owner decision

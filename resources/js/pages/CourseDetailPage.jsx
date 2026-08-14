@@ -126,7 +126,10 @@ function BuyCard({ course }) {
 
         {/* Actions — Add to Cart adds the catalog product (base price, qty 1,
             like the live Woo store) and opens the cart. */}
-        <button type="button" onClick={() => { cart.add(cartItemOf(course)); nav('/cart'); }}
+        {/* Carries the plan and level chosen above. It used to add the catalogue
+            base price and silently discard the choice, so the cart charged the
+            cheapest rate for whatever was displayed. */}
+        <button type="button" onClick={() => { cart.add(cartItemOf(course, { plan, level: levels[level], price: cell.net })); nav('/cart'); }}
           className="w-full flex items-center justify-center gap-2 rounded-[10px] bg-brand-600 text-white py-3 text-sm font-bold hover:bg-brand-700">
           <ShoppingCart className="h-4 w-4" /> Add to Cart
         </button>
