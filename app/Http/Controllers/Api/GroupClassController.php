@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Course;
 use App\Models\CourseBatch;
 use Illuminate\Http\Request;
@@ -27,15 +28,18 @@ class GroupClassController extends Controller
             ->orderBy('position')->orderBy('name')
             ->get();
 
-        $cards = $courses->map(fn ($c) => $this->cardPayload($c))->values();
+        // Every category, so a leaf can be walked up to its top-level ancestor.
+        // Two queries for the whole page rather than one per course.
+        $tree = Category::query()->get(['id', 'name', 'slug', 'parent_id'])->keyBy('id');
+
+        $cards = $courses->map(fn ($c) => $this->cardPayload($c, $tree))->values();
 
         // The sidebar, built from the category each card actually resolves to.
         //
-        // Deliberately not "every category on these courses" (24 entries — the
-        // leaves: Python, Chess, Tamil) and not "every root category" either:
-        // some leaves are stored with parent_id NULL, so "Python" showed up as a
-        // filter that matched nothing. Deriving from the resolved card value
-        // makes an empty filter impossible by construction.
+        // Deliberately not "every category on these courses" — that gives 24
+        // entries, the leaves: Python, Chess, Tamil. Deriving it from the value
+        // the cards resolved to makes a filter matching nothing impossible by
+        // construction.
         $categories = $cards
             ->filter(fn ($c) => $c['category_key'])
             ->map(fn ($c) => ['key' => $c['category_key'], 'label' => $c['category_label']])
@@ -47,19 +51,19 @@ class GroupClassController extends Controller
         ]);
     }
 
-    private function cardPayload(Course $c): array
+    private function cardPayload(Course $c, $tree): array
     {
         $price = (float) ($c->sale_price ?: $c->regular_price);
         $was   = $c->on_sale ? (float) $c->regular_price : null;
+        $top   = $this->topLevelCategory($c, $tree);
 
         return [
             'id'             => $c->id,
             'slug'           => $c->slug,
             'title'          => $c->name,
-            // The root category, to match the sidebar keys above — first() would
-            // often return the leaf ("Python") and never match the filter.
-            'category_key'   => $c->categories->whereNull('parent_id')->first()?->slug,
-            'category_label' => $c->categories->whereNull('parent_id')->first()?->name,
+            // The TOP-LEVEL ancestor, which is what the sidebar lists.
+            'category_key'   => $top?->slug,
+            'category_label' => $top?->name,
             'about'          => $c->group_about ?: $c->short_description,
             'highlights'     => $c->group_highlights ?: [],
             'age_range'      => $c->group_age_range,
@@ -81,6 +85,30 @@ class GroupClassController extends Controller
                 'seats'    => $b->seats_total,
             ])->values(),
         ];
+    }
+
+
+    /**
+     * The top-level ancestor of whichever category a course is tagged with.
+     *
+     * CourseSeeder attaches only the LEAF of each chain, so a course on
+     * "IT Technologies > Python" carries Python alone. Looking for a root among
+     * the course's own categories therefore found nothing and the card dropped
+     * out of every filter — reachable only through "All Categories".
+     */
+    private function topLevelCategory(Course $c, $tree)
+    {
+        foreach ($c->categories as $cat) {
+            $node = $tree[$cat->id] ?? $cat;
+            $seen = [];
+            // Guard the walk: a cycle in parent_id would otherwise hang the page.
+            while ($node && $node->parent_id && !isset($seen[$node->id])) {
+                $seen[$node->id] = true;
+                $node = $tree[$node->parent_id] ?? null;
+            }
+            if ($node) return $node;
+        }
+        return null;
     }
 
     /* ------------------------------------------------------------------ admin */
