@@ -15,6 +15,7 @@ import {
   ABOUT_LEAD, ABOUT_LIST, ABOUT_STATS, HOW_STEPS, DEMO_VIDEOS,
 } from '../data/homeLive.js';
 import { BOARDS } from '../data/boards.js';
+import { WhatsAppTestimonials, LatestNews, InstagramFeed } from '../components/SocialProofSections.jsx';
 
 // Mirrors the live indiatutorsonline.com homepage (WP theme "ito-ud" / "ito-cb"
 // sections) — same content, colors and layout, rebuilt in React + Tailwind.
@@ -696,6 +697,10 @@ export default function HomePage() {
         </div>
       </div></section>
 
+      {/* WHATSAPP TESTIMONIALS — real messages managed from the Content tab;
+          demo cards fill the grid until the owner publishes real ones. */}
+      <WhatsAppTestimonials />
+
       {/* PRICING */}
       <section className="py-14" style={{ background: CREAM }}><div className="container-wide">
         <Eyebrow center>Transparent · No hidden fees</Eyebrow>
@@ -717,6 +722,12 @@ export default function HomePage() {
         </div>
         <p className="mt-7 text-center text-sm text-slate-500 flex items-center justify-center gap-2"><Info className="h-4 w-4 shrink-0" aria-hidden="true" />Group class pricing is lower. Video courses are one-time purchases. Contact us for custom packages and bulk session discounts.</p>
       </div></section>
+
+      {/* LATEST NEWS — the three newest published blog posts (Content tab). */}
+      <LatestNews />
+
+      {/* INSTAGRAM FEED — live once the token is configured, tiles until then. */}
+      <InstagramFeed />
 
       {/* CTA */}
       <section className="py-16 text-white" style={{ background: 'linear-gradient(145deg,#0B1220 0%,#1E40AF 100%)' }}>

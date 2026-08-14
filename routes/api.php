@@ -62,6 +62,8 @@ Route::get('/site-settings',     [SiteSettingController::class, 'index']);
 Route::get('/deploy-info',       [SiteSettingController::class, 'deployInfo']);
 // Home-page testimonials: reviews a human approved AND shortlisted.
 Route::get('/testimonials',      [TestimonialController::class, 'index']);
+// The WhatsApp-style cards. Empty (not 500) until the table exists — see controller.
+Route::get('/whatsapp-testimonials', [\App\Http\Controllers\Api\WhatsappTestimonialController::class, 'index']);
 Route::get('/courses/{slug}',    [CourseController::class, 'show'])->name('api.courses.show');
 // Two segments, so these never shadow /courses/{slug} above.
 Route::get('/courses/{course:slug}/reviews',  [ReviewController::class, 'index']);
@@ -376,6 +378,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/exam-updates',                     [ExamUpdateController::class, 'store']);
         Route::patch('/exam-updates/{examUpdate}',       [ExamUpdateController::class, 'update']);
         Route::delete('/exam-updates/{examUpdate}',      [ExamUpdateController::class, 'destroy']);
+        // WhatsApp testimonials — the chat-bubble cards on the homepage.
+        Route::get('/whatsapp-testimonials',                          [\App\Http\Controllers\Api\WhatsappTestimonialController::class, 'adminIndex']);
+        Route::post('/whatsapp-testimonials',                         [\App\Http\Controllers\Api\WhatsappTestimonialController::class, 'store']);
+        Route::patch('/whatsapp-testimonials/{whatsappTestimonial}',  [\App\Http\Controllers\Api\WhatsappTestimonialController::class, 'update']);
+        Route::delete('/whatsapp-testimonials/{whatsappTestimonial}', [\App\Http\Controllers\Api\WhatsappTestimonialController::class, 'destroy']);
     });
 });
 

@@ -2,8 +2,10 @@ import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight, MessageCircle, Instagram } from 'lucide-react';
-import { fetchSocialInstagram } from '../lib/api.js';
+import { fetchPosts, fetchSocialInstagram, fetchWhatsappTestimonials } from '../lib/api.js';
 import { useSiteSettings } from '../lib/siteSettings.js';
+import { postDate } from '../pages/BlogPostPage.jsx';
+import { excerptOf } from '../pages/BlogPage.jsx';
 import {
   TEACHERS, STUDENT_WINS, ACHIEVEMENT_PHOTOS, PARENTS, FAMILY_NOTES,
   WHATSAPP_TESTIMONIALS, BLOG_POSTS, INSTAGRAM,
@@ -14,6 +16,10 @@ import {
 // sections on its /shop): Meet our Teachers → Recent Student Wins → Student
 // Achievements → What Our Parents Say About Us → What Families Say → WhatsApp
 // Testimonials → Latest News and Resources → Instagram Feed.
+//
+// WhatsAppTestimonials, LatestNews and InstagramFeed are also exported singly —
+// the homepage renders them around its pricing section (WinQuest parity again:
+// the live site closes its homepage with testimonials → news → Instagram).
 
 const SectionHead = ({ children }) => (
   <div className="text-center mb-9">
@@ -148,16 +154,34 @@ function FamiliesSay() {
   );
 }
 
-function WhatsAppTestimonials() {
+export function WhatsAppTestimonials() {
   const site = useSiteSettings();
+
+  // Real messages, added from the Content tab. Same deal the owner struck for
+  // the review testimonials: real entries fill the grid from the front and the
+  // demo cards only top it up, retiring one by one as real ones are published.
+  // A failed request just leaves the demo cards, so the section never renders
+  // empty.
+  const { data: live } = useQuery({
+    queryKey: ['whatsapp-testimonials'],
+    queryFn: fetchWhatsappTestimonials,
+    staleTime: 5 * 60_000,
+    retry: 1,
+  });
+  const real = (live ?? []).map(t => ({
+    key: `r${t.id}`, init: t.init, name: t.name, time: t.time_label, text: t.text,
+  }));
+  const demo = WHATSAPP_TESTIMONIALS.map(w => ({ ...w, key: w.name + w.time }));
+  const cards = [...real, ...demo].slice(0, Math.max(demo.length, real.length));
+
   return (
     <section className="py-14 bg-white">
       <div className="container-wide">
         <SectionHead>WhatsApp Testimonials</SectionHead>
         <p className="text-center text-slate-500 -mt-6 mb-9">Real voices from our WhatsApp community 💚📚</p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {WHATSAPP_TESTIMONIALS.map(w => (
-            <div key={w.name + w.time} className="rounded-2xl bg-[#ECE5DD] p-4">
+          {cards.map(w => (
+            <div key={w.key} className="rounded-2xl bg-[#ECE5DD] p-4">
               <div className="relative rounded-xl rounded-tl-sm bg-white p-3 shadow-sm">
                 <span className="absolute -left-1.5 top-0 h-3 w-3 bg-white [clip-path:polygon(100%_0,0_0,100%_100%)]" aria-hidden="true" />
                 <div className="flex items-center gap-2">
@@ -183,17 +207,37 @@ function WhatsAppTestimonials() {
   );
 }
 
-function LatestNews() {
+export function LatestNews() {
+  // The three newest published posts from the Content tab — so publishing a
+  // post updates this section everywhere it renders. The hardcoded cards are
+  // only the fallback for an empty blog or a failed request; they link to the
+  // index because they have no real post behind them to link to.
+  const { data } = useQuery({
+    queryKey: ['posts', 'latest'],
+    queryFn: () => fetchPosts({ per_page: 3 }),
+    staleTime: 5 * 60_000,
+    retry: 1,
+  });
+  const live = (data?.data ?? []).map(p => ({
+    key: p.slug, to: `/blog/${p.slug}`, img: p.image_url, initial: (p.title || '?')[0],
+    date: postDate(p.published_at), title: p.title, excerpt: excerptOf(p),
+  }));
+  const cards = live.length
+    ? live
+    : BLOG_POSTS.map(b => ({ key: b.title, to: '/blog', img: b.img, date: b.date, title: b.title, excerpt: b.excerpt }));
+
   return (
     <section className="py-14 bg-[#FAFBFE]">
       <div className="container-wide">
         <SectionHead>Latest News and Resources</SectionHead>
         <p className="-mt-6 mb-9 text-center text-sm font-semibold text-slate-600">📰 Learning Updates <span className="text-slate-300">|</span> 📘 Tips <span className="text-slate-300">|</span> 🎓 Resources <span className="text-slate-300">|</span> 💻 Online Courses</p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {BLOG_POSTS.map(b => (
-            <Link key={b.title} to="/blog" className="group rounded-[14px] bg-white border border-[#E7E7EF] overflow-hidden flex flex-col shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+          {cards.map(b => (
+            <Link key={b.key} to={b.to} className="group rounded-[14px] bg-white border border-[#E7E7EF] overflow-hidden flex flex-col shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
               <span className="block h-[190px] overflow-hidden">
-                <img src={b.img} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
+                {b.img
+                  ? <img src={b.img} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
+                  : <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1E40AF] to-[#1E3A8A] font-heading text-5xl font-bold text-white/90">{b.initial}</span>}
               </span>
               <span className="p-5 flex flex-col flex-1">
                 <span className="text-xs font-bold text-brand-600">{b.date}</span>
@@ -203,6 +247,9 @@ function LatestNews() {
             </Link>
           ))}
         </div>
+        <div className="mt-8 text-center">
+          <Link to="/blog" className="inline-flex rounded-lg border-2 border-brand-600/35 text-brand-600 px-6 py-2.5 text-sm font-bold hover:bg-brand-50">View All Blogs →</Link>
+        </div>
       </div>
     </section>
   );
@@ -210,7 +257,7 @@ function LatestNews() {
 
 // Instagram Feed — real latest posts via /api/social/instagram when the token
 // is configured (auto-refresh hourly); placeholder tiles until then.
-function InstagramFeed() {
+export function InstagramFeed() {
   const { data } = useQuery({ queryKey: ['social-instagram'], queryFn: fetchSocialInstagram, staleTime: 3600_000 });
   const posts = data?.configured ? (data.data || []) : [];
   return (

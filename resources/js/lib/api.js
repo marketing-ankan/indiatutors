@@ -159,6 +159,13 @@ export const createExamUpdate = async (p) => { const { data } = await api.post('
 export const updateExamUpdate = async (id, p) => { const { data } = await api.patch(`/admin/exam-updates/${id}`, p); return data.data; };
 export const deleteExamUpdate = async (id) => { await api.delete(`/admin/exam-updates/${id}`); };
 
+// WhatsApp testimonials — the chat-bubble cards on the homepage / shop page.
+export const fetchWhatsappTestimonials      = async () => { const { data } = await api.get('/whatsapp-testimonials'); return data.data; };
+export const fetchAdminWhatsappTestimonials = async () => { const { data } = await api.get('/admin/whatsapp-testimonials'); return data.data; };
+export const createWhatsappTestimonial      = async (p) => { const { data } = await api.post('/admin/whatsapp-testimonials', p); return data.data; };
+export const updateWhatsappTestimonial      = async (id, p) => { const { data } = await api.patch(`/admin/whatsapp-testimonials/${id}`, p); return data.data; };
+export const deleteWhatsappTestimonial      = async (id) => { await api.delete(`/admin/whatsapp-testimonials/${id}`); };
+
 // Admin (staff)
 export const fetchAdminDemoRequests = async (p={}) => { const { data } = await api.get('/admin/demo-requests', { params: typeof p === 'string' ? { status: p } : p }); return data; };
 export const fetchDemoSuggestions   = async (id) => { const { data } = await api.get(`/admin/demo-requests/${id}/suggestions`); return data; };

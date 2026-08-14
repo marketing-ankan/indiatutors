@@ -11,6 +11,7 @@ import {
   fetchAdminExamUpdates, createExamUpdate, updateExamUpdate, deleteExamUpdate,
   fetchAdminAnalytics, inr,
   fetchAdminPosts, createAdminPost, updateAdminPost, deleteAdminPost,
+  fetchAdminWhatsappTestimonials, createWhatsappTestimonial, updateWhatsappTestimonial, deleteWhatsappTestimonial,
 } from '../../lib/api.js';
 import { errText, Modal, Chips, SearchBox, btnPrimary, btnGhost } from './AdminUI.jsx';
 import { ImagePicker, CategorySelect } from './FormPickers.jsx';
@@ -697,6 +698,14 @@ export function ContentTab() {
         <BlogPanel />
       </div>
       <div className="border-t border-slate-100 pt-6">
+        <h3 className="font-heading text-lg font-extrabold text-[#0B1220]">WhatsApp testimonials</h3>
+        <p className="text-sm text-slate-500">
+          The chat-bubble cards on the homepage and the courses page. Until you publish real ones,
+          visitors see demo cards — each real message you add replaces a demo card, first to last.
+        </p>
+        <WhatsappPanel />
+      </div>
+      <div className="border-t border-slate-100 pt-6">
         <h3 className="font-heading text-lg font-extrabold text-[#0B1220]">Exam updates</h3>
         <p className="text-sm text-slate-500">Published to the exam-updates feed on every learner's dashboard.</p>
         <ExamUpdatesPanel />
@@ -746,6 +755,83 @@ function ProposalsPanel() {
         )) : <p className="text-slate-500 py-10 text-center">No course proposals.</p>}
       </div>
     </>
+  );
+}
+
+// ---- WhatsApp testimonials --------------------------------------------------
+
+// The chat-bubble cards on the homepage / courses page. The public grid shows
+// demo placeholders until rows exist here; each published row replaces a demo
+// card from the front of the grid — the same one-by-one retirement the owner
+// chose for the review testimonials.
+
+const WA_BLANK = { name:'', text:'', time_label:'', position:0 };
+
+function WhatsappPanel() {
+  const qc = useQueryClient();
+  const { data: items = [] } = useQuery({ queryKey:['admin-whatsapp-testimonials'], queryFn: fetchAdminWhatsappTestimonials });
+  const [form, setForm] = useState(WA_BLANK);
+  const [editingId, setEditingId] = useState(null);
+  const reset = () => { setForm(WA_BLANK); setEditingId(null); };
+  const invalidate = () => { qc.invalidateQueries({queryKey:['admin-whatsapp-testimonials']}); qc.invalidateQueries({queryKey:['whatsapp-testimonials']}); };
+
+  const payload = () => ({ ...form, time_label: form.time_label || null, position: Number(form.position) || 0 });
+  const save = useMutation({
+    mutationFn: () => editingId ? updateWhatsappTestimonial(editingId, payload()) : createWhatsappTestimonial(payload()),
+    onSuccess: () => { reset(); invalidate(); },
+  });
+  const toggle = useMutation({ mutationFn: ({id, pub}) => updateWhatsappTestimonial(id, { is_published: pub }), onSuccess: invalidate });
+  const remove = useMutation({ mutationFn: deleteWhatsappTestimonial, onSuccess: () => { reset(); invalidate(); } });
+  const inp = "w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
+
+  const edit = t => {
+    setEditingId(t.id);
+    setForm({ name:t.name ?? '', text:t.text ?? '', time_label:t.time_label ?? '', position:t.position ?? 0 });
+  };
+
+  return (
+    <div className="mt-4 space-y-5">
+      <form onSubmit={e=>{e.preventDefault();save.mutate();}} className="rounded-xl ring-1 ring-slate-100 bg-white p-4 space-y-2">
+        <div className="flex items-center justify-between gap-3">
+          <h4 className="font-bold text-sm">{editingId ? 'Edit testimonial' : 'Add a WhatsApp testimonial'}</h4>
+          {editingId && <button type="button" onClick={reset} className="text-xs font-semibold text-slate-500 hover:text-slate-800">Cancel — add a new one instead</button>}
+        </div>
+        <div className="grid sm:grid-cols-3 gap-2">
+          <input required value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Sender's first name (e.g. Sangeeta)" className={inp + ' sm:col-span-2'} maxLength={80}/>
+          <input value={form.time_label} onChange={e=>setForm({...form,time_label:e.target.value})} placeholder="Time shown (e.g. 6:20 PM)" className={inp} maxLength={20}/>
+        </div>
+        <textarea required rows={2} value={form.text} onChange={e=>setForm({...form,text:e.target.value})} placeholder="The message, as they sent it — emojis welcome" className={inp} maxLength={500}/>
+        <F label="Order — lower numbers show first; leave 0 to keep the order they were added in">
+          <input type="number" min="0" value={form.position} onChange={e=>setForm({...form,position:e.target.value})} className={inp + ' max-w-[8rem]'}/>
+        </F>
+        {save.isError && <p className="text-xs text-red-600">{errText(save.error)}</p>}
+        <button disabled={save.isPending} className="rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">
+          {save.isPending ? 'Saving…' : editingId ? 'Save changes' : 'Add testimonial'}
+        </button>
+      </form>
+
+      <div className="space-y-2">
+        {items.length ? items.map(t => (
+          <div key={t.id} className="rounded-xl ring-1 ring-slate-100 bg-white p-4 flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="font-semibold text-sm text-slate-800">{t.name}</div>
+              <div className="text-xs text-slate-500 mt-0.5">{[t.time_label, `added ${t.created_at}`, t.position ? `order ${t.position}` : null].filter(Boolean).join(' · ')}</div>
+              <p className="text-sm text-slate-600 mt-1">{t.text}</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button onClick={()=>toggle.mutate({id:t.id, pub:!t.is_published})}
+                title={t.is_published ? 'Unpublish' : 'Publish'}
+                className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${t.is_published?'bg-green-50 text-green-700':'bg-slate-100 text-slate-500'}`}>
+                {t.is_published?'Published':'Draft'}
+              </button>
+              <button onClick={()=>edit(t)} className={btnGhost}>Edit</button>
+              <button onClick={()=>{ if (confirm(`Delete ${t.name}'s testimonial? This cannot be undone.`)) remove.mutate(t.id); }}
+                className="p-1.5 text-slate-400 hover:text-red-600" title="Delete"><X className="h-4 w-4"/></button>
+            </div>
+          </div>
+        )) : <p className="text-slate-500 py-8 text-center">No real testimonials yet — the site is showing the demo cards.</p>}
+      </div>
+    </div>
   );
 }
 
