@@ -39,7 +39,11 @@ export const FAQS = [
   { q: 'Is previous experience required?', a: 'No, the course is designed to accommodate complete beginners.' },
   { q: 'Will I get a certificate after the course completion?', a: 'Yes, We provide certificates after completion of the course. We also encourage students to participate in various competitions which are Internationally recognised.' },
   { q: 'Where are the teachers from?', a: 'Most of our teachers are from India with Masters in their subject or relevant experience teaching International Curriculum.' },
-  { q: 'How does the scheduling work with different time zones?', a: 'We are providing classes in the USA, Canada, UK, Europe, Australia, Dubai, Singapore etc. We schedule sessions accordingly to the time comfortable to kids in their respective time zones.' },
+  // Was: "We are providing classes in the USA, Canada, UK, Europe, Australia,
+  // Dubai, Singapore etc." — a direct service claim, contradicting the India-only
+  // position the owner confirmed on 10 Aug and which was already stripped from
+  // the policy pages. It survived here because it reads as a scheduling answer.
+  { q: 'What times are classes available?', a: 'We teach families across India, and sessions are scheduled around school hours — early mornings, evenings and weekends are all available. Tell us the times that suit your child when you book a free demo and we will match a tutor to them.' },
   { q: 'How are the classes conducted?', a: 'Classes are conducted online via Google Meet or Zoom on the scheduled time, whether the classes be 1:1 or in a group.' },
   { q: 'What are the requirements for this course?', a: 'A device (laptop/desktop) and a stable internet connection. Specific tools/accounts (e.g., a free Scratch / MIT App Inventor account, a Python interpreter and an IDE) are listed under the Requirements tab for each course.' },
   { q: 'What if my child is below minimum age?', a: "We'll recommend you to check out our other courses for your kid's age group." },

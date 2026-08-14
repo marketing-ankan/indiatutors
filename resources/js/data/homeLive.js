@@ -486,23 +486,24 @@ export const TEACHERS = [
   { name: 'Pinki', subj: 'Yoga · Naturopathy · Wellness', exp: '20+ yrs · Online', slug: 'pinki', img: teacherImg('pinki') },
 ];
 
+// Placeholder testimonials, kept by the owner's decision until real approved
+// reviews replace them (they retire one by one — see TestimonialSlider).
+//
+// SIX were removed on 14 Aug 2026: New Jersey USA, Singapore, Dubai UAE,
+// London UK, Sydney Australia and Lisbon Portugal. The owner confirmed the
+// business serves India only, and the overseas service claims were stripped
+// from the policy pages on 10 Aug — but these cards were still telling every
+// visitor that the customers are abroad, which is the same claim in a more
+// persuasive form.
+//
+// Deleted rather than relocated: inventing "Parent, Pune" in place of "Parent,
+// Singapore" would just be a different fiction, and real reviews are one click
+// from displacing these anyway.
 export const TESTIMONIALS = [
-  { init: 'S', color: '#1E40AF', name: 'Sunita Rajan', role: 'Parent, New Jersey USA · Class 8 Maths',
-    text: 'My daughter went from failing algebra to scoring 94% in her mid-terms — in just one term. The tutor identified her exact weak spots in the first session and built the entire plan around fixing them. I have never seen her this confident in maths.' },
-  { init: 'A', color: '#D4AF37', name: 'Arvind Krishnamurthy', role: 'Parent, Singapore · Python & AI batch, Grade 6',
-    text: 'My son joined the Python batch with zero coding experience. Within six weeks he had built a working quiz game and was already asking about AI projects. The tutor makes every session feel like a game — my son actually asks to log in early.' },
   { init: 'I', color: '#0E7490', name: 'Ishaan Mehta', role: 'Student, Pune · JEE Main prep, Class 11',
     text: 'I was drowning in JEE coaching-class material and getting nowhere. My tutor rebuilt my Physics and Maths fundamentals from the NCERT up, then drilled me on previous-year papers. My mock percentile went from the 60s to the low 90s over two terms.' },
-  { init: 'P', color: '#7C3AED', name: 'Preethi Nambiar', role: 'Parent, Dubai UAE · Violin, Age 7',
-    text: "We booked a free Violin trial expecting nothing special. Twenty minutes in, my 7-year-old was already plucking her first melody. We enrolled that evening. Eight months later she performed at her school's annual day and brought the house down." },
   { init: 'R', color: '#B45309', name: 'Rohan Malhotra', role: 'Student, Delhi · Class 12 Physics (CBSE boards)',
     text: 'Class 12 Physics was wrecking my board average. My tutor broke every chapter down with real-world examples and worked through years of CBSE sample papers with me. I finished the boards on 92 in Physics — my weakest subject became my best one.' },
-  { init: 'L', color: '#0F766E', name: 'Lakshmi Venkataraman', role: 'Parent, London UK · Bharatnatyam, Age 10',
-    text: "The no-commitment policy was what convinced us to try. That was 10 months ago — my daughter has not missed a single Bharatnatyam class. She placed second at a regional youth dance competition last month. The teacher's patience and passion are genuinely extraordinary." },
-  { init: 'M', color: '#BE185D', name: 'Meera Iyer', role: 'Parent, Sydney Australia · Public Speaking, Age 11',
-    text: 'My son was painfully shy in group settings. Six months of Public Speaking classes later, he hosted his school science fair — on stage, mic in hand, completely calm. The change in his confidence has been remarkable.' },
-  { init: 'D', color: '#2563EB', name: 'Daniel Fernandes', role: 'Adult learner, Lisbon Portugal · French',
-    text: 'I needed French before relocating to Paris for work. My tutor built every lesson around real conversations I would actually use. In four months I went from zero to handling daily life in French with confidence.' },
 ];
 
 export const WHY_ITEMS = [

@@ -463,6 +463,36 @@ than this change: deleting a user account leaves their review — name, words an
 all — published, since `user_id` is nulled rather than the row scrubbed. Worth a
 decision, as it is a data-erasure question rather than a bug in this path.
 
+### The overseas testimonials are gone
+
+The owner confirmed on 10 August that the business serves India only, and the
+overseas *service* claims were stripped from the policy pages that day. The
+home-page testimonials were missed: **six of the eight** placed the customer
+abroad — New Jersey USA, Singapore, Dubai UAE, London UK, Sydney Australia and
+Lisbon Portugal. Left up, they made the same claim in a more persuasive form
+than the policy wording ever did: not "we serve the USA" but "here is a happy
+parent in New Jersey".
+
+Deleted rather than relocated. Rewriting "Parent, Singapore" as "Parent, Pune"
+would be a different fiction, and a real approved review now displaces these
+with one click.
+
+Two placeholders remain (Pune and Delhi). The carousel was checked at 360, 768
+and 1440px with only two cards: no overflow, controls intact.
+
+One more overseas claim was found and fixed while checking, in the course-page
+FAQ — *"We are providing classes in the USA, Canada, UK, Europe, Australia,
+Dubai, Singapore etc."* It had survived the 10 August sweep because it is phrased
+as an answer about time zones rather than about where the company operates. It
+now answers the question a parent in India is actually asking, about class times
+around school hours.
+
+Checked and deliberately left: the Trinity College **London** exam is an
+examination board, not an overseas branch; "worldwide" in the Terms is the
+content licence a user grants for their own uploads. The course-page social
+proof — parents, family notes, WhatsApp cards, student wins — was already
+India-only.
+
 ---
 
 ## Open — needs an owner decision
