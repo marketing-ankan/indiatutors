@@ -64,6 +64,11 @@ Route::get('/deploy-info',       [SiteSettingController::class, 'deployInfo']);
 Route::get('/testimonials',      [TestimonialController::class, 'index']);
 // The WhatsApp-style cards. Empty (not 500) until the table exists — see controller.
 Route::get('/whatsapp-testimonials', [\App\Http\Controllers\Api\WhatsappTestimonialController::class, 'index']);
+// The screenshots those cards show. Served through Laravel because they live
+// in storage/, the one directory the deploy never wipes — the docroot is not
+// an option for runtime uploads on this host.
+Route::get('/media/whatsapp/{file}', [\App\Http\Controllers\Api\WhatsappTestimonialController::class, 'serve'])
+    ->where('file', '[A-Za-z0-9._-]+');
 Route::get('/courses/{slug}',    [CourseController::class, 'show'])->name('api.courses.show');
 // Two segments, so these never shadow /courses/{slug} above.
 Route::get('/courses/{course:slug}/reviews',  [ReviewController::class, 'index']);

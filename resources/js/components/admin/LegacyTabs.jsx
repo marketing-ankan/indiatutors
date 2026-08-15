@@ -700,8 +700,9 @@ export function ContentTab() {
       <div className="border-t border-slate-100 pt-6">
         <h3 className="font-heading text-lg font-extrabold text-[#0B1220]">WhatsApp testimonials</h3>
         <p className="text-sm text-slate-500">
-          The chat-bubble cards on the homepage and the courses page. Until you publish real ones,
-          visitors see demo cards — each real message you add replaces a demo card, first to last.
+          Screenshots of real WhatsApp chats, shown on the homepage and the courses page. Until the
+          first screenshot is published, visitors see demo cards; from the first one on, only your
+          real screenshots show. Uploads survive deploys — they live outside the site build.
         </p>
         <WhatsappPanel />
       </div>
@@ -760,63 +761,87 @@ function ProposalsPanel() {
 
 // ---- WhatsApp testimonials --------------------------------------------------
 
-// The chat-bubble cards on the homepage / courses page. The public grid shows
-// demo placeholders until rows exist here; each published row replaces a demo
-// card from the front of the grid — the same one-by-one retirement the owner
-// chose for the review testimonials.
-
-const WA_BLANK = { name:'', text:'', time_label:'', position:0 };
+// Screenshots of real WhatsApp chats, shown on the homepage / courses page.
+// The public section shows demo cards until the first screenshot is published,
+// then switches to the real ones outright. Uploads land in storage/ — the one
+// directory the deploy never wipes — and are served back through the API, so
+// unlike every other image on this site they do NOT ride in the git repo.
 
 function WhatsappPanel() {
   const qc = useQueryClient();
   const { data: items = [] } = useQuery({ queryKey:['admin-whatsapp-testimonials'], queryFn: fetchAdminWhatsappTestimonials });
-  const [form, setForm] = useState(WA_BLANK);
-  const [editingId, setEditingId] = useState(null);
-  const reset = () => { setForm(WA_BLANK); setEditingId(null); };
+  const [file, setFile] = useState(null);       // the chosen screenshot (File)
+  const [label, setLabel] = useState('');
+  const [position, setPosition] = useState(0);
+  const [editingId, setEditingId] = useState(null); // editing = label/order only; the image itself is immutable
+  const reset = () => { setFile(null); setLabel(''); setPosition(0); setEditingId(null); };
   const invalidate = () => { qc.invalidateQueries({queryKey:['admin-whatsapp-testimonials']}); qc.invalidateQueries({queryKey:['whatsapp-testimonials']}); };
 
-  const payload = () => ({ ...form, time_label: form.time_label || null, position: Number(form.position) || 0 });
   const save = useMutation({
-    mutationFn: () => editingId ? updateWhatsappTestimonial(editingId, payload()) : createWhatsappTestimonial(payload()),
+    mutationFn: () => {
+      if (editingId) return updateWhatsappTestimonial(editingId, { label: label || null, position: Number(position) || 0 });
+      const fd = new FormData();
+      fd.append('image', file);
+      if (label) fd.append('label', label);
+      fd.append('position', Number(position) || 0);
+      return createWhatsappTestimonial(fd);
+    },
     onSuccess: () => { reset(); invalidate(); },
   });
   const toggle = useMutation({ mutationFn: ({id, pub}) => updateWhatsappTestimonial(id, { is_published: pub }), onSuccess: invalidate });
   const remove = useMutation({ mutationFn: deleteWhatsappTestimonial, onSuccess: () => { reset(); invalidate(); } });
   const inp = "w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
 
-  const edit = t => {
-    setEditingId(t.id);
-    setForm({ name:t.name ?? '', text:t.text ?? '', time_label:t.time_label ?? '', position:t.position ?? 0 });
-  };
+  const edit = t => { setEditingId(t.id); setFile(null); setLabel(t.label ?? ''); setPosition(t.position ?? 0); };
 
   return (
     <div className="mt-4 space-y-5">
-      <form onSubmit={e=>{e.preventDefault();save.mutate();}} className="rounded-xl ring-1 ring-slate-100 bg-white p-4 space-y-2">
+      <form onSubmit={e=>{e.preventDefault(); if (editingId || file) save.mutate();}} className="rounded-xl ring-1 ring-slate-100 bg-white p-4 space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h4 className="font-bold text-sm">{editingId ? 'Edit testimonial' : 'Add a WhatsApp testimonial'}</h4>
-          {editingId && <button type="button" onClick={reset} className="text-xs font-semibold text-slate-500 hover:text-slate-800">Cancel — add a new one instead</button>}
+          <h4 className="font-bold text-sm">{editingId ? 'Edit label / order' : 'Upload a chat screenshot'}</h4>
+          {editingId && <button type="button" onClick={reset} className="text-xs font-semibold text-slate-500 hover:text-slate-800">Cancel — upload a new one instead</button>}
         </div>
-        <div className="grid sm:grid-cols-3 gap-2">
-          <input required value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="Sender's first name (e.g. Sangeeta)" className={inp + ' sm:col-span-2'} maxLength={80}/>
-          <input value={form.time_label} onChange={e=>setForm({...form,time_label:e.target.value})} placeholder="Time shown (e.g. 6:20 PM)" className={inp} maxLength={20}/>
+
+        {/* The image is chosen on upload and never edited — to change it,
+            delete the card and upload the right screenshot. */}
+        {!editingId && (
+          <div className="flex flex-wrap items-center gap-3">
+            {file
+              ? <img src={URL.createObjectURL(file)} alt="Selected screenshot preview" className="h-24 w-16 rounded-md object-cover object-top ring-1 ring-slate-200"/>
+              : <div className="grid h-24 w-16 place-items-center rounded-md bg-slate-100 text-[10px] text-slate-400">none</div>}
+            <label className="cursor-pointer rounded-lg ring-1 ring-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50">
+              {file ? 'Change screenshot' : 'Choose screenshot…'}
+              <input type="file" accept="image/*" className="hidden"
+                onChange={e => setFile(e.target.files?.[0] ?? null)} />
+            </label>
+            {file && <span className="text-xs text-slate-500">{file.name} · {(file.size/1024).toFixed(0)} KB</span>}
+          </div>
+        )}
+
+        <div className="grid sm:grid-cols-2 gap-2">
+          <F label="Label (optional) — who or which class, used as the image's alt text">
+            <input value={label} onChange={e=>setLabel(e.target.value)} placeholder="e.g. Sruthi English Class" className={inp} maxLength={120}/>
+          </F>
+          <F label="Order — lower numbers show first">
+            <input type="number" min="0" value={position} onChange={e=>setPosition(e.target.value)} className={inp + ' max-w-[8rem]'}/>
+          </F>
         </div>
-        <textarea required rows={2} value={form.text} onChange={e=>setForm({...form,text:e.target.value})} placeholder="The message, as they sent it — emojis welcome" className={inp} maxLength={500}/>
-        <F label="Order — lower numbers show first; leave 0 to keep the order they were added in">
-          <input type="number" min="0" value={form.position} onChange={e=>setForm({...form,position:e.target.value})} className={inp + ' max-w-[8rem]'}/>
-        </F>
         {save.isError && <p className="text-xs text-red-600">{errText(save.error)}</p>}
-        <button disabled={save.isPending} className="rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">
-          {save.isPending ? 'Saving…' : editingId ? 'Save changes' : 'Add testimonial'}
+        <button disabled={save.isPending || (!editingId && !file)} className="rounded-lg bg-brand-600 text-white px-4 py-2 text-sm font-bold hover:bg-brand-700 disabled:opacity-60">
+          {save.isPending ? (editingId ? 'Saving…' : 'Uploading…') : editingId ? 'Save changes' : 'Upload & publish'}
         </button>
       </form>
 
       <div className="space-y-2">
         {items.length ? items.map(t => (
           <div key={t.id} className="rounded-xl ring-1 ring-slate-100 bg-white p-4 flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="font-semibold text-sm text-slate-800">{t.name}</div>
-              <div className="text-xs text-slate-500 mt-0.5">{[t.time_label, `added ${t.created_at}`, t.position ? `order ${t.position}` : null].filter(Boolean).join(' · ')}</div>
-              <p className="text-sm text-slate-600 mt-1">{t.text}</p>
+            <div className="flex min-w-0 items-start gap-3">
+              <img src={t.image_url} alt={t.label || 'WhatsApp chat screenshot'} loading="lazy"
+                className="h-24 w-16 shrink-0 rounded-md object-cover object-top ring-1 ring-slate-200"/>
+              <div className="min-w-0">
+                <div className="font-semibold text-sm text-slate-800">{t.label || 'Untitled screenshot'}</div>
+                <div className="text-xs text-slate-500 mt-0.5">{[`added ${t.created_at}`, t.position ? `order ${t.position}` : null].filter(Boolean).join(' · ')}</div>
+              </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <button onClick={()=>toggle.mutate({id:t.id, pub:!t.is_published})}
@@ -825,11 +850,11 @@ function WhatsappPanel() {
                 {t.is_published?'Published':'Draft'}
               </button>
               <button onClick={()=>edit(t)} className={btnGhost}>Edit</button>
-              <button onClick={()=>{ if (confirm(`Delete ${t.name}'s testimonial? This cannot be undone.`)) remove.mutate(t.id); }}
+              <button onClick={()=>{ if (confirm(`Delete “${t.label || 'this screenshot'}”? This cannot be undone.`)) remove.mutate(t.id); }}
                 className="p-1.5 text-slate-400 hover:text-red-600" title="Delete"><X className="h-4 w-4"/></button>
             </div>
           </div>
-        )) : <p className="text-slate-500 py-8 text-center">No real testimonials yet — the site is showing the demo cards.</p>}
+        )) : <p className="text-slate-500 py-8 text-center">No screenshots yet — the site is showing the demo cards.</p>}
       </div>
     </div>
   );

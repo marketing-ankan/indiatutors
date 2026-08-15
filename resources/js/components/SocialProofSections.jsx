@@ -157,46 +157,55 @@ function FamiliesSay() {
 export function WhatsAppTestimonials() {
   const site = useSiteSettings();
 
-  // Real messages, added from the Content tab. Same deal the owner struck for
-  // the review testimonials: real entries fill the grid from the front and the
-  // demo cards only top it up, retiring one by one as real ones are published.
-  // A failed request just leaves the demo cards, so the section never renders
-  // empty.
+  // Real SCREENSHOTS of WhatsApp chats, uploaded from the Content tab. As soon
+  // as any exist they replace the demo cards outright rather than mixing with
+  // them — a mock chat bubble standing beside a genuine screenshot would read
+  // as fake and taint the real one. Until then (and on a failed request) the
+  // demo cards keep the section from rendering empty.
   const { data: live } = useQuery({
     queryKey: ['whatsapp-testimonials'],
     queryFn: fetchWhatsappTestimonials,
     staleTime: 5 * 60_000,
     retry: 1,
   });
-  const real = (live ?? []).map(t => ({
-    key: `r${t.id}`, init: t.init, name: t.name, time: t.time_label, text: t.text,
-  }));
-  const demo = WHATSAPP_TESTIMONIALS.map(w => ({ ...w, key: w.name + w.time }));
-  const cards = [...real, ...demo].slice(0, Math.max(demo.length, real.length));
+  const shots = live ?? [];
 
   return (
     <section className="py-14 bg-white">
       <div className="container-wide">
         <SectionHead>WhatsApp Testimonials</SectionHead>
         <p className="text-center text-slate-500 -mt-6 mb-9">Real voices from our WhatsApp community 💚📚</p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {cards.map(w => (
-            <div key={w.key} className="rounded-2xl bg-[#ECE5DD] p-4">
-              <div className="relative rounded-xl rounded-tl-sm bg-white p-3 shadow-sm">
-                <span className="absolute -left-1.5 top-0 h-3 w-3 bg-white [clip-path:polygon(100%_0,0_0,100%_100%)]" aria-hidden="true" />
-                <div className="flex items-center gap-2">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#25D366] text-xs font-bold text-white">{w.init}</span>
-                  <strong className="text-[13px] text-[#075E54]">{w.name}</strong>
-                </div>
-                <p className="mt-1.5 text-sm leading-relaxed text-slate-700">{w.text}</p>
-                <div className="mt-1 flex items-center justify-end gap-1 text-[11px] text-slate-400">
-                  {w.time}
-                  <svg viewBox="0 0 18 18" className="h-3.5 w-3.5 text-[#34B7F1]" fill="currentColor" aria-label="read"><path d="M17.4 5.5l-1-.9-6.9 8-1.3-1.2-1 .9 2.3 2.4zM12.6 5.5l-1-.9-6.9 8L2 10.3l-1 1L4 14.5z"/></svg>
+
+        {shots.length > 0 ? (
+          <Rail label="WhatsApp testimonials" gapClass="gap-4 sm:gap-6">
+            {shots.map(s => (
+              <figure key={s.id} className="group flex-shrink-0 snap-start w-[68%] sm:w-[270px] overflow-hidden rounded-2xl border border-[#E7E7EF] bg-[#ECE5DD] shadow-[0_4px_18px_rgba(6,30,67,.10)] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                <img src={s.image_url} alt={s.label || 'WhatsApp chat screenshot from a parent'}
+                  loading="lazy" className="aspect-[9/16] w-full object-cover object-top" />
+              </figure>
+            ))}
+          </Rail>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {WHATSAPP_TESTIMONIALS.map(w => (
+              <div key={w.name + w.time} className="rounded-2xl bg-[#ECE5DD] p-4">
+                <div className="relative rounded-xl rounded-tl-sm bg-white p-3 shadow-sm">
+                  <span className="absolute -left-1.5 top-0 h-3 w-3 bg-white [clip-path:polygon(100%_0,0_0,100%_100%)]" aria-hidden="true" />
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#25D366] text-xs font-bold text-white">{w.init}</span>
+                    <strong className="text-[13px] text-[#075E54]">{w.name}</strong>
+                  </div>
+                  <p className="mt-1.5 text-sm leading-relaxed text-slate-700">{w.text}</p>
+                  <div className="mt-1 flex items-center justify-end gap-1 text-[11px] text-slate-400">
+                    {w.time}
+                    <svg viewBox="0 0 18 18" className="h-3.5 w-3.5 text-[#34B7F1]" fill="currentColor" aria-label="read"><path d="M17.4 5.5l-1-.9-6.9 8-1.3-1.2-1 .9 2.3 2.4zM12.6 5.5l-1-.9-6.9 8L2 10.3l-1 1L4 14.5z"/></svg>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
+
         <div className="mt-8 text-center">
           <a href={site.socials.whatsapp} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-6 py-2.5 text-sm font-bold text-white hover:brightness-105">
             <MessageCircle className="h-4 w-4" /> Chat with us on WhatsApp
