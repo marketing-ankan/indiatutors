@@ -225,15 +225,14 @@ export const CHANNEL_VIDEOS = [
   { id: 'cSFfJLWctI4', title: 'Splash Art Landscape Painting for Beginners', len: '16:25' },
 ];
 
-// "Latest News and Resources" cards (WinQuest-parity section). Cover photos
-// self-hosted under public/images/news (from the sister brand); titles and
-// excerpts India-adapted (no NRI/abroad framing). Cards link to /blog until
-// the full articles are authored locally.
-export const BLOG_POSTS = [
-  { img: '/build/images/news/coding.png', date: 'July 16, 2026', title: "What's the Best Age for a Child to Start Coding? An Honest Guide for Parents", excerpt: 'If you work in tech, you have probably wondered whether your child should be coding by now. Ads…' },
-  { img: '/build/images/news/bilingual.png', date: 'July 16, 2026', title: 'How to Raise a Bilingual Child: What Actually Works (From Families Who\'ve Done It)', excerpt: 'You say something in Hindi — or Tamil, Telugu, Kannada, Bengali — and your child answers in flawless English…' },
-  { img: '/build/images/news/regional-language.png', date: 'July 16, 2026', title: 'Teaching Telugu (or Any Regional Language) to Kids: A Practical Playbook', excerpt: 'Your mother calls from Hyderabad and asks why her grandchildren answer only in English. Sound familiar?…' },
-];
+// The "Latest News and Resources" cards used to be hardcoded here: three
+// titles with cover art and teaser text, and no article behind any of them.
+// They advertised content the site did not have and that the Staff Console
+// could not see, let alone edit — the Content tab correctly showed an empty
+// blog while the homepage showed three posts. The three articles were written
+// for real (migration 2026_08_15_000001) and the section now renders only
+// published posts, so this array is gone rather than kept "as a fallback":
+// a fallback is exactly what recreated the phantom-content problem.
 
 // WhatsApp-style testimonials (WinQuest product-page parity). PLACEHOLDER copy —
 // replace with real screenshots/messages from the WhatsApp community.
@@ -340,4 +339,3 @@ import { ASSET_V } from './assetVersion.js';
 const _v = (p) => (typeof p === 'string' && p.startsWith('/build/') ? `${p}?v=${ASSET_V}` : p);
 TEACHERS.forEach((t) => { t.img = _v(t.img); });
 ACHIEVEMENT_PHOTOS.forEach((p, i, a) => { a[i] = _v(p); });
-BLOG_POSTS.forEach((b) => { b.img = _v(b.img); });

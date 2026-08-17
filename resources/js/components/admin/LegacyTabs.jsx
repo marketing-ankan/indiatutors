@@ -15,6 +15,9 @@ import {
 } from '../../lib/api.js';
 import { errText, Modal, Chips, SearchBox, btnPrimary, btnGhost } from './AdminUI.jsx';
 import { ImagePicker, CategorySelect } from './FormPickers.jsx';
+// The public article renderer, so a draft preview cannot drift from the page
+// the visitor will actually see.
+import { PostBody } from '../../pages/BlogPostPage.jsx';
 
 // Areas this platform has that the reference console does not: dated events,
 // self-paced video courses (with the direct-to-R2 upload flow), teacher course
@@ -978,10 +981,26 @@ function BlogPanel() {
     qc.invalidateQueries({queryKey:['post']});
   };
 
+  const [preview, setPreview] = useState(null); // a post shown as the site renders it
+
   const toggle = useMutation({ mutationFn: ({id, pub}) => updateAdminPost({ id, is_published: pub }),
     onSuccess: () => { setRowErr(''); invalidate(); }, onError: e => setRowErr(errText(e)) });
   const remove = useMutation({ mutationFn: deleteAdminPost,
     onSuccess: () => { setRowErr(''); invalidate(); }, onError: e => setRowErr(errText(e)) });
+
+  // Duplicate — the fastest way to write the next post in a series, and a safe
+  // way to try a rewrite without touching what is already live. Always lands as
+  // a DRAFT with its own new web address, so a copy can never quietly replace
+  // the published original. `slug` is deliberately omitted: the API generates
+  // (and de-duplicates) it from the title, and rejects the field on create.
+  const copy = useMutation({
+    mutationFn: p => createAdminPost({
+      title: `${p.title} (copy)`, excerpt: p.excerpt ?? null, body: p.body ?? null,
+      image_url: p.image_url ?? null, author: p.author ?? null,
+      is_published: false, published_at: null,
+    }),
+    onSuccess: () => { setRowErr(''); invalidate(); }, onError: e => setRowErr(errText(e)),
+  });
 
   const published = posts.filter(p => p.is_published).length;
   const shown = posts.filter(p =>
@@ -1011,12 +1030,19 @@ function BlogPanel() {
         )}
         {shown.map(p => (
           <div key={p.id} className="rounded-xl ring-1 ring-slate-100 bg-white p-4 flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="font-semibold text-sm text-slate-800">{p.title}</div>
-              <div className="text-xs text-slate-500 mt-0.5">
-                {[p.published_at ? `published ${istDate(p.published_at)}` : 'never published', p.author, `/blog/${p.slug}`].filter(Boolean).join(' · ')}
+            <div className="flex min-w-0 items-start gap-3">
+              {/* The cover, because a post list without its art makes the admin
+                  open each row just to see which post it is. */}
+              {p.image_url
+                ? <img src={p.image_url} alt="" loading="lazy" className="h-14 w-20 shrink-0 rounded-md object-cover ring-1 ring-slate-200"/>
+                : <span className="grid h-14 w-20 shrink-0 place-items-center rounded-md bg-slate-100 font-heading text-lg font-bold text-slate-400">{(p.title || '?')[0]}</span>}
+              <div className="min-w-0">
+                <div className="font-semibold text-sm text-slate-800">{p.title}</div>
+                <div className="text-xs text-slate-500 mt-0.5">
+                  {[p.published_at ? `published ${istDate(p.published_at)}` : 'never published', p.author, `/blog/${p.slug}`].filter(Boolean).join(' · ')}
+                </div>
+                {p.excerpt && <p className="text-sm text-slate-600 mt-1 line-clamp-2">{p.excerpt}</p>}
               </div>
-              {p.excerpt && <p className="text-sm text-slate-600 mt-1 line-clamp-2">{p.excerpt}</p>}
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <button onClick={()=>toggle.mutate({id:p.id, pub:!p.is_published})}
@@ -1024,12 +1050,14 @@ function BlogPanel() {
                 className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${p.is_published?'bg-green-50 text-green-700':'bg-slate-100 text-slate-500'}`}>
                 {p.is_published?'Published':'Draft'}
               </button>
-              {/* Only when published: the public route 404s drafts, so a View
-                  link on a draft would just open "Post not found". */}
-              {p.is_published && (
-                <a href={`/blog/${p.slug}`} target="_blank" rel="noreferrer" className={btnGhost}>View ↗</a>
-              )}
+              {/* Published posts open the real page; a draft 404s there, so it
+                  gets the same article rendered in a preview instead — the
+                  point of a draft is to read it before anyone else can. */}
+              {p.is_published
+                ? <a href={`/blog/${p.slug}`} target="_blank" rel="noreferrer" className={btnGhost}>View ↗</a>
+                : <button onClick={()=>setPreview(p)} className={btnGhost}>Preview</button>}
               <button onClick={()=>setModal(p)} className={btnGhost}>Edit</button>
+              <button onClick={()=>copy.mutate(p)} disabled={copy.isPending} className={btnGhost} title="Duplicate as a new draft">Copy</button>
               <button onClick={()=>{ if (confirm(`Delete “${p.title}”? This cannot be undone.`)) remove.mutate(p.id); }}
                 className="p-1.5 text-slate-400 hover:text-red-600" title="Delete"><X className="h-4 w-4"/></button>
             </div>
@@ -1038,7 +1066,24 @@ function BlogPanel() {
       </div>
 
       {modal && <PostForm post={modal.id ? modal : null} onClose={() => setModal(null)} onSaved={invalidate} />}
+      {preview && <PostPreview post={preview} onClose={() => setPreview(null)} />}
     </div>
+  );
+}
+
+/** A draft as the public page will render it — same PostBody, same date format. */
+function PostPreview({ post, onClose }) {
+  return (
+    <Modal title="Preview" subtitle={`Draft · will publish at /blog/${post.slug}`} onClose={onClose} wide>
+      <article>
+        <h1 className="font-heading text-2xl font-extrabold tracking-tight text-slate-900">{post.title}</h1>
+        <p className="mt-2 text-sm text-slate-500">
+          {[post.published_at ? istDate(post.published_at) : 'not dated yet', post.author].filter(Boolean).join(' · ')}
+        </p>
+        {post.image_url && <img src={post.image_url} alt="" className="mt-4 w-full rounded-xl object-cover"/>}
+        <div className="mt-4"><PostBody body={post.body}/></div>
+      </article>
+    </Modal>
   );
 }
 
