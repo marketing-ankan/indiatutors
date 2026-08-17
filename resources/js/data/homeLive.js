@@ -460,33 +460,40 @@ export const SUBJECT_TAGS = {
   'Trending': '#E0654A', 'Popular': '#7C4DBC', 'Kids Favourite': '#0E9F8E',
   'Top Rated': '#C99A2E', 'Exam Prep': '#2563EB',
 };
-// No prices here, deliberately.
+// OWNER-OWNED. Do not edit these figures.
 //
-// Every tile used to carry a hardcoded "/hr" figure, and every one of them
-// disagreed with something: JEE Main and NEET were advertised at ₹750 while the
-// course cards further up the SAME page said ₹1,500 and the server bills ₹1,500;
-// Chess and Bharatnatyam showed ₹750 against a real 1-on-1 rate of ₹600; Physics
-// and Biology showed ₹750 against ₹1,200. A family captured on ₹750 and quoted
-// ₹1,500 on the follow-up call is a lost lead and a fair accusation of bait
-// pricing — under a homepage heading that reads "Transparent · No hidden fees".
+// FOR THE NEXT PRICING REVISION — a pre-launch audit verified that these tile
+// rates disagree with the per-course prices shown elsewhere on this same page,
+// and with what the server actually bills (database/data/rates.json, which
+// AppSupportRateCard prices orders from). Left exactly as the owner set them;
+// listed here so the review has the specifics:
 //
-// The cure is structural, not a corrected number: a rate typed in a fourth
-// place will drift again the first time rates.json changes. These tiles are
-// navigation, so they now navigate, and the price is stated where it is derived
-// from the rate sheet — the catalogue card, the course page and Plans & Pricing.
+//   JEE Main      ₹750/hr tile  vs  ₹1,500 course card, ₹1,500 billed
+//   NEET          ₹750/hr tile  vs  ₹1,500 course card, ₹1,500 billed
+//   Physics       ₹750/hr tile  vs  ₹1,200 course card, ₹1,200 billed (11-12)
+//   Biology       ₹750/hr tile  vs  ₹1,200 course card, ₹1,200 billed (11-12)
+//   Mathematics   ₹750/hr tile  vs  ₹600 (Gr 1-7) / ₹750 (Gr 8) / ₹1,000 (9-10) / ₹1,200 (11-12)
+//   Chess         ₹750/hr tile  vs  ₹600 one-to-one, ₹300 group
+//   Bharatnatyam  ₹750/hr tile  vs  ₹600 one-to-one, ₹300 group
+//   AI & ML       ₹1,200/hr tile vs ₹600 group on the card
+//
+// The durable fix, whenever a revision is agreed, is to stop stating a rate
+// here at all and let the tile link to the catalogue, which derives its price
+// from the rate sheet — a figure typed in a fourth place will drift again the
+// next time rates.json changes.
 export const POPULAR_SUBJECTS = [
-  { tag: 'Trending', name: 'AI & Machine Learning', icon: 'brain', q: 'ai-ml' },
-  { tag: 'Popular', name: 'Python Programming', icon: 'code', q: 'python' },
-  { tag: 'Kids Favourite', name: 'Robotics', icon: 'bot', q: 'robotics' },
-  { tag: 'Top Rated', name: 'Mathematics', icon: 'calculator', q: 'Mathematics' },
-  { tag: null, name: 'Physics', icon: 'atom', q: 'Physics' },
-  { tag: null, name: 'Biology', icon: 'dna', q: 'Biology' },
-  { tag: 'Popular', name: 'Violin', icon: 'music', q: 'violin' },
-  { tag: null, name: 'Piano', icon: 'music', q: 'piano' },
-  { tag: 'Exam Prep', name: 'JEE Main', icon: 'radical', q: 'JEE' },
-  { tag: 'Exam Prep', name: 'NEET', icon: 'pen', q: 'NEET' },
-  { tag: null, name: 'Chess', icon: 'castle', q: 'chess' },
-  { tag: null, name: 'Bharatnatyam', icon: 'person', q: 'bharatnatyam' },
+  { tag: 'Trending', name: 'AI & Machine Learning', price: '₹1,200/hr', icon: 'brain', q: 'ai-ml' },
+  { tag: 'Popular', name: 'Python Programming', price: '₹600/hr', icon: 'code', q: 'python' },
+  { tag: 'Kids Favourite', name: 'Robotics', price: '₹600/hr', icon: 'bot', q: 'robotics' },
+  { tag: 'Top Rated', name: 'Mathematics', price: '₹750/hr', icon: 'calculator', q: 'Mathematics' },
+  { tag: null, name: 'Physics', price: '₹750/hr', icon: 'atom', q: 'Physics' },
+  { tag: null, name: 'Biology', price: '₹750/hr', icon: 'dna', q: 'Biology' },
+  { tag: 'Popular', name: 'Violin', price: '₹1,000/hr', icon: 'music', q: 'violin' },
+  { tag: null, name: 'Piano', price: '₹600/hr', icon: 'music', q: 'piano' },
+  { tag: 'Exam Prep', name: 'JEE Main', price: '₹750/hr', icon: 'radical', q: 'JEE' },
+  { tag: 'Exam Prep', name: 'NEET', price: '₹750/hr', icon: 'pen', q: 'NEET' },
+  { tag: null, name: 'Chess', price: '₹750/hr', icon: 'castle', q: 'chess' },
+  { tag: null, name: 'Bharatnatyam', price: '₹750/hr', icon: 'person', q: 'bharatnatyam' },
 ];
 
 export const TEACHERS = [
@@ -529,20 +536,19 @@ export const WHY_ITEMS = [
   { icon: 'rupee', t: 'Value for Money', d: 'Top-quality tutoring at transparent, affordable rates. 1-on-1 and group options to suit every budget.' },
 ];
 
-// Ranges, not single figures, and taken from the canonical rate sheet
-// (database/data/rates.json) rather than invented here.
+// OWNER-OWNED. Do not edit these figures.
 //
-// A flat "₹750" for Academics was wrong in both directions: primary-class
-// tuition starts at ₹600, while Classes 9-12 start at ₹1,000 and JEE/NEET bill
-// ₹1,500 — so the section promising "Simple, Honest Pricing" under-quoted the
-// exact courses a parent is most likely to be shopping for. Music showed ₹600
-// while Violin has never been below ₹1,000. A range is honest about a catalogue
-// that genuinely varies by subject and class, and the per-class unit is stated
-// because that is what an order is actually billed in.
+// The displayed pricing is settled: it comes from the owner's own Plan and
+// Pricing sheet and any revision comes from them, not from this repository. A
+// pre-launch audit flagged that these headline rates do not line up with the
+// per-course catalogue prices on the same page (see the note on
+// POPULAR_SUBJECTS below for the specifics worth reviewing), and that finding
+// was handed to the owner rather than acted on. Leave as-is until a revision
+// is supplied.
 export const PRICING = [
-  { icon: 'calculator', cat: 'Academics & Exams', subjects: 'Maths, Science, Social Science, Commerce, JEE / NEET / CUET, Olympiads', rate: '₹600 – ₹1,500', featured: false },
-  { icon: 'code', cat: 'Coding & IT', subjects: 'Python, Java, AI & ML, Robotics, Blockly, Scratch, Web Dev', rate: '₹600 – ₹1,200', featured: true },
-  { icon: 'music', cat: 'Music, Dance & Arts', subjects: 'Piano, Violin, Guitar, Vocals, Bharatnatyam, Kathak, Painting', rate: '₹600 – ₹2,000', featured: false },
+  { icon: 'calculator', cat: 'Academics & Exams', subjects: 'Maths, Science, Social Science, Commerce, JEE / NEET / CUET, Olympiads', rate: '₹750', featured: false },
+  { icon: 'code', cat: 'Coding & IT', subjects: 'Python, Java, AI & ML, Robotics, Blockly, Scratch, Web Dev', rate: '₹600', featured: true },
+  { icon: 'music', cat: 'Music, Dance & Arts', subjects: 'Piano, Violin, Guitar, Vocals, Bharatnatyam, Kathak, Painting', rate: '₹600', featured: false },
 ];
 
 export const ABOUT_LEAD = 'Indiatutors Online is a trusted learning platform connecting students with expert tutors for Academics, Competitive Exams, Coding, Music, Dance and Languages. From early learners to exam aspirants, we make high-quality, personalised teaching accessible — anywhere, at any pace.';
