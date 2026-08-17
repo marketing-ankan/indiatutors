@@ -154,22 +154,18 @@ export default function Footer() {
       {/* Trust strip + payment badges, like the live footer */}
       <div className="border-t border-slate-800">
         <div className="container-wide py-4 flex flex-col lg:flex-row items-center justify-between gap-3 text-xs text-slate-400">
-          {/* What survives here is what the site can stand behind.
-              Removed 2026-08-15: "⭐ 4.8/5 Avg Rating" (a fabricated aggregate
-              score, the same class the 10 Aug sweep deleted from the homepage),
-              and "10,000+ Happy Students" / "500+ Expert Tutors" — this footer
-              renders on the homepage, which says 8,000+ students and 75+ tutors
-              a few hundred pixels above it, so the two numbers called each
-              other liars on a single screen. They are not replaced with
-              corrected figures here: the homepage is the one place those counts
-              are stated, and repeating a number in two hardcoded places is what
-              caused this. "Verified Tutors" is now "Screened Tutors", which is
-              what the About page actually promises — only tutors who complete
-              verification carry the Verified badge. */}
+          {/* Owner-settled placeholder trust strip. The rating and the counts
+              are dummies that get replaced as the real numbers/reviews land —
+              same policy as the testimonials. NOTE for the owner: the "10,000+
+              Happy Students / 500+ Expert Tutors" here do not match the
+              homepage's "8,000+ / 75+", and both render on the homepage; worth
+              reconciling when the real figures are set. */}
           <div className="flex flex-wrap justify-center gap-x-5 gap-y-1.5">
-            <span>🛡️ Screened Tutors</span>
-            <span>🎓 Free First Demo Class</span>
+            <span>🛡️ Verified Tutors</span>
+            <span>⭐ 4.8/5 Avg Rating</span>
+            <span>👨‍👩‍👧 10,000+ Happy Students</span>
             <span>🔒 SSL Secured</span>
+            <span>🎓 500+ Expert Tutors</span>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-1.5">
             <span className="mr-1">We accept:</span>
