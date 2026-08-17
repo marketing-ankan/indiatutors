@@ -611,7 +611,10 @@ export default function HomePage() {
                   : <span className="block h-[18px] mb-2" aria-hidden="true" />}
                 <Icon className="h-6 w-6 text-brand-600 transition-transform duration-300 group-hover:scale-125" aria-hidden="true" />
                 <span className="mt-2 block text-[14px] font-semibold text-[#1A1A1A] leading-snug">{s.name}</span>
-                <span className="mt-1 block text-[13px] font-bold text-green-500">{s.price}</span>
+                {/* The hardcoded per-hour figure that sat here is gone — see
+                    POPULAR_SUBJECTS in homeLive.js. The tile links straight to
+                    the catalogue, which prices from the live rate sheet. */}
+                <span className="mt-1 block text-[13px] font-bold text-brand-600">View courses →</span>
               </Link>
             );
           })}
@@ -714,7 +717,9 @@ export default function HomePage() {
                 <span className="mx-auto w-[60px] h-[60px] rounded-2xl bg-[#F3F6FC] text-brand-600 flex items-center justify-center transition-transform duration-300 group-hover:scale-110"><Icon className="h-7 w-7" /></span>
                 <h3 className="mt-4 font-heading font-bold text-lg text-[#1A1A1A]">{p.cat}</h3>
                 <p className="mt-1.5 text-sm text-slate-500">{p.subjects}</p>
-                <div className="mt-4 font-heading text-[32px] font-extrabold text-brand-600">{p.rate}<span className="text-base font-semibold text-slate-500">/hour</span></div>
+                {/* "per class", not "/hour": a class is the unit an order is
+                    billed in, and the rate sheet is written per class. */}
+                <div className="mt-4 font-heading text-[26px] font-extrabold text-brand-600">{p.rate}<span className="block text-sm font-semibold text-slate-500">per class</span></div>
                 <Link to="/book-demo" className="mt-5 inline-flex rounded-lg bg-brand-600 text-white px-6 py-2.5 text-sm font-bold hover:bg-brand-700">Book Free Trial</Link>
               </div>
             );
@@ -738,9 +743,15 @@ export default function HomePage() {
             <Link to="/book-demo" className="rounded-lg bg-white text-brand-700 hover:bg-slate-100 px-8 py-3 text-sm font-bold">Book a Free Trial</Link>
             <Link to="/contact" className="rounded-lg border border-white/40 hover:bg-white/10 px-8 py-3 text-sm font-semibold">Contact Us</Link>
           </div>
+          {/* The US number that used to sit here — (+1) 302 306 5099 — is gone
+              as of 2026-08-15. It was the last survivor of the overseas sweep
+              that removed the foreign testimonials and the USA/Canada/UK
+              service claim: the business serves India only, the number appeared
+              on no other page, no support surface and no policy document, and a
+              lead tapping it at the exact moment of conversion intent was
+              dialling a line nobody answers. */}
           <div className="mt-8 flex flex-col sm:flex-row flex-wrap gap-x-8 gap-y-3 justify-center text-sm text-white/85">
             <a href="tel:+919330811581" className="inline-flex items-center gap-2 hover:text-white"><Phone className="h-4 w-4" aria-hidden="true" />+91 93308 11581</a>
-            <a href="tel:+13023065099" className="inline-flex items-center gap-2 hover:text-white"><Phone className="h-4 w-4" aria-hidden="true" />(+1) 302 306 5099</a>
             <a href="mailto:connect@indiatutorsonline.com" className="inline-flex items-center gap-2 hover:text-white"><Mail className="h-4 w-4" aria-hidden="true" />connect@indiatutorsonline.com</a>
           </div>
         </div>

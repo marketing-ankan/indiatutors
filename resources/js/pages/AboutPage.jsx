@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { MapPin, Phone, Mail, Star } from 'lucide-react';
+import { MapPin, Phone, Mail } from 'lucide-react';
 import { fetchCourses, inr } from '../lib/api.js';
 import { imageFor } from '../data/courseImages.js';
 
@@ -137,9 +137,13 @@ export default function AboutPage() {
               </div>
               <div className="p-3">
                 <p className="text-xs font-semibold text-slate-800 line-clamp-2 min-h-[2rem]">{c.name}</p>
-                <div className="mt-1.5 flex items-center justify-between">
+                {/* Price only. There was a hardcoded "★ 4.8" here, printed
+                    identically on every card whatever course it was — a
+                    survivor of the 2026-08-07 fabricated-ratings sweep. No
+                    rating replaces it: these cards come from the live
+                    catalogue, and the catalogue has no real rating to show. */}
+                <div className="mt-1.5">
                   <span className="text-sm font-bold text-brand-700">{inr(c.sale_price||c.regular_price)}</span>
-                  <span className="flex items-center gap-0.5 text-xs text-slate-500"><Star className="h-3 w-3 text-yellow-400 fill-yellow-400"/>4.8</span>
                 </div>
               </div>
             </Link>

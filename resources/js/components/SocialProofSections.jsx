@@ -73,7 +73,15 @@ function StudentWinsCarousel() {
     <section className="py-14 bg-[#FAFBFE]">
       <div className="container-wide">
         <SectionHead>Recent Student Wins</SectionHead>
-        <p className="-mt-6 mb-9 text-center text-slate-500">Real, verified results from Indiatutors students this year 🇮🇳🏆</p>
+        {/* Was "Real, verified results from Indiatutors students this year".
+            The cards below are placeholders carrying named students and
+            independently checkable exam results (NTSE, IMO, JEE percentiles),
+            so an affirmative "verified" label on them was a false claim, not a
+            harmless bit of marketing. The subtitle now describes the kind of
+            result the classes aim at, and asserts nothing about these specific
+            cards; restore a "verified" wording only when real, consented
+            outcomes replace them. */}
+        <p className="-mt-6 mb-9 text-center text-slate-500">The kinds of goals our students work towards 🇮🇳🏆</p>
         <Rail label="wins" gapClass="gap-4 sm:gap-5">
           {STUDENT_WINS.map(w => (
             <div key={w.title} className="flex-shrink-0 snap-start w-[80%] sm:w-[290px] rounded-2xl border-t-[3px] border-[#D4AF37] bg-white p-5 shadow-[0_4px_18px_rgba(6,30,67,.08)] ring-1 ring-[#E7E7EF] transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
@@ -113,7 +121,9 @@ function ParentsSpotlight() {
     <section className="py-14 bg-[#FAFBFE]">
       <div className="container-wide">
         <SectionHead>What Our Parents Say About Us</SectionHead>
-        <p className="-mt-6 mb-9 text-center text-slate-500">👨‍👩‍👧 Real Results. Real Parent Voices. 🏆 Futures Built with Care</p>
+        {/* "Real Results. Real Parent Voices." removed for the same reason as
+            the Student Wins caption: the cards below are placeholder voices. */}
+        <p className="-mt-6 mb-9 text-center text-slate-500">👨‍👩‍👧 Why families choose us 🏆 Futures built with care</p>
         <div className="flex gap-5 overflow-x-auto snap-x pb-2 scrollbar-hide">
           {PARENTS.map(p => (
             <figure key={p.name} className="relative flex-shrink-0 snap-start w-[86%] sm:w-[46%] lg:w-[31.5%] rounded-2xl bg-white border border-[#E7E7EF] p-6 shadow-[0_4px_18px_rgba(6,30,67,.08)]">

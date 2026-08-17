@@ -101,7 +101,17 @@ export default function CheckoutPage() {
   };
 
   const submit = useMutation({
-    mutationFn: () => placeOrder({ ...f, items: items.map(i => ({ slug: i.slug, kind: i.kind || 'course' })) }),
+    // plan and level MUST travel with the line. The cart stores the buyer's
+    // choice from the product page, and the server prices from it — but this
+    // payload used to send only slug and kind, so the server saw no valid
+    // choice and fell back to the course's cheapest (group) rate. The summary
+    // on this very page showed the chosen-plan total, so a One-to-One purchase
+    // displayed one number and recorded another, and the invoice line lost its
+    // plan label. Harmless while no gateway is live; a mis-charge the day one
+    // is. The browser still never sends an amount — only the choice.
+    mutationFn: () => placeOrder({ ...f, items: items.map(i => ({
+      slug: i.slug, kind: i.kind || 'course', plan: i.plan ?? null, level: i.level ?? null,
+    })) }),
     onSuccess: data => {
       cart.clear();
       if (data.razorpay) openRazorpayModal(data.razorpay, data.order);

@@ -46,35 +46,29 @@ class AdminSeeder extends Seeder {
         }
 
         $this->command->info('Admin user ensured: ' . $admin->email);
-
-        $this->promoteRecoveryAccount();
     }
 
-    /**
-     * TEMPORARY recovery path — remove once the three admin accounts work.
+    /*
+     * REMOVED 2026-08-15: promoteRecoveryAccount().
      *
-     * Production is locked out: the server's configured ADMIN_PASSWORD is not
-     * the value the owner intends (a stale or duplicate .env line), so the
-     * one-shot unlock migration faithfully applied the wrong password, and this
-     * host has no shell. Every remaining fix needs one working admin login.
+     * It was a temporary way back into a locked-out console: it promoted
+     * whoever held a hardcoded plus-alias of the owner's Gmail to admin, on
+     * every deploy, so the owner could register that address on the public form
+     * and be an admin five minutes later.
      *
-     * The bootstrap: the owner registers this exact address through the site's
-     * PUBLIC registration form, choosing the password there — so the password
-     * travels over HTTPS to the server and never appears in this repository.
-     * This seeder then promotes the account on the next deploy. Promotion is
-     * role-only and idempotent; if the account does not exist yet it does
-     * nothing and simply tries again next cycle.
+     * It was also an unauthenticated privilege-escalation backdoor, and a
+     * pre-launch audit was right to call it the worst finding on the site. The
+     * address is committed in this repository and therefore public;
+     * registration is open and has no email verification (deferred until SMTP
+     * exists), so receiving mail at that alias was never required to claim it.
+     * Anyone who read the repo could register the address with a password of
+     * their choosing and be handed the full console — every lead's name, phone
+     * and home address, teacher CVs, and password resets for other users — by
+     * the next cron deploy. The "only the owner's inbox can receive for it"
+     * reasoning that justified it protects the mail, not the login.
      *
-     * Hardcoding the address is safe precisely because it is a plus-alias of
-     * the owner's own Gmail — only the owner's inbox can receive for it.
+     * If console access is ever lost again, recover it the way that does not
+     * leave a permanent hole: set ADMIN_PASSWORD_RESET=true in the server .env
+     * for exactly one deploy (see the block above), then remove the flag.
      */
-    private function promoteRecoveryAccount(): void
-    {
-        $recovery = User::where('email', 'marketing.freelancer2026+admin@gmail.com')->first();
-
-        if ($recovery && $recovery->role !== 'admin') {
-            $recovery->update(['role' => 'admin']);
-            $this->command->warn('AdminSeeder: recovery account promoted to admin.');
-        }
-    }
 }
