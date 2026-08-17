@@ -8,7 +8,7 @@ import { postDate } from '../pages/BlogPostPage.jsx';
 import { excerptOf } from '../pages/BlogPage.jsx';
 import {
   TEACHERS, STUDENT_WINS, ACHIEVEMENT_PHOTOS, PARENTS, FAMILY_NOTES,
-  WHATSAPP_TESTIMONIALS, BLOG_POSTS, INSTAGRAM,
+  WHATSAPP_TESTIMONIALS, INSTAGRAM,
 } from '../data/courseDetail.js';
 
 // The shared WinQuest-parity social-proof block shown below the fold on both
@@ -217,23 +217,29 @@ export function WhatsAppTestimonials() {
 }
 
 export function LatestNews() {
-  // The three newest published posts from the Content tab — so publishing a
-  // post updates this section everywhere it renders. The hardcoded cards are
-  // only the fallback for an empty blog or a failed request; they link to the
-  // index because they have no real post behind them to link to.
+  // The three newest published posts from the Content tab — and NOTHING else.
+  //
+  // This used to fall back to three hardcoded cards when the blog was empty.
+  // That produced the worst possible state for an admin: the homepage
+  // advertised three articles that did not exist, each one clicking through to
+  // an empty blog index, while the Content tab correctly reported "No posts
+  // yet" — so the person responsible for the site's content could see the
+  // articles but could not edit, delete or even find them. Phantom content is
+  // worse than no content: the section simply hides itself until a real post
+  // is published, which makes the Content tab the single source of truth for
+  // what appears here.
   const { data } = useQuery({
     queryKey: ['posts', 'latest'],
     queryFn: () => fetchPosts({ per_page: 3 }),
     staleTime: 5 * 60_000,
     retry: 1,
   });
-  const live = (data?.data ?? []).map(p => ({
+  const cards = (data?.data ?? []).map(p => ({
     key: p.slug, to: `/blog/${p.slug}`, img: p.image_url, initial: (p.title || '?')[0],
     date: postDate(p.published_at), title: p.title, excerpt: excerptOf(p),
   }));
-  const cards = live.length
-    ? live
-    : BLOG_POSTS.map(b => ({ key: b.title, to: '/blog', img: b.img, date: b.date, title: b.title, excerpt: b.excerpt }));
+
+  if (!cards.length) return null;
 
   return (
     <section className="py-14 bg-[#FAFBFE]">
