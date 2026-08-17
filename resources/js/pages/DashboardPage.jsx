@@ -17,7 +17,7 @@ import TuitionRequirementsCard from '../components/physical/TuitionRequirementsC
 // every other visitor.
 const AdminConsole = lazy(() => import('../components/admin/AdminConsole.jsx'));
 import {
-  fetchStudents, createStudent, deleteStudent,
+  fetchStudents, createStudent, updateStudent, deleteStudent,
   fetchKyc, uploadKyc, deleteKyc, fetchMyDemoRequests, fetchMyEnrollments,
   acceptDemoSlot, declineDemoSlot,
   fetchMyAchievements, createMyAchievement, updateMyAchievement, fetchMyRecord,
@@ -1675,7 +1675,7 @@ function StudentsCard() {
       {err && <div className="mb-3 rounded-md bg-red-50 text-red-700 text-xs p-2">{err}</div>}
       <form onSubmit={e=>{e.preventDefault();create.mutate();}} className="space-y-2">
         <input required placeholder="Student name" value={form.name} onChange={set('name')} className={inp}/>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid gap-2 sm:grid-cols-3">
           <input placeholder="Grade" value={form.grade} onChange={set('grade')} className={inp}/>
           <input placeholder="Board" value={form.board} onChange={set('board')} className={inp}/>
           <input placeholder="Subjects" value={form.subjects} onChange={set('subjects')} className={inp}/>
@@ -1688,8 +1688,70 @@ function StudentsCard() {
   );
 }
 
+/**
+ * A child, and the details every match is made against.
+ *
+ * These four fields were read-only, and the row's only control was an
+ * unconfirmed bin icon — so the single way to correct a typed grade, or to
+ * move a child from Class 8 to Class 9, was to delete them and add them
+ * again. That is not an edit: the student row is what the portfolio, the
+ * achievements, the class record and every enrolment hang off, so re-adding
+ * returns an empty child with the same name and quietly destroys their whole
+ * history. Grade and board are also what the matching pipeline reads, so a
+ * stale grade degrades every suggestion until someone notices.
+ *
+ * PUT /students/{id} has existed all along and its resource returns every
+ * field the form writes, so nothing is erased on save.
+ */
 function ParentStudentRow({ s, onRemove }) {
+  const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({ name: s.name ?? '', grade: s.grade ?? '', board: s.board ?? '', subjects: s.subjects ?? '' });
+  const [err, setErr] = useState('');
+
+  const save = useMutation({
+    mutationFn: () => updateStudent(s.id, form),
+    onSuccess: () => {
+      setEditing(false); setErr('');
+      qc.invalidateQueries({ queryKey: ['students'] });
+      // The record card counts per student, and the matcher reads grade/board.
+      qc.invalidateQueries({ queryKey: ['my-record'] });
+    },
+    onError: e => setErr(e?.response?.data?.message
+      || Object.values(e?.response?.data?.errors || {})[0]?.[0] || 'Could not save.'),
+  });
+
+  const cancel = () => {
+    setForm({ name: s.name ?? '', grade: s.grade ?? '', board: s.board ?? '', subjects: s.subjects ?? '' });
+    setEditing(false); setErr('');
+  };
+  const set = k => e => setForm({ ...form, [k]: e.target.value });
+
+  if (editing) {
+    return (
+      <li className="rounded-lg ring-1 ring-brand-200 bg-brand-50/40 p-3">
+        <form onSubmit={e => { e.preventDefault(); save.mutate(); }} className="space-y-2">
+          <input required value={form.name} onChange={set('name')} placeholder="Student name" className={inp} />
+          {/* sm:grid-cols-3, not a bare grid-cols-3: three text inputs side by
+              side at 360px is unusable, and this card has form off a phone. */}
+          <div className="grid gap-2 sm:grid-cols-3">
+            <input value={form.grade} onChange={set('grade')} placeholder="Grade" className={inp} />
+            <input value={form.board} onChange={set('board')} placeholder="Board" className={inp} />
+            <input value={form.subjects} onChange={set('subjects')} placeholder="Subjects" className={inp} />
+          </div>
+          {err && <p className="text-xs font-semibold text-red-600">{err}</p>}
+          <div className="flex gap-2">
+            <button disabled={save.isPending} className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+              <Save className="h-3.5 w-3.5" />{save.isPending ? 'Saving…' : 'Save changes'}
+            </button>
+            <button type="button" onClick={cancel} className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 hover:bg-white">Cancel</button>
+          </div>
+        </form>
+      </li>
+    );
+  }
+
   return (
     <li className="rounded-lg ring-1 ring-slate-100 overflow-hidden">
       <div className="flex items-center justify-between px-3 py-2">
@@ -1702,7 +1764,11 @@ function ParentStudentRow({ s, onRemove }) {
         </button>
         <div className="flex items-center gap-1 shrink-0">
           <button onClick={()=>setOpen(o=>!o)} className="p-1.5 text-slate-400 hover:text-brand-600" title="Portfolio">{open ? <ChevronUp className="h-4 w-4"/> : <ChevronDown className="h-4 w-4"/>}</button>
-          <button onClick={onRemove} className="p-1.5 text-slate-400 hover:text-red-600" title="Remove"><Trash2 className="h-4 w-4"/></button>
+          <button onClick={()=>{ setEditing(true); setOpen(false); }} className="rounded-lg px-2 py-1 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50">Edit</button>
+          {/* Confirmed now. This removes a child and everything recorded about
+              them, and it was a single unguarded click next to Portfolio. */}
+          <button onClick={()=>{ if (confirm(`Remove ${s.name}? Their portfolio, achievements and class record go with them. This cannot be undone.`)) onRemove(); }}
+            className="p-1.5 text-slate-400 hover:text-red-600" title="Remove"><Trash2 className="h-4 w-4"/></button>
         </div>
       </div>
       {open && <div className="border-t border-slate-100 bg-slate-50"><PortfolioPanel studentId={s.id} /></div>}
