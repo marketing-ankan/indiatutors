@@ -6,6 +6,10 @@ import { Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, G
 import { useAuth } from '../lib/auth.jsx';
 import DashboardHero from '../components/dashboard/DashboardHero.jsx';
 import SupportCard from '../components/dashboard/SupportCard.jsx';
+// Password, sign-in addresses and order receipts. All three endpoints have
+// always worked; nothing outside the admin view ever rendered them.
+import AccountSettingsCard from '../components/AccountSettingsCard.jsx';
+import MyOrdersCard from '../components/MyOrdersCard.jsx';
 import PhysicalProfileCard from '../components/physical/PhysicalProfileCard.jsx';
 import TuitionRequirementsCard from '../components/physical/TuitionRequirementsCard.jsx';
 
@@ -97,7 +101,19 @@ function TeacherDashboard() {
 
       {section === 'classroom' && <TeacherClassroom />}
 
-      {section === 'schedule' && <TeacherCalendarCard />}
+      {/* Exam updates are published to every signed-in role and were shown to
+          families only — board dates and pattern changes matter at least as
+          much to the teacher planning the syllabus. */}
+      {section === 'schedule' && (
+        <>
+          <TeacherCalendarCard />
+          <ExamUpdatesCard />
+        </>
+      )}
+
+      {/* The company material a teacher is meant to teach from. Resolved for
+          teachers by the same endpoint all along; simply never rendered. */}
+      {section === 'materials' && <ClassMaterialsSection audience="teacher" />}
 
       {section === 'requests' && (
         <>
@@ -116,6 +132,8 @@ function TeacherDashboard() {
           <KycCard />
         </>
       )}
+
+      {section === 'support' && <SupportCard />}
     </DashboardShell>
   );
 }
@@ -127,7 +145,7 @@ function ParentDashboard() {
     <DashboardShell role="parent" section={section} onSection={setSection} rail={<ParentRail />}>
       {section === 'overview' && (
         <>
-          <GettingStartedCard />
+          <GettingStartedCard onGoTo={setSection} />
           <MyCoursesCard />
           <UpcomingClassesCard />
           <ExamUpdatesCard />
@@ -142,24 +160,40 @@ function ParentDashboard() {
         </>
       )}
 
-      {section === 'bookings' && (
+      {/* Company-published decks and worksheets. The endpoint has always
+          resolved these for a parent (via their children's enrolments), but
+          only the student dashboard ever rendered them — so the parent paying
+          for the course could not see the material it comes with. */}
+      {section === 'materials' && (
         <>
-          <RequestsCard />
-          <PlansAndOffersCard />
+          <MyCoursesCard />
+          <ClassMaterialsSection audience="parent" />
         </>
       )}
+
+      {/* PlansAndOffersCard removed: like Certificates it was a permanent
+          "coming soon" card with no model or endpoint behind it. */}
+      {section === 'bookings' && <RequestsCard />}
 
       {section === 'achievements' && (
         <>
           <StudentRecordCard />
           <AchievementsCard />
-          <CertificatesCard />
         </>
       )}
 
       {section === 'children' && <StudentsCard />}
 
-      {section === 'account' && <KycCard />}
+      {/* The account settings and receipts that /account holds are reachable
+          from the header link now; KYC stays here because it is specific to
+          home tuition rather than to the login. */}
+      {section === 'account' && (
+        <>
+          <AccountSettingsCard />
+          <MyOrdersCard />
+          <KycCard />
+        </>
+      )}
 
       {section === 'support' && <SupportCard />}
     </DashboardShell>
@@ -216,7 +250,7 @@ function StudentDashboard() {
         </>
       )}
 
-      {section === 'materials' && <ClassMaterialsSection><MyCoursesCard /></ClassMaterialsSection>}
+      {section === 'materials' && <ClassMaterialsSection audience="student"><MyCoursesCard /></ClassMaterialsSection>}
 
       {section === 'achievements' && (
         <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
@@ -227,11 +261,15 @@ function StudentDashboard() {
             <span>Your achievements, certificates and milestones — added by you and your teachers.</span>
             <span className="rounded bg-brand-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-brand-700">{profile.code}</span>
           </p>
-          <PortfolioPanel studentId={profile.id} />
+          {/* audience="student": the panel is shared with the teacher's
+              classroom and the parent's child rows, and its default blurb
+              describes building "the student's" portfolio "visible to the
+              parent and the assigned teacher" — written for staff and shown,
+              until now, to the child it is about. */}
+          <PortfolioPanel studentId={profile.id} audience="student" />
         </section>
       )}
 
-      {section === 'certificates' && <CertificatesCard />}
       {section === 'support' && <SupportCard />}
     </DashboardShell>
   );
@@ -250,7 +288,7 @@ function StudentDashboard() {
  * derived from real state, so it cannot claim a step is incomplete when it
  * isn't, and it cannot linger once the account is running.
  */
-function GettingStartedCard() {
+function GettingStartedCard({ onGoTo }) {
   const { data: students = [], isLoading: ls } = useQuery({ queryKey: ['students'], queryFn: fetchStudents });
   const { data: requests = [], isLoading: lr } = useQuery({ queryKey: ['my-demo-requests'], queryFn: fetchMyDemoRequests });
   const { data: enrolments = [], isLoading: le } = useQuery({ queryKey: ['my-enrollments'], queryFn: fetchMyEnrollments });
@@ -261,9 +299,13 @@ function GettingStartedCard() {
   if (enrolments.length) return null;   // up and running; the cards speak for themselves
 
   const steps = [
+    // section, not '#students'. This card renders in the OVERVIEW section and
+    // StudentsCard (which carries id="students") only mounts under "My
+    // children" — so the anchor pointed at a node that was not on the page and
+    // the first button a new parent ever presses did nothing at all.
     { done: students.length > 0, title: 'Add your child',
       body: 'Their class, board and subjects — everything else is matched against this.',
-      cta: 'Add a student', href: '#students' },
+      cta: 'Add a student', section: 'children' },
     { done: requests.length > 0, title: 'Book a free demo',
       body: 'Meet a teacher first. No card, no commitment.',
       cta: 'Book a free demo', href: '/book-demo' },
@@ -294,8 +336,9 @@ function GettingStartedCard() {
                 {!s.done && <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{s.body}</p>}
               </div>
               {isNext && s.cta && (
-                s.href.startsWith('#') ? (
-                  <a href={s.href} className="shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700">{s.cta}</a>
+                s.section ? (
+                  <button type="button" onClick={() => onGoTo?.(s.section)}
+                    className="shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700">{s.cta}</button>
                 ) : (
                   <Link to={s.href} className="shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700">{s.cta}</Link>
                 )
@@ -493,8 +536,16 @@ function ClassroomTabs({ enrollmentId, studentId }) {
   );
 }
 
-// Shared by the teacher's classroom tab and the parent's student rows.
-function PortfolioPanel({ studentId }) {
+// Shared by the teacher's classroom tab, the parent's student rows AND the
+// student's own Achievements section — so the blurb has to change voice. The
+// staff wording ("the student's portfolio … visible to the parent and the
+// assigned teacher") was being shown to the child it describes.
+const PORTFOLIO_BLURB = {
+  staff: "Build the student's portfolio — achievements, certificates, milestones and artwork. Visible to the parent and the assigned teacher.",
+  student: 'Your achievements, certificates, milestones and artwork. Your parent and your teacher can see these too.',
+};
+
+function PortfolioPanel({ studentId, audience = 'staff' }) {
   const qc = useQueryClient();
   const fileRef = useRef();
   const { data: items = [], isLoading } = useQuery({ queryKey:['portfolio', studentId], queryFn:()=>fetchPortfolio(studentId) });
@@ -516,7 +567,7 @@ function PortfolioPanel({ studentId }) {
 
   return (
     <div className="p-3 space-y-3">
-      <p className="text-xs text-slate-500">Build the student's portfolio — achievements, certificates, milestones and artwork. Visible to the parent and the assigned teacher.</p>
+      <p className="text-xs text-slate-500">{PORTFOLIO_BLURB[audience] ?? PORTFOLIO_BLURB.staff}</p>
       {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : items.length ? (
         <ul className="space-y-1.5">
           {items.map(i => (
@@ -1166,15 +1217,23 @@ function AchievementsCard() {
   );
 }
 
-const PlansAndOffersCard = () => (
-  <ComingSoonCard icon={Megaphone} title="Plans &amp; offers"
-    blurb="Free plans, referral rewards and seasonal offers will appear here." />
-);
-
-const CertificatesCard = () => (
-  <ComingSoonCard icon={Award} title="Certificates"
-    blurb="Certificates for completed courses will appear here once your course offers one." />
-);
+/*
+ * PlansAndOffersCard and CertificatesCard are gone (2026-08-17).
+ *
+ * Both were ComingSoonCard instances, and neither could ever stop being one:
+ * there is no Certificate model and no plans/offers model, so no endpoint
+ * could fill either. "Certificates" was worse than a card — it was a top-level
+ * item in the student's sidebar, so a child clicked a promised section and got
+ * "Nothing here yet" every time, permanently.
+ *
+ * A certificate already has a truthful home: PortfolioItem supports
+ * type: 'certificate' and the portfolio panel renders it. If the owner ever
+ * wants issued certificates, that is a scoped feature with a model and an
+ * admin issuance flow behind it — not a nav slot to be filled.
+ *
+ * ComingSoonCard itself stays: it is the honest way to hold a section that is
+ * genuinely arriving, and is still the right tool the next time one is.
+ */
 
 function RequestsCard() {
   const { data: reqs = [], isLoading } = useQuery({ queryKey:['my-demo-requests'], queryFn: fetchMyDemoRequests });
