@@ -130,11 +130,18 @@ Route::middleware(\App\Http\Middleware\EnsurePhysicalSchema::class)->group(funct
     Route::post('/tuition-requirements', [TuitionRequirementController::class, 'store'])->middleware('throttle:10,1');
 });
 
-Route::post('/demo-requests',    [DemoRequestController::class, 'store']);
+// Throttled like every sibling lead endpoint below. These two were the only
+// public POSTs with no limit at all — and they are the busiest, so they were
+// the cheapest to flood. There is no global API throttle to fall back on
+// (bootstrap/app.php does not call throttleApi), and each accepted request
+// writes a row, notifies every admin in-app, sends a lead email once SMTP is
+// live, and pushes a record to the LMS. 20/min is far above any real family
+// filling in a form twice and far below a bot burying the console.
+Route::post('/demo-requests',    [DemoRequestController::class, 'store'])->middleware('throttle:20,1');
 // Guarded too: this is the lead-capture path for seven public forms, and it now
 // writes a support ticket. A missing table here loses an enquiry.
 Route::post('/contact',          [ContactController::class, 'store'])
-    ->middleware(\App\Http\Middleware\EnsureSupportSchema::class);
+    ->middleware([\App\Http\Middleware\EnsureSupportSchema::class, 'throttle:20,1']);
 Route::post('/teacher-applications', [TeacherApplicationController::class, 'store'])->middleware('throttle:6,1');
 Route::post('/orders',           [OrderController::class, 'store'])->middleware('throttle:10,1');
 Route::post('/orders/verify',    [OrderController::class, 'verify'])->middleware('throttle:20,1');
