@@ -2,6 +2,7 @@ import { Navigate, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import AccountSettingsCard from '../components/AccountSettingsCard.jsx';
+import ContactPreferencesCard from '../components/ContactPreferencesCard.jsx';
 import MyOrdersCard from '../components/MyOrdersCard.jsx';
 
 // "Account & orders" — the page the dashboard hero links to, for every role.
@@ -24,6 +25,7 @@ export default function AccountPage() {
 
       <div className="mt-6 space-y-6">
         <AccountSettingsCard />
+        <ContactPreferencesCard />
         <MyOrdersCard />
       </div>
     </div>

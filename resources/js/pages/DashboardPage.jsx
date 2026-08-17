@@ -10,6 +10,7 @@ import SupportCard from '../components/dashboard/SupportCard.jsx';
 // always worked; nothing outside the admin view ever rendered them.
 import AccountSettingsCard from '../components/AccountSettingsCard.jsx';
 import MyOrdersCard from '../components/MyOrdersCard.jsx';
+import ContactPreferencesCard from '../components/ContactPreferencesCard.jsx';
 import PhysicalProfileCard from '../components/physical/PhysicalProfileCard.jsx';
 import TuitionRequirementsCard from '../components/physical/TuitionRequirementsCard.jsx';
 
@@ -190,6 +191,7 @@ function ParentDashboard() {
       {section === 'account' && (
         <>
           <AccountSettingsCard />
+          <ContactPreferencesCard />
           <MyOrdersCard />
           <KycCard />
         </>
@@ -238,6 +240,7 @@ function StudentDashboard() {
         <>
           <KeepLearning />
           <UpcomingClassesCard />
+          <StudentAboutMe profile={profile} />
           <SuggestedCourses />
         </>
       )}
@@ -496,6 +499,61 @@ function TeacherClassroom({ onGoTo }) {
           ) : <p className="text-sm text-slate-500">No students assigned yet. Once a demo is converted to an enrollment, your students appear here.</p>}
         </>
       )}
+    </section>
+  );
+}
+
+/**
+ * What the platform believes about this student, shown to the student.
+ *
+ * A learner could see their class only as a bare number in a stats tile, and
+ * their board and subjects nowhere at all — while those three fields are
+ * exactly what every tutor match, every suggested course and every material
+ * list is filtered by. So a student whose grade was entered wrong could watch
+ * the whole product quietly aim at the wrong year and have no way to tell that
+ * was what had happened, let alone say so.
+ *
+ * Read-only on purpose. The student record belongs to the guardian — a child
+ * silently changing their own class would re-route matching behind the paying
+ * adult's back. The fix for "this is wrong" is therefore a sentence telling
+ * them who can change it, not an edit box.
+ */
+function StudentAboutMe({ profile }) {
+  if (!profile) return null;
+
+  const rows = [
+    ['Name', profile.name],
+    ['Class', profile.grade],
+    ['Board', profile.board],
+    ['Subjects', profile.subjects],
+  ].filter(([, v]) => v);
+
+  return (
+    <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+      <h2 className="font-heading flex items-center gap-2 text-lg font-bold text-[#0B1220]">
+        <GraduationCap className="h-5 w-5 text-brand-600" />About me
+      </h2>
+      <p className="mt-1 text-xs text-slate-500">
+        Your teachers and your class suggestions are matched against these details.
+      </p>
+
+      <dl className="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-2">
+        {rows.map(([label, value]) => (
+          <div key={label} className="min-w-0">
+            <dt className="text-[11px] font-bold uppercase tracking-widest text-slate-400">{label}</dt>
+            <dd className="mt-0.5 break-words text-sm font-semibold text-slate-800">{value}</dd>
+          </div>
+        ))}
+        <div className="min-w-0">
+          <dt className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Student ID</dt>
+          <dd className="mt-0.5 font-mono text-sm font-semibold text-slate-800">{profile.code}</dd>
+        </div>
+      </dl>
+
+      <p className="mt-4 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500 ring-1 ring-slate-100">
+        Something not right? Ask your parent to update it from their account — or tell us from
+        <span className="font-semibold text-slate-600"> Help</span>, and we will sort it out.
+      </p>
     </section>
   );
 }

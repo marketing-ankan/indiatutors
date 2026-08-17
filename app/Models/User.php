@@ -20,6 +20,12 @@ class User extends Authenticatable
         'role',
         'phone',
         'phone_country_code',
+        // How this person wants to be contacted. Service messages default on,
+        // marketing defaults off — see the migration for why they are separate.
+        'notify_whatsapp',
+        'notify_email',
+        'class_reminders',
+        'marketing_opt_in',
     ];
 
     protected $hidden = [
@@ -32,6 +38,10 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'notify_whatsapp'  => 'boolean',
+            'notify_email'     => 'boolean',
+            'class_reminders'  => 'boolean',
+            'marketing_opt_in' => 'boolean',
         ];
     }
 
