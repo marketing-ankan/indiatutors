@@ -91,6 +91,10 @@ export const fetchOnlineAllowance = async () => { const { data } = await api.get
 // details stay withheld until a coordinator releases them.
 export const proposeDemoSlot      = async ({ demoId, ...p }) => { const { data } = await api.post(`/teacher/demos/${demoId}/slots`, p); return data; };
 export const withdrawDemoSlot     = async ({ demoId, slotId }) => { const { data } = await api.patch(`/teacher/demos/${demoId}/slots/${slotId}/withdraw`); return data; };
+// E2 — "I cannot take Thursday's class". Resolved as a substitute, or as an
+// online class against the teacher's monthly allowance. The server decides
+// which is possible and returns a sentence saying what it did.
+export const reportAbsence        = async ({ enrollmentId, ...p }) => { const { data } = await api.post(`/teacher/enrollments/${enrollmentId}/absence`, p); return data; };
 export const fetchClassLogs = async (enrollmentId) => { const { data } = await api.get(`/teacher/enrollments/${enrollmentId}/logs`); return data.data; };
 export const addClassLog    = async (enrollmentId, payload) => { const { data } = await api.post(`/teacher/enrollments/${enrollmentId}/logs`, payload); return data.data; };
 

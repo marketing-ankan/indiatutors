@@ -24,7 +24,7 @@ import {
 } from '../lib/api.js';
 import DashboardShell, { KeepLearning, SuggestedCourses, ParentRail, TeacherRail, ClassMaterialsSection } from '../components/dashboard/DashboardShell.jsx';
 import {
-  fetchTeacherProfile, updateTeacherProfile,
+  fetchTeacherProfile, updateTeacherProfile, proposeDemoSlot, withdrawDemoSlot, reportAbsence,
   fetchTeacherStudents, fetchTeacherDemos, fetchClassLogs, addClassLog,
   fetchCurriculum, addCurriculumItem, updateCurriculumItem, deleteCurriculumItem,
   fetchMaterials, uploadMaterial, deleteMaterial, downloadMaterial,
@@ -94,12 +94,12 @@ function TeacherDashboard() {
     <DashboardShell role="teacher" section={section} onSection={setSection} rail={<TeacherRail />}>
       {section === 'overview' && (
         <>
-          <TeacherClassroom />
+          <TeacherClassroom onGoTo={setSection} />
           <TeacherCalendarCard />
         </>
       )}
 
-      {section === 'classroom' && <TeacherClassroom />}
+      {section === 'classroom' && <TeacherClassroom onGoTo={setSection} />}
 
       {/* Exam updates are published to every signed-in role and were shown to
           families only — board dates and pattern changes matter at least as
@@ -450,7 +450,7 @@ function TeacherProfileCard() {
   );
 }
 
-function TeacherClassroom() {
+function TeacherClassroom({ onGoTo }) {
   const { data: profile } = useQuery({ queryKey:['teacher-profile'], queryFn: fetchTeacherProfile });
   const approved = profile?.status === 'approved';
   const { data: roster = [], isLoading } = useQuery({ queryKey:['teacher-students'], queryFn: fetchTeacherStudents, enabled: approved });
@@ -462,8 +462,20 @@ function TeacherClassroom() {
       <p className="text-xs text-slate-500 mb-4">Students assigned to you, their upcoming demos, and the class progress you log.</p>
 
       {!approved ? (
-        <div className="rounded-lg bg-amber-50 text-amber-800 text-sm p-4">
-          Your classroom unlocks once our team approves your teacher profile. Complete your profile and KYC above to speed things up.
+        // "Complete your profile and KYC above" pointed at nothing: both live
+        // under My profile, a different section entirely, so the one screen a
+        // new teacher actually meets told them to do something they could not
+        // see. It says where to go now, and offers to take them there.
+        <div className="rounded-lg bg-amber-50 p-4 text-sm text-amber-900">
+          <p className="font-semibold">Your profile is with our team for review.</p>
+          <p className="mt-1 text-amber-800">
+            Your classroom, students and schedule unlock once it is approved. A complete profile and
+            KYC is what we review, so finishing those is the fastest way through.
+          </p>
+          <button type="button" onClick={() => onGoTo?.('profile')}
+            className="mt-3 rounded-lg bg-amber-800 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-900">
+            Finish my profile &amp; KYC
+          </button>
         </div>
       ) : (
         <>
@@ -471,15 +483,7 @@ function TeacherClassroom() {
             <div className="mb-5">
               <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Upcoming demos</h3>
               <ul className="divide-y divide-slate-100">
-                {demos.map(d => (
-                  <li key={d.id} className="flex items-center justify-between py-2.5">
-                    <div>
-                      <div className="font-semibold text-sm text-slate-800">{d.course?.name || d.subject || 'Demo class'}</div>
-                      <div className="text-xs text-slate-500">{[d.student, d.grade, d.mode, d.city].filter(Boolean).join(' · ')}</div>
-                    </div>
-                    <span className="text-xs text-slate-500">{d.scheduled_at ? new Date(d.scheduled_at).toLocaleString() : 'To be scheduled'}</span>
-                  </li>
-                ))}
+                {demos.map(d => <TeacherDemoRow key={d.id} d={d} />)}
               </ul>
             </div>
           )}
@@ -493,6 +497,132 @@ function TeacherClassroom() {
         </>
       )}
     </section>
+  );
+}
+
+/**
+ * A demo the teacher has been assigned, and the times they have offered on it.
+ *
+ * The teacher rail has always told them "Propose a time from the Classroom
+ * section — the family confirms it", and the family half has always been
+ * built: ProposedTimes renders "That works" / "Can't make it" against every
+ * open offer. The teacher's half simply did not exist — this row printed a
+ * name and "To be scheduled", and the endpoint that creates a slot had no
+ * caller anywhere in the app. So the only way a time could ever be proposed
+ * was a coordinator typing it in after a phone call, which is exactly the
+ * fallback the owner wanted, not the default.
+ *
+ * Times are sent as the naive local string the picker produces. APP_TIMEZONE
+ * is Asia/Kolkata, so the server reads 17:00 as 17:00 IST, which is what both
+ * the teacher and the family mean — and it is the same convention the family
+ * side already displays with.
+ */
+function TeacherDemoRow({ d }) {
+  const qc = useQueryClient();
+  const [openForm, setOpenForm] = useState(false);
+  const [form, setForm] = useState({ starts_at: '', duration_minutes: 45, note: '' });
+  const [err, setErr] = useState('');
+  const [msg, setMsg] = useState('');
+
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ['teacher-demos'] });
+    qc.invalidateQueries({ queryKey: ['teacher-calendar'] });
+  };
+  // The API's 422s are already written for a human ("You already have five open
+  // proposals on this demo — withdraw one first"), so they are shown verbatim
+  // rather than replaced with a generic failure line.
+  const fail = e => setErr(e?.response?.data?.message
+    || Object.values(e?.response?.data?.errors || {})[0]?.[0] || 'Could not save.');
+
+  const propose = useMutation({
+    mutationFn: () => proposeDemoSlot({ demoId: d.id, ...form, note: form.note || null }),
+    onSuccess: r => { setForm({ starts_at: '', duration_minutes: 45, note: '' }); setOpenForm(false);
+      setErr(''); setMsg(r?.message || 'Time proposed.'); invalidate(); },
+    onError: e => { setMsg(''); fail(e); },
+  });
+  const withdraw = useMutation({
+    mutationFn: slotId => withdrawDemoSlot({ demoId: d.id, slotId }),
+    onSuccess: () => { setErr(''); setMsg('Proposal withdrawn.'); invalidate(); },
+    onError: e => { setMsg(''); fail(e); },
+  });
+
+  const slots = d.slots ?? [];
+  const open  = slots.filter(s => s.status === 'proposed');
+  const agreed = slots.find(s => s.status === 'accepted');
+  const settled = !!d.scheduled_at || !!agreed;
+  const slotStyle = { proposed:'bg-amber-50 text-amber-700', accepted:'bg-green-50 text-green-700',
+    declined:'bg-red-50 text-red-700', withdrawn:'bg-slate-100 text-slate-500' };
+  const when = iso => new Date(String(iso).replace(' ', 'T')).toLocaleString('en-IN',
+    { weekday:'short', day:'numeric', month:'short', hour:'numeric', minute:'2-digit' });
+
+  return (
+    <li className="py-3">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0">
+          <div className="font-semibold text-sm text-slate-800">{d.course?.name || d.subject || 'Demo class'}</div>
+          <div className="text-xs text-slate-500">{[d.student, d.grade, d.mode, d.city].filter(Boolean).join(' · ')}</div>
+        </div>
+        <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${settled ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>
+          {settled ? `Confirmed ${when(d.scheduled_at || agreed.starts_at)}` : open.length ? `${open.length} time${open.length===1?'':'s'} offered` : 'Needs a time'}
+        </span>
+      </div>
+
+      {slots.length > 0 && (
+        <ul className="mt-2 space-y-1">
+          {slots.map(s => (
+            <li key={s.id} className="flex flex-wrap items-center gap-2 text-xs">
+              <span className={`rounded px-1.5 py-0.5 font-semibold capitalize ${slotStyle[s.status] || 'bg-slate-100 text-slate-500'}`}>{s.status}</span>
+              <span className="text-slate-600">{when(s.starts_at)} · {s.duration_minutes} min</span>
+              {s.source === 'coordinator' && <span className="text-slate-400">(arranged by our team)</span>}
+              {s.note && <span className="text-slate-400">“{s.note}”</span>}
+              {s.status === 'proposed' && (
+                <button type="button" onClick={() => withdraw.mutate(s.id)} disabled={withdraw.isPending}
+                  className="font-semibold text-slate-500 underline hover:text-red-600 disabled:opacity-50">Withdraw</button>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {!settled && (openForm ? (
+        <form onSubmit={ev => { ev.preventDefault(); propose.mutate(); }} className="mt-2 rounded-lg bg-slate-50 p-3 ring-1 ring-slate-100">
+          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <label className="block">
+              <span className="mb-1 block text-[11px] font-semibold text-slate-600">Offer a time</span>
+              <input type="datetime-local" required value={form.starts_at}
+                onChange={ev => setForm({ ...form, starts_at: ev.target.value })}
+                className="w-full rounded-lg px-3 py-2 text-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500" />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-[11px] font-semibold text-slate-600">Length</span>
+              <select value={form.duration_minutes} onChange={ev => setForm({ ...form, duration_minutes: Number(ev.target.value) })}
+                className="w-full rounded-lg px-3 py-2 text-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                {[30, 45, 60].map(m => <option key={m} value={m}>{m} min</option>)}
+              </select>
+            </label>
+          </div>
+          <input value={form.note} maxLength={300} onChange={ev => setForm({ ...form, note: ev.target.value })}
+            placeholder="Note for the family (optional)"
+            className="mt-2 w-full rounded-lg px-3 py-2 text-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500" />
+          {err && <p className="mt-2 text-xs font-semibold text-red-600">{err}</p>}
+          <div className="mt-2 flex gap-2">
+            <button disabled={propose.isPending} className="rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+              {propose.isPending ? 'Sending…' : 'Offer this time'}
+            </button>
+            <button type="button" onClick={() => { setOpenForm(false); setErr(''); }}
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 hover:bg-white">Cancel</button>
+          </div>
+        </form>
+      ) : (
+        <button type="button" onClick={() => { setOpenForm(true); setMsg(''); }}
+          className="mt-2 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700">
+          {open.length ? 'Offer another time' : 'Propose a time'}
+        </button>
+      ))}
+
+      {msg && <p className="mt-2 text-xs font-semibold text-green-700">{msg}</p>}
+      {err && !openForm && <p className="mt-2 text-xs font-semibold text-red-600">{err}</p>}
+    </li>
   );
 }
 
@@ -511,8 +641,104 @@ function RosterRow({ e }) {
           {open ? <ChevronUp className="h-4 w-4 text-slate-400"/> : <ChevronDown className="h-4 w-4 text-slate-400"/>}
         </div>
       </button>
-      {open && <ClassroomTabs enrollmentId={e.id} studentId={e.student_id} />}
+      {open && (
+        <>
+          <AbsencePanel enrollmentId={e.id} />
+          <ClassroomTabs enrollmentId={e.id} studentId={e.student_id} />
+        </>
+      )}
     </li>
+  );
+}
+
+/**
+ * "I cannot take this class on this date."
+ *
+ * The teacher rail has been showing an "Online classes this month" quota with
+ * a progress bar since it was built, and nothing in the product could spend
+ * it: the only consumer of that allowance is this endpoint, and it had no
+ * client wrapper and no control. So a teacher who could not make Thursday had
+ * no in-app action at all — no substitute request, no "take it online" — and
+ * staff had the receiving half of the flow with nothing ever arriving in it.
+ *
+ * The server owns every decision here: whether a class exists that day, whether
+ * the teacher is eligible to move it online, whether the monthly allowance is
+ * spent, and who covers it instead. All this does is collect three fields and
+ * repeat the sentence it gets back — including the refusals, which are already
+ * written for a person to read.
+ */
+function AbsencePanel({ enrollmentId }) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ occurs_on: '', resolution: 'substitute', reason: '' });
+  const [err, setErr] = useState('');
+  const [msg, setMsg] = useState('');
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+
+  const report = useMutation({
+    mutationFn: () => reportAbsence({ enrollmentId, ...form, reason: form.reason || null }),
+    onSuccess: r => {
+      setForm({ occurs_on: '', resolution: 'substitute', reason: '' });
+      setOpen(false); setErr('');
+      // The response says what actually happened — a named substitute, a class
+      // moved online with the remaining count, or "a coordinator will arrange
+      // cover" when nobody was free. Never flattened to "Done".
+      setMsg(r?.message || 'Reported.');
+      qc.invalidateQueries({ queryKey: ['online-allowance'] });
+      qc.invalidateQueries({ queryKey: ['teacher-calendar'] });
+      qc.invalidateQueries({ queryKey: ['teacher-students'] });
+    },
+    onError: e => { setMsg(''); setErr(e?.response?.data?.message
+      || Object.values(e?.response?.data?.errors || {})[0]?.[0] || 'Could not report this.'); },
+  });
+
+  return (
+    <div className="border-t border-slate-100 bg-white px-3 py-2.5">
+      {!open ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" onClick={() => { setOpen(true); setMsg(''); }}
+            className="rounded-lg px-3 py-1.5 text-xs font-bold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50">
+            Can't take a class?
+          </button>
+          {msg && <span className="text-xs font-semibold text-green-700">{msg}</span>}
+          {err && <span className="text-xs font-semibold text-red-600">{err}</span>}
+        </div>
+      ) : (
+        <form onSubmit={ev => { ev.preventDefault(); report.mutate(); }} className="rounded-lg bg-slate-50 p-3 ring-1 ring-slate-100">
+          <p className="mb-2 text-[11px] text-slate-500">
+            Tell us early and the family is told for you — either a substitute takes it, or you take it
+            online against this month's allowance.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-1 block text-[11px] font-semibold text-slate-600">Which day</span>
+              <input type="date" required min={today} value={form.occurs_on}
+                onChange={ev => setForm({ ...form, occurs_on: ev.target.value })}
+                className="w-full rounded-lg px-3 py-2 text-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500" />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-[11px] font-semibold text-slate-600">What should happen</span>
+              <select value={form.resolution} onChange={ev => setForm({ ...form, resolution: ev.target.value })}
+                className="w-full rounded-lg px-3 py-2 text-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <option value="substitute">Find a substitute</option>
+                <option value="online">I'll take it online</option>
+              </select>
+            </label>
+          </div>
+          <input value={form.reason} maxLength={300} onChange={ev => setForm({ ...form, reason: ev.target.value })}
+            placeholder="Reason (optional)"
+            className="mt-2 w-full rounded-lg px-3 py-2 text-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500" />
+          {err && <p className="mt-2 text-xs font-semibold text-red-600">{err}</p>}
+          <div className="mt-2 flex gap-2">
+            <button disabled={report.isPending} className="rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+              {report.isPending ? 'Reporting…' : 'Report this class'}
+            </button>
+            <button type="button" onClick={() => { setOpen(false); setErr(''); }}
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 hover:bg-white">Cancel</button>
+          </div>
+        </form>
+      )}
+    </div>
   );
 }
 

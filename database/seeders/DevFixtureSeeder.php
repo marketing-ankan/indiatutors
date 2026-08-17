@@ -110,6 +110,29 @@ class DevFixtureSeeder extends Seeder
             );
         }
 
+        // A standing timetable. Without one there is nothing to be absent
+        // FROM: reportAbsence looks for an active schedule on that weekday and
+        // 422s otherwise, so the absence flow cannot be exercised at all until
+        // this row exists. Every weekday, so any date the tester picks works.
+        foreach ([1, 2, 3, 4, 5] as $weekday) {
+            \App\Models\EnrollmentSchedule::firstOrCreate(
+                ['enrollment_id' => $enrollment->id, 'weekday' => $weekday],
+                ['start_time' => '17:00:00', 'duration_minutes' => 60, 'active' => true],
+            );
+        }
+
+        // A demo assigned to the teacher, so the propose-a-time flow has
+        // something to act on. Left in 'new' with no scheduled_at: that is the
+        // state a teacher actually meets, and the one the proposal flow exists
+        // to resolve.
+        \App\Models\DemoRequest::firstOrCreate(
+            ['email' => 'parent' . self::DOMAIN, 'subject' => 'Mathematics'],
+            ['user_id' => $parentUser->id, 'student_id' => $active->id,
+             'assigned_tutor_id' => $tutor->id, 'name' => 'Meera Nair', 'phone' => '9000000000',
+             'grade' => '8', 'board' => 'CBSE', 'mode' => 'online', 'city' => 'Kolkata',
+             'status' => 'new'],
+        );
+
         $this->command?->info('Dev fixtures ready. Password for all: ' . self::PASSWORD);
         foreach (['teacher', 'teacher-pending', 'parent', 'parent-new', 'student'] as $who) {
             $this->command?->line('  ' . str_pad($who, 16) . $who . self::DOMAIN);
