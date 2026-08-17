@@ -62,6 +62,13 @@ Route::get('/site-settings',     [SiteSettingController::class, 'index']);
 Route::get('/deploy-info',       [SiteSettingController::class, 'deployInfo']);
 // Home-page testimonials: reviews a human approved AND shortlisted.
 Route::get('/testimonials',      [TestimonialController::class, 'index']);
+// The WhatsApp-style cards. Empty (not 500) until the table exists — see controller.
+Route::get('/whatsapp-testimonials', [\App\Http\Controllers\Api\WhatsappTestimonialController::class, 'index']);
+// The screenshots those cards show. Served through Laravel because they live
+// in storage/, the one directory the deploy never wipes — the docroot is not
+// an option for runtime uploads on this host.
+Route::get('/media/whatsapp/{file}', [\App\Http\Controllers\Api\WhatsappTestimonialController::class, 'serve'])
+    ->where('file', '[A-Za-z0-9._-]+');
 Route::get('/courses/{slug}',    [CourseController::class, 'show'])->name('api.courses.show');
 // Two segments, so these never shadow /courses/{slug} above.
 Route::get('/courses/{course:slug}/reviews',  [ReviewController::class, 'index']);
@@ -376,6 +383,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/exam-updates',                     [ExamUpdateController::class, 'store']);
         Route::patch('/exam-updates/{examUpdate}',       [ExamUpdateController::class, 'update']);
         Route::delete('/exam-updates/{examUpdate}',      [ExamUpdateController::class, 'destroy']);
+        // WhatsApp testimonials — the chat-bubble cards on the homepage.
+        Route::get('/whatsapp-testimonials',                          [\App\Http\Controllers\Api\WhatsappTestimonialController::class, 'adminIndex']);
+        Route::post('/whatsapp-testimonials',                         [\App\Http\Controllers\Api\WhatsappTestimonialController::class, 'store']);
+        Route::patch('/whatsapp-testimonials/{whatsappTestimonial}',  [\App\Http\Controllers\Api\WhatsappTestimonialController::class, 'update']);
+        Route::delete('/whatsapp-testimonials/{whatsappTestimonial}', [\App\Http\Controllers\Api\WhatsappTestimonialController::class, 'destroy']);
     });
 });
 

@@ -10,7 +10,9 @@ import { postDate } from './BlogPostPage.jsx';
 // Console, readers need what every blog index gives them: a card per post that
 // links to it, and pagination the API has offered all along.
 
-function excerptOf(p) {
+// Exported: the homepage's Latest News section renders the same three-line
+// summary for its post cards.
+export function excerptOf(p) {
   if (p.excerpt) return p.excerpt;
   // No summary written — first ~150 chars of the body, tags stripped for the
   // legacy HTML posts.
