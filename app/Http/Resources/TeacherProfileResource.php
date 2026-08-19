@@ -10,6 +10,10 @@ class TeacherProfileResource extends JsonResource {
             'headline'         => $this->headline,
             'qualification'    => $this->qualification,
             'subjects'         => $this->subjects,
+            // Returned as well as accepted: a field the form writes but the
+            // resource withholds comes back undefined and is wiped by the next
+            // save, which is the round-trip bug this project keeps meeting.
+            'grades'           => $this->grades,
             'languages'        => $this->languages,
             'experience_years' => $this->experience_years,
             'fee_hourly'       => $this->fee_hourly !== null ? (float) $this->fee_hourly : null,

@@ -388,6 +388,16 @@ function MyCoursesCard() {
   );
 }
 
+// The directory stores this as a comma-separated string ("Class 9, Class 10").
+// Kept as a string rather than a join table because that is the shape the
+// public listing, the matcher and the seeded range already speak.
+const CLASS_OPTIONS = [
+  'Pre-primary', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6',
+  'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12', 'College', 'Adult',
+];
+const gradesToList = (raw) =>
+  String(raw ?? '').split(',').map(s => s.trim()).filter(Boolean);
+
 function TeacherProfileCard() {
   const qc = useQueryClient();
   const { data: p, isLoading } = useQuery({ queryKey:['teacher-profile'], queryFn: fetchTeacherProfile });
@@ -397,11 +407,13 @@ function TeacherProfileCard() {
     headline:p.headline||'', qualification:p.qualification||'', subjects:p.subjects||'', languages:p.languages||'',
     experience_years:p.experience_years||'', fee_hourly:p.fee_hourly||'', city:p.city||'', teaching_mode:p.teaching_mode||'online',
     service_areas:p.service_areas||'', bio:p.bio||'', slots:p.availability?.slots||'', days:p.availability?.days||[],
+    grades: gradesToList(p.grades),
   } : null);
   const set = k => e => { setSaved(false); setForm({ ...value, [k]: e.target.value }); };
   const toggleDay = d => { setSaved(false); const days = value.days.includes(d) ? value.days.filter(x=>x!==d) : [...value.days, d]; setForm({ ...value, days }); };
+  const toggleGrade = g => { setSaved(false); const grades = value.grades.includes(g) ? value.grades.filter(x=>x!==g) : [...value.grades, g]; setForm({ ...value, grades }); };
   const save = useMutation({
-    mutationFn: () => updateTeacherProfile({ ...value, experience_years: value.experience_years?Number(value.experience_years):null, fee_hourly: value.fee_hourly?Number(value.fee_hourly):null, availability:{ days:value.days, slots:value.slots } }),
+    mutationFn: () => updateTeacherProfile({ ...value, experience_years: value.experience_years?Number(value.experience_years):null, fee_hourly: value.fee_hourly?Number(value.fee_hourly):null, availability:{ days:value.days, slots:value.slots }, grades: value.grades.join(', ') }),
     onSuccess: () => { setSaved(true); qc.invalidateQueries({queryKey:['teacher-profile']}); },
   });
   const statusBadge = { pending:'bg-amber-50 text-amber-700', approved:'bg-green-50 text-green-700', rejected:'bg-red-50 text-red-700' };
@@ -432,6 +444,30 @@ function TeacherProfileCard() {
             <option value="online">Online</option><option value="home">Home tuition</option><option value="both">Online & Home</option>
           </select>
           <input value={value.city} onChange={set('city')} placeholder="City" className={inp}/>
+        </div>
+        {/* Which classes they actually teach.
+            Until this existed the directory listed EVERY teacher as covering
+            Pre-primary to Class 12 — the full range the publisher seeds on
+            creation, which nobody could narrow. That is untrue on a public
+            profile, and it makes the class useless for matching a family to a
+            teacher: a signal every teacher matches cannot tell any two apart.
+            Left empty it stays "not stated" and the current listing is kept. */}
+        <div>
+          <label className="mb-1 block text-xs font-semibold text-slate-600">Classes you teach</label>
+          <div className="flex flex-wrap gap-1.5">
+            {CLASS_OPTIONS.map(g => (
+              <button type="button" key={g} onClick={()=>toggleGrade(g)}
+                aria-pressed={value.grades.includes(g)}
+                className={`rounded-full px-2.5 py-1 text-xs font-semibold ${value.grades.includes(g)?'bg-brand-600 text-white':'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+                {g}
+              </button>
+            ))}
+          </div>
+          <p className="mt-1 text-[11px] text-slate-400">
+            {value.grades.length
+              ? 'Families searching for these classes can be matched to you.'
+              : 'Not stated yet — pick the classes you teach so families searching for them find you.'}
+          </p>
         </div>
         <input value={value.service_areas} onChange={set('service_areas')} placeholder="Service areas / pincodes (e.g. 700001, Salt Lake)" className={inp}/>
         <div>
