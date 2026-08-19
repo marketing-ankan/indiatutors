@@ -77,9 +77,22 @@ class AuthController extends Controller {
      * login identifier unverified is one typo away from a locked-out account.
      */
     public function updateMe(Request $request) {
+        // Every field is 'sometimes', because this endpoint now serves two
+        // independent forms: the details card (name and phone) and the contact
+        // preferences card (the four switches). Each sends only what it owns,
+        // so neither can reset the other's fields as a side effect.
+        //
+        // 'sometimes|required' on the name, not plain 'required': a name that
+        // IS sent still may not be blanked, but a request that never mentions
+        // it — every preference toggle — is not a validation error. It was,
+        // which made saving a preference impossible.
         $data = $request->validate([
-            'name'  => 'required|string|max:120',
-            'phone' => 'nullable|string|max:20',
+            'name'  => 'sometimes|required|string|max:120',
+            'phone' => 'sometimes|nullable|string|max:20',
+            'notify_whatsapp'  => 'sometimes|boolean',
+            'notify_email'     => 'sometimes|boolean',
+            'class_reminders'  => 'sometimes|boolean',
+            'marketing_opt_in' => 'sometimes|boolean',
         ]);
         $request->user()->update($data);
         return new UserResource($request->user()->fresh());

@@ -6,6 +6,11 @@ import { Plus, Trash2, Upload, ShieldCheck, UserPlus, FileText, CalendarClock, G
 import { useAuth } from '../lib/auth.jsx';
 import DashboardHero from '../components/dashboard/DashboardHero.jsx';
 import SupportCard from '../components/dashboard/SupportCard.jsx';
+// Password, sign-in addresses and order receipts. All three endpoints have
+// always worked; nothing outside the admin view ever rendered them.
+import AccountSettingsCard from '../components/AccountSettingsCard.jsx';
+import MyOrdersCard from '../components/MyOrdersCard.jsx';
+import ContactPreferencesCard from '../components/ContactPreferencesCard.jsx';
 import PhysicalProfileCard from '../components/physical/PhysicalProfileCard.jsx';
 import TuitionRequirementsCard from '../components/physical/TuitionRequirementsCard.jsx';
 
@@ -13,14 +18,14 @@ import TuitionRequirementsCard from '../components/physical/TuitionRequirementsC
 // every other visitor.
 const AdminConsole = lazy(() => import('../components/admin/AdminConsole.jsx'));
 import {
-  fetchStudents, createStudent, deleteStudent,
+  fetchStudents, createStudent, updateStudent, deleteStudent,
   fetchKyc, uploadKyc, deleteKyc, fetchMyDemoRequests, fetchMyEnrollments,
   acceptDemoSlot, declineDemoSlot,
   fetchMyAchievements, createMyAchievement, updateMyAchievement, fetchMyRecord,
 } from '../lib/api.js';
 import DashboardShell, { KeepLearning, SuggestedCourses, ParentRail, TeacherRail, ClassMaterialsSection } from '../components/dashboard/DashboardShell.jsx';
 import {
-  fetchTeacherProfile, updateTeacherProfile,
+  fetchTeacherProfile, updateTeacherProfile, proposeDemoSlot, withdrawDemoSlot, reportAbsence,
   fetchTeacherStudents, fetchTeacherDemos, fetchClassLogs, addClassLog,
   fetchCurriculum, addCurriculumItem, updateCurriculumItem, deleteCurriculumItem,
   fetchMaterials, uploadMaterial, deleteMaterial, downloadMaterial,
@@ -90,14 +95,26 @@ function TeacherDashboard() {
     <DashboardShell role="teacher" section={section} onSection={setSection} rail={<TeacherRail />}>
       {section === 'overview' && (
         <>
-          <TeacherClassroom />
+          <TeacherClassroom onGoTo={setSection} />
           <TeacherCalendarCard />
         </>
       )}
 
-      {section === 'classroom' && <TeacherClassroom />}
+      {section === 'classroom' && <TeacherClassroom onGoTo={setSection} />}
 
-      {section === 'schedule' && <TeacherCalendarCard />}
+      {/* Exam updates are published to every signed-in role and were shown to
+          families only — board dates and pattern changes matter at least as
+          much to the teacher planning the syllabus. */}
+      {section === 'schedule' && (
+        <>
+          <TeacherCalendarCard />
+          <ExamUpdatesCard />
+        </>
+      )}
+
+      {/* The company material a teacher is meant to teach from. Resolved for
+          teachers by the same endpoint all along; simply never rendered. */}
+      {section === 'materials' && <ClassMaterialsSection audience="teacher" />}
 
       {section === 'requests' && (
         <>
@@ -116,6 +133,8 @@ function TeacherDashboard() {
           <KycCard />
         </>
       )}
+
+      {section === 'support' && <SupportCard />}
     </DashboardShell>
   );
 }
@@ -127,7 +146,7 @@ function ParentDashboard() {
     <DashboardShell role="parent" section={section} onSection={setSection} rail={<ParentRail />}>
       {section === 'overview' && (
         <>
-          <GettingStartedCard />
+          <GettingStartedCard onGoTo={setSection} />
           <MyCoursesCard />
           <UpcomingClassesCard />
           <ExamUpdatesCard />
@@ -142,24 +161,41 @@ function ParentDashboard() {
         </>
       )}
 
-      {section === 'bookings' && (
+      {/* Company-published decks and worksheets. The endpoint has always
+          resolved these for a parent (via their children's enrolments), but
+          only the student dashboard ever rendered them — so the parent paying
+          for the course could not see the material it comes with. */}
+      {section === 'materials' && (
         <>
-          <RequestsCard />
-          <PlansAndOffersCard />
+          <MyCoursesCard />
+          <ClassMaterialsSection audience="parent" />
         </>
       )}
+
+      {/* PlansAndOffersCard removed: like Certificates it was a permanent
+          "coming soon" card with no model or endpoint behind it. */}
+      {section === 'bookings' && <RequestsCard />}
 
       {section === 'achievements' && (
         <>
           <StudentRecordCard />
           <AchievementsCard />
-          <CertificatesCard />
         </>
       )}
 
       {section === 'children' && <StudentsCard />}
 
-      {section === 'account' && <KycCard />}
+      {/* The account settings and receipts that /account holds are reachable
+          from the header link now; KYC stays here because it is specific to
+          home tuition rather than to the login. */}
+      {section === 'account' && (
+        <>
+          <AccountSettingsCard />
+          <ContactPreferencesCard />
+          <MyOrdersCard />
+          <KycCard />
+        </>
+      )}
 
       {section === 'support' && <SupportCard />}
     </DashboardShell>
@@ -204,6 +240,7 @@ function StudentDashboard() {
         <>
           <KeepLearning />
           <UpcomingClassesCard />
+          <StudentAboutMe profile={profile} />
           <SuggestedCourses />
         </>
       )}
@@ -216,7 +253,7 @@ function StudentDashboard() {
         </>
       )}
 
-      {section === 'materials' && <ClassMaterialsSection><MyCoursesCard /></ClassMaterialsSection>}
+      {section === 'materials' && <ClassMaterialsSection audience="student"><MyCoursesCard /></ClassMaterialsSection>}
 
       {section === 'achievements' && (
         <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
@@ -227,11 +264,15 @@ function StudentDashboard() {
             <span>Your achievements, certificates and milestones — added by you and your teachers.</span>
             <span className="rounded bg-brand-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-brand-700">{profile.code}</span>
           </p>
-          <PortfolioPanel studentId={profile.id} />
+          {/* audience="student": the panel is shared with the teacher's
+              classroom and the parent's child rows, and its default blurb
+              describes building "the student's" portfolio "visible to the
+              parent and the assigned teacher" — written for staff and shown,
+              until now, to the child it is about. */}
+          <PortfolioPanel studentId={profile.id} audience="student" />
         </section>
       )}
 
-      {section === 'certificates' && <CertificatesCard />}
       {section === 'support' && <SupportCard />}
     </DashboardShell>
   );
@@ -250,7 +291,7 @@ function StudentDashboard() {
  * derived from real state, so it cannot claim a step is incomplete when it
  * isn't, and it cannot linger once the account is running.
  */
-function GettingStartedCard() {
+function GettingStartedCard({ onGoTo }) {
   const { data: students = [], isLoading: ls } = useQuery({ queryKey: ['students'], queryFn: fetchStudents });
   const { data: requests = [], isLoading: lr } = useQuery({ queryKey: ['my-demo-requests'], queryFn: fetchMyDemoRequests });
   const { data: enrolments = [], isLoading: le } = useQuery({ queryKey: ['my-enrollments'], queryFn: fetchMyEnrollments });
@@ -261,9 +302,13 @@ function GettingStartedCard() {
   if (enrolments.length) return null;   // up and running; the cards speak for themselves
 
   const steps = [
+    // section, not '#students'. This card renders in the OVERVIEW section and
+    // StudentsCard (which carries id="students") only mounts under "My
+    // children" — so the anchor pointed at a node that was not on the page and
+    // the first button a new parent ever presses did nothing at all.
     { done: students.length > 0, title: 'Add your child',
       body: 'Their class, board and subjects — everything else is matched against this.',
-      cta: 'Add a student', href: '#students' },
+      cta: 'Add a student', section: 'children' },
     { done: requests.length > 0, title: 'Book a free demo',
       body: 'Meet a teacher first. No card, no commitment.',
       cta: 'Book a free demo', href: '/book-demo' },
@@ -294,8 +339,9 @@ function GettingStartedCard() {
                 {!s.done && <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{s.body}</p>}
               </div>
               {isNext && s.cta && (
-                s.href.startsWith('#') ? (
-                  <a href={s.href} className="shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700">{s.cta}</a>
+                s.section ? (
+                  <button type="button" onClick={() => onGoTo?.(s.section)}
+                    className="shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700">{s.cta}</button>
                 ) : (
                   <Link to={s.href} className="shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700">{s.cta}</Link>
                 )
@@ -407,7 +453,7 @@ function TeacherProfileCard() {
   );
 }
 
-function TeacherClassroom() {
+function TeacherClassroom({ onGoTo }) {
   const { data: profile } = useQuery({ queryKey:['teacher-profile'], queryFn: fetchTeacherProfile });
   const approved = profile?.status === 'approved';
   const { data: roster = [], isLoading } = useQuery({ queryKey:['teacher-students'], queryFn: fetchTeacherStudents, enabled: approved });
@@ -419,8 +465,20 @@ function TeacherClassroom() {
       <p className="text-xs text-slate-500 mb-4">Students assigned to you, their upcoming demos, and the class progress you log.</p>
 
       {!approved ? (
-        <div className="rounded-lg bg-amber-50 text-amber-800 text-sm p-4">
-          Your classroom unlocks once our team approves your teacher profile. Complete your profile and KYC above to speed things up.
+        // "Complete your profile and KYC above" pointed at nothing: both live
+        // under My profile, a different section entirely, so the one screen a
+        // new teacher actually meets told them to do something they could not
+        // see. It says where to go now, and offers to take them there.
+        <div className="rounded-lg bg-amber-50 p-4 text-sm text-amber-900">
+          <p className="font-semibold">Your profile is with our team for review.</p>
+          <p className="mt-1 text-amber-800">
+            Your classroom, students and schedule unlock once it is approved. A complete profile and
+            KYC is what we review, so finishing those is the fastest way through.
+          </p>
+          <button type="button" onClick={() => onGoTo?.('profile')}
+            className="mt-3 rounded-lg bg-amber-800 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-900">
+            Finish my profile &amp; KYC
+          </button>
         </div>
       ) : (
         <>
@@ -428,15 +486,7 @@ function TeacherClassroom() {
             <div className="mb-5">
               <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Upcoming demos</h3>
               <ul className="divide-y divide-slate-100">
-                {demos.map(d => (
-                  <li key={d.id} className="flex items-center justify-between py-2.5">
-                    <div>
-                      <div className="font-semibold text-sm text-slate-800">{d.course?.name || d.subject || 'Demo class'}</div>
-                      <div className="text-xs text-slate-500">{[d.student, d.grade, d.mode, d.city].filter(Boolean).join(' · ')}</div>
-                    </div>
-                    <span className="text-xs text-slate-500">{d.scheduled_at ? new Date(d.scheduled_at).toLocaleString() : 'To be scheduled'}</span>
-                  </li>
-                ))}
+                {demos.map(d => <TeacherDemoRow key={d.id} d={d} />)}
               </ul>
             </div>
           )}
@@ -450,6 +500,187 @@ function TeacherClassroom() {
         </>
       )}
     </section>
+  );
+}
+
+/**
+ * What the platform believes about this student, shown to the student.
+ *
+ * A learner could see their class only as a bare number in a stats tile, and
+ * their board and subjects nowhere at all — while those three fields are
+ * exactly what every tutor match, every suggested course and every material
+ * list is filtered by. So a student whose grade was entered wrong could watch
+ * the whole product quietly aim at the wrong year and have no way to tell that
+ * was what had happened, let alone say so.
+ *
+ * Read-only on purpose. The student record belongs to the guardian — a child
+ * silently changing their own class would re-route matching behind the paying
+ * adult's back. The fix for "this is wrong" is therefore a sentence telling
+ * them who can change it, not an edit box.
+ */
+function StudentAboutMe({ profile }) {
+  if (!profile) return null;
+
+  const rows = [
+    ['Name', profile.name],
+    ['Class', profile.grade],
+    ['Board', profile.board],
+    ['Subjects', profile.subjects],
+  ].filter(([, v]) => v);
+
+  return (
+    <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
+      <h2 className="font-heading flex items-center gap-2 text-lg font-bold text-[#0B1220]">
+        <GraduationCap className="h-5 w-5 text-brand-600" />About me
+      </h2>
+      <p className="mt-1 text-xs text-slate-500">
+        Your teachers and your class suggestions are matched against these details.
+      </p>
+
+      <dl className="mt-4 grid gap-x-6 gap-y-3 sm:grid-cols-2">
+        {rows.map(([label, value]) => (
+          <div key={label} className="min-w-0">
+            <dt className="text-[11px] font-bold uppercase tracking-widest text-slate-400">{label}</dt>
+            <dd className="mt-0.5 break-words text-sm font-semibold text-slate-800">{value}</dd>
+          </div>
+        ))}
+        <div className="min-w-0">
+          <dt className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Student ID</dt>
+          <dd className="mt-0.5 font-mono text-sm font-semibold text-slate-800">{profile.code}</dd>
+        </div>
+      </dl>
+
+      <p className="mt-4 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500 ring-1 ring-slate-100">
+        Something not right? Ask your parent to update it from their account — or tell us from
+        <span className="font-semibold text-slate-600"> Help</span>, and we will sort it out.
+      </p>
+    </section>
+  );
+}
+
+/**
+ * A demo the teacher has been assigned, and the times they have offered on it.
+ *
+ * The teacher rail has always told them "Propose a time from the Classroom
+ * section — the family confirms it", and the family half has always been
+ * built: ProposedTimes renders "That works" / "Can't make it" against every
+ * open offer. The teacher's half simply did not exist — this row printed a
+ * name and "To be scheduled", and the endpoint that creates a slot had no
+ * caller anywhere in the app. So the only way a time could ever be proposed
+ * was a coordinator typing it in after a phone call, which is exactly the
+ * fallback the owner wanted, not the default.
+ *
+ * Times are sent as the naive local string the picker produces. APP_TIMEZONE
+ * is Asia/Kolkata, so the server reads 17:00 as 17:00 IST, which is what both
+ * the teacher and the family mean — and it is the same convention the family
+ * side already displays with.
+ */
+function TeacherDemoRow({ d }) {
+  const qc = useQueryClient();
+  const [openForm, setOpenForm] = useState(false);
+  const [form, setForm] = useState({ starts_at: '', duration_minutes: 45, note: '' });
+  const [err, setErr] = useState('');
+  const [msg, setMsg] = useState('');
+
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ['teacher-demos'] });
+    qc.invalidateQueries({ queryKey: ['teacher-calendar'] });
+  };
+  // The API's 422s are already written for a human ("You already have five open
+  // proposals on this demo — withdraw one first"), so they are shown verbatim
+  // rather than replaced with a generic failure line.
+  const fail = e => setErr(e?.response?.data?.message
+    || Object.values(e?.response?.data?.errors || {})[0]?.[0] || 'Could not save.');
+
+  const propose = useMutation({
+    mutationFn: () => proposeDemoSlot({ demoId: d.id, ...form, note: form.note || null }),
+    onSuccess: r => { setForm({ starts_at: '', duration_minutes: 45, note: '' }); setOpenForm(false);
+      setErr(''); setMsg(r?.message || 'Time proposed.'); invalidate(); },
+    onError: e => { setMsg(''); fail(e); },
+  });
+  const withdraw = useMutation({
+    mutationFn: slotId => withdrawDemoSlot({ demoId: d.id, slotId }),
+    onSuccess: () => { setErr(''); setMsg('Proposal withdrawn.'); invalidate(); },
+    onError: e => { setMsg(''); fail(e); },
+  });
+
+  const slots = d.slots ?? [];
+  const open  = slots.filter(s => s.status === 'proposed');
+  const agreed = slots.find(s => s.status === 'accepted');
+  const settled = !!d.scheduled_at || !!agreed;
+  const slotStyle = { proposed:'bg-amber-50 text-amber-700', accepted:'bg-green-50 text-green-700',
+    declined:'bg-red-50 text-red-700', withdrawn:'bg-slate-100 text-slate-500' };
+  const when = iso => new Date(String(iso).replace(' ', 'T')).toLocaleString('en-IN',
+    { weekday:'short', day:'numeric', month:'short', hour:'numeric', minute:'2-digit' });
+
+  return (
+    <li className="py-3">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0">
+          <div className="font-semibold text-sm text-slate-800">{d.course?.name || d.subject || 'Demo class'}</div>
+          <div className="text-xs text-slate-500">{[d.student, d.grade, d.mode, d.city].filter(Boolean).join(' · ')}</div>
+        </div>
+        <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${settled ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>
+          {settled ? `Confirmed ${when(d.scheduled_at || agreed.starts_at)}` : open.length ? `${open.length} time${open.length===1?'':'s'} offered` : 'Needs a time'}
+        </span>
+      </div>
+
+      {slots.length > 0 && (
+        <ul className="mt-2 space-y-1">
+          {slots.map(s => (
+            <li key={s.id} className="flex flex-wrap items-center gap-2 text-xs">
+              <span className={`rounded px-1.5 py-0.5 font-semibold capitalize ${slotStyle[s.status] || 'bg-slate-100 text-slate-500'}`}>{s.status}</span>
+              <span className="text-slate-600">{when(s.starts_at)} · {s.duration_minutes} min</span>
+              {s.source === 'coordinator' && <span className="text-slate-400">(arranged by our team)</span>}
+              {s.note && <span className="text-slate-400">“{s.note}”</span>}
+              {s.status === 'proposed' && (
+                <button type="button" onClick={() => withdraw.mutate(s.id)} disabled={withdraw.isPending}
+                  className="font-semibold text-slate-500 underline hover:text-red-600 disabled:opacity-50">Withdraw</button>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {!settled && (openForm ? (
+        <form onSubmit={ev => { ev.preventDefault(); propose.mutate(); }} className="mt-2 rounded-lg bg-slate-50 p-3 ring-1 ring-slate-100">
+          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <label className="block">
+              <span className="mb-1 block text-[11px] font-semibold text-slate-600">Offer a time</span>
+              <input type="datetime-local" required value={form.starts_at}
+                onChange={ev => setForm({ ...form, starts_at: ev.target.value })}
+                className="w-full rounded-lg px-3 py-2 text-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500" />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-[11px] font-semibold text-slate-600">Length</span>
+              <select value={form.duration_minutes} onChange={ev => setForm({ ...form, duration_minutes: Number(ev.target.value) })}
+                className="w-full rounded-lg px-3 py-2 text-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                {[30, 45, 60].map(m => <option key={m} value={m}>{m} min</option>)}
+              </select>
+            </label>
+          </div>
+          <input value={form.note} maxLength={300} onChange={ev => setForm({ ...form, note: ev.target.value })}
+            placeholder="Note for the family (optional)"
+            className="mt-2 w-full rounded-lg px-3 py-2 text-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500" />
+          {err && <p className="mt-2 text-xs font-semibold text-red-600">{err}</p>}
+          <div className="mt-2 flex gap-2">
+            <button disabled={propose.isPending} className="rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+              {propose.isPending ? 'Sending…' : 'Offer this time'}
+            </button>
+            <button type="button" onClick={() => { setOpenForm(false); setErr(''); }}
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 hover:bg-white">Cancel</button>
+          </div>
+        </form>
+      ) : (
+        <button type="button" onClick={() => { setOpenForm(true); setMsg(''); }}
+          className="mt-2 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700">
+          {open.length ? 'Offer another time' : 'Propose a time'}
+        </button>
+      ))}
+
+      {msg && <p className="mt-2 text-xs font-semibold text-green-700">{msg}</p>}
+      {err && !openForm && <p className="mt-2 text-xs font-semibold text-red-600">{err}</p>}
+    </li>
   );
 }
 
@@ -468,8 +699,104 @@ function RosterRow({ e }) {
           {open ? <ChevronUp className="h-4 w-4 text-slate-400"/> : <ChevronDown className="h-4 w-4 text-slate-400"/>}
         </div>
       </button>
-      {open && <ClassroomTabs enrollmentId={e.id} studentId={e.student_id} />}
+      {open && (
+        <>
+          <AbsencePanel enrollmentId={e.id} />
+          <ClassroomTabs enrollmentId={e.id} studentId={e.student_id} />
+        </>
+      )}
     </li>
+  );
+}
+
+/**
+ * "I cannot take this class on this date."
+ *
+ * The teacher rail has been showing an "Online classes this month" quota with
+ * a progress bar since it was built, and nothing in the product could spend
+ * it: the only consumer of that allowance is this endpoint, and it had no
+ * client wrapper and no control. So a teacher who could not make Thursday had
+ * no in-app action at all — no substitute request, no "take it online" — and
+ * staff had the receiving half of the flow with nothing ever arriving in it.
+ *
+ * The server owns every decision here: whether a class exists that day, whether
+ * the teacher is eligible to move it online, whether the monthly allowance is
+ * spent, and who covers it instead. All this does is collect three fields and
+ * repeat the sentence it gets back — including the refusals, which are already
+ * written for a person to read.
+ */
+function AbsencePanel({ enrollmentId }) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ occurs_on: '', resolution: 'substitute', reason: '' });
+  const [err, setErr] = useState('');
+  const [msg, setMsg] = useState('');
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+
+  const report = useMutation({
+    mutationFn: () => reportAbsence({ enrollmentId, ...form, reason: form.reason || null }),
+    onSuccess: r => {
+      setForm({ occurs_on: '', resolution: 'substitute', reason: '' });
+      setOpen(false); setErr('');
+      // The response says what actually happened — a named substitute, a class
+      // moved online with the remaining count, or "a coordinator will arrange
+      // cover" when nobody was free. Never flattened to "Done".
+      setMsg(r?.message || 'Reported.');
+      qc.invalidateQueries({ queryKey: ['online-allowance'] });
+      qc.invalidateQueries({ queryKey: ['teacher-calendar'] });
+      qc.invalidateQueries({ queryKey: ['teacher-students'] });
+    },
+    onError: e => { setMsg(''); setErr(e?.response?.data?.message
+      || Object.values(e?.response?.data?.errors || {})[0]?.[0] || 'Could not report this.'); },
+  });
+
+  return (
+    <div className="border-t border-slate-100 bg-white px-3 py-2.5">
+      {!open ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" onClick={() => { setOpen(true); setMsg(''); }}
+            className="rounded-lg px-3 py-1.5 text-xs font-bold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50">
+            Can't take a class?
+          </button>
+          {msg && <span className="text-xs font-semibold text-green-700">{msg}</span>}
+          {err && <span className="text-xs font-semibold text-red-600">{err}</span>}
+        </div>
+      ) : (
+        <form onSubmit={ev => { ev.preventDefault(); report.mutate(); }} className="rounded-lg bg-slate-50 p-3 ring-1 ring-slate-100">
+          <p className="mb-2 text-[11px] text-slate-500">
+            Tell us early and the family is told for you — either a substitute takes it, or you take it
+            online against this month's allowance.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-1 block text-[11px] font-semibold text-slate-600">Which day</span>
+              <input type="date" required min={today} value={form.occurs_on}
+                onChange={ev => setForm({ ...form, occurs_on: ev.target.value })}
+                className="w-full rounded-lg px-3 py-2 text-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500" />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-[11px] font-semibold text-slate-600">What should happen</span>
+              <select value={form.resolution} onChange={ev => setForm({ ...form, resolution: ev.target.value })}
+                className="w-full rounded-lg px-3 py-2 text-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <option value="substitute">Find a substitute</option>
+                <option value="online">I'll take it online</option>
+              </select>
+            </label>
+          </div>
+          <input value={form.reason} maxLength={300} onChange={ev => setForm({ ...form, reason: ev.target.value })}
+            placeholder="Reason (optional)"
+            className="mt-2 w-full rounded-lg px-3 py-2 text-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500" />
+          {err && <p className="mt-2 text-xs font-semibold text-red-600">{err}</p>}
+          <div className="mt-2 flex gap-2">
+            <button disabled={report.isPending} className="rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+              {report.isPending ? 'Reporting…' : 'Report this class'}
+            </button>
+            <button type="button" onClick={() => { setOpen(false); setErr(''); }}
+              className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 hover:bg-white">Cancel</button>
+          </div>
+        </form>
+      )}
+    </div>
   );
 }
 
@@ -493,8 +820,16 @@ function ClassroomTabs({ enrollmentId, studentId }) {
   );
 }
 
-// Shared by the teacher's classroom tab and the parent's student rows.
-function PortfolioPanel({ studentId }) {
+// Shared by the teacher's classroom tab, the parent's student rows AND the
+// student's own Achievements section — so the blurb has to change voice. The
+// staff wording ("the student's portfolio … visible to the parent and the
+// assigned teacher") was being shown to the child it describes.
+const PORTFOLIO_BLURB = {
+  staff: "Build the student's portfolio — achievements, certificates, milestones and artwork. Visible to the parent and the assigned teacher.",
+  student: 'Your achievements, certificates, milestones and artwork. Your parent and your teacher can see these too.',
+};
+
+function PortfolioPanel({ studentId, audience = 'staff' }) {
   const qc = useQueryClient();
   const fileRef = useRef();
   const { data: items = [], isLoading } = useQuery({ queryKey:['portfolio', studentId], queryFn:()=>fetchPortfolio(studentId) });
@@ -516,7 +851,7 @@ function PortfolioPanel({ studentId }) {
 
   return (
     <div className="p-3 space-y-3">
-      <p className="text-xs text-slate-500">Build the student's portfolio — achievements, certificates, milestones and artwork. Visible to the parent and the assigned teacher.</p>
+      <p className="text-xs text-slate-500">{PORTFOLIO_BLURB[audience] ?? PORTFOLIO_BLURB.staff}</p>
       {isLoading ? <p className="text-sm text-slate-400">Loading…</p> : items.length ? (
         <ul className="space-y-1.5">
           {items.map(i => (
@@ -1166,15 +1501,23 @@ function AchievementsCard() {
   );
 }
 
-const PlansAndOffersCard = () => (
-  <ComingSoonCard icon={Megaphone} title="Plans &amp; offers"
-    blurb="Free plans, referral rewards and seasonal offers will appear here." />
-);
-
-const CertificatesCard = () => (
-  <ComingSoonCard icon={Award} title="Certificates"
-    blurb="Certificates for completed courses will appear here once your course offers one." />
-);
+/*
+ * PlansAndOffersCard and CertificatesCard are gone (2026-08-17).
+ *
+ * Both were ComingSoonCard instances, and neither could ever stop being one:
+ * there is no Certificate model and no plans/offers model, so no endpoint
+ * could fill either. "Certificates" was worse than a card — it was a top-level
+ * item in the student's sidebar, so a child clicked a promised section and got
+ * "Nothing here yet" every time, permanently.
+ *
+ * A certificate already has a truthful home: PortfolioItem supports
+ * type: 'certificate' and the portfolio panel renders it. If the owner ever
+ * wants issued certificates, that is a scoped feature with a model and an
+ * admin issuance flow behind it — not a nav slot to be filled.
+ *
+ * ComingSoonCard itself stays: it is the honest way to hold a section that is
+ * genuinely arriving, and is still the right tool the next time one is.
+ */
 
 function RequestsCard() {
   const { data: reqs = [], isLoading } = useQuery({ queryKey:['my-demo-requests'], queryFn: fetchMyDemoRequests });
@@ -1390,7 +1733,7 @@ function StudentsCard() {
       {err && <div className="mb-3 rounded-md bg-red-50 text-red-700 text-xs p-2">{err}</div>}
       <form onSubmit={e=>{e.preventDefault();create.mutate();}} className="space-y-2">
         <input required placeholder="Student name" value={form.name} onChange={set('name')} className={inp}/>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid gap-2 sm:grid-cols-3">
           <input placeholder="Grade" value={form.grade} onChange={set('grade')} className={inp}/>
           <input placeholder="Board" value={form.board} onChange={set('board')} className={inp}/>
           <input placeholder="Subjects" value={form.subjects} onChange={set('subjects')} className={inp}/>
@@ -1403,8 +1746,70 @@ function StudentsCard() {
   );
 }
 
+/**
+ * A child, and the details every match is made against.
+ *
+ * These four fields were read-only, and the row's only control was an
+ * unconfirmed bin icon — so the single way to correct a typed grade, or to
+ * move a child from Class 8 to Class 9, was to delete them and add them
+ * again. That is not an edit: the student row is what the portfolio, the
+ * achievements, the class record and every enrolment hang off, so re-adding
+ * returns an empty child with the same name and quietly destroys their whole
+ * history. Grade and board are also what the matching pipeline reads, so a
+ * stale grade degrades every suggestion until someone notices.
+ *
+ * PUT /students/{id} has existed all along and its resource returns every
+ * field the form writes, so nothing is erased on save.
+ */
 function ParentStudentRow({ s, onRemove }) {
+  const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({ name: s.name ?? '', grade: s.grade ?? '', board: s.board ?? '', subjects: s.subjects ?? '' });
+  const [err, setErr] = useState('');
+
+  const save = useMutation({
+    mutationFn: () => updateStudent(s.id, form),
+    onSuccess: () => {
+      setEditing(false); setErr('');
+      qc.invalidateQueries({ queryKey: ['students'] });
+      // The record card counts per student, and the matcher reads grade/board.
+      qc.invalidateQueries({ queryKey: ['my-record'] });
+    },
+    onError: e => setErr(e?.response?.data?.message
+      || Object.values(e?.response?.data?.errors || {})[0]?.[0] || 'Could not save.'),
+  });
+
+  const cancel = () => {
+    setForm({ name: s.name ?? '', grade: s.grade ?? '', board: s.board ?? '', subjects: s.subjects ?? '' });
+    setEditing(false); setErr('');
+  };
+  const set = k => e => setForm({ ...form, [k]: e.target.value });
+
+  if (editing) {
+    return (
+      <li className="rounded-lg ring-1 ring-brand-200 bg-brand-50/40 p-3">
+        <form onSubmit={e => { e.preventDefault(); save.mutate(); }} className="space-y-2">
+          <input required value={form.name} onChange={set('name')} placeholder="Student name" className={inp} />
+          {/* sm:grid-cols-3, not a bare grid-cols-3: three text inputs side by
+              side at 360px is unusable, and this card has form off a phone. */}
+          <div className="grid gap-2 sm:grid-cols-3">
+            <input value={form.grade} onChange={set('grade')} placeholder="Grade" className={inp} />
+            <input value={form.board} onChange={set('board')} placeholder="Board" className={inp} />
+            <input value={form.subjects} onChange={set('subjects')} placeholder="Subjects" className={inp} />
+          </div>
+          {err && <p className="text-xs font-semibold text-red-600">{err}</p>}
+          <div className="flex gap-2">
+            <button disabled={save.isPending} className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+              <Save className="h-3.5 w-3.5" />{save.isPending ? 'Saving…' : 'Save changes'}
+            </button>
+            <button type="button" onClick={cancel} className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 hover:bg-white">Cancel</button>
+          </div>
+        </form>
+      </li>
+    );
+  }
+
   return (
     <li className="rounded-lg ring-1 ring-slate-100 overflow-hidden">
       <div className="flex items-center justify-between px-3 py-2">
@@ -1417,7 +1822,11 @@ function ParentStudentRow({ s, onRemove }) {
         </button>
         <div className="flex items-center gap-1 shrink-0">
           <button onClick={()=>setOpen(o=>!o)} className="p-1.5 text-slate-400 hover:text-brand-600" title="Portfolio">{open ? <ChevronUp className="h-4 w-4"/> : <ChevronDown className="h-4 w-4"/>}</button>
-          <button onClick={onRemove} className="p-1.5 text-slate-400 hover:text-red-600" title="Remove"><Trash2 className="h-4 w-4"/></button>
+          <button onClick={()=>{ setEditing(true); setOpen(false); }} className="rounded-lg px-2 py-1 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50">Edit</button>
+          {/* Confirmed now. This removes a child and everything recorded about
+              them, and it was a single unguarded click next to Portfolio. */}
+          <button onClick={()=>{ if (confirm(`Remove ${s.name}? Their portfolio, achievements and class record go with them. This cannot be undone.`)) onRemove(); }}
+            className="p-1.5 text-slate-400 hover:text-red-600" title="Remove"><Trash2 className="h-4 w-4"/></button>
         </div>
       </div>
       {open && <div className="border-t border-slate-100 bg-slate-50"><PortfolioPanel studentId={s.id} /></div>}

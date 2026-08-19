@@ -68,6 +68,15 @@ class LeadNotifier
         }
     }
 
+    /**
+     * The staff alert. NOT gated by the lead's contact preferences, and that is
+     * deliberate — see ContactPolicy note 2. This tells our own team that
+     * somebody asked to be taught; a parent who declined marketing has still
+     * asked to be taught, and filtering this on their preference would mean the
+     * more privacy-conscious the family, the less likely anybody ever calls
+     * them back. The preferences govern messages TO the family, which is a
+     * different journey and passes through ContactPolicy.
+     */
     private static function email(string $title, array $lines, ?string $adminPath): void
     {
         $to = config('app.lead_notify_email') ?: config('app.admin_email');

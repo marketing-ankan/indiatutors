@@ -20,6 +20,12 @@ class User extends Authenticatable
         'role',
         'phone',
         'phone_country_code',
+        // How this person wants to be contacted. Service messages default on,
+        // marketing defaults off — see the migration for why they are separate.
+        'notify_whatsapp',
+        'notify_email',
+        'class_reminders',
+        'marketing_opt_in',
     ];
 
     protected $hidden = [
@@ -32,7 +38,21 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'notify_whatsapp'  => 'boolean',
+            'notify_email'     => 'boolean',
+            'class_reminders'  => 'boolean',
+            'marketing_opt_in' => 'boolean',
         ];
+    }
+
+    /**
+     * May we send this person this kind of message on this channel?
+     * Thin pass-through to ContactPolicy, which owns the rules — see there for
+     * what is deliberately NOT gated (the in-app bell, and staff alerts).
+     */
+    public function acceptsContact(string $channel, string $purpose = 'service'): bool
+    {
+        return \App\Support\ContactPolicy::allows($this, $channel, $purpose);
     }
 
     // Relationships

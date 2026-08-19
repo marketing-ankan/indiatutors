@@ -91,6 +91,10 @@ export const fetchOnlineAllowance = async () => { const { data } = await api.get
 // details stay withheld until a coordinator releases them.
 export const proposeDemoSlot      = async ({ demoId, ...p }) => { const { data } = await api.post(`/teacher/demos/${demoId}/slots`, p); return data; };
 export const withdrawDemoSlot     = async ({ demoId, slotId }) => { const { data } = await api.patch(`/teacher/demos/${demoId}/slots/${slotId}/withdraw`); return data; };
+// E2 — "I cannot take Thursday's class". Resolved as a substitute, or as an
+// online class against the teacher's monthly allowance. The server decides
+// which is possible and returns a sentence saying what it did.
+export const reportAbsence        = async ({ enrollmentId, ...p }) => { const { data } = await api.post(`/teacher/enrollments/${enrollmentId}/absence`, p); return data; };
 export const fetchClassLogs = async (enrollmentId) => { const { data } = await api.get(`/teacher/enrollments/${enrollmentId}/logs`); return data.data; };
 export const addClassLog    = async (enrollmentId, payload) => { const { data } = await api.post(`/teacher/enrollments/${enrollmentId}/logs`, payload); return data.data; };
 
@@ -351,6 +355,12 @@ export const fetchAdminPosts        = async () => { const { data } = await api.g
 export const createAdminPost        = async (p) => { const { data } = await api.post('/admin/posts', p); return data; };
 export const updateAdminPost        = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/posts/${id}`, p); return data; };
 export const deleteAdminPost        = async (id) => { const { data } = await api.delete(`/admin/posts/${id}`); return data; };
+// The Content tab's writing assistant. Both return 503 with a readable
+// message when the provider is unconfigured or out of quota — surfaced as-is.
+// Config booleans (never values) — used to hide features that have no key.
+export const fetchDeployInfo = async () => { const { data } = await api.get('/deploy-info'); return data.data; };
+export const aiDraftPost   = async (p) => { const { data } = await api.post('/admin/ai/blog-draft', p); return data.data; };
+export const aiCoverImage  = async (p) => { const { data } = await api.post('/admin/ai/cover-image', p); return data.data; };
 
 // Policy pages and site-wide details, both editable in the console.
 export const fetchSiteSettings     = async () => { const { data } = await api.get('/site-settings'); return data.data; };

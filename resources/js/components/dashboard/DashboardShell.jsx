@@ -39,13 +39,18 @@ export const NAV_BY_ROLE = {
     { key: 'overview',     label: 'Overview',     Icon: LayoutGrid },
     { key: 'classes',      label: 'My classes',   Icon: BookOpen },
     { key: 'materials',    label: 'Materials',    Icon: FolderOpen },
+    // "Certificates" used to sit here as its own destination. Nothing could
+    // ever appear in it: there is no Certificate model and no endpoint that
+    // could fill one, so the section was a permanent "coming soon" card. A
+    // certificate already has a real home — a portfolio item of type
+    // 'certificate' — so the nav entry is gone rather than kept as a promise.
     { key: 'achievements', label: 'Achievements', Icon: Trophy },
-    { key: 'certificates', label: 'Certificates', Icon: Award },
     { key: 'support',      label: 'Help',         Icon: LifeBuoy },
   ],
   parent: [
     { key: 'overview',     label: 'Overview',     Icon: LayoutGrid },
     { key: 'classes',      label: 'Classes',      Icon: BookOpen },
+    { key: 'materials',    label: 'Materials',    Icon: FolderOpen },
     { key: 'bookings',     label: 'Bookings',     Icon: CalendarClock },
     { key: 'achievements', label: 'Achievements', Icon: Trophy },
     { key: 'children',     label: 'My children',  Icon: Users },
@@ -56,9 +61,20 @@ export const NAV_BY_ROLE = {
     { key: 'overview',   label: 'Overview',   Icon: LayoutGrid },
     { key: 'classroom',  label: 'Classroom',  Icon: BookOpen },
     { key: 'schedule',   label: 'Schedule',   Icon: CalendarClock },
+    { key: 'materials',  label: 'Materials',  Icon: FolderOpen },
     { key: 'requests',   label: 'Requests',   Icon: Trophy },
     { key: 'profile',    label: 'My profile', Icon: ShieldCheck },
+    // A teacher had no way to reach a human in-product at all. The support
+    // endpoints have never been role-restricted.
+    { key: 'support',    label: 'Help',       Icon: LifeBuoy },
   ],
+};
+
+/** The one line under the greeting. A teacher does not "learn" here. */
+const SUBTITLE = {
+  student: 'Here is where your learning stands.',
+  parent:  "Here is how your children's classes are going.",
+  teacher: 'Here is your teaching at a glance.',
 };
 
 export default function DashboardShell({ role = 'student', section, onSection, children, rail }) {
@@ -117,8 +133,23 @@ export default function DashboardShell({ role = 'student', section, onSection, c
               <h1 className="font-heading truncate text-xl font-extrabold text-[#0B1220] sm:text-2xl">
                 Hello, {user?.name?.split(' ')[0] || 'there'} 👋
               </h1>
-              <p className="text-xs text-slate-500">Here is where your learning stands.</p>
+              {/* Per role. This line was "Here is where your learning stands."
+                  for everybody, so a parent and a teacher were both told about
+                  "your learning" — the teacher does not learn here, they teach,
+                  and the parent is watching someone else's progress. */}
+              <p className="text-xs text-slate-500">{SUBTITLE[role] ?? SUBTITLE.student}</p>
             </div>
+
+            {/* /account holds the password change, the sign-in addresses and the
+                order receipts, and every one of those endpoints works — but the
+                only link to it in the whole app lived in a component that just
+                the admin view renders, so all three of these roles were locked
+                out of their own account settings. */}
+            <Link to="/account"
+              className="ml-auto shrink-0 rounded-lg bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50">
+              <span className="hidden sm:inline">Account &amp; orders</span>
+              <span className="sm:hidden">Account</span>
+            </Link>
           </div>
 
           {/* 2xl, not lg: the rail only earns its place once the main column
@@ -386,7 +417,26 @@ export function KeepLearning() {
  *
  * It also surfaces the company decks, which existed only as an API until now.
  */
-export function ClassMaterialsSection({ children }) {
+// One endpoint serves all three roles, so the copy has to change voice: a
+// teacher is not "enrolled in" the class they teach, and a parent's materials
+// arrive through their child.
+const MATERIALS_COPY = {
+  student: {
+    blurb: 'Notes, slides and worksheets for the classes you are enrolled in.',
+    empty: 'Nothing shared yet. Material appears here once you are enrolled in a class and your teacher or our team publishes it.',
+  },
+  parent: {
+    blurb: "Notes, slides and worksheets for the classes your children are enrolled in.",
+    empty: "Nothing shared yet. Material appears here once a child is enrolled and their teacher or our team publishes it.",
+  },
+  teacher: {
+    blurb: 'Notes, slides and worksheets published for the courses you teach.',
+    empty: 'Nothing published yet for your courses. Company material our team uploads appears here.',
+  },
+};
+
+export function ClassMaterialsSection({ children, audience = 'student' }) {
+  const copy = MATERIALS_COPY[audience] ?? MATERIALS_COPY.student;
   const { data: groups = [], isLoading } = useQuery({
     queryKey: ['my-course-materials'],
     queryFn: fetchMyCourseMaterials,
@@ -406,16 +456,13 @@ export function ClassMaterialsSection({ children }) {
         <h2 className="font-heading flex items-center gap-2 text-lg font-bold text-[#0B1220]">
           <FolderOpen className="h-5 w-5 text-brand-600" />Class materials
         </h2>
-        <p className="mt-1 text-xs text-slate-500">
-          Notes, slides and worksheets for the classes you are enrolled in.
-        </p>
+        <p className="mt-1 text-xs text-slate-500">{copy.blurb}</p>
 
         {isLoading ? (
           <p className="mt-3 text-sm text-slate-400">Loading…</p>
         ) : total === 0 ? (
           <p className="mt-3 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-500 ring-1 ring-slate-100">
-            Nothing shared yet. Material appears here once you are enrolled in a class and your teacher
-            or our team publishes it.
+            {copy.empty}
           </p>
         ) : (
           <div className="mt-4 space-y-5">
@@ -464,7 +511,12 @@ export function ClassMaterialsSection({ children }) {
 export function SuggestedCourses() {
   const { data: courses = [] } = useQuery({
     queryKey: ['dash-popular-courses'],
-    queryFn: () => fetchCourses({ per_page: 3 }),
+    // .data, because /courses is PAGINATED — fetchCourses hands back the whole
+    // {data, links, meta} envelope. Reading .length off the envelope gave
+    // undefined, so the guard below fired every single time and this section
+    // has never rendered for any student since it was written. Every other
+    // caller in the app unwraps it; this one did not.
+    queryFn: () => fetchCourses({ per_page: 3 }).then(r => r?.data ?? []),
     staleTime: 600_000,
   });
   if (!courses.length) return null;
