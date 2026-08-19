@@ -694,7 +694,8 @@ class AdminController extends Controller {
 
     /** Paginated account list, newest first. Optional search + role filter. */
     public function users(Request $request) {
-        $q = User::query()->select(['id', 'name', 'email', 'phone', 'role', 'created_at'])
+        $q = User::query()->select(['id', 'name', 'email', 'phone', 'role', 'created_at',
+                'notify_whatsapp', 'notify_email', 'class_reminders', 'marketing_opt_in'])
             ->withCount(['videoEntitlements', 'students', 'orders'])
             ->with('studentProfile:id,account_user_id')
             ->latest();

@@ -103,6 +103,30 @@ export default function UsersTab() {
                     u.entitlements ? `${u.entitlements} video course${u.entitlements === 1 ? '' : 's'}` : null,
                   ].filter(Boolean).join(' · ')}
                 </div>
+                {/* What this person agreed to be contacted about. Shown to the
+                    coordinator who is about to ring or message them, because
+                    consent that lives only in the customer's own settings
+                    screen is consent staff breach by accident. Only the OFF
+                    switches are called out — a row with nothing here is
+                    contactable normally, which is the common case. */}
+                {u.contact && (() => {
+                  const off = [
+                    !u.contact.whatsapp && 'no WhatsApp',
+                    !u.contact.email && 'no email',
+                    !u.contact.reminders && 'no reminders',
+                  ].filter(Boolean);
+                  if (!off.length && !u.contact.marketing) return null;
+                  return (
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {off.map(label => (
+                        <span key={label} className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">{label}</span>
+                      ))}
+                      {u.contact.marketing && (
+                        <span className="rounded bg-green-50 px-1.5 py-0.5 text-[10px] font-bold text-green-700">offers ok</span>
+                      )}
+                    </div>
+                  );
+                })()}
               </td>
               <td className="px-3 py-3">
                 <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold capitalize ${ROLE_TONE[u.role] || 'bg-slate-100 text-slate-600'}`}>{u.role}</span>

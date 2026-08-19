@@ -45,6 +45,16 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * May we send this person this kind of message on this channel?
+     * Thin pass-through to ContactPolicy, which owns the rules — see there for
+     * what is deliberately NOT gated (the in-app bell, and staff alerts).
+     */
+    public function acceptsContact(string $channel, string $purpose = 'service'): bool
+    {
+        return \App\Support\ContactPolicy::allows($this, $channel, $purpose);
+    }
+
     // Relationships
     public function students() { return $this->hasMany(Student::class); }
     /** Alternate sign-in addresses. The primary is users.email, not in here. */
