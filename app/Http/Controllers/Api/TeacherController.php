@@ -36,6 +36,9 @@ class TeacherController extends Controller {
             'headline'          => 'nullable|string|max:255',
             'qualification'     => 'nullable|string|max:255',
             'subjects'          => 'nullable|string|max:255',
+            // Which classes they teach. Free string of the same shape the
+            // directory stores, built by the checkboxes in the profile form.
+            'grades'            => 'nullable|string|max:300',
             'languages'         => 'nullable|string|max:255',
             'experience_years'  => 'nullable|integer|min:0|max:70',
             'fee_hourly'        => 'nullable|numeric|min:0|max:100000',

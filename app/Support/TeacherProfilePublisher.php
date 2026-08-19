@@ -27,8 +27,14 @@ use Illuminate\Support\Str;
  *     able to set it by saving a form.
  *   - slug — the public URL. Renaming yourself must not break inbound links
  *     or reviews already pointing at the old address.
- *   - grades — seeded to the full range at creation and narrowed by staff;
- *     the profile has no field for it, so publishing would blank it.
+ *
+ * Grades ARE published now, but only when the teacher has actually stated
+ * them. The profile had no field for years, so the full Pre-primary-to-Class-12
+ * range seeded at creation was every teacher's permanent public claim — untrue
+ * for most of them, and useless for matching, since a signal every teacher
+ * matches cannot tell any two apart. A blank still means "not stated", and
+ * payload() drops it so an unanswered field never wipes a range staff narrowed
+ * by hand.
  */
 class TeacherProfilePublisher
 {
@@ -40,6 +46,7 @@ class TeacherProfilePublisher
         'qualification'    => 'qualification',
         'experience_years' => 'experience_years',
         'subjects'         => 'subjects',
+        'grades'           => 'grades',
         'city'             => 'city',
         'languages'        => 'languages',
         'teaching_mode'    => 'teaching_mode',
@@ -66,6 +73,15 @@ class TeacherProfilePublisher
         // approving such a teacher 500'd. Dropping nulls also stops a
         // half-filled profile blanking details already live on the listing.
         // '' is kept: that is a field deliberately cleared, not one never set.
+        // Grades are the exception to the ''-is-deliberate rule below. The
+        // field is a set of checkboxes whose natural unanswered state is empty,
+        // and publishing that empty would blank a range staff may have narrowed
+        // by hand — and leave the teacher matching no class at all. Empty here
+        // means "not stated", so it is dropped like a null.
+        if (($out['grades'] ?? null) !== null && trim((string) $out['grades']) === '') {
+            unset($out['grades']);
+        }
+
         $out = array_filter($out, static fn ($v) => $v !== null);
         // A null fee would render as "₹0 per hour" on the public card, which is
         // a price nobody offered.

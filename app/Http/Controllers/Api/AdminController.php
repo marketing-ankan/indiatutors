@@ -31,6 +31,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+// Approving a teacher publishes them to the public directory. Without this
+// import the call resolved to App\Http\Controllers\Api\TeacherProfilePublisher
+// and fatalled, AFTER the status had already been written.
+use App\Support\TeacherProfilePublisher;
 
 class AdminController extends Controller {
     /**

@@ -6,7 +6,7 @@ class TeacherProfile extends Model {
     // changes_submitted_at / published_at are deliberately NOT fillable: they
     // are the review gate, and a mass-assign from a teacher's own form must
     // never be able to mark their edits as already reviewed.
-    protected $fillable = ['user_id','headline','qualification','subjects','languages','experience_years','fee_hourly','city','teaching_mode','service_areas','availability','bio','status'];
+    protected $fillable = ['user_id','headline','qualification','subjects','grades','languages','experience_years','fee_hourly','city','teaching_mode','service_areas','availability','bio','status'];
     protected $casts = [
         'experience_years'     => 'integer',
         'fee_hourly'           => 'decimal:2',
