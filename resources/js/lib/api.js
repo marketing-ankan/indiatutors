@@ -355,6 +355,12 @@ export const fetchAdminPosts        = async () => { const { data } = await api.g
 export const createAdminPost        = async (p) => { const { data } = await api.post('/admin/posts', p); return data; };
 export const updateAdminPost        = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/posts/${id}`, p); return data; };
 export const deleteAdminPost        = async (id) => { const { data } = await api.delete(`/admin/posts/${id}`); return data; };
+// The Content tab's writing assistant. Both return 503 with a readable
+// message when the provider is unconfigured or out of quota — surfaced as-is.
+// Config booleans (never values) — used to hide features that have no key.
+export const fetchDeployInfo = async () => { const { data } = await api.get('/deploy-info'); return data.data; };
+export const aiDraftPost   = async (p) => { const { data } = await api.post('/admin/ai/blog-draft', p); return data.data; };
+export const aiCoverImage  = async (p) => { const { data } = await api.post('/admin/ai/cover-image', p); return data.data; };
 
 // Policy pages and site-wide details, both editable in the console.
 export const fetchSiteSettings     = async () => { const { data } = await api.get('/site-settings'); return data.data; };

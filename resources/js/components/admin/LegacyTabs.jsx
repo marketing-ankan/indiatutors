@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Check, Plus, X } from 'lucide-react';
+import { Check, Plus, X, Sparkles } from 'lucide-react';
 import {
   fetchAdminEvents, createAdminEvent, updateAdminEvent, deleteAdminEvent,
   fetchAdminVideoCourses, createAdminVideoCourse, updateAdminVideoCourse, deleteAdminVideoCourse,
@@ -12,6 +12,7 @@ import {
   fetchAdminAnalytics, inr,
   fetchAdminPosts, createAdminPost, updateAdminPost, deleteAdminPost,
   fetchAdminWhatsappTestimonials, createWhatsappTestimonial, updateWhatsappTestimonial, deleteWhatsappTestimonial,
+  aiDraftPost, aiCoverImage, fetchDeployInfo,
 } from '../../lib/api.js';
 import { errText, Modal, Chips, SearchBox, btnPrimary, btnGhost } from './AdminUI.jsx';
 import { ImagePicker, CategorySelect } from './FormPickers.jsx';
@@ -1096,6 +1097,35 @@ function PostForm({ post, onClose, onSaved }) {
   const [err, setErr] = useState('');
   const inp = "w-full rounded-lg ring-1 ring-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
 
+  // --- Writing assistant -----------------------------------------------
+  // Offered only when a key is configured on this server, so the buttons are
+  // absent rather than broken on an install without one.
+  const { data: deploy } = useQuery({ queryKey: ['deploy-info'], queryFn: fetchDeployInfo, staleTime: 600_000 });
+  const aiOn = !!deploy?.ai_configured;
+  const [aiOpen, setAiOpen] = useState(false);
+  const [brief, setBrief] = useState({ topic: '', angle: '' });
+  const [aiErr, setAiErr] = useState('');
+  const [aiNote, setAiNote] = useState('');
+
+  // Lands in the editor as text to read and change, and never touches the
+  // publish switch: a machine drafting copy for a business that has twice had
+  // to delete invented claims must not be able to put anything live by itself.
+  const draft = useMutation({
+    mutationFn: () => aiDraftPost({ topic: brief.topic, angle: brief.angle || null }),
+    onSuccess: d => {
+      setForm(f => ({ ...f, title: d.title || f.title, excerpt: d.excerpt || f.excerpt, body: d.body || f.body }));
+      setAiOpen(false); setAiErr('');
+      setAiNote('Draft written. Read it through and correct anything before publishing.');
+    },
+    onError: e => { setAiNote(''); setAiErr(errText(e)); },
+  });
+
+  const cover = useMutation({
+    mutationFn: () => aiCoverImage({ subject: form.title || brief.topic }),
+    onSuccess: d => { setForm(f => ({ ...f, image_url: d.image_url })); setAiErr(''); setAiNote('Cover image generated.'); },
+    onError: e => { setAiNote(''); setAiErr(errText(e)); },
+  });
+
   const save = useMutation({
     mutationFn: () => {
       const payload = { ...form, excerpt: form.excerpt || null, body: form.body || null,
@@ -1117,6 +1147,50 @@ function PostForm({ post, onClose, onSaved }) {
       subtitle={post ? `/blog/${post.slug}` : 'The web address is generated from the title.'}
       onClose={onClose} wide>
       <form onSubmit={e=>{e.preventDefault();save.mutate();}} className="space-y-3">
+        {aiOn && (
+          <div className="rounded-xl bg-brand-50/60 p-3 ring-1 ring-brand-100">
+            {!aiOpen ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <button type="button" onClick={()=>{ setAiOpen(true); setAiErr(''); setAiNote(''); }}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700">
+                  <Sparkles className="h-3.5 w-3.5"/>Write with AI
+                </button>
+                <button type="button" disabled={cover.isPending || !(form.title || brief.topic)}
+                  onClick={()=>{ setAiErr(''); setAiNote(''); cover.mutate(); }}
+                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold text-brand-700 ring-1 ring-brand-200 hover:bg-white disabled:opacity-50">
+                  <Sparkles className="h-3.5 w-3.5"/>{cover.isPending ? 'Generating image…' : 'Generate cover image'}
+                </button>
+                <span className="text-[11px] text-slate-500">Give it a title first — the cover is drawn from it.</span>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <F label="What should the post be about?">
+                  <input autoFocus value={brief.topic} maxLength={500} onChange={e=>setBrief({...brief, topic:e.target.value})}
+                    placeholder="e.g. How to help a Class 9 student who has fallen behind in Maths" className={inp}/>
+                </F>
+                <F label="Any angle you want it to take (optional)">
+                  <input value={brief.angle} maxLength={500} onChange={e=>setBrief({...brief, angle:e.target.value})}
+                    placeholder="e.g. be reassuring, aimed at working parents" className={inp}/>
+                </F>
+                <p className="text-[11px] leading-relaxed text-slate-500">
+                  It writes India-only, with no invented statistics, no prices and no markdown — the same
+                  rules the existing posts follow. It always arrives as a draft for you to check.
+                </p>
+                <div className="flex gap-2">
+                  <button type="button" disabled={draft.isPending || !brief.topic.trim()} onClick={()=>{ setAiErr(''); draft.mutate(); }}
+                    className="rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700 disabled:opacity-50">
+                    {draft.isPending ? 'Writing…' : 'Write the draft'}
+                  </button>
+                  <button type="button" onClick={()=>{ setAiOpen(false); setAiErr(''); }}
+                    className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 hover:bg-white">Cancel</button>
+                </div>
+              </div>
+            )}
+            {aiNote && <p className="mt-2 text-[11px] font-semibold text-green-700">{aiNote}</p>}
+            {aiErr && <p className="mt-2 text-[11px] font-semibold text-red-600">{aiErr}</p>}
+          </div>
+        )}
+
         <F label="Title"><input required value={form.title} onChange={e=>setForm({...form,title:e.target.value})} placeholder="How to choose a home tutor" className={inp}/></F>
         <F label="Summary — shown on the blog index and in link previews">
           <textarea rows={2} value={form.excerpt} onChange={e=>setForm({...form,excerpt:e.target.value})} className={inp}/>

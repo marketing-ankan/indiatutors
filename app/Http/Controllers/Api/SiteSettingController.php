@@ -42,6 +42,8 @@ class SiteSettingController extends Controller
             'admin_password_reset_active' => (bool) config('app.admin_password_reset'),
             'mail_mailer'   => (string) config('mail.default'),
             'ga_configured' => (bool) config('app.ga_id'),
+            // Whether the Content tab can offer the writing assistant at all.
+            'ai_configured' => (bool) config('services.ai.key'),
         ]]);
     }
 

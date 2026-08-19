@@ -78,6 +78,14 @@ return [
         // overuse) while gemini-flash-latest answered fine on the same key.
         // The alias follows wherever the free quota goes; a pin dies with it.
         'model'    => env('AI_MODEL', 'gemini-flash-latest'),
+
+        // Image generation is a SEPARATE model and a separate quota. On the
+        // free tier it returns 429 with "limit: 0" — not overuse, but no free
+        // allowance at all — so cover-image generation only starts working
+        // once billing is enabled on the Google account. Text drafting works
+        // on the free tier today. Kept configurable so the model can be moved
+        // without a deploy of new code.
+        'image_model' => env('AI_IMAGE_MODEL', 'gemini-2.5-flash-image'),
     ],
 
     // Social feeds on the course page. YouTube needs no credentials — the
