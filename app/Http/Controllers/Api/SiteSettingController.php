@@ -44,6 +44,36 @@ class SiteSettingController extends Controller
             'ga_configured' => (bool) config('app.ga_id'),
             // Whether the Content tab can offer the writing assistant at all.
             'ai_configured' => (bool) config('services.ai.key'),
+
+            // Why nobody can sign in, narrowed without exposing anything.
+            //
+            // login() answers an identical 422 for "no such account" and "wrong
+            // password", which is correct — telling an attacker which addresses
+            // exist is an enumeration gift — but it also means the lockout
+            // cannot be diagnosed from outside at all. These two say which of
+            // the three possible causes it is, and neither echoes an address or
+            // a secret: a count, and a state for whatever ADMIN_EMAIL happens
+            // to be set to on this server.
+            //
+            //   admin_count 0            -> no admin exists; the seeder never ran
+            //   admin_email_account
+            //     'missing'              -> ADMIN_EMAIL points at an address with
+            //                               no account, so the unlock migration
+            //                               force-set the password on something
+            //                               else entirely
+            //     'exists_not_admin'     -> the account is there but not staff
+            //     'admin'                -> account and role are both right, so
+            //                               the only remaining cause is that
+            //                               ADMIN_PASSWORD is not the password
+            //                               being typed
+            'admin_count' => \App\Models\User::where('role', 'admin')->count(),
+            'admin_email_account' => (function () {
+                $email = config('app.admin_email');
+                if (! $email) return 'not_configured';
+                $user = \App\Models\User::where('email', $email)->first();
+                if (! $user) return 'missing';
+                return $user->role === 'admin' ? 'admin' : 'exists_not_admin';
+            })(),
         ]]);
     }
 
