@@ -59,10 +59,27 @@ class TutorMatcher
 
             if ($tokens->isNotEmpty()) {
                 $subjects = mb_strtolower((string) $t->subjects);
-                if ($tokens->first(fn ($tok) => str_contains($subjects, $tok))) {
-                    $score += 3;
-                    $why[]  = 'subject';
+                if (! $tokens->first(fn ($tok) => str_contains($subjects, $tok))) {
+                    // A named subject is a REQUIREMENT, not a bonus.
+                    //
+                    // Without this the grade point below could qualify a tutor
+                    // on its own, and "teaches Class 9" says nothing about
+                    // whether they teach Maths: an enquiry for Class 9
+                    // Mathematics was returning a Yoga teacher, an English
+                    // teacher and a drummer, because no tutor on the site
+                    // teaches Maths and those three happen to cover Class 9.
+                    // On the booking form — the highest-intent page there is —
+                    // an irrelevant suggestion is worse than none, and it
+                    // quietly tells the family we have nobody who understands
+                    // what they asked for.
+                    //
+                    // Same disease as the home-visits chip below, one branch
+                    // over: any signal that is not evidence of fit must not be
+                    // able to clear the score gate by itself.
+                    return null;
                 }
+                $score += 3;
+                $why[]  = 'subject';
             }
 
             if ($gradeNum !== null && $t->grades) {

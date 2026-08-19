@@ -79,7 +79,26 @@ function TeacherShortlist({ subject, grade, city, mode, picked, onPick, onClear,
   }
 
   const rows = data?.data ?? [];
-  if (!isFetching && rows.length === 0) return null;   // no fit: silence beats a bad guess
+
+  // Nobody fits. This used to return null and vanish, on the reasoning that
+  // silence beats a bad guess — right about the bad guess, wrong about the
+  // silence, and it was a rare state only because the matcher used to fill the
+  // list with anyone who taught the right CLASS. Now that a named subject is
+  // genuinely required, "we list no Chess teacher yet" is an ordinary outcome,
+  // and a section that quietly disappears mid-form reads as a broken page.
+  //
+  // Say it plainly instead, and keep the booking moving: a coordinator matches
+  // these by hand anyway, so an unlisted subject is not a dead end — and this
+  // is the lead-capture form, where an unexplained blank is the one thing that
+  // makes someone give up.
+  if (!isFetching && rows.length === 0) {
+    return (
+      <p className="rounded-lg bg-slate-50 px-4 py-3 text-xs text-slate-500 ring-1 ring-slate-100">
+        We don't have a teacher listed for that yet — go ahead and book, and a coordinator
+        will find you the right person.
+      </p>
+    );
+  }
 
   return (
     <fieldset>
