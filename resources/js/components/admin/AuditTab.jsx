@@ -17,6 +17,20 @@ const TYPES = [
   { key: 'booking', label: 'Bookings' },
 ];
 
+// "1 minute ago" answers "is this recent"; it cannot answer "what happened on
+// the 14th", which is the question anyone actually opens an audit log to ask.
+// So the row carries both.
+//
+// Formatted by slicing the string, NOT by parsing it into a Date. The API sends
+// a naive "YYYY-MM-DD HH:MM:SS" already in IST (APP_TIMEZONE=Asia/Kolkata), and
+// handing that to new Date() is exactly how this project has repeatedly shifted
+// timestamps by a day — the browser is free to read it as UTC. There is no
+// timezone maths to get wrong here if none is done.
+const auditDate = (when) => {
+  const [y, m, d] = String(when ?? '').slice(0, 10).split('-');
+  return y && m && d ? `${d}-${m}-${y}` : '';
+};
+
 // Not just prettier: "role_changed" is a database value, and staff reading the
 // log should not have to translate it.
 const ACTION_LABEL = {
@@ -66,7 +80,10 @@ export default function AuditTab() {
         minWidth={900}
         renderRow={r => (
           <tr key={r.id} className="align-top">
-            <td className="px-3 py-3 whitespace-nowrap text-slate-500" title={r.when}>{r.when_human}</td>
+            <td className="px-3 py-3 whitespace-nowrap text-slate-500" title={r.when}>
+              <div>{r.when_human}</div>
+              <div className="text-[11px] text-slate-400 tabular-nums">{auditDate(r.when)}</div>
+            </td>
             <td className="px-3 py-3 text-slate-700">{r.actor}</td>
             <td className="px-3 py-3">
               <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-[11px] text-slate-700">
