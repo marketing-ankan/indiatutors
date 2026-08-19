@@ -56,22 +56,108 @@ class EnrollmentController extends Controller {
     }
 
     /** Upcoming scheduled classes across all the parent's enrollments (Phase 6). */
+    /**
+     * What is actually coming up for this family.
+     *
+     * This used to read only class_logs with status 'scheduled' — individual
+     * dated rows a teacher had entered in advance. Nothing in the product ever
+     * creates those: teachers log a class after teaching it, as 'completed'. So
+     * the card was empty for every family on the site, while the card directly
+     * above it listed "Mondays at 5:00 PM, Tuesdays at 5:00 PM…" from the
+     * standing timetable. One screen, telling a parent both that their child
+     * has five classes a week and that nothing is scheduled.
+     *
+     * The timetable is the answer. enrollment_schedules holds the weekly rule;
+     * this projects it forward into dated occurrences, which is exactly what a
+     * family means by "upcoming". An explicitly scheduled class_log still wins
+     * for its date — a teacher naming a specific day is more authoritative than
+     * the recurring rule — and a day someone has reported an absence on is
+     * labelled rather than silently shown as normal, because "your teacher
+     * cannot make Thursday" is the single most useful thing this card can say.
+     */
     public function upcomingClasses(Request $request) {
         $enrollmentIds = $this->enrollmentsFor($request->user())->pluck('enrollments.id');
-        $classes = \App\Models\ClassLog::whereIn('enrollment_id', $enrollmentIds)
-            ->where('status', 'scheduled')
-            ->whereDate('held_on', '>=', now()->toDateString())
-            ->with(['enrollment.student:id,name', 'enrollment.course:id,name', 'tutor:id,name'])
-            ->orderBy('held_on')->limit(10)->get();
+        if ($enrollmentIds->isEmpty()) return response()->json(['data' => []]);
 
-        return response()->json(['data' => $classes->map(fn ($l) => [
-            'id'      => $l->id,
-            'date'    => $l->held_on->toDateString(),
-            'topic'   => $l->topic,
-            'student' => $l->enrollment?->student?->name,
-            'course'  => $l->enrollment?->course?->name,
-            'teacher' => $l->tutor?->name,
-        ])]);
+        $today  = now()->startOfDay();
+        $horizon = $today->copy()->addDays(14);
+
+        // Explicitly dated classes a teacher entered ahead of time.
+        $logs = \App\Models\ClassLog::whereIn('enrollment_id', $enrollmentIds)
+            ->where('status', 'scheduled')
+            ->whereDate('held_on', '>=', $today->toDateString())
+            ->with(['enrollment.student:id,name', 'enrollment.course:id,name', 'tutor:id,name'])
+            ->orderBy('held_on')->get();
+
+        $out  = [];
+        $seen = [];
+        foreach ($logs as $l) {
+            $key = $l->enrollment_id . '|' . $l->held_on->toDateString();
+            $seen[$key] = true;
+            $out[] = [
+                'date'    => $l->held_on->toDateString(),
+                'time'    => null,
+                'topic'   => $l->topic,
+                'student' => $l->enrollment?->student?->name,
+                'course'  => $l->enrollment?->course?->name,
+                'plan'    => $l->enrollment?->plan,
+                'teacher' => $l->tutor?->name,
+                'note'    => null,
+            ];
+        }
+
+        // The weekly timetable, projected across the next fortnight.
+        $schedules = \App\Models\EnrollmentSchedule::whereIn('enrollment_id', $enrollmentIds)
+            ->active()
+            ->with(['enrollment.student:id,name', 'enrollment.course:id,name', 'enrollment.tutor:id,name'])
+            ->get();
+
+        // Reported absences, so a class that is not happening as usual says so.
+        $absences = \App\Models\ClassAbsence::whereIn('enrollment_id', $enrollmentIds)
+            ->whereDate('occurs_on', '>=', $today->toDateString())
+            ->whereDate('occurs_on', '<=', $horizon->toDateString())
+            ->with('substitute:id,name')
+            ->get()
+            ->keyBy(fn ($a) => $a->enrollment_id . '|' . \Illuminate\Support\Carbon::parse($a->occurs_on)->toDateString());
+
+        foreach ($schedules as $sch) {
+            for ($day = $today->copy(); $day->lte($horizon); $day->addDay()) {
+                if ($day->dayOfWeekIso !== $sch->weekday) continue;
+
+                $key = $sch->enrollment_id . '|' . $day->toDateString();
+                if (isset($seen[$key])) continue;   // the teacher already dated this one
+                $seen[$key] = true;
+
+                $absence = $absences[$key] ?? null;
+                $note = match ($absence?->status) {
+                    'covered'   => trim(($absence->substitute?->name ?? 'A substitute') . ' is covering this class'),
+                    'online'    => 'Moved online for this day',
+                    'cancelled' => 'Cancelled',
+                    'requested', 'uncovered' => 'Your teacher cannot make this day — we are arranging cover',
+                    default     => null,
+                };
+                if ($absence?->status === 'cancelled') continue;
+
+                $out[] = [
+                    'date'    => $day->toDateString(),
+                    'time'    => \Illuminate\Support\Carbon::createFromFormat('H:i:s', $sch->start_time)->format('g:i A'),
+                    'topic'   => null,
+                    'student' => $sch->enrollment?->student?->name,
+                    'course'  => $sch->enrollment?->course?->name,
+                    // Falls back to the plan ("One-to-One") so a row is not ten
+                    // identical lines reading "Class" when an enrolment has no
+                    // catalogue course attached, which is the common case for
+                    // bespoke tuition.
+                    'plan'    => $sch->enrollment?->plan,
+                    'teacher' => $sch->enrollment?->tutor?->name,
+                    'note'    => $note,
+                ];
+            }
+        }
+
+        usort($out, fn ($a, $b) => [$a['date'], $a['time'] ?? ''] <=> [$b['date'], $b['time'] ?? '']);
+
+        return response()->json(['data' => array_slice($out, 0, 10)]);
     }
 
     /** Parent asks the teacher to reschedule an upcoming class (Phase 8). */
