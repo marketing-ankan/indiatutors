@@ -17,10 +17,31 @@ class DocrootBuildTest extends TestCase
 {
     private array $tempDirs = [];
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->forgetWebRoot();
+    }
+
     protected function tearDown(): void
     {
         foreach ($this->tempDirs as $dir) $this->rrmdir($dir);
+        $this->forgetWebRoot();
         parent::tearDown();
+    }
+
+    /**
+     * webRoot() memoises, because the shell request now asks it more than once.
+     * A static that survives between tests would let the first test's answer
+     * decide the rest, so each test starts from an unresolved detector.
+     */
+    private function forgetWebRoot(): void
+    {
+        foreach (['webRoot' => null, 'webRootResolved' => false] as $prop => $value) {
+            $ref = new \ReflectionProperty(DocrootBuild::class, $prop);
+            $ref->setAccessible(true);
+            $ref->setValue(null, $value);
+        }
     }
 
     /** @return mixed */
@@ -53,7 +74,9 @@ class DocrootBuildTest extends TestCase
     /** THE safety test: no patched index.php one level up means no docroot, means no copying. */
     public function test_it_refuses_to_act_outside_the_hostinger_split_layout(): void
     {
-        $this->assertNull($this->callPrivate('docroot'),
+        // webRoot(), and public now: WebRootVite resolves the Vite manifest
+        // against the same directory, and one detector must give one answer.
+        $this->assertNull(DocrootBuild::webRoot(),
             'Local layout must not be mistaken for the server web root.');
 
         $sibling = dirname(base_path());
