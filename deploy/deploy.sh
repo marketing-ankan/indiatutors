@@ -71,26 +71,66 @@ NEED_ASSETS=0
 if [ "$NEED_ASSETS" = "1" ]; then
   log "assets: syncing web root to ${HEAD:0:8} (${MAIN_JS:-no manifest})"
 
-  # Build beside the live directory and swap, so the web root is never left
-  # without a build for longer than a rename takes. The old script did
-  # `rm -rf build && cp -r …`, which leaves it missing for the whole copy.
-  rm -rf "$DOCROOT/build.new" "$DOCROOT/build.old"
-  if cp -r "$LARAVEL_DIR/public/build" "$DOCROOT/build.new"; then
-    [ -d "$DOCROOT/build" ] && mv "$DOCROOT/build" "$DOCROOT/build.old"
-    mv "$DOCROOT/build.new" "$DOCROOT/build"
-    rm -rf "$DOCROOT/build.old"
-    log "assets: build swapped"
+  # ADDITIVE, never a swap. Asset filenames carry a content hash, so a new build
+  # can only ever ADD files beside the old ones — nothing collides, and the
+  # previous bundle keeps working for anyone still holding the previous HTML.
+  #
+  # The swap this replaces looked atomic and was not, in two ways that both cost
+  # real page views:
+  #
+  #   1. Between `mv build build.old` and `mv build.new build` the web root has
+  #      no build directory at all. Milliseconds, but a request landing in it
+  #      404s — and the hws front layer CACHES 404s, so one unlucky request
+  #      poisons that URL for everyone behind that edge.
+  #   2. The instant the swap completes, every file of the previous build is
+  #      deleted. Any visitor, CDN edge or service worker still holding the
+  #      previous HTML then asks for a bundle that no longer exists. That is
+  #      not a millisecond window; it lasts as long as the old HTML is cached.
+  #
+  # Copying in place removes both: old files stay, new files appear, and the
+  # manifest is written LAST so it can never name a file that has not landed
+  # yet. WebRootVite reads the manifest from THIS directory for the same
+  # reason, so the HTML can never outrun the copy either.
+  mkdir -p "$DOCROOT/build"
+  ASSETS_OK=1
+  if [ -d "$LARAVEL_DIR/public/build/assets" ]; then
+    mkdir -p "$DOCROOT/build/assets"
+    cp -r "$LARAVEL_DIR/public/build/assets/." "$DOCROOT/build/assets/" || ASSETS_OK=0
+  fi
+  if [ -d "$LARAVEL_DIR/public/build/images" ]; then
+    mkdir -p "$DOCROOT/build/images"
+    cp -r "$LARAVEL_DIR/public/build/images/." "$DOCROOT/build/images/" || ASSETS_OK=0
+  fi
+  if [ "$ASSETS_OK" = "1" ]; then
+    cp -f "$LARAVEL_DIR/public/build/manifest.json" "$DOCROOT/build/manifest.json" 2>/dev/null || true
+    log "assets: build synced (additive)"
   else
-    log "assets: WARN build copy failed, leaving the previous build in place"
-    rm -rf "$DOCROOT/build.new"
+    # The manifest is deliberately NOT written: leaving the previous one in
+    # place keeps the site on the previous build, which works, instead of
+    # pointing it at a half-copied new one.
+    log "assets: WARN asset copy incomplete — manifest left on the previous build"
+  fi
+  # Old hashed assets are retired on a delay, not on the deploy that replaces
+  # them, so a cached page from last week still resolves. 14 days is comfortably
+  # longer than any HTML or service-worker cache this site sets.
+  if [ -d "$DOCROOT/build/assets" ]; then
+    PRUNED="$(find "$DOCROOT/build/assets" -type f -mtime +14 -print -delete 2>/dev/null | wc -l | tr -d ' ')"
+    [ "${PRUNED:-0}" != "0" ] && log "assets: pruned $PRUNED asset(s) older than 14 days"
   fi
 
   # PWA + icons + self-hosted images. These lived at the very end of the old
   # script, which is why manifest.webmanifest was three weeks stale.
   cp -f "$LARAVEL_DIR/public/sw.js" "$DOCROOT/sw.js" 2>/dev/null || true
   cp -f "$LARAVEL_DIR/public/manifest.webmanifest" "$DOCROOT/manifest.webmanifest" 2>/dev/null || true
-  rm -rf "$DOCROOT/icons"  && cp -r "$LARAVEL_DIR/public/icons"  "$DOCROOT/icons"  2>/dev/null || true
-  rm -rf "$DOCROOT/images" && cp -r "$LARAVEL_DIR/public/images" "$DOCROOT/images" 2>/dev/null || true
+  # Also additive, and for a worse version of the same reason. `rm -rf images`
+  # followed by a recursive copy leaves EVERY image on the site 404ing for the
+  # whole duration of that copy — seconds, not milliseconds, across hundreds of
+  # files — and the front layer caches those 404s. Copying over the top means an
+  # image is only ever replaced by its new self. Deletions are rare and can be
+  # done by hand; a broken page for every visitor mid-deploy cannot.
+  mkdir -p "$DOCROOT/icons" "$DOCROOT/images"
+  cp -r "$LARAVEL_DIR/public/icons/."  "$DOCROOT/icons/"  2>/dev/null || true
+  cp -r "$LARAVEL_DIR/public/images/." "$DOCROOT/images/" 2>/dev/null || true
 
   # robots.txt MUST be a static file at the web root. The original assumption —
   # a Laravel route serves it, a static file would shadow it — turned out to be

@@ -37,6 +37,10 @@ class DocrootBuild
     private const ROOT_FILES = ['sw.js', 'manifest.webmanifest'];
     private const ROOT_DIRS  = ['icons'];
 
+    /** Memo for webRoot(); see there. Null is a real answer, hence the flag. */
+    private static ?string $webRoot = null;
+    private static bool $webRootResolved = false;
+
     /**
      * Cheap on the happy path: read a ~1 KB manifest, one cache hit, return.
      *
@@ -57,7 +61,7 @@ class DocrootBuild
             if (Cache::get($key)) return;
 
             // Only on a miss, so the steady state never pays for it.
-            $docroot = self::docroot();
+            $docroot = self::webRoot();
             if (!$docroot) return;
 
             if (is_file($docroot . '/build/' . $entry)) {
@@ -90,9 +94,20 @@ class DocrootBuild
      * up one level and rewrites `__DIR__.'/../` to `__DIR__.'/laravel/`. Nothing
      * else produces that. Without this check a local XAMPP install would happily
      * start copying builds into C:\xampp2\htdocs.
+     *
+     * Public because [[WebRootVite]] resolves the Vite manifest against the same
+     * directory, and the two must never disagree about where the web root is —
+     * one detector, one answer. Memoised: it reads the head of index.php, and on
+     * the shell request it is now asked more than once. The layout cannot change
+     * within a request, and statics do not survive between them.
      */
-    private static function docroot(): ?string
+    public static function webRoot(): ?string
     {
+        if (self::$webRootResolved) return self::$webRoot;
+
+        self::$webRootResolved = true;
+        self::$webRoot = null;
+
         $dir = dirname(base_path());
         $idx = $dir . '/index.php';
 
@@ -102,7 +117,11 @@ class DocrootBuild
         $head = @file_get_contents($idx, false, null, 0, 4096);
         if (!$head) return null;
 
-        return str_contains($head, "__DIR__.'/" . basename(base_path()) . "/") ? $dir : null;
+        if (str_contains($head, "__DIR__.'/" . basename(base_path()) . "/")) {
+            self::$webRoot = $dir;
+        }
+
+        return self::$webRoot;
     }
 
     /**
