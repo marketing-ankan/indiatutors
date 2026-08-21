@@ -62,7 +62,11 @@ class Sku
                     $value = 1;
                 } catch (\Illuminate\Database\QueryException $e) {
                     // Lost the insert race; the winner's row is now readable.
-                    $row   = DB::table('number_sequences')->where('key', $key)->lockForUpdate()->first();
+                    // A duplicate key is the expected cause, but a deadlock or
+                    // a busy database throws the same type and leaves nothing
+                    // to re-read — rethrow rather than fatal on null.
+                    $row = DB::table('number_sequences')->where('key', $key)->lockForUpdate()->first();
+                    if (! $row) throw $e;
                     $value = (int) $row->next;
                 }
             } else {

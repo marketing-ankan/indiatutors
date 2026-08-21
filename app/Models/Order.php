@@ -55,7 +55,17 @@ class Order extends Model {
             // same sale — the same lesson the demo notification learned when it
             // fired on the payload instead of the change.
             if ($order->wasChanged('status') && $order->status === 'paid') {
-                $order->issueInvoice();
+                try {
+                    $order->issueInvoice();
+                } catch (\Throwable $e) {
+                    // The sale is already committed — this hook runs after the
+                    // status write. Failing the whole request now would tell a
+                    // customer their payment did not go through when it did, so
+                    // the failure is reported and left for issueMissingInvoices()
+                    // rather than thrown. What must never happen is it passing
+                    // unnoticed, which is what an empty catch would do.
+                    report($e);
+                }
             }
         });
     }
@@ -75,11 +85,35 @@ class Order extends Model {
 
         // Allocation and write commit together, or neither does. Taking the
         // number in one transaction and saving it in another leaves a hole in
-        // the series whenever the save fails — and an invoice series with a
-        // hole in it is the thing somebody has to account for later. Nested
-        // inside the checkout's own transaction this becomes a savepoint, so a
-        // rolled-back order gives its number back too.
+        // the series whenever the save fails. Nested inside the checkout's own
+        // transaction this becomes a savepoint, so a rolled-back order gives
+        // its number back too.
         DB::transaction(function () {
+            // Re-read the ROW under a lock, not the in-memory attribute.
+            //
+            // The guard above asks this object what it loaded, which is
+            // useless when two objects loaded the same order before either
+            // wrote: both saw null, both minted, the second overwrote the
+            // first, and the first number was left belonging to no order at
+            // all — while verify() had already returned it to the buyer. Two
+            // instances of one order is not exotic: it is a double-tapped pay
+            // button, or Razorpay's handler retried after a network flap.
+            //
+            // The lock makes the loser wait until the winner has committed, at
+            // which point it reads a number and stops. The unique index cannot
+            // help here: two ORDERS sharing a number is not what happens, one
+            // order being renumbered is.
+            $issued = static::whereKey($this->getKey())
+                ->lockForUpdate()
+                ->value('invoice_number');
+
+            if ($issued) {
+                // Somebody else got there. Adopt theirs so this instance stops
+                // reporting a number the order does not have.
+                $this->forceFill(['invoice_number' => $issued])->syncOriginal();
+                return;
+            }
+
             $snapshot = TaxSettings::breakdown((float) $this->total, $this->state);
 
             $this->forceFill($snapshot + [
@@ -89,5 +123,37 @@ class Order extends Model {
                                  // that triggered it, not a new status change
                                  // to react to
         });
+    }
+
+    /**
+     * Sales that were recorded as paid but never got their document.
+     *
+     * The status change and the invoice are two writes, and Eloquent fires the
+     * second only after committing the first — so a deadlock, a lock-wait
+     * timeout or a dropped connection inside issueInvoice() leaves the sale
+     * recorded and the invoice unissued, with nothing on screen to say so. Nor
+     * does re-saving fix it: issuance keys off the TRANSITION into paid, and a
+     * row that is already paid never transitions again.
+     *
+     * So the gap is closed by looking for it rather than by hoping. Idempotent,
+     * safe to run repeatedly, and it issues in id order so the series still
+     * runs in the order the sales happened.
+     *
+     * @return int how many were issued
+     */
+    public static function issueMissingInvoices(): int
+    {
+        $n = 0;
+
+        static::query()
+            ->where('status', 'paid')
+            ->whereNull('invoice_number')
+            ->orderBy('id')
+            ->each(function (Order $o) use (&$n) {
+                $o->issueInvoice();
+                if ($o->invoice_number) $n++;
+            });
+
+        return $n;
     }
 }

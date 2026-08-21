@@ -60,7 +60,17 @@ class DocumentNumber
                     ]);
                     $value = 1;
                 } catch (\Illuminate\Database\QueryException $e) {
-                    $row   = DB::table('number_sequences')->where('key', $key)->lockForUpdate()->first();
+                    $row = DB::table('number_sequences')->where('key', $key)->lockForUpdate()->first();
+
+                    // A duplicate key is the expected reason to land here, and
+                    // the re-read finds the winner's row. It is NOT the only
+                    // reason: a deadlock, a lock-wait timeout or a busy
+                    // database throws the same exception type, and then the
+                    // re-read finds nothing and `$row->next` fataled on null —
+                    // turning a retryable database hiccup into a 500 in the
+                    // middle of taking money. Rethrow what we did not expect.
+                    if (! $row) throw $e;
+
                     $value = (int) $row->next;
                 }
             } else {

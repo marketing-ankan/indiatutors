@@ -330,4 +330,79 @@ class OrderNumberingAndInvoiceTest extends TestCase
                 "The {$rate}% slab does not balance.");
         }
     }
+
+    // ---- round five: what the pre-merge pass found --------------------------
+
+    /**
+     * Two objects for one order, both told to become paid.
+     *
+     * A double-tapped pay button, or Razorpay's handler retried after a network
+     * flap. Both instances loaded invoice_number as NULL, so the in-memory
+     * guard let both mint: the second overwrote the first, and the first number
+     * belonged to no order at all — while verify() had already returned it to
+     * the buyer. Nothing in the schema catches it; the unique index prevents two
+     * ORDERS sharing a number, not one order being renumbered.
+     */
+    public function test_two_instances_of_one_order_cannot_issue_two_numbers(): void
+    {
+        $o = $this->order();
+
+        $a = Order::find($o->id);
+        $b = Order::find($o->id);
+        $a->update(['status' => 'paid']);
+        $b->update(['status' => 'paid']);
+
+        $number = $o->fresh()->invoice_number;
+
+        $this->assertNotNull($number);
+        $this->assertSame($number, $a->invoice_number, 'Instance A reports a number the order does not have.');
+        $this->assertSame($number, $b->invoice_number);
+
+        // ...and no number was minted that belongs to nothing.
+        $issued = Order::whereNotNull('invoice_number')->pluck('invoice_number');
+        $this->assertCount(1, $issued);
+        $this->assertSame($number, $issued->first());
+    }
+
+    /**
+     * A sale can be recorded as paid and never get its document: the status
+     * write commits, and only then does the hook that issues the invoice run.
+     * Re-saving does not recover it, because issuance keys off the TRANSITION.
+     */
+    public function test_a_paid_order_left_without_an_invoice_can_be_reconciled(): void
+    {
+        $o = $this->order();
+        $o->update(['status' => 'paid']);
+
+        // Exactly the state a failure inside the hook leaves behind.
+        Order::withoutEvents(fn () => $o->forceFill([
+            'invoice_number' => null, 'invoice_issued_at' => null, 'taxable_value' => null,
+        ])->saveQuietly());
+        $this->assertNull($o->fresh()->invoice_number);
+
+        // Re-saving is NOT the recovery — proving why the command exists.
+        $o->fresh()->update(['status' => 'paid']);
+        $this->assertNull($o->fresh()->invoice_number);
+
+        $this->assertSame(1, Order::issueMissingInvoices());
+        $this->assertNotNull($o->fresh()->invoice_number);
+
+        // Idempotent: a second run finds nothing and changes nothing.
+        $number = $o->fresh()->invoice_number;
+        $this->assertSame(0, Order::issueMissingInvoices());
+        $this->assertSame($number, $o->fresh()->invoice_number);
+    }
+
+    public function test_the_reconcile_command_runs_and_reports(): void
+    {
+        $o = $this->order();
+        $o->update(['status' => 'paid']);
+        Order::withoutEvents(fn () => $o->forceFill(['invoice_number' => null])->saveQuietly());
+
+        $this->artisan('invoices:issue-missing --dry-run')->assertSuccessful();
+        $this->assertNull($o->fresh()->invoice_number, 'A dry run must not issue anything.');
+
+        $this->artisan('invoices:issue-missing')->assertSuccessful();
+        $this->assertNotNull($o->fresh()->invoice_number);
+    }
 }

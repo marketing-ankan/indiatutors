@@ -42,6 +42,22 @@ use Illuminate\Support\Collection;
  *      shares "science" with "Computer Science", and a ten-year-old's science
  *      enquiry came back with two programmers badged as teaching it.
  *   3. Matching must be SYMMETRIC and normalisation IDENTICAL on both sides.
+ *
+ * KNOWN AND STILL OPEN — written down because a commit message claimed one of
+ * these was fixed when it was not, and the next person to read that would have
+ * trusted it:
+ *
+ *   - "Vocal Music Theory" returns only the vocal teacher, as a partial. The
+ *     two tutors who list "Music Theory" VERBATIM still score 0: three words,
+ *     one leads, and the exact-word rescue is capped at two-word requests. The
+ *     person who plainly teaches the thing asked for is the one left out.
+ *   - The same cap loses "Hip Hop Dance", "Advanced Music Theory" and the long
+ *     "…Guitar Lessons for Kids — Basics to Mastery" title.
+ *   - A request phrased as a sentence ("I need a piano tutor") matches nobody.
+ *
+ * None of these is a regression against what is live — production returns
+ * nobody for all of them too — but none is fixed either, and the file should
+ * not pretend otherwise.
  *      Fixing (2) by requiring the tutor's wording to lead the enquiry's meant
  *      an enquiry more specific than the tutor's own words matched nobody:
  *      "Python Programming for Beginners" — a featured course — found neither
