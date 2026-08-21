@@ -303,7 +303,10 @@ export const closeSupportTicket  = async (id) => { const { data } = await api.pa
 // Staff side of the same queue.
 export const fetchAdminSupport       = async (p={}) => { const { data } = await api.get('/admin/support', { params:p }); return data; };
 export const fetchAdminSupportTicket = async (id) => { const { data } = await api.get(`/admin/support/${id}`); return data.data; };
-export const replyAdminSupport       = async ({ id, message }) => { const { data } = await api.post(`/admin/support/${id}/messages`, { message }); return data.data; };
+// Returns the delivery report alongside the ticket. A reply to someone with no
+// account only reaches them if email is configured, so "sent" is a question the
+// server answers rather than something the console may assume.
+export const replyAdminSupport       = async ({ id, message }) => { const { data } = await api.post(`/admin/support/${id}/messages`, { message }); return { ticket: data.data, delivery: data.meta?.delivery ?? null }; };
 export const updateAdminSupport      = async ({ id, ...p }) => { const { data } = await api.patch(`/admin/support/${id}`, p); return data.data; };
 
 // --- Physical / home tuition -------------------------------------------------

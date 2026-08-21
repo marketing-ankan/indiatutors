@@ -103,7 +103,14 @@ function TicketModal({ id, onClose }) {
     qc.invalidateQueries({ queryKey: ['admin-support'] });
     qc.invalidateQueries({ queryKey: ['admin-support-ticket', id] });
   };
-  const send  = useMutation({ mutationFn: () => replyAdminSupport({ id, message: reply }), onSuccess: () => { setReply(''); refresh(); } });
+  // What happened to the last reply. Held here rather than derived from the
+  // ticket, because "we could not send this" is an event, not a state the
+  // ticket carries — and it is the one thing staff must read before moving on.
+  const [delivery, setDelivery] = useState(null);
+  const send  = useMutation({
+    mutationFn: () => replyAdminSupport({ id, message: reply }),
+    onSuccess: ({ delivery }) => { setReply(''); setDelivery(delivery); refresh(); },
+  });
   const close = useMutation({ mutationFn: () => updateAdminSupport({ id, status: 'closed' }), onSuccess: () => { refresh(); onClose(); } });
 
   return (
@@ -126,9 +133,18 @@ function TicketModal({ id, onClose }) {
 
           <form onSubmit={e => { e.preventDefault(); if (reply.trim()) send.mutate(); }} className="mt-4 border-t border-slate-100 pt-3">
             <textarea rows={3} value={reply} onChange={e => setReply(e.target.value)}
-              placeholder="Write a reply — they'll see it on their dashboard and get a notification."
+              placeholder="Write a reply — we'll tell you below how it reached them."
               className="w-full rounded-lg px-3 py-2 text-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500" />
             {send.isError && <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{errText(send.error)}</p>}
+            {delivery && (
+              <p className={`mt-2 rounded-lg px-3 py-2 text-sm ${
+                delivery.status === 'undelivered'
+                  ? 'bg-amber-50 font-semibold text-amber-900 ring-1 ring-amber-200'
+                  : 'bg-green-50 text-green-800'}`}>
+                {delivery.status === 'undelivered' ? 'Saved, but not sent. ' : 'Reply sent. '}
+                {delivery.detail}
+              </p>
+            )}
             <div className="mt-2 flex flex-wrap gap-2">
               <button disabled={send.isPending || !reply.trim()}
                 className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-700 disabled:opacity-50">
@@ -140,7 +156,9 @@ function TicketModal({ id, onClose }) {
             </div>
             {!t.messages?.[0]?.is_staff && (
               <p className="mt-2 text-[11px] text-slate-400">
-                Replying notifies them in-app. If they came from a website form and have no account, reach them on the email or phone in the list.
+                Someone with an account reads the reply on their dashboard. A website enquiry is emailed instead —
+                and if email is not configured on the server, the reply is saved but stays yours to send, and the
+                ticket stays in <em>Needs a reply</em> until you close it.
               </p>
             )}
           </form>
