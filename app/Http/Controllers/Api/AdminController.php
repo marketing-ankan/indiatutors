@@ -78,6 +78,11 @@ class AdminController extends Controller {
             $q->where(fn ($w) => $w->where('first_name', 'like', "%{$s}%")
                 ->orWhere('last_name', 'like', "%{$s}%")
                 ->orWhere('email', 'like', "%{$s}%")
+                // Staff are given the ORDER NUMBER by the customer, so that
+                // is what they will paste in. Searching only the primary key
+                // meant the one identifier a caller can read out found nothing.
+                ->orWhere('order_number', 'like', "%{$s}%")
+                ->orWhere('invoice_number', 'like', "%{$s}%")
                 ->orWhere('id', ltrim($s, '#')));
         }
         return AdminOrderResource::collection($q->paginate(20));

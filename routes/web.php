@@ -1,5 +1,6 @@
 <?php
 use App\Http\Controllers\CurriculumPdfController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\SitemapController;
 use App\Support\SeoMeta;
 use Illuminate\Http\Request;
@@ -15,6 +16,16 @@ Route::get('/curriculum/{slug}.pdf', [CurriculumPdfController::class, 'show'])
     ->where('slug', '[a-z0-9-]+')
     ->middleware('throttle:30,1')
     ->name('curriculum.pdf');
+
+// The order's invoice PDF. A web route rather than an API one because it is a
+// file a person opens, and because signed URLs -- how a guest buyer reaches
+// their own invoice, having no account to authenticate with -- are generated
+// against named web routes. Authorisation lives in the controller: owner,
+// staff, or a valid signature, and never the order id on its own.
+Route::get('/orders/{order}/invoice.pdf', [InvoiceController::class, 'show'])
+    ->whereNumber('order')
+    ->middleware('throttle:30,1')
+    ->name('orders.invoice');
 
 // --- 301 redirect map: old WordPress/WooCommerce URLs → new URLs ---
 // Ready for the real-domain cutover; harmless on staging. URLs the two sites

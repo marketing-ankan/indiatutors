@@ -7,6 +7,11 @@ class AdminOrderResource extends JsonResource {
     public function toArray(Request $request): array {
         return [
             'id'            => $this->id,
+            // Staff quote this on the phone and search by it, so it has to
+            // be here as well as on the customer's copy.
+            'order_number'  => $this->order_number,
+            'invoice_number'=> $this->invoice_number,
+            'invoice_url'   => route('orders.invoice', ['order' => $this->id]),
             'customer'      => trim($this->first_name . ' ' . ($this->last_name ?? '')),
             'email'         => $this->email,
             'phone'         => $this->phone,

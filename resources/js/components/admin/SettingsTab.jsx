@@ -102,6 +102,67 @@ function SiteDetailsPanel() {
         </label>
       </div>
 
+      {/* Off by default, and left that way until the owner says otherwise.
+          Whether this business is registered for GST, and at what rate its
+          services are taxed, is a question for its accountant — putting a
+          guessed rate on a legal document is worse than putting none. */}
+      <div className="rounded-xl bg-white p-4 ring-1 ring-slate-100">
+        <h4 className="mb-1 text-sm font-bold">GST &amp; invoices</h4>
+        <p className="mb-3 text-xs text-slate-500">
+          Every paid order already gets an invoice number and a downloadable PDF. These settings
+          only control whether that invoice shows GST. Check with your accountant before turning
+          it on — the rate and your registration status are their call, not ours.
+        </p>
+
+        <label className="flex cursor-pointer items-start gap-2.5 rounded-lg p-2 hover:bg-slate-50">
+          <input type="checkbox" checked={(current.gst_enabled ?? '0') === '1'}
+            onChange={e => setForm(f => ({ ...(f ?? current), gst_enabled: e.target.checked ? '1' : '0' }))}
+            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500" />
+          <span>
+            <span className="block text-sm font-semibold text-slate-800">Show GST on invoices</span>
+            <span className="block text-[11px] leading-snug text-slate-500">
+              Off: invoices print with no tax lines, which is correct for an unregistered seller.
+            </span>
+          </span>
+        </label>
+
+        {(current.gst_enabled ?? '0') === '1' && (
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-1 block text-xs font-semibold text-slate-600">GSTIN</span>
+              <input value={current.gstin ?? ''} onChange={set('gstin')} placeholder="22AAAAA0000A1Z5" className={inp} />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-xs font-semibold text-slate-600">Rate (%)</span>
+              <input value={current.gst_rate ?? ''} onChange={set('gst_rate')} className={inp} />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-xs font-semibold text-slate-600">Your state</span>
+              <input value={current.seller_state ?? ''} onChange={set('seller_state')} className={inp} />
+              <span className="mt-1 block text-[11px] text-slate-400">
+                Decides CGST+SGST for buyers in your state, IGST for everyone else.
+              </span>
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-xs font-semibold text-slate-600">Prices…</span>
+              <select value={current.gst_mode ?? 'inclusive'} onChange={set('gst_mode')} className={inp}>
+                <option value="inclusive">…already include GST</option>
+                <option value="exclusive">…are before GST</option>
+              </select>
+              <span className="mt-1 block text-[11px] text-slate-400">
+                Inclusive is the safe choice: what customers pay does not change, the invoice just
+                shows how much of it was tax.
+              </span>
+            </label>
+            <label className="block sm:col-span-2">
+              <span className="mb-1 block text-xs font-semibold text-slate-600">Footer note on invoices</span>
+              <input value={current.invoice_footer ?? ''} onChange={set('invoice_footer')}
+                placeholder="e.g. bank details, or terms" className={inp} />
+            </label>
+          </div>
+        )}
+      </div>
+
       {/* A radio pair rather than a checkbox: "coming soon" and "on sale" are
           two named states the whole video catalogue reads, and a bare tick box
           labelled "coming soon" leaves the off position meaning something the

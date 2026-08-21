@@ -72,7 +72,19 @@ export default function OrdersTab() {
         minWidth={980}
         renderRow={o => (
           <tr key={o.id} className="align-top">
-            <td className="px-3 py-3 font-bold text-slate-800">#{o.id}</td>
+            {/* The order NUMBER is what a customer reads out on the phone, so
+                it leads. The database id stays visible underneath because
+                every other console screen and the audit log still key on it. */}
+            <td className="px-3 py-3 font-bold text-slate-800">
+              {o.order_number || `#${o.id}`}
+              {o.invoice_number && (
+                <span className="mt-0.5 block text-[11px] font-semibold text-green-700">{o.invoice_number}</span>
+              )}
+              <a href={o.invoice_url} target="_blank" rel="noopener noreferrer"
+                className="mt-1 block text-[11px] font-semibold text-brand-600 hover:underline">
+                Invoice PDF ↓
+              </a>
+            </td>
             <td className="px-3 py-3">
               <div className="text-slate-800">{o.customer}</div>
               <div className="text-xs text-slate-500">{o.email}</div>

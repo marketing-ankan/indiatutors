@@ -191,7 +191,19 @@ class OrderController extends Controller {
 
     private static function orderPayload(Order $order): array {
         return [
-            'number'         => $order->id,
+            // The order's own number, not its primary key. "#123" told every
+            // customer how many orders the business had ever taken, and could
+            // not survive anything that renumbered rows.
+            'number'         => $order->order_number ?: ('#' . $order->id),
+            'invoice_number' => $order->invoice_number,
+            // Signed, and time-limited, because checkout is open to guests:
+            // they have no account to authenticate with, so the URL itself has
+            // to be the credential. Thirty days is long enough to keep a
+            // receipt and short enough that a forwarded link stops working.
+            // Staff can always re-issue from the console.
+            'invoice_url'    => \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                'orders.invoice', now()->addDays(30), ['order' => $order->id],
+            ),
             'date'           => $order->created_at->toDateString(),
             'email'          => $order->email,
             'total'          => $order->total,
