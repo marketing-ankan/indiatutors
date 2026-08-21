@@ -102,6 +102,35 @@ function SiteDetailsPanel() {
         </label>
       </div>
 
+      {/* A radio pair rather than a checkbox: "coming soon" and "on sale" are
+          two named states the whole video catalogue reads, and a bare tick box
+          labelled "coming soon" leaves the off position meaning something the
+          label never says. */}
+      <div className="rounded-xl bg-white p-4 ring-1 ring-slate-100">
+        <h4 className="mb-1 text-sm font-bold">Recorded (video) courses</h4>
+        <p className="mb-3 text-xs text-slate-500">
+          Controls every video course page at once. Nothing is deleted either way — switching
+          back to “on sale” restores the player, the price and the buy button exactly as they were.
+        </p>
+        <div className="space-y-2">
+          {[
+            ['coming_soon', 'Coming soon', 'Shows “not on sale yet” and asks visitors which subject to record first. Their answers collect under Video courses → What people are asking for.'],
+            ['live', 'On sale', 'Normal selling: free previews, price and checkout.'],
+          ].map(([value, label, hint]) => (
+            <label key={value} className="flex cursor-pointer items-start gap-2.5 rounded-lg p-2 hover:bg-slate-50">
+              <input type="radio" name="video_courses_status" value={value}
+                checked={(current.video_courses_status ?? 'coming_soon') === value}
+                onChange={set('video_courses_status')}
+                className="mt-0.5 h-4 w-4 text-brand-600 focus:ring-brand-500" />
+              <span>
+                <span className="block text-sm font-semibold text-slate-800">{label}</span>
+                <span className="block text-[11px] leading-snug text-slate-500">{hint}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </div>
+
       <div className="rounded-xl bg-white p-4 ring-1 ring-slate-100">
         <h4 className="mb-1 text-sm font-bold">Social links</h4>
         <p className="mb-3 text-xs text-slate-500">Clear one to hide its icon in the footer.</p>

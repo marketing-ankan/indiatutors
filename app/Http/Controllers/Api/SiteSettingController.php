@@ -93,6 +93,12 @@ class SiteSettingController extends Controller
             'contact_address'  => $all['contact_address'],
             'contact_locality' => $all['contact_locality'],
             'footer_blurb'     => $all['footer_blurb'],
+            // Whether the recorded-course catalogue is open for business. Read
+            // by every video course page, so it has to cross this whitelist —
+            // adding the key to SiteSettings::FIELDS alone is not enough, and
+            // omitting it here left the front end permanently on its fallback,
+            // which happens to be "coming soon" and so looked like it worked.
+            'video_courses_status' => $all['video_courses_status'] ?: 'coming_soon',
             'socials'          => [
                 'whatsapp'  => $all['whatsapp_url'],
                 'facebook'  => $all['facebook_url'],

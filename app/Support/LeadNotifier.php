@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Mail;
 class LeadNotifier
 {
     /**
-     * @param string $kind   'demo' | 'contact' | 'tuition'
+     * @param string $kind   'demo' | 'contact' | 'tuition' | 'video_demand'
      * @param array  $lines  label => value, shown in the email and the notification
      */
     public static function announce(string $kind, string $title, array $lines, ?string $adminPath = null): void

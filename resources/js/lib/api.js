@@ -367,6 +367,12 @@ export const aiCoverImage  = async (p) => { const { data } = await api.post('/ad
 
 // Policy pages and site-wide details, both editable in the console.
 export const fetchSiteSettings     = async () => { const { data } = await api.get('/site-settings'); return data.data; };
+// Demand capture for recorded courses that do not exist yet. Public: the whole
+// point is to hear from someone who found nothing to buy.
+export const requestVideoCourse    = async (payload) => { const { data } = await api.post('/video-course-requests', payload); return data; };
+export const fetchVideoDemand      = async (p={}) => { const { data } = await api.get('/admin/video-demand', { params:p }); return data; };
+export const fetchVideoDemandInsights = async () => { const { data } = await api.get('/admin/video-demand/insights'); return data.data; };
+export const setVideoDemandStatus  = async ({ id, status }) => { const { data } = await api.patch(`/admin/video-demand/${id}`, { status }); return data; };
 export const fetchLegalNav         = async () => { const { data } = await api.get('/legal'); return data.data; };
 export const fetchLegalDoc         = async (slug) => { const { data } = await api.get(`/legal/${slug}`); return data.data; };
 export const fetchAdminLegal       = async () => { const { data } = await api.get('/admin/legal'); return data.data; };

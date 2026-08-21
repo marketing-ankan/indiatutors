@@ -42,6 +42,21 @@ class SiteSettings
         'twitter_url'   => ['https://twitter.com/indiatutorsonline', 'nullable|url|max:300', 'X (Twitter)'],
         // Pre-existing key, kept here so every setting has one home.
         'google_review_url' => [null, 'nullable|url|max:500', 'Google review link'],
+
+        /**
+         * Whether the recorded-course catalogue is open for business.
+         *
+         * 'coming_soon' shows every video course as not-yet-available and puts
+         * a "which subject should we record?" form in place of the player and
+         * the buy button. 'live' restores normal selling.
+         *
+         * A setting rather than a config constant or a code branch, because the
+         * day the first course is ready is a business decision made by someone
+         * who cannot deploy — and on this host a config change needs a new
+         * commit to take effect, which would make launch day depend on a
+         * developer being available.
+         */
+        'video_courses_status' => ['coming_soon', 'nullable|in:coming_soon,live', 'Recorded courses'],
     ];
 
     /** Every setting, falling back to what the site shipped with. */

@@ -7,6 +7,8 @@ import { cart, videoCartItem, useCart } from '../lib/cart.js';
 import { useAuth } from '../lib/auth.jsx';
 import LessonPlayer from '../components/LessonPlayer.jsx';
 import LessonAssistant from '../components/LessonAssistant.jsx';
+import VideoCourseComingSoon from '../components/VideoCourseComingSoon.jsx';
+import { useSiteSettings } from '../lib/siteSettings.js';
 
 // Video course detail — the gated playlist. Free-preview and owned lessons play
 // in the embedded player; locked lessons show a padlock and a buy prompt. Buying
@@ -20,6 +22,8 @@ export default function VideoCourseDetailPage() {
   const { slug } = useParams();
   const nav = useNavigate();
   const { isAuthed } = useAuth();
+  // Above the early returns: hooks cannot run conditionally.
+  const site = useSiteSettings();
   const inCart = useCart().some(i => i.slug === slug && i.kind === 'video');
   const { data, isLoading, isError } = useQuery({ queryKey: ['video-course', slug, isAuthed], queryFn: () => fetchVideoCourse(slug) });
 
@@ -61,6 +65,26 @@ export default function VideoCourseDetailPage() {
   );
 
   const course = data.data;
+
+  // The catalogue is not ready to sell. Everything below this line — the
+  // player, the playlist, the price and the buy button — is replaced by a
+  // plain statement of that plus the one question this visit can answer.
+  // Flipped from the Staff Console (Settings > Recorded courses), because
+  // launch day is a business decision and a config change on this host
+  // needs a new commit to take effect.
+  if (site.video_courses_status === 'coming_soon') {
+    return (
+      <div className="bg-[#f9f9fc]">
+        <div className="container-wide py-4 text-xs text-slate-500">
+          <Link to="/" className="hover:text-brand-600">Home</Link> / <Link to="/video-courses" className="hover:text-brand-600">Video Courses</Link> / <span className="text-slate-700">{course.title}</span>
+        </div>
+        <div className="container-wide pb-16">
+          <VideoCourseComingSoon course={course} />
+        </div>
+      </div>
+    );
+  }
+
   const owned = course.owned;
   const active = lessons.find(l => l.id === activeId);
   // The next lesson they can actually watch — skipping locked ones, so

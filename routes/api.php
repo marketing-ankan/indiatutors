@@ -25,7 +25,9 @@ use App\Http\Controllers\Api\CourseMaterialController;
 use App\Http\Controllers\Api\DemoRequestController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\ExamUpdateController;
+use App\Http\Controllers\Api\AdminVideoDemandController;
 use App\Http\Controllers\Api\VideoCourseController;
+use App\Http\Controllers\Api\VideoCourseRequestController;
 use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\AdminPhysicalController;
@@ -108,6 +110,10 @@ Route::get('/events/{slug}',     [EventController::class, 'show'])->name('api.ev
 
 // Video courses — public list/detail (ownership resolved from a bearer token if
 // present); lesson playback is gated in the controller.
+// Demand capture for courses that do not exist yet. Public and unauthenticated:
+// the whole point is to hear from someone who found nothing to buy. Throttled
+// like the other public write endpoints.
+Route::post('/video-course-requests', [VideoCourseRequestController::class, 'store'])->middleware('throttle:10,1');
 Route::get('/video-courses',         [VideoCourseController::class, 'index']);
 Route::get('/video-courses/{slug}',  [VideoCourseController::class, 'show'])->name('api.video.show');
 Route::post('/video-courses/{videoCourse}/lessons/{lesson}/playback', [VideoCourseController::class, 'playback'])->middleware('throttle:60,1');
@@ -381,6 +387,12 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/support',                    [AdminSupportController::class, 'index']);
             Route::get('/support/{ticket}',           [AdminSupportController::class, 'show']);
             Route::post('/support/{ticket}/messages', [AdminSupportController::class, 'reply']);
+
+            // Which recorded courses people are asking for. A report, not a
+            // queue — see VideoCourseRequest for why this is not a support inbox.
+            Route::get('/video-demand',            [AdminVideoDemandController::class, 'index']);
+            Route::get('/video-demand/insights',   [AdminVideoDemandController::class, 'insights']);
+            Route::patch('/video-demand/{videoCourseRequest}', [AdminVideoDemandController::class, 'update']);
             Route::patch('/support/{ticket}',         [AdminSupportController::class, 'update']);
         });
 
