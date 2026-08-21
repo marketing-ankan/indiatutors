@@ -239,9 +239,10 @@ class TutorMatcher
                 if ($ch === ',' || $ch === ';' || $ch === '/' || $ch === '&') {
                     $parts[] = $buf; $buf = ''; continue;
                 }
-                // " and " as a separator, but not the "and" inside a word.
-                if (($ch === 'a' || $ch === 'A') && substr($s, $i, 5) === ' and '
-                    || substr($s, $i, 5) === ' and ') {
+                // " and " as a separator, but never the "and" inside a word —
+                // the surrounding spaces are the whole point, or "Command Line"
+                // and "Andhra" would split.
+                if (substr($s, $i, 5) === ' and ') {
                     $parts[] = $buf; $buf = ''; $i += 4; continue;
                 }
             }
