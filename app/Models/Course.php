@@ -4,6 +4,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Course extends Model {
+    /**
+     * Every course gets a product code at creation, so the catalogue cannot
+     * grow a row that an order line has no stable way to name. A code supplied
+     * by hand is respected — the five legacy ones were typed, not generated.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (Course $c) {
+            if (! $c->sku) $c->sku = \App\Support\Sku::next(\App\Support\Sku::COURSE);
+        });
+    }
+
     protected $fillable = ['sku','name','slug','subtitle','short_description','description','age','pills','curriculum','curriculum_variants','regular_price','sale_price','image_url','is_featured','is_published','position',
         // Group-class fields. NOTE: these are deliberately absent from
         // CourseSeeder's $attrs — that seeder upserts from courses.json and

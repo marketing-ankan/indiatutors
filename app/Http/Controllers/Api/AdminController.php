@@ -71,7 +71,9 @@ class AdminController extends Controller {
 
     /** Cart orders (guest checkout), newest first, with status/month/search filters. */
     public function orders(Request $request) {
-        $q = Order::query()->with(['items:id,order_id,name,price,qty', 'user:id,name,email'])->latest();
+        // sku listed explicitly: a column left out of this select is null on the
+        // resource, which reads exactly like a product that never had a code.
+        $q = Order::query()->with(['items:id,order_id,sku,name,price,qty', 'user:id,name,email'])->latest();
         if ($s = $request->string('status')->toString()) $q->where('status', $s);
         $this->applyMonth($q, $request->string('month')->toString());
         if ($s = trim($request->string('q')->toString())) {
@@ -83,6 +85,9 @@ class AdminController extends Controller {
                 // meant the one identifier a caller can read out found nothing.
                 ->orWhere('order_number', 'like', "%{$s}%")
                 ->orWhere('invoice_number', 'like', "%{$s}%")
+                // ...and by what was bought. A coordinator handed a product
+                // code should be able to find every order carrying it.
+                ->orWhereHas('items', fn ($i) => $i->where('sku', 'like', "%{$s}%"))
                 ->orWhere('id', ltrim($s, '#')));
         }
         return AdminOrderResource::collection($q->paginate(20));

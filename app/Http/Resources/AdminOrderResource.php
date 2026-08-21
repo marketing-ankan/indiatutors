@@ -26,7 +26,7 @@ class AdminOrderResource extends JsonResource {
             // shows the typed-in name instead of pretending there is an account.
             'user'          => $this->whenLoaded('user', fn () => $this->user?->only(['id', 'name', 'email'])),
             'items'         => $this->whenLoaded('items', fn () => $this->items->map(fn ($i) => [
-                'id' => $i->id, 'name' => $i->name, 'price' => (float) $i->price, 'qty' => $i->qty,
+                'id' => $i->id, 'sku' => $i->sku, 'name' => $i->name, 'price' => (float) $i->price, 'qty' => $i->qty,
             ])),
             'created_at'    => optional($this->created_at)->toDateTimeString(),
         ];

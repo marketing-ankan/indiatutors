@@ -94,7 +94,17 @@ export default function OrdersTab() {
                 : <div className="text-[11px] text-slate-400">Guest checkout</div>}
             </td>
             <td className="px-3 py-3 text-slate-600">
-              {(o.items || []).map(i => i.name).join(', ') || <span className="text-slate-400">—</span>}
+              {/* The product CODE under each line, because that is what a
+                  report, an export and this row can all agree on — a title
+                  can be edited, and then they no longer name the same thing. */}
+              {(o.items || []).length === 0
+                ? <span className="text-slate-400">—</span>
+                : (o.items || []).map(i => (
+                    <div key={i.id} className="mb-1 last:mb-0">
+                      {i.name}
+                      {i.sku && <span className="ml-1.5 text-[11px] font-semibold text-slate-400">{i.sku}</span>}
+                    </div>
+                  ))}
             </td>
             <td className="px-3 py-3 font-bold tabular-nums text-slate-800">{inr(o.total)}</td>
             <td className="px-3 py-3"><StatusBadge status={o.status} /></td>

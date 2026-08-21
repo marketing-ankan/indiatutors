@@ -150,9 +150,10 @@
   <thead>
     <tr>
       <th width="6%">#</th>
-      <th width="60%">Description</th>
+      <th width="46%">Description</th>
+      <th width="16%">Code</th>
       <th width="10%" class="right">Qty</th>
-      <th width="24%" class="right">Amount</th>
+      <th width="22%" class="right">Amount</th>
     </tr>
   </thead>
   <tbody>
@@ -160,6 +161,9 @@
       <tr @if ($i % 2) class="alt" @endif>
         <td>{{ $i + 1 }}</td>
         <td>{{ $item->name }}</td>
+        {{-- The code recorded ON THE LINE, so a reprint years later still names
+             what was sold even if the catalogue has moved on. --}}
+        <td class="small muted">{{ $item->sku ?: '—' }}</td>
         <td class="right">{{ $item->qty }}</td>
         <td class="right">{{ $money($item->price * $item->qty) }}</td>
       </tr>

@@ -112,12 +112,15 @@ class OrderController extends Controller {
                 // "Chess" at a number the customer cannot account for.
                 $label = $rate !== null ? "{$c->name} — {$plan}, {$level}" : $c->name;
 
-                $order->items()->create(['course_id' => $c->id, 'name' => $label, 'price' => $price, 'qty' => 1]);
+                // The code is COPIED onto the line, not looked up later. An
+                // order line is a record of a sale and has to keep saying what
+                // was sold after the product is renamed, re-coded or deleted.
+                $order->items()->create(['course_id' => $c->id, 'sku' => $c->sku, 'name' => $label, 'price' => $price, 'qty' => 1]);
                 $total += $price;
             }
             foreach ($videos as $v) {
                 $price = (float) $v->price;
-                $order->items()->create(['video_course_id' => $v->id, 'name' => $v->title.' (video course)', 'price' => $price, 'qty' => 1]);
+                $order->items()->create(['video_course_id' => $v->id, 'sku' => $v->sku, 'name' => $v->title.' (video course)', 'price' => $price, 'qty' => 1]);
                 $total += $price;
             }
             $order->update(['total' => $total]);
@@ -223,7 +226,7 @@ class OrderController extends Controller {
             'currency'       => $order->currency,
             'payment_method' => $order->payment_method,
             'status'         => $order->status,
-            'items'          => $order->items->map(fn ($i) => ['name' => $i->name, 'price' => $i->price, 'qty' => $i->qty]),
+            'items'          => $order->items->map(fn ($i) => ['sku' => $i->sku, 'name' => $i->name, 'price' => $i->price, 'qty' => $i->qty]),
         ];
     }
 }
