@@ -59,7 +59,14 @@ class TutorMatcher
 
             if ($tokens->isNotEmpty()) {
                 $subjects = mb_strtolower((string) $t->subjects);
-                if (! $tokens->first(fn ($tok) => str_contains($subjects, $tok))) {
+                // The phrase is the first token, so an exact multi-word hit is
+                // distinguishable from a single-word one and can be scored
+                // higher. Without that, "Vocal Music" ranked the actual vocal
+                // teacher THIRD, behind two people who merely list "Music
+                // Theory" — both are legitimate results, but only one of them
+                // is what was asked for.
+                $phraseHit = self::subjectHit($subjects, $tokens->first());
+                if (! $phraseHit && ! $tokens->first(fn ($tok) => self::subjectHit($subjects, $tok))) {
                     // A named subject is a REQUIREMENT, not a bonus.
                     //
                     // Without this the grade point below could qualify a tutor
@@ -78,7 +85,7 @@ class TutorMatcher
                     // able to clear the score gate by itself.
                     return null;
                 }
-                $score += 3;
+                $score += $phraseHit ? 4 : 3;
                 $why[]  = 'subject';
             }
 
@@ -125,16 +132,73 @@ class TutorMatcher
     }
 
     /**
-     * "Maths & Science" / "Physics, Chemistry" → ['math','science',…].
-     * Tokens under 3 chars are noise ("ap", "&"), and 'maths' must become
-     * 'math' or it never substring-matches a tutor row's "Mathematics".
+     * Words that describe the ENQUIRY rather than the subject.
+     *
+     * "Class 10 Math" must not match on "class", or a token that is a prefix of
+     * "Classical Vocals" quietly makes a singing teacher a maths result. These
+     * carry no subject meaning, so dropping them costs nothing and removes a
+     * whole family of false positives.
+     */
+    private const NOISE = [
+        'class', 'classes', 'grade', 'std', 'standard', 'level', 'year',
+        'tuition', 'tutor', 'tutors', 'teacher', 'teachers', 'lesson', 'lessons',
+        'online', 'home', 'for', 'the', 'and', 'my', 'kid', 'kids', 'child',
+        'son', 'daughter', 'need', 'want', 'help', 'course', 'classhelp',
+    ];
+
+    /**
+     * What an enquiry is actually asking for.
+     *
+     * Returns the whole normalised phrase AND its individual words, because the
+     * two catch different real inputs and neither is sufficient alone:
+     *
+     *   "Python Programming"  the phrase matches a tutor's "Python Programming"
+     *   "Class 10 Math"       only the WORD "math" can reach "Mathematics"
+     *   "AI & ML"             only the words survive; both are under 3 letters
+     *
+     * The previous version split on punctuation but never on whitespace, so a
+     * multi-word enquiry became one token that had to appear verbatim in the
+     * tutor's subject string. That made the booking form's own placeholder
+     * ("e.g. Class 10 Math") match nothing, and it made "AI & ML" tokenise to
+     * NOTHING at all — which was the dangerous case, because an empty token set
+     * skipped the subject requirement entirely and let any tutor through on the
+     * grade point alone. The phrase token below can never be empty for a
+     * non-empty subject, so that bypass cannot reopen.
      */
     private static function tokens(?string $subject): Collection
     {
-        return collect(preg_split('/[,\/&+]|\band\b/i', mb_strtolower(trim((string) $subject))))
-            ->map(fn ($t) => trim($t))
-            ->map(fn ($t) => $t === 'maths' ? 'math' : $t)
-            ->filter(fn ($t) => mb_strlen($t) >= 3)
-            ->values();
+        $raw = mb_strtolower(trim((string) $subject));
+        if ($raw === '') return collect();
+
+        $phrase = trim(preg_replace('/\s+/', ' ', $raw));
+
+        $words = collect(preg_split('/[^a-z0-9+#]+/u', $phrase, -1, PREG_SPLIT_NO_EMPTY))
+            ->map(fn ($w) => $w === 'maths' ? 'math' : $w)
+            ->reject(fn ($w) => in_array($w, self::NOISE, true))
+            ->reject(fn ($w) => ctype_digit($w))          // "10" in "Class 10 Math"
+            ->reject(fn ($w) => mb_strlen($w) < 2)
+            ->unique();
+
+        // Phrase first: an exact multi-word hit is the strongest signal, and
+        // keeping it guarantees a non-empty set for any non-empty subject.
+        return collect([$phrase])->concat($words)->unique()->values();
+    }
+
+    /**
+     * Does this tutor's subject list answer that token?
+     *
+     * Anchored at a word boundary rather than a bare substring, so "art" cannot
+     * match "Bharatnatyam". A token of four or more characters may match a
+     * PREFIX, which is what lets "math" find "Mathematics" and "program" find
+     * "Programming"; anything shorter must be a whole word, so "ai" matches
+     * "AI & ML" without also matching "Trained".
+     */
+    private static function subjectHit(string $subjects, string $token): bool
+    {
+        $t = preg_quote($token, '/');
+
+        return mb_strlen($token) >= 4
+            ? (bool) preg_match('/\b' . $t . '/u', $subjects)
+            : (bool) preg_match('/\b' . $t . '\b/u', $subjects);
     }
 }

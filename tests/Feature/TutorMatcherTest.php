@@ -108,4 +108,101 @@ class TutorMatcherTest extends TestCase
             'rank() itself does not filter — the endpoint must pass published tutors.');
         $this->assertCount(0, TutorMatcher::rank(Tutor::published()->get(), 'Mathematics', null, null, false));
     }
+
+    /**
+     * The bypass that made the subject requirement optional.
+     *
+     * The old tokeniser dropped fragments under three characters and never
+     * split on whitespace, so "AI & ML" produced an EMPTY token set. An empty
+     * set skipped the subject check completely, the grade point alone cleared
+     * the score gate, and the enquiry came back with every tutor on the site.
+     * The requirement was still in the code and still passing its own test; it
+     * simply was not reached. That is the failure mode worth a regression test.
+     */
+    public function test_a_subject_that_tokenises_to_nothing_still_requires_a_subject(): void
+    {
+        $this->tutor(['name' => 'Yoga person', 'subjects' => 'Yoga, Naturopathy', 'grades' => '1-12']);
+        $this->tutor(['name' => 'Singer',      'subjects' => 'Classical Vocals',  'grades' => '1-12']);
+
+        foreach (['AI & ML', 'C++', 'C#'] as $subject) {
+            $this->assertCount(0, $this->rank($subject, '9'),
+                "\"{$subject}\" matches nobody here and must return nobody, not everybody.");
+        }
+    }
+
+    public function test_short_subjects_match_the_tutor_who_actually_teaches_them(): void
+    {
+        $this->tutor(['name' => 'AI person', 'subjects' => 'AI & ML, Python', 'grades' => '9-12']);
+        $this->tutor(['name' => 'Yoga person', 'subjects' => 'Yoga', 'grades' => '1-12']);
+
+        $out = $this->rank('AI & ML', '9');
+
+        $this->assertCount(1, $out);
+        $this->assertSame('AI person', $out->first()['tutor']->name);
+    }
+
+    /**
+     * The booking form's own placeholder is "e.g. Class 10 Math". It matched
+     * nothing, because the whole string had to appear verbatim in a tutor's
+     * subject list. The likeliest thing a parent types was the one shape the
+     * matcher could not read.
+     */
+    public function test_the_booking_forms_own_placeholder_finds_a_maths_teacher(): void
+    {
+        $this->tutor(['name' => 'Maths teacher', 'subjects' => 'Mathematics', 'grades' => '6-12']);
+
+        foreach (['Class 10 Math', 'Class 10 Maths', 'class 10 mathematics'] as $typed) {
+            $out = $this->rank($typed, '10');
+            $this->assertCount(1, $out, "A parent typing \"{$typed}\" must reach the Maths teacher.");
+            $this->assertSame('Maths teacher', $out->first()['tutor']->name);
+        }
+    }
+
+    /**
+     * Enquiry words must not qualify a tutor on their own. "Class" is the trap:
+     * it is a prefix of "Classical Vocals", so a maths enquiry that kept the
+     * word "class" as a token silently returned a singing teacher.
+     */
+    public function test_enquiry_words_do_not_match_subjects(): void
+    {
+        $this->tutor(['name' => 'Singer', 'subjects' => 'Classical Vocals', 'grades' => '1-12']);
+
+        $this->assertCount(0, $this->rank('Class 10 Math', '10'),
+            '"Class" must not match "Classical".');
+        $this->assertCount(0, $this->rank('Online tuition', '10'),
+            'Words describing the arrangement are not subjects.');
+    }
+
+    /**
+     * A token shorter than four characters must be a whole word, or "art"
+     * reaches "Bharatnatyam" and every three-letter enquiry becomes a lucky dip.
+     */
+    public function test_a_short_token_must_be_a_whole_word_not_a_fragment(): void
+    {
+        // "ai" sits inside "painting" as a bare substring, and this site really
+        // does teach both Painting and AI & ML — so matching one against the
+        // other is a false positive that would genuinely have reached a family.
+        $this->tutor(['name' => 'Painter', 'subjects' => 'Painting, Sketching', 'grades' => '1-12']);
+        $this->tutor(['name' => 'Dancer',  'subjects' => 'Bharatnatyam',        'grades' => '1-12']);
+
+        $this->assertCount(0, $this->rank('AI'), '"AI" must not match "Painting".');
+    }
+
+    /**
+     * Both are defensible results; only one is what was asked for. Before the
+     * phrase was scored above the word, an enquiry for "Vocal Music" put the
+     * actual vocal teacher THIRD, behind two people who merely list "Music
+     * Theory". Ordering is the whole product here — families read the top row.
+     */
+    public function test_an_exact_phrase_outranks_a_single_word_overlap(): void
+    {
+        $this->tutor(['name' => 'Vocal teacher', 'subjects' => 'Vocal Music', 'grades' => '1-12']);
+        $this->tutor(['name' => 'Pianist',       'subjects' => 'Piano, Music Theory', 'grades' => '1-12']);
+
+        $out = $this->rank('Vocal Music');
+
+        $this->assertCount(2, $out, 'The music teacher is still a reasonable second.');
+        $this->assertSame('Vocal teacher', $out->first()['tutor']->name);
+        $this->assertGreaterThan($out->last()['score'], $out->first()['score']);
+    }
 }
