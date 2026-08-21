@@ -11,6 +11,7 @@ use App\Models\AppNotification;
 use App\Models\AuditLog;
 use App\Models\ClassAbsence;
 use App\Models\ClassLog;
+use App\Models\ContactMessage;
 use App\Models\Course;
 use App\Models\CourseProposal;
 use App\Models\DemoRequest;
@@ -20,9 +21,11 @@ use App\Models\Order;
 use App\Models\RescheduleRequest;
 use App\Models\Review;
 use App\Models\Student;
+use App\Models\SupportTicket;
 use App\Models\TeacherApplication;
 use App\Models\User;
 use App\Models\TeacherProfile;
+use App\Models\TuitionRequirement;
 use App\Models\Tutor;
 use App\Support\SubstituteFinder;
 use App\Support\TeacherPerformance;
@@ -595,11 +598,35 @@ class AdminController extends Controller {
                 'users'    => User::count(),
                 'audit'    => AuditLog::count(),
             ],
+            // What is sitting unattended. Four of these were missing, and the
+            // Overview does not merely omit them — it prints "Nothing waiting
+            // on staff right now" in green whenever this list comes back empty.
+            // Support tickets, website enquiries, home-tuition requirements and
+            // reschedule requests could all be piling up behind that reassurance.
             'needs_attention' => [
                 'applications_awaiting' => $appsAwaiting,
                 'reviews_pending'       => Review::where('status', 'pending')->count(),
                 'bookings_new'          => DemoRequest::where('status', 'new')->count(),
                 'proposals_pending'     => CourseProposal::where('status', 'pending')->count(),
+                'support_open'          => SupportTicket::where('status', 'open')->count(),
+                'messages_new'          => ContactMessage::where('status', 'new')->count(),
+                'requirements_open'     => TuitionRequirement::where('status', 'open')->count(),
+                'reschedules_pending'   => RescheduleRequest::where('status', 'pending')->count(),
+                // A booking with a teacher on it but no date is the stall
+                // nothing was watching: it has left the "new" queue, so it
+                // reads as handled everywhere, while the family waits for a
+                // time that was never set.
+                //
+                // A positive list of the in-flight statuses, not a blocklist of
+                // the finished ones. Every terminal state is legitimately
+                // dateless — completed, converted, no_show and closed all are —
+                // and naming them to exclude means the next status anybody adds
+                // starts silently raising a false alarm. Listing what still
+                // needs a date fails the safe way instead.
+                'demos_unscheduled'     => DemoRequest::whereNotNull('assigned_tutor_id')
+                    ->whereNull('scheduled_at')
+                    ->whereIn('status', ['new', 'contacted', 'scheduled'])
+                    ->count(),
             ],
         ]]);
     }

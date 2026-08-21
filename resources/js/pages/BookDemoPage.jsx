@@ -38,7 +38,9 @@ function TeacherShortlist({ subject, grade, city, mode, picked, onPick, onClear,
   // inside the home branch, so an online enquiry with just a city can never
   // return anyone. Asking for the subject in that case beats promising
   // suggestions that will never arrive.
-  const hasSubject = (q.subject?.trim()?.length ?? 0) >= 3;
+  // Two, not three: "AI" is a subject this site actually teaches, and the
+  // matcher now resolves it correctly, so the form must not refuse to ask.
+  const hasSubject = (q.subject?.trim()?.length ?? 0) >= 2;
   const wantsHome  = q.mode === 'home';
   const enabled    = !lockedTo && (hasSubject || (wantsHome && !!q.city?.trim()));
   const { data, isFetching } = useQuery({

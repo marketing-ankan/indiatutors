@@ -28,6 +28,74 @@ class AdminConsoleTest extends TestCase
         $this->parent = User::factory()->create(['role' => 'parent']);
     }
 
+    /**
+     * The Overview prints "Nothing waiting on staff right now" in green
+     * whenever every needs_attention counter is zero. Four queues were absent
+     * from that list, so an unanswered family could be sitting behind the
+     * reassurance that there was nothing to answer. Each counter here is a
+     * person waiting; a missing one is worse than a wrong number, because a
+     * wrong number is at least visible.
+     */
+    public function test_every_queue_a_person_is_waiting_in_reaches_the_overview(): void
+    {
+        \App\Models\SupportTicket::create([
+            'name' => 'Asha', 'email' => 'asha@x.test', 'subject' => 'Refund',
+            'source' => 'website', 'category' => 'billing', 'status' => 'open',
+        ]);
+        \App\Models\ContactMessage::create([
+            'name' => 'Rohit', 'email' => 'rohit@x.test', 'message' => 'Do you teach Chemistry?',
+        ]);
+        \App\Models\TuitionRequirement::create([
+            'name' => 'Meera', 'phone' => '9000000000', 'subject' => 'Physics',
+            'city' => 'Pune', 'status' => 'open',
+        ]);
+
+        Sanctum::actingAs($this->admin);
+        $res = $this->getJson('/api/admin/overview')->assertOk();
+
+        $res->assertJsonPath('data.needs_attention.support_open', 1)
+            ->assertJsonPath('data.needs_attention.messages_new', 1)
+            ->assertJsonPath('data.needs_attention.requirements_open', 1);
+    }
+
+    /**
+     * A booking with a teacher on it but no date. It has left the "new" queue,
+     * so every other counter treats it as handled while the family waits for a
+     * time that was never set — the one stall nothing was watching.
+     */
+    public function test_a_booking_assigned_without_a_date_is_flagged(): void
+    {
+        $tutor = \App\Models\Tutor::create(['name' => 'T', 'slug' => 't-' . uniqid(), 'is_published' => true]);
+
+        $stalled = DemoRequest::create([
+            'name' => 'Waiting', 'email' => 'w@x.test', 'phone' => '1', 'subject' => 'Physics',
+            'status' => 'contacted', 'assigned_tutor_id' => $tutor->id, 'scheduled_at' => null,
+        ]);
+        // Dated: nobody is waiting on staff for this one.
+        DemoRequest::create([
+            'name' => 'Booked', 'email' => 'b@x.test', 'phone' => '2', 'subject' => 'Physics',
+            'status' => 'scheduled', 'assigned_tutor_id' => $tutor->id, 'scheduled_at' => now()->addDay(),
+        ]);
+        // Every terminal status is legitimately dateless. Asserted one by one,
+        // because the first version of this counter excluded a "cancelled"
+        // status that does not exist in DemoRequest::STATUSES, which left
+        // converted, no_show and closed bookings raising a false alarm.
+        foreach (['completed', 'converted', 'no_show', 'closed'] as $i => $done) {
+            DemoRequest::create([
+                'name' => 'Done ' . $done, 'email' => "d{$i}@x.test", 'phone' => '3', 'subject' => 'Physics',
+                'status' => $done, 'assigned_tutor_id' => $tutor->id, 'scheduled_at' => null,
+            ]);
+        }
+
+        Sanctum::actingAs($this->admin);
+        $this->getJson('/api/admin/overview')->assertOk()
+            ->assertJsonPath('data.needs_attention.demos_unscheduled', 1);
+
+        // ...and it clears once a date is set, or the flag would never go away.
+        $stalled->update(['scheduled_at' => now()->addDays(2), 'status' => 'scheduled']);
+        $this->getJson('/api/admin/overview')->assertOk()
+            ->assertJsonPath('data.needs_attention.demos_unscheduled', 0);
+    }
     public function test_overview_reports_tiles_counts_and_what_needs_attention(): void
     {
         TeacherApplication::create(['name' => 'A', 'email' => 'a@x.test', 'phone' => '1', 'status' => 'pending']);
