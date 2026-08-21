@@ -214,4 +214,49 @@ class VideoCourseDemandTest extends TestCase
         $this->patchJson("/api/admin/video-demand/{$id}", ['status' => 'nonsense'])
             ->assertStatus(422);
     }
+
+    /**
+     * "Coming soon" has to hold on the SERVER.
+     *
+     * It was enforced in the two React pages only, so POST /api/orders happily
+     * accepted a video line while the catalogue said the course was not on
+     * sale — minting a real order, a real invoice number and a signed invoice
+     * URL for a recording that does not exist. A stale tab, a cached bundle or
+     * anyone posting directly reaches that path.
+     */
+    public function test_the_server_refuses_to_sell_a_video_course_while_it_is_coming_soon(): void
+    {
+        \App\Models\Setting::put('video_courses_status', 'coming_soon');
+
+        $v = \App\Models\VideoCourse::create([
+            'title' => 'Class 10 Maths', 'slug' => 'class-10-maths-' . uniqid(),
+            'price' => 999, 'is_published' => true,
+        ]);
+
+        $this->postJson('/api/orders', [
+            'first_name' => 'Asha', 'email' => 'asha@example.test',
+            'address_1' => '1 Park Street', 'city' => 'Kolkata',
+            'items' => [['slug' => $v->slug, 'kind' => 'video']],
+        ])->assertStatus(422);
+
+        $this->assertDatabaseCount('orders', 0);
+    }
+
+    public function test_the_server_sells_it_once_the_catalogue_is_live(): void
+    {
+        \App\Models\Setting::put('video_courses_status', 'live');
+
+        $v = \App\Models\VideoCourse::create([
+            'title' => 'Class 10 Maths', 'slug' => 'class-10-maths-' . uniqid(),
+            'price' => 999, 'is_published' => true,
+        ]);
+
+        $this->postJson('/api/orders', [
+            'first_name' => 'Asha', 'email' => 'asha@example.test',
+            'address_1' => '1 Park Street', 'city' => 'Kolkata',
+            'items' => [['slug' => $v->slug, 'kind' => 'video']],
+        ])->assertSuccessful();
+
+        $this->assertDatabaseCount('orders', 1);
+    }
 }

@@ -109,7 +109,7 @@ class TutorMatcher
                 // judge for themselves. Both callers render an unknown `why`
                 // token verbatim, so this needs no change at either end.
                 $why[] = $fit['kind'] === 'partial'
-                    ? 'teaches ' . ucwords($fit['item'])
+                    ? 'teaches ' . $fit['item']
                     : 'subject';
             }
 
@@ -177,8 +177,14 @@ class TutorMatcher
         // Only ever stripped from the ENQUIRY. A tutor's own "IELTS Training"
         // keeps both words, so it is still what gets matched against.
         // "learning" is deliberately absent — it would gut "Machine Learning".
-        'coaching', 'training', 'preparation', 'prep', 'practice', 'bootcamp',
-        'beginner', 'beginners', 'basics', 'intermediate', 'advanced', 'crash',
+        //
+        // LEVEL words are deliberately absent too, and that is not an oversight.
+        // Stripping "advanced" and "beginners" collapsed products this
+        // catalogue sells separately: /courses/jee-advanced ranked a
+        // JEE-Main-only tutor first, badged as teaching it, and the two Vedic
+        // Maths courses became the same request. A level is part of what is
+        // being bought, not a description of the format.
+        'coaching', 'training', 'preparation', 'prep', 'practice', 'bootcamp', 'crash',
     ];
 
     /**
@@ -309,12 +315,21 @@ class TutorMatcher
      */
     private static function offered(?string $subjects): array
     {
-        return collect(self::splitTop(self::canon((string) $subjects)))
-            ->map(fn ($s) => self::flatten($s))
-            ->reject(fn ($s) => $s === '')
-            ->unique()
-            ->values()
-            ->all();
+        $out = [];
+
+        // Keyed by the normalised form, valued by the teacher's OWN wording.
+        // Matching uses the key; anything shown to a family uses the value, so
+        // a chip quotes the teacher rather than the parser — it read
+        // "teaches Ai" on /courses/ai-prompting, because the normalised token
+        // is lower-cased and ucwords() cannot know it was an acronym.
+        foreach (self::splitTop((string) $subjects) as $raw) {
+            $key = self::flatten(self::canon($raw));
+            if ($key === '' || isset($out[$key])) continue;
+
+            $out[$key] = trim($raw);
+        }
+
+        return $out;
     }
 
     /**
@@ -338,7 +353,7 @@ class TutorMatcher
 
             // The whole request, both with and without its stopwords.
             foreach ([$want['raw'], $want['phrase']] as $whole) {
-                $take(self::wholeFit($offers, $whole, $n));
+                $take(self::wholeFit($offers, $whole));
             }
 
             // Otherwise, how much of the request do they cover? One word is
@@ -359,10 +374,20 @@ class TutorMatcher
             // violin — an imperfect answer, not a wrong one. Exactness is what
             // carries it; leading would let "music" reach "Music Theory" and
             // put a piano teacher back in front of a vocals enquiry.
-            foreach ($want['words'] as $w) {
-                if (in_array($w, $offers, true)) {
-                    $take(['score' => 3, 'kind' => 'partial', 'item' => $w]);
-                    break;
+            //
+            // Only for a request of one or two words, matching the rule just
+            // above. Without that floor, one word out of four qualified, and
+            // "Olympiad Preparation (Maths, Science & English)" came back with
+            // an IELTS trainer as its only card — matching "english" out of a
+            // list of three subjects the course covers and she teaches one of.
+            // It costs the long "…Guitar Lessons for Kids — Basics to Mastery"
+            // card, which is one true positive given up for five false ones.
+            if ($n <= 2) {
+                foreach ($want['words'] as $w) {
+                    if (isset($offers[$w])) {
+                        $take(['score' => 3, 'kind' => 'partial', 'item' => $offers[$w]]);
+                        break;
+                    }
                 }
             }
         }
@@ -384,27 +409,43 @@ class TutorMatcher
      * course, while one who lists the bare word "Music" has not said they teach
      * Music Theory. The second is scored and labelled as a partial.
      */
-    private static function wholeFit(array $offers, string $whole, int $words): array
+    private static function wholeFit(array $offers, string $whole): array
     {
-        if ($whole === '') return ['score' => 0, 'kind' => null, 'item' => null];
+        $best = ['score' => 0, 'kind' => null, 'item' => null];
+        if ($whole === '') return $best;
 
-        foreach ($offers as $offer) {
+        // Scored by the size of what MATCHED, not by how much the family typed.
+        $size = substr_count($whole, ' ') + 1;
+
+        // Every offer is considered and the best kept. Returning on the first
+        // hit made a tutor's own field ORDER decide their score: "Python,
+        // Python Programming" scored 3 with a partial chip while "Python
+        // Programming, Python" — the same subjects, typed the other way round
+        // — scored 6 with a full one, and with the callers taking only the top
+        // six or eight, that difference drops people off the shortlist.
+        foreach ($offers as $offer => $label) {
             // They list it, or they list something that begins with it:
-            // "python" finding "Python Programming".
+            // "python" finding "Python Programming". They have named the thing
+            // asked for, so this is a full claim.
             if ($offer === $whole || self::startsWithWord($offer, $whole)) {
-                return ['score' => 4 + $words, 'kind' => 'subject', 'item' => $offer];
+                if (4 + $size > $best['score']) {
+                    $best = ['score' => 4 + $size, 'kind' => 'subject', 'item' => $label];
+                }
+                continue;
             }
 
-            // The request begins with something they list — it is a more
-            // specific version of their subject.
-            if (self::startsWithWord($whole, $offer)) {
-                return str_contains($offer, ' ')
-                    ? ['score' => 4 + $words, 'kind' => 'subject', 'item' => $offer]
-                    : ['score' => 3, 'kind' => 'partial', 'item' => $offer];
+            // The request begins with something they list, so they teach
+            // something BROADER than what was asked for. Always a partial,
+            // whether their entry is one word or several: a tutor listing
+            // "Vocal Music" has not claimed to teach "Vocal Music Theory", and
+            // scoring that as a full match made her the sole result for it
+            // while filtering out both people who list "Music Theory" verbatim.
+            if (self::startsWithWord($whole, $offer) && $best['score'] < 3) {
+                $best = ['score' => 3, 'kind' => 'partial', 'item' => $label];
             }
         }
 
-        return ['score' => 0, 'kind' => null, 'item' => null];
+        return $best;
     }
 
     /** Does any subject LEAD with this token? (Not merely contain it.) */
@@ -412,7 +453,7 @@ class TutorMatcher
     {
         if ($token === '') return false;
 
-        foreach ($offers as $offer) {
+        foreach ($offers as $offer => $label) {
             if ($offer === $token || self::startsWithWord($offer, $token)) return true;
         }
 

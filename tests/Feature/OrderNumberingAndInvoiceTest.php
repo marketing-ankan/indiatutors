@@ -254,4 +254,80 @@ class OrderNumberingAndInvoiceTest extends TestCase
         $this->get(str_replace("/orders/{$mine->id}/", "/orders/{$other->id}/", $url))
             ->assertForbidden();
     }
+
+    // ---- round four ---------------------------------------------------------
+
+    /**
+     * Deleting the row deletes the number out of the series, and a tax invoice
+     * series with a hole in it is what has to be explained later. The guard
+     * keyed off `status`, which is mutable — paid, pending, Delete, gone.
+     */
+    public function test_an_issued_invoice_number_cannot_be_deleted_out_of_the_series(): void
+    {
+        $o = $this->order();
+        $o->update(['status' => 'paid']);
+        $number = $o->fresh()->invoice_number;
+
+        // The two clicks that used to work.
+        $o->update(['status' => 'pending']);
+
+        Sanctum::actingAs(User::factory()->create(['role' => 'admin']));
+        $this->deleteJson("/api/admin/orders/{$o->id}")->assertStatus(422);
+
+        $this->assertDatabaseHas('orders', ['id' => $o->id, 'invoice_number' => $number]);
+    }
+
+    /** An order that never reached paid has no number to protect. */
+    public function test_an_order_with_no_invoice_can_still_be_deleted(): void
+    {
+        $o = $this->order();
+
+        Sanctum::actingAs(User::factory()->create(['role' => 'admin']));
+        $this->deleteJson("/api/admin/orders/{$o->id}")->assertOk();
+
+        $this->assertDatabaseMissing('orders', ['id' => $o->id]);
+    }
+
+    /**
+     * GST is only ever taken OUT of the price. There is no mode that adds it on
+     * top: that would raise every advertised price, and one that half-existed
+     * printed an invoice whose lines summed to 118% of its own stated total.
+     */
+    public function test_there_is_no_tax_mode_that_adds_to_the_total(): void
+    {
+        Setting::put('gst_enabled', '1');
+        Setting::put('gst_rate', '18');
+        Setting::put('gst_mode', 'exclusive');   // refused by the rules; ignored here
+
+        foreach ([999.99, 0.01, 1, 1180, 4999] as $amount) {
+            Order::query()->delete();
+            $o = $this->order(['total' => $amount]);
+            $o->update(['status' => 'paid']);
+            $o = $o->fresh();
+
+            $this->assertEqualsWithDelta((float) $amount, (float) $o->total, 0.001,
+                "Enabling GST changed the charge for {$amount}.");
+            $this->assertEqualsWithDelta(
+                (float) $o->total, $o->taxable_value + $o->totalTax(), 0.01,
+                "Lines do not sum to the total for {$amount}.");
+        }
+    }
+
+    /** Every GST slab must balance, not just 18%. */
+    public function test_every_gst_slab_balances(): void
+    {
+        Setting::put('gst_enabled', '1');
+
+        foreach ([5, 12, 18, 28] as $rate) {
+            Setting::put('gst_rate', (string) $rate);
+            Order::query()->delete();
+            $o = $this->order(['total' => 999.99]);
+            $o->update(['status' => 'paid']);
+            $o = $o->fresh();
+
+            $this->assertEqualsWithDelta(
+                (float) $o->total, $o->taxable_value + $o->totalTax(), 0.01,
+                "The {$rate}% slab does not balance.");
+        }
+    }
 }

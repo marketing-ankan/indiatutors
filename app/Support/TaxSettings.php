@@ -16,13 +16,15 @@ use App\Models\Setting;
  *    number on a legal document. Off means invoices print with no tax lines at
  *    all, which is the correct appearance for an unregistered seller.
  *
- * 2. WHEN TURNED ON, TAX IS INCLUSIVE BY DEFAULT. The prices on this site are
- *    owner-set and are what customers have been told they will pay. Adding tax
- *    on top would silently raise every price; taking it out of the total
- *    changes nothing about what is charged and only records how much of it was
- *    tax. Exclusive mode exists for when the owner decides otherwise, and that
- *    is their decision to make explicitly rather than one made for them by a
- *    default.
+ * 2. WHEN TURNED ON, TAX IS INCLUSIVE — the only mode there is. The prices on
+ *    this site are owner-set and are what customers have been told they will
+ *    pay. Taking tax out of the total changes nothing about what is charged and
+ *    only records how much of it was tax. Adding it on top would raise every
+ *    advertised price, which is a pricing decision and not one a tax setting
+ *    should make. An "exclusive" option was offered briefly and printed an
+ *    invoice whose lines summed to 118% of the total the same document stated;
+ *    it is gone rather than half-built, because an issued invoice cannot be
+ *    corrected afterwards.
  *
  * CGST/SGST versus IGST is decided by where the customer is. Same state as the
  * seller, the tax splits in half between centre and state; different state, it
@@ -36,7 +38,15 @@ class TaxSettings
     public const FIELDS = [
         'gst_enabled'      => ['0',  'nullable|in:0,1',              'Charge GST'],
         'gst_rate'         => ['18', 'nullable|numeric|min:0|max:50', 'GST rate (%)'],
-        'gst_mode'         => ['inclusive', 'nullable|in:inclusive,exclusive', 'Prices include GST'],
+        // Inclusive only, and the enum enforces it. An 'exclusive' option was
+        // offered and printed a tax invoice whose lines summed to 118% of the
+        // total the same document stated — taxable 999.99 + CGST 90 + SGST 90
+        // under a Total of 999.99. Making it real would mean adding tax ON TOP
+        // of the price, which raises every figure the owner set and the site
+        // advertises. That is a pricing decision, not a tax setting, so the
+        // option is gone rather than half-built: an issued invoice cannot be
+        // corrected afterwards.
+        'gst_mode'         => ['inclusive', 'nullable|in:inclusive', 'Prices include GST'],
         'gstin'            => [null, 'nullable|string|max:20',       'GSTIN'],
         'seller_state'     => ['West Bengal', 'nullable|string|max:60', 'State of supply'],
         'invoice_footer'   => [null, 'nullable|string|max:500',      'Invoice footer note'],
@@ -93,15 +103,11 @@ class TaxSettings
             ];
         }
 
-        $inclusive = $cfg['gst_mode'] !== 'exclusive';
-
-        // Inclusive: the total already contains the tax, so the taxable value
-        // is what is left once it is removed. Exclusive is not used to inflate
-        // the charge here — the order total is still the total — it simply
-        // treats that total as the pre-tax value, which is what an owner who
-        // chooses that mode is asserting about their own prices.
-        $taxable = $inclusive ? $total / (1 + $rate / 100) : $total;
-        $tax     = $inclusive ? $total - $taxable : $total * ($rate / 100);
+        // The total already contains the tax, so the taxable value is what is
+        // left once it is removed. What the customer pays is untouched — this
+        // only records how much of it was tax.
+        $taxable = $total / (1 + $rate / 100);
+        $tax     = $total - $taxable;
 
         $sameState = $buyerState
             && strcasecmp(trim($buyerState), trim((string) $cfg['seller_state'])) === 0;
@@ -120,7 +126,7 @@ class TaxSettings
             'tax_sgst'        => $sgst,
             'tax_igst'        => $sameState ? null : round($tax, 2),
             'tax_rate'        => $rate,
-            'tax_mode'        => $inclusive ? 'inclusive' : 'exclusive',
+            'tax_mode'        => 'inclusive',
             'seller_gstin'    => $cfg['gstin'] ?: null,
             'place_of_supply' => $buyerState ?: null,
         ];

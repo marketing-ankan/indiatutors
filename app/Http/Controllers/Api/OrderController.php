@@ -5,6 +5,7 @@ use App\Http\Resources\AdminOrderResource;
 use App\Models\Course;
 use App\Models\Order;
 use App\Models\VideoCourse;
+use App\Support\SiteSettings;
 use App\Models\VideoEntitlement;
 use App\Support\RateCard;
 use App\Support\Razorpay;
@@ -48,6 +49,18 @@ class OrderController extends Controller {
 
         $courses = Course::whereIn('slug', $courseSlugs)->published()->get();
         $videos  = VideoCourse::whereIn('slug', $videoSlugs)->published()->get();
+
+        // "Coming soon" is a statement about whether the product is on sale, so
+        // it has to hold on the SERVER. It was enforced only in the two React
+        // pages, which means POST /api/orders happily took payment for a
+        // recorded course that does not exist yet — minting a real order, a
+        // real invoice number and a signed invoice URL for it. A stale tab, a
+        // cached bundle or anyone posting directly reaches that path.
+        if ($videos->isNotEmpty() && SiteSettings::get('video_courses_status') !== 'live') {
+            return response()->json([
+                'message' => 'Our recorded courses are not on sale yet. Everything else in your cart can still be checked out.',
+            ], 422);
+        }
         if ($courses->isEmpty() && $videos->isEmpty()) {
             return response()->json(['message' => 'None of the cart items are available.'], 422);
         }

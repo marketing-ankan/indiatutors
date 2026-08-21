@@ -412,11 +412,14 @@ class TutorMatcherTest extends TestCase
 
         $out = $this->rank('Olympiad Preparation (Maths, Science & English)');
 
-        // She may still appear — she does teach one part of it — but only as a
-        // partial, never as though she taught the course.
+        // Nobody. She teaches one of the three subjects the course covers,
+        // which is not teaching the course — and she was its ONLY card,
+        // badged "teaches this subject", on a maths-and-science page.
+        $this->assertCount(0, $out);
+
+        // ...and nothing here may score as the whole request either way.
         foreach ($out as $row) {
-            $this->assertNotContains('subject', $row['why'],
-                'A fragment inside brackets must not score as the whole request.');
+            $this->assertNotContains('subject', $row['why']);
         }
     }
 
@@ -454,5 +457,95 @@ class TutorMatcherTest extends TestCase
 
         $this->assertSame('Vocalist', $out->first()['tutor']->name);
         $this->assertGreaterThan($out->last()['score'], $out->first()['score']);
+    }
+
+    // ---- round four: what the second adversarial pass found -----------------
+
+    /**
+     * A shared PREFIX is not a claim to teach the thing asked for.
+     *
+     * Scoring it as one made a tutor listing "Vocal Music" the sole result for
+     * "Vocal Music Theory" at the top of the scale, badged "teaches this
+     * subject", while BOTH people who list "Music Theory" verbatim scored zero
+     * and were filtered out of the shortlist entirely.
+     */
+    public function test_a_shared_prefix_is_not_a_claim_to_teach_the_request(): void
+    {
+        $this->tutor(['name' => 'Vocalist',   'subjects' => 'Vocal Music, Carnatic Vocals']);
+        $this->tutor(['name' => 'Theorist',   'subjects' => 'Music Theory, Piano']);
+
+        $out = $this->rank('Vocal Music Theory');
+
+        $vocalist = $out->first(fn ($r) => $r['tutor']->name === 'Vocalist');
+        $this->assertNotNull($vocalist);
+        $this->assertNotContains('subject', $vocalist['why'],
+            'Listing "Vocal Music" is not a claim to teach Vocal Music Theory.');
+    }
+
+    /**
+     * A LEVEL is part of what is being bought. Stripping it collapsed products
+     * the catalogue sells separately: /courses/jee-advanced ranked a
+     * JEE-Main-only tutor first, badged as teaching it.
+     */
+    public function test_a_level_qualifier_keeps_two_products_apart(): void
+    {
+        $this->tutor(['name' => 'Main coach',     'subjects' => 'JEE Main']);
+        $this->tutor(['name' => 'Advanced coach', 'subjects' => 'JEE Advanced']);
+
+        $adv = $this->rank('JEE Advanced');
+        $this->assertCount(1, $adv);
+        $this->assertSame('Advanced coach', $adv->first()['tutor']->name);
+
+        $main = $this->rank('JEE Main');
+        $this->assertCount(1, $main);
+        $this->assertSame('Main coach', $main->first()['tutor']->name);
+    }
+
+    /**
+     * The ORDER a tutor happens to type their subjects in must not change their
+     * score. It did: "Python, Python Programming" scored a 3-point partial
+     * while the same two subjects the other way round scored a full match — and
+     * with the callers taking only the top six or eight, that drops people off
+     * the list for editing an unrelated field.
+     */
+    public function test_the_order_of_a_tutors_own_subjects_does_not_change_their_score(): void
+    {
+        $this->tutor(['name' => 'A', 'subjects' => 'Python, Python Programming']);
+        $first = $this->rank('Python Programming')->first();
+
+        Tutor::query()->delete();
+        $this->tutor(['name' => 'B', 'subjects' => 'Python Programming, Python']);
+        $second = $this->rank('Python Programming')->first();
+
+        $this->assertSame($first['score'], $second['score']);
+        $this->assertSame($first['why'], $second['why']);
+        $this->assertContains('subject', $first['why'], 'They list it verbatim either way round.');
+    }
+
+    /**
+     * One word out of four is not a match. Without a floor on the exact-word
+     * rescue, the live Olympiad course came back with an IELTS trainer as its
+     * only card — she teaches one of the three subjects it covers.
+     */
+    public function test_one_word_of_a_long_request_does_not_qualify(): void
+    {
+        $this->tutor(['name' => 'English teacher', 'subjects' => 'English, IELTS Training']);
+
+        $this->assertCount(0, $this->rank('Olympiad Preparation (Maths, Science & English)'));
+        // Two words still may — that is the Carnatic Violin case the rule keeps.
+        Tutor::query()->delete();
+        $this->tutor(['name' => 'Violinist', 'subjects' => 'Violin']);
+        $this->assertCount(1, $this->rank('Carnatic Violin'));
+    }
+
+    /** The chip quotes the teacher's own wording, not the parser's lower-cased token. */
+    public function test_the_partial_chip_quotes_the_teachers_own_wording(): void
+    {
+        $this->tutor(['name' => 'Rahul', 'subjects' => 'AI & Machine Learning']);
+
+        $out = $this->rank('AI Prompting');
+
+        $this->assertCount(1, $out);
+        $this->assertContains('teaches AI', $out->first()['why'], 'It read "teaches Ai".');
     }
 }

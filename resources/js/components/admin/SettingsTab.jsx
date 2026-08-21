@@ -143,17 +143,15 @@ function SiteDetailsPanel() {
                 Decides CGST+SGST for buyers in your state, IGST for everyone else.
               </span>
             </label>
-            <label className="block">
-              <span className="mb-1 block text-xs font-semibold text-slate-600">Prices…</span>
-              <select value={current.gst_mode ?? 'inclusive'} onChange={set('gst_mode')} className={inp}>
-                <option value="inclusive">…already include GST</option>
-                <option value="exclusive">…are before GST</option>
-              </select>
-              <span className="mt-1 block text-[11px] text-slate-400">
-                Inclusive is the safe choice: what customers pay does not change, the invoice just
-                shows how much of it was tax.
+            {/* No mode picker: GST is always taken OUT of the price shown, never
+                added on top. The alternative would raise every advertised price,
+                which is a pricing decision rather than a tax setting. */}
+            <div className="block rounded-lg bg-slate-50 px-3 py-2">
+              <span className="block text-xs font-semibold text-slate-600">Prices already include GST</span>
+              <span className="mt-1 block text-[11px] leading-snug text-slate-500">
+                What customers pay does not change. The invoice simply shows how much of the total was tax.
               </span>
-            </label>
+            </div>
             <label className="block sm:col-span-2">
               <span className="mb-1 block text-xs font-semibold text-slate-600">Footer note on invoices</span>
               <input value={current.invoice_footer ?? ''} onChange={set('invoice_footer')}

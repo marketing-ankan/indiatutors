@@ -109,6 +109,18 @@ class AdminController extends Controller {
      * with nothing to justify it. Cancel it instead — that path revokes cleanly.
      */
     public function destroyOrder(Order $order) {
+        // An issued invoice number is gone from the series if this row goes,
+        // and a tax invoice series with a hole in it is the thing somebody has
+        // to account for later. The guard keyed off `status`, which is mutable
+        // — two clicks (paid -> pending -> Delete) removed an issued number.
+        // The remedy for a reversed sale is a cancellation that KEEPS the
+        // number, never deletion.
+        if ($order->invoice_number) {
+            return response()->json([
+                'message' => "Invoice {$order->invoice_number} has been issued for this order, so it cannot be deleted. Cancel it instead — the invoice number stays in the series either way.",
+            ], 422);
+        }
+
         if ($order->status === 'paid') {
             return response()->json([
                 'message' => 'A paid order cannot be deleted — it is the record behind any course access it granted. Cancel it instead.',
