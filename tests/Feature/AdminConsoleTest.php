@@ -96,6 +96,64 @@ class AdminConsoleTest extends TestCase
         $this->getJson('/api/admin/overview')->assertOk()
             ->assertJsonPath('data.needs_attention.demos_unscheduled', 0);
     }
+    /**
+     * The console heading and the console shortlist must read one booking the
+     * same way.
+     *
+     * BookingsTab labels a row `course?.name || subject`, so a family who picked
+     * a course and left the free-text subject empty is displayed under the
+     * course name — while the shortlist was matching on the empty subject and
+     * offering either nobody or, worse, everybody.
+     */
+    public function test_the_shortlist_reads_the_booking_the_way_the_console_labels_it(): void
+    {
+        $course = Course::create([
+            'name' => 'Carnatic Vocal Music', 'slug' => 'carnatic-vocal-music-' . uniqid(),
+            'regular_price' => 1000, 'is_published' => true,
+        ]);
+        $singer = \App\Models\Tutor::create([
+            'name' => 'Vijaya', 'slug' => 'vijaya-' . uniqid(), 'is_published' => true,
+            'subjects' => 'Vocal Music, Carnatic Vocals', 'teaching_mode' => 'online',
+        ]);
+        \App\Models\Tutor::create([
+            'name' => 'Pianist', 'slug' => 'pianist-' . uniqid(), 'is_published' => true,
+            'subjects' => 'Piano, Music Theory', 'teaching_mode' => 'online',
+        ]);
+
+        $booking = DemoRequest::create([
+            'name' => 'Asha', 'email' => 'asha@x.test', 'phone' => '9',
+            'subject' => null, 'course_id' => $course->id, 'status' => 'new',
+        ]);
+
+        Sanctum::actingAs($this->admin);
+        $res = $this->getJson("/api/admin/demo-requests/{$booking->id}/suggestions")->assertOk();
+
+        $this->assertSame(1, $res->json('meta.count'), 'The pianist is not a vocal teacher.');
+        $this->assertSame($singer->id, $res->json('data.0.id'));
+    }
+
+    /**
+     * A booking with no subject AND no course tells us nothing about what the
+     * family wants, so it must suggest nobody rather than the whole roster.
+     */
+    public function test_a_booking_with_nothing_to_match_on_suggests_nobody(): void
+    {
+        foreach ([['Yoga person', 'Yoga'], ['Drummer', 'Drums'], ['Singer', 'Vocal Music']] as [$n, $subj]) {
+            \App\Models\Tutor::create([
+                'name' => $n, 'slug' => strtolower($n) . '-' . uniqid(), 'is_published' => true,
+                'subjects' => $subj, 'grades' => '1-12', 'teaching_mode' => 'online',
+            ]);
+        }
+
+        $booking = DemoRequest::create([
+            'name' => 'Asha', 'email' => 'asha@x.test', 'phone' => '9',
+            'subject' => null, 'grade' => 'Class 9', 'status' => 'new',
+        ]);
+
+        Sanctum::actingAs($this->admin);
+        $this->getJson("/api/admin/demo-requests/{$booking->id}/suggestions")->assertOk()
+            ->assertJsonPath('meta.count', 0);
+    }
     public function test_overview_reports_tiles_counts_and_what_needs_attention(): void
     {
         TeacherApplication::create(['name' => 'A', 'email' => 'a@x.test', 'phone' => '1', 'status' => 'pending']);

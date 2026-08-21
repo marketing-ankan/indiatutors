@@ -194,15 +194,130 @@ class TutorMatcherTest extends TestCase
      * actual vocal teacher THIRD, behind two people who merely list "Music
      * Theory". Ordering is the whole product here — families read the top row.
      */
-    public function test_an_exact_phrase_outranks_a_single_word_overlap(): void
+    /**
+     * One word of a multi-word request is an overlap, not a match.
+     *
+     * This test used to assert the pianist was "a reasonable second" for a
+     * Vocal Music enquiry. Review disagreed, and review was right: the chip
+     * next to that name reads "teaches this subject", and a Music Theory
+     * listing is not a claim to teach vocals. On the live roster the same
+     * leniency put two piano teachers ABOVE the site's only vocal teacher on
+     * her own three course pages, because a one-word overlap scored the same
+     * as a full match. Being second is not harmless when second is wrong.
+     */
+    public function test_a_single_word_overlap_is_not_a_match(): void
     {
         $this->tutor(['name' => 'Vocal teacher', 'subjects' => 'Vocal Music', 'grades' => '1-12']);
         $this->tutor(['name' => 'Pianist',       'subjects' => 'Piano, Music Theory', 'grades' => '1-12']);
 
         $out = $this->rank('Vocal Music');
 
-        $this->assertCount(2, $out, 'The music teacher is still a reasonable second.');
+        $this->assertCount(1, $out, 'Sharing the word "music" is not teaching vocals.');
         $this->assertSame('Vocal teacher', $out->first()['tutor']->name);
-        $this->assertGreaterThan($out->last()['score'], $out->first()['score']);
+    }
+
+    /**
+     * The mirror: when one word is the WHOLE request, one word is enough.
+     */
+    public function test_a_single_word_request_still_matches_on_that_word(): void
+    {
+        $this->tutor(['name' => 'Pianist', 'subjects' => 'Piano, Music Theory', 'grades' => '1-12']);
+
+        $this->assertCount(1, $this->rank('Piano'));
+        $this->assertCount(1, $this->rank('Music Theory'));
+    }
+
+    /**
+     * A compound subject is a different subject from its head noun. Sharing it
+     * put two programmers in front of a parent looking for school science for a
+     * ten-year-old, badged as teaching it.
+     */
+    public function test_a_qualified_subject_does_not_answer_the_bare_one(): void
+    {
+        $this->tutor(['name' => 'Programmer', 'subjects' => 'Computer Science, Data Science', 'grades' => '1-12']);
+
+        $this->assertCount(0, $this->rank('Science Grade 1-7', '5'));
+        $this->assertCount(0, $this->rank('Social Science Grade 8', '8'));
+        // ...but the subject they really do teach still finds them.
+        $this->assertCount(1, $this->rank('Computer Science Grade 11-12', '11'));
+    }
+
+    /**
+     * Nothing but a grade must never qualify anybody. Subject is optional on
+     * the booking form, so this is reachable from the live site, and it was
+     * returning every published tutor on the roster.
+     */
+    public function test_a_blank_subject_suggests_nobody(): void
+    {
+        $this->tutor(['name' => 'Yoga person', 'subjects' => 'Yoga', 'grades' => '1-12']);
+        $this->tutor(['name' => 'Drummer',     'subjects' => 'Drums', 'grades' => '1-12']);
+
+        foreach ([null, '', '   '] as $blank) {
+            $this->assertCount(0, $this->rank($blank, '9'),
+                'A grade is not a request for anything.');
+        }
+    }
+
+    /**
+     * ...except for a home enquiry, where "visits homes in your city" is a true
+     * and useful thing to say even with no subject, and the chips say exactly
+     * that rather than claiming a subject.
+     */
+    public function test_a_home_enquiry_with_a_city_still_finds_someone_without_a_subject(): void
+    {
+        $t = $this->tutor(['name' => 'Local', 'subjects' => 'Yoga', 'city' => 'Kolkata', 'teaching_mode' => 'home']);
+
+        $out = $this->rank(null, null, 'Kolkata', true);
+
+        $this->assertCount(1, $out);
+        $this->assertContains('same-city', $out->first()['why']);
+        $this->assertNotContains('subject', $out->first()['why'], 'No subject was asked for, so none is claimed.');
+    }
+
+    /** Both spellings, both sides. A tutor writing "Maths" must be findable. */
+    public function test_maths_and_mathematics_are_the_same_subject_either_way_round(): void
+    {
+        $this->tutor(['name' => 'Maths teacher', 'subjects' => 'Maths, Physics', 'grades' => '6-12']);
+
+        foreach (['Mathematics Grade 11-12', 'Class 10 Math', 'maths'] as $typed) {
+            $this->assertCount(1, $this->rank($typed), "\"{$typed}\" must reach a tutor listing \"Maths\".");
+        }
+    }
+
+    /**
+     * An ampersand separates alternatives on BOTH sides. "AI & ML" is two
+     * names either of which is the whole request, and a tutor writing
+     * "AI & Machine Learning" means two things they teach.
+     */
+    public function test_an_ampersand_separates_subjects_on_both_sides(): void
+    {
+        $this->tutor(['name' => 'AI person', 'subjects' => 'Python Programming, AI & Machine Learning']);
+
+        foreach (['AI & ML', 'Machine Learning', 'Artificial Intelligence & Machine Learning'] as $typed) {
+            $this->assertGreaterThan(0, $this->rank($typed)->count(), "\"{$typed}\" found nobody.");
+        }
+    }
+
+    /**
+     * A space binds a compound, so only the qualifier matching is not a match.
+     * "Western Flute" against "Western Vocals" is the case that reached a
+     * family: a flute enquiry answered by a singing teacher.
+     */
+    public function test_matching_only_the_qualifier_of_a_compound_is_not_a_match(): void
+    {
+        $this->tutor(['name' => 'Singer', 'subjects' => 'Vocal Music, Western Vocals, Carnatic Vocals']);
+
+        $this->assertCount(0, $this->rank('Western Flute'));
+        // The same singer is still the right answer to what she does teach.
+        $this->assertCount(1, $this->rank('Western Vocal Music'));
+    }
+
+    /** A prefix stops at a boundary: Java is not JavaScript. */
+    public function test_a_prefix_does_not_run_into_a_different_subject(): void
+    {
+        $this->tutor(['name' => 'Front-end dev', 'subjects' => 'JavaScript, CSS']);
+
+        $this->assertCount(0, $this->rank('Java'));
+        $this->assertCount(1, $this->rank('JavaScript'));
     }
 }

@@ -24,6 +24,24 @@ use Illuminate\Support\Collection;
  * answers "how well does this teacher do". Fit leads, because a superb Physics
  * teacher is the wrong answer to a Piano enquiry; track record only breaks ties
  * among teachers who genuinely fit.
+ *
+ * THE RULE THIS FILE EXISTS TO GET RIGHT
+ *
+ * A suggestion is a claim, rendered to families as "teaches this subject". So
+ * the bar is not "shares a word with the enquiry", it is "actually teaches it",
+ * and where the two disagree the honest answer is an empty list — which both
+ * callers now render as a sentence rather than a blank space.
+ *
+ * Two earlier attempts got this wrong in instructive ways, and the rules below
+ * are shaped by those failures rather than by theory:
+ *
+ *   - Any signal that is not evidence of subject fit must be unable to qualify
+ *     a tutor ON ITS OWN. A grade point did it once ("teaches Class 9" says
+ *     nothing about Maths) and a home-visits point did it before that.
+ *   - Any single WORD of a multi-word enquiry must not qualify either.
+ *     "Science Grade 1-7" shares "science" with "Computer Science", so a
+ *     school-science enquiry for a ten-year-old returned two programmers,
+ *     badged as teaching it.
  */
 class TutorMatcher
 {
@@ -40,16 +58,15 @@ class TutorMatcher
     ): Collection {
         $cityKey  = mb_strtolower(trim((string) $city));
         $gradeNum = preg_match('/(\d{1,2})/', (string) $grade, $m) ? (int) $m[1] : null;
-        $tokens   = self::tokens($subject);
+        $wants    = self::wanted($subject);
 
-        $rows = $tutors->map(function (Tutor $t) use ($tokens, $gradeNum, $wantsHome, $cityKey) {
+        $rows = $tutors->map(function (Tutor $t) use ($wants, $gradeNum, $wantsHome, $cityKey) {
             $mode = $t->teaching_mode ?: 'online';
             if ($wantsHome && ! in_array($mode, ['home', 'both'], true)) {
                 return null;   // cannot visit a home, whatever else fits
             }
-            // ...and the mirror case, which was missing: a family asking for
-            // ONLINE classes was being offered home-only tutors who cannot
-            // teach them at all.
+            // ...and the mirror case: a family asking for ONLINE classes was
+            // being offered home-only tutors who cannot teach them at all.
             if (! $wantsHome && $mode === 'home') {
                 return null;
             }
@@ -57,36 +74,38 @@ class TutorMatcher
             $why   = [];
             $score = 0;
 
-            if ($tokens->isNotEmpty()) {
-                $subjects = mb_strtolower((string) $t->subjects);
-                // The phrase is the first token, so an exact multi-word hit is
-                // distinguishable from a single-word one and can be scored
-                // higher. Without that, "Vocal Music" ranked the actual vocal
-                // teacher THIRD, behind two people who merely list "Music
-                // Theory" — both are legitimate results, but only one of them
-                // is what was asked for.
-                $phraseHit = self::subjectHit($subjects, $tokens->first());
-                if (! $phraseHit && ! $tokens->first(fn ($tok) => self::subjectHit($subjects, $tok))) {
-                    // A named subject is a REQUIREMENT, not a bonus.
-                    //
-                    // Without this the grade point below could qualify a tutor
-                    // on its own, and "teaches Class 9" says nothing about
-                    // whether they teach Maths: an enquiry for Class 9
-                    // Mathematics was returning a Yoga teacher, an English
-                    // teacher and a drummer, because no tutor on the site
-                    // teaches Maths and those three happen to cover Class 9.
-                    // On the booking form — the highest-intent page there is —
-                    // an irrelevant suggestion is worse than none, and it
-                    // quietly tells the family we have nobody who understands
-                    // what they asked for.
-                    //
-                    // Same disease as the home-visits chip below, one branch
-                    // over: any signal that is not evidence of fit must not be
-                    // able to clear the score gate by itself.
-                    return null;
+            // Something must positively justify suggesting this person. Grade
+            // and mode are not that; they qualify nobody by themselves.
+            $qualified = false;
+
+            if ($wants->isNotEmpty()) {
+                $offers = self::offered($t->subjects);
+                $fit    = self::subjectFit($wants, $offers);
+
+                // A named subject is a REQUIREMENT, not a bonus. Asked for
+                // something we cannot teach, the answer is nobody.
+                if ($fit === 0) return null;
+
+                $qualified = true;
+                $score    += $fit;
+                $why[]     = 'subject';
+            }
+
+            if ($wantsHome) {
+                // The chip is worth showing; the point is not. Awarding one
+                // here meant every home-visiting tutor cleared the gate for a
+                // Piano enquiry they teach nothing relevant to.
+                $why[] = 'home-visits';
+
+                if ($cityKey !== '' && mb_strtolower((string) $t->city) === $cityKey) {
+                    // This one DOES qualify, and is the reason a home enquiry
+                    // with a city but no subject still returns somebody: "visits
+                    // homes in your city" is a true and useful thing to say, and
+                    // the chips say exactly that rather than claiming a subject.
+                    $qualified = true;
+                    $score    += 2;
+                    $why[]     = 'same-city';
                 }
-                $score += $phraseHit ? 4 : 3;
-                $why[]  = 'subject';
             }
 
             if ($gradeNum !== null && $t->grades) {
@@ -95,28 +114,14 @@ class TutorMatcher
                         ? ($gradeNum >= (int) $r[1] && $gradeNum <= (int) $r[2])
                         : (ctype_digit($g) && (int) $g === $gradeNum);
                     if ($hit) {
-                        $score += 1;
+                        $score += 1;      // deliberately cannot qualify alone
                         $why[]  = 'grade';
                         break;
                     }
                 }
             }
 
-            if ($wantsHome) {
-                // Scores NOTHING on its own. Being able to visit homes is the
-                // filter applied above, not a reason to prefer one teacher over
-                // another — awarding +1 here meant every home-visiting tutor on
-                // the site cleared the `score > 0` gate and got suggested for a
-                // Piano enquiry they teach nothing relevant to. The chip stays,
-                // because it is still worth telling the family why they qualify.
-                $why[] = 'home-visits';
-                if ($cityKey !== '' && mb_strtolower((string) $t->city) === $cityKey) {
-                    $score += 2;
-                    $why[]  = 'same-city';
-                }
-            }
-
-            return $score > 0 ? ['tutor' => $t, 'score' => $score, 'why' => $why] : null;
+            return $qualified ? ['tutor' => $t, 'score' => $score, 'why' => $why] : null;
         })->filter();
 
         // Track record breaks ties among equally-fitting teachers — it never
@@ -135,9 +140,7 @@ class TutorMatcher
      * Words that describe the ENQUIRY rather than the subject.
      *
      * "Class 10 Math" must not match on "class", or a token that is a prefix of
-     * "Classical Vocals" quietly makes a singing teacher a maths result. These
-     * carry no subject meaning, so dropping them costs nothing and removes a
-     * whole family of false positives.
+     * "Classical Vocals" quietly makes a singing teacher a maths result.
      */
     private const NOISE = [
         'class', 'classes', 'grade', 'std', 'standard', 'level', 'year',
@@ -147,58 +150,156 @@ class TutorMatcher
     ];
 
     /**
-     * What an enquiry is actually asking for.
+     * One spelling for things that are the same subject under two names.
      *
-     * Returns the whole normalised phrase AND its individual words, because the
-     * two catch different real inputs and neither is sufficient alone:
-     *
-     *   "Python Programming"  the phrase matches a tutor's "Python Programming"
-     *   "Class 10 Math"       only the WORD "math" can reach "Mathematics"
-     *   "AI & ML"             only the words survive; both are under 3 letters
-     *
-     * The previous version split on punctuation but never on whitespace, so a
-     * multi-word enquiry became one token that had to appear verbatim in the
-     * tutor's subject string. That made the booking form's own placeholder
-     * ("e.g. Class 10 Math") match nothing, and it made "AI & ML" tokenise to
-     * NOTHING at all — which was the dangerous case, because an empty token set
-     * skipped the subject requirement entirely and let any tutor through on the
-     * grade point alone. The phrase token below can never be empty for a
-     * non-empty subject, so that bypass cannot reopen.
+     * Applied to BOTH sides. Doing it only to the enquiry — which is what the
+     * previous version did — meant a tutor who writes "Maths" was invisible to
+     * every one of the site's five "Mathematics …" courses, which is the exact
+     * mismatch this was added to prevent.
      */
-    private static function tokens(?string $subject): Collection
+    private static function canon(string $s): string
     {
-        $raw = mb_strtolower(trim((string) $subject));
-        if ($raw === '') return collect();
+        $s = mb_strtolower(trim($s));
+        $s = preg_replace('/\s+/', ' ', $s);
 
-        $phrase = trim(preg_replace('/\s+/', ' ', $raw));
-
-        $words = collect(preg_split('/[^a-z0-9+#]+/u', $phrase, -1, PREG_SPLIT_NO_EMPTY))
-            ->map(fn ($w) => $w === 'maths' ? 'math' : $w)
-            ->reject(fn ($w) => in_array($w, self::NOISE, true))
-            ->reject(fn ($w) => ctype_digit($w))          // "10" in "Class 10 Math"
-            ->reject(fn ($w) => mb_strlen($w) < 2)
-            ->unique();
-
-        // Phrase first: an exact multi-word hit is the strongest signal, and
-        // keeping it guarantees a non-empty set for any non-empty subject.
-        return collect([$phrase])->concat($words)->unique()->values();
+        return preg_replace('/\bmaths?\b|\bmathematics\b|\bmathematic\b/u', 'math', $s);
     }
 
     /**
-     * Does this tutor's subject list answer that token?
+     * What the enquiry is asking for, as a list of ALTERNATIVES.
      *
-     * Anchored at a word boundary rather than a bare substring, so "art" cannot
-     * match "Bharatnatyam". A token of four or more characters may match a
-     * PREFIX, which is what lets "math" find "Mathematics" and "program" find
-     * "Programming"; anything shorter must be a whole word, so "ai" matches
-     * "AI & ML" without also matching "Trained".
+     * A comma, a slash or an ampersand separates different subjects; a space
+     * binds one compound subject. That distinction is what separates "AI & ML"
+     * — two names, either of which is the whole request — from "Western Flute",
+     * where "western" alone is a qualifier and matching only it is how a flute
+     * enquiry came back with a vocal teacher.
+     *
+     * @return Collection<array{phrase: string, words: string[]}>
      */
-    private static function subjectHit(string $subjects, string $token): bool
+    private static function wanted(?string $subject): Collection
     {
-        $t = preg_quote($token, '/');
+        $raw = self::canon((string) $subject);
+        if ($raw === '') return collect();
 
-        return mb_strlen($token) >= 4
-            ? (bool) preg_match('/\b' . $t . '/u', $subjects)
-            : (bool) preg_match('/\b' . $t . '\b/u', $subjects);
+        return collect(preg_split('/[,\/&]+|\band\b/u', $raw, -1, PREG_SPLIT_NO_EMPTY))
+            ->map(function (string $alt) {
+                $alt   = trim(preg_replace('/\s+/', ' ', $alt));
+                $words = collect(preg_split('/[^a-z0-9+#]+/u', $alt, -1, PREG_SPLIT_NO_EMPTY))
+                    ->reject(fn ($w) => in_array($w, self::NOISE, true))
+                    ->reject(fn ($w) => ctype_digit($w))      // the "10" in "Class 10 Math"
+                    ->values();
+
+                // The phrase minus its noise words, so "Class 10 Math" is
+                // compared as "math" rather than never matching anything.
+                return ['phrase' => $words->implode(' '), 'words' => $words->all()];
+            })
+            ->reject(fn ($a) => $a['phrase'] === '')
+            ->values();
+    }
+
+    /**
+     * A tutor's subjects, one canonical entry each.
+     *
+     * Split on the same separators as the enquiry, ampersand included. A tutor
+     * writes "AI & Machine Learning" meaning two things they teach, exactly as
+     * a parent typing it means two things they might want — and splitting only
+     * the enquiry side left a request for "Machine Learning" unable to find the
+     * person who teaches it, because their entry merely CONTAINED the phrase
+     * rather than leading with it.
+     */
+    private static function offered(?string $subjects): array
+    {
+        return collect(preg_split('/[,;\/&]+|\band\b/u', (string) $subjects, -1, PREG_SPLIT_NO_EMPTY))
+            ->map(fn ($s) => self::canon($s))
+            ->reject(fn ($s) => $s === '')
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Does this tutor teach any of the things asked for, and how squarely?
+     *
+     * 0 means no — and 0 is a perfectly good answer that both callers now say
+     * out loud rather than rendering as a blank.
+     */
+    private static function subjectFit(Collection $wants, array $offers): int
+    {
+        $best = 0;
+
+        foreach ($wants as $want) {
+            // The whole request is one of their subjects. Strongest signal
+            // there is, and it is what makes an exact course name beat a
+            // one-word overlap: "Vocal Music" outranks "Music Theory".
+            if (self::leads($offers, $want['phrase'])) {
+                $best = max($best, 4);
+                continue;
+            }
+
+            $hits = 0;
+            foreach ($want['words'] as $w) {
+                if (self::leads($offers, $w)) $hits++;
+            }
+
+            // One word is enough only when one word is all that was asked for.
+            // Beyond that a single lead is an overlap rather than a match:
+            // "Western Flute" shares "western" with "Western Vocals" and shares
+            // nothing that matters. Extra coverage raises the score, so the
+            // teacher who matches most of the request is ranked first.
+            $needed = count($want['words']) === 1 ? 1 : 2;
+            if ($hits >= $needed) {
+                $best = max($best, 2 + $hits);
+                continue;
+            }
+
+            // ...unless one word is EXACTLY something they teach. "Carnatic
+            // Violin" is a violin request, and a tutor whose subject list says
+            // "Violin" teaches violin — the qualifier being unmet makes them an
+            // imperfect answer, not a wrong one. The exactness is what carries
+            // it: leading would let "music" reach "Music Theory" and put a
+            // piano teacher back in front of a vocals enquiry, which is the
+            // thing this whole rule exists to stop.
+            //
+            // It is also what rescues the long marketing-style course names —
+            // "Customized Online Guitar Lessons for Kids — Basics to Mastery"
+            // matches only on "guitar", and the guitar teacher is plainly the
+            // right answer to it.
+            foreach ($want['words'] as $w) {
+                if (in_array($w, $offers, true)) { $best = max($best, 3); break; }
+            }
+        }
+
+        return $best;
+    }
+
+    /**
+     * Does one of these subjects LEAD with this token?
+     *
+     * Leading, not containing. "Science" must not find "Computer Science" —
+     * a compound subject is a different subject from its head noun, and
+     * treating them as equal is what put programmers in front of a parent
+     * looking for school science. "Python" finding "Python Programming" is the
+     * same rule working the way round that is wanted.
+     *
+     * Plain string comparison rather than a regex, so a token ending in
+     * punctuation behaves: "C++" could never match anything under \b, because
+     * there is no word boundary after a plus sign.
+     */
+    private static function leads(array $offers, string $token): bool
+    {
+        if ($token === '') return false;
+        $len = strlen($token);
+
+        foreach ($offers as $offer) {
+            if ($offer === $token) return true;
+
+            // A prefix only counts up to a boundary: "java" leads "java script"
+            // but must not reach "javascript", which is a different subject.
+            if (str_starts_with($offer, $token)) {
+                $next = $offer[$len] ?? '';
+                if ($next !== '' && ! ctype_alnum($next)) return true;
+            }
+        }
+
+        return false;
     }
 }
