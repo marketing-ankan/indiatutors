@@ -198,13 +198,17 @@ class AdminController extends Controller {
         // right. What differs between them is only what each side may SEE.
         $rows = TutorMatcher::rank(
             Tutor::published()->get(),
-            // Fall back to the course, because the console ROW already does:
-            // BookingsTab renders `course?.name || subject`, so a family who
-            // picked "Carnatic Vocal Music" from a course page and left the
-            // free-text box empty was shown under that heading and then matched
-            // against nothing — while the site's only vocal teacher went
-            // unoffered. The heading and the shortlist must read one booking
-            // the same way.
+            // Subject first, then the course — and BookingsTab's row renders it
+            // the same way round, so the heading a coordinator reads and the
+            // shortlist underneath describe one booking identically.
+            //
+            // Both halves of that were wrong before. The shortlist read only
+            // the subject, so a family who picked "Carnatic Vocal Music" from a
+            // course page and left the free-text box empty was shown under that
+            // heading and matched against nothing, while the site's only vocal
+            // teacher went unoffered. The row read the course first, so when
+            // the two disagreed the heading described one request and the
+            // suggestions answered another.
             $demoRequest->subject ?: $demoRequest->course?->name,
             $demoRequest->grade,
             $demoRequest->city,

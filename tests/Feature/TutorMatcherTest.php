@@ -320,4 +320,139 @@ class TutorMatcherTest extends TestCase
         $this->assertCount(0, $this->rank('Java'));
         $this->assertCount(1, $this->rank('JavaScript'));
     }
+
+    // ---- round three: what adversarial review found in the round-two fix ----
+
+    /**
+     * Matching must work in BOTH directions.
+     *
+     * Requiring the tutor's wording to contain the enquiry's fixed the
+     * "one shared word" defect and created a worse one: any enquiry MORE
+     * specific than a tutor's own phrasing matched nobody. "Python Programming
+     * for Beginners" is a real, featured course, and it found neither of the
+     * two people who list "Python Programming" — while the shorter form of the
+     * very same request matched both at full score.
+     */
+    public function test_an_enquiry_more_specific_than_the_tutors_wording_still_matches(): void
+    {
+        $this->tutor(['name' => 'Coder', 'subjects' => 'Python Programming, Web Development']);
+
+        foreach ([
+            'Python Programming for Beginners',
+            'Python Programming for Kids — Code Your First Projects',
+            'Web Development bootcamp',
+            'Python',
+        ] as $typed) {
+            $this->assertCount(1, $this->rank($typed), "\"{$typed}\" found nobody.");
+        }
+    }
+
+    /**
+     * ...and the reverse direction must still not claim too much. A tutor who
+     * lists the bare word "Music" has not said they teach Music Theory, so they
+     * may appear, but labelled for what they actually offer.
+     */
+    public function test_a_broader_subject_answers_as_a_partial_not_as_the_thing_asked_for(): void
+    {
+        $this->tutor(['name' => 'Generalist', 'subjects' => 'Music']);
+
+        $out = $this->rank('Music Theory');
+
+        $this->assertCount(1, $out);
+        $this->assertContains('teaches Music', $out->first()['why']);
+        $this->assertNotContains('subject', $out->first()['why'],
+            'Listing "Music" is not a claim to teach Music Theory.');
+    }
+
+    /**
+     * Punctuation must be normalised identically on both sides. It was not:
+     * the enquiry was rebuilt from word fragments while the tutor's subjects
+     * kept their apostrophes and brackets, so a tutor whose subject string was
+     * BYTE-IDENTICAL to the course name scored zero for that course.
+     */
+    public function test_a_tutor_whose_subject_is_the_course_name_matches_that_course(): void
+    {
+        foreach (["Rubik's Cube", 'NEET (UG)', 'Vedic Maths (Advanced)', 'C++', 'Arts & Painting'] as $name) {
+            Tutor::query()->delete();
+            $this->tutor(['name' => 'T', 'subjects' => $name]);
+
+            $this->assertCount(1, $this->rank($name), "A tutor listing exactly \"{$name}\" did not match it.");
+        }
+    }
+
+    /**
+     * A subject made only of stopwords and digits is NOT the same as no subject.
+     * Treating it as one let a home enquiry fall through to the city branch and
+     * return the whole roster — for "Class 10", which is the shape the booking
+     * form's own placeholder teaches.
+     */
+    public function test_a_subject_that_is_all_noise_suggests_nobody(): void
+    {
+        $this->tutor(['name' => 'Yoga person', 'subjects' => 'Yoga', 'city' => 'Kolkata', 'teaching_mode' => 'home']);
+        $this->tutor(['name' => 'Drummer',     'subjects' => 'Drums', 'city' => 'Kolkata', 'teaching_mode' => 'home']);
+
+        foreach (['Class 10', 'online tuition', 'std 5'] as $typed) {
+            $this->assertCount(0, $this->rank($typed, null, 'Kolkata', true),
+                "\"{$typed}\" named something we cannot read — that is not a request for everybody.");
+        }
+
+        // The documented exception is unchanged: naming NOTHING still works.
+        $this->assertCount(2, $this->rank(null, null, 'Kolkata', true));
+    }
+
+    /**
+     * A parenthesised list is a qualifier, not a set of separate requests.
+     * Splitting it blindly made an IELTS trainer the sole top-scoring result
+     * for a live maths-and-science olympiad course, because the fragment
+     * "english" was treated as the whole request.
+     */
+    public function test_a_bracketed_list_is_not_split_into_separate_requests(): void
+    {
+        $this->tutor(['name' => 'English teacher', 'subjects' => 'English, IELTS Training']);
+
+        $out = $this->rank('Olympiad Preparation (Maths, Science & English)');
+
+        // She may still appear — she does teach one part of it — but only as a
+        // partial, never as though she taught the course.
+        foreach ($out as $row) {
+            $this->assertNotContains('subject', $row['why'],
+                'A fragment inside brackets must not score as the whole request.');
+        }
+    }
+
+    /** An ampersand OUTSIDE brackets still separates alternatives. */
+    public function test_an_ampersand_outside_brackets_still_splits(): void
+    {
+        $this->tutor(['name' => 'AI person', 'subjects' => 'AI & Machine Learning']);
+
+        foreach (['AI & ML', 'Machine Learning', 'AI'] as $typed) {
+            $this->assertCount(1, $this->rank($typed), "\"{$typed}\" found nobody.");
+        }
+    }
+
+    /**
+     * Words naming the FORMAT are not the subject. "IELTS coaching" found
+     * nobody while "IELTS Training" found the IELTS trainer — the two differ
+     * only in a word that says what kind of teaching it is.
+     */
+    public function test_words_describing_the_format_are_not_part_of_the_subject(): void
+    {
+        $this->tutor(['name' => 'Anney', 'subjects' => 'English, IELTS Training']);
+
+        foreach (['IELTS coaching', 'IELTS preparation', 'IELTS Training for adults', 'IELTS'] as $typed) {
+            $this->assertCount(1, $this->rank($typed), "\"{$typed}\" found nobody.");
+        }
+    }
+
+    /** An exact match must always outrank a partial one. */
+    public function test_an_exact_match_outranks_a_partial(): void
+    {
+        $this->tutor(['name' => 'Vocalist', 'subjects' => 'Vocal Music']);
+        $this->tutor(['name' => 'Generalist', 'subjects' => 'Piano, Music']);
+
+        $out = $this->rank('Vocal Music');
+
+        $this->assertSame('Vocalist', $out->first()['tutor']->name);
+        $this->assertGreaterThan($out->last()['score'], $out->first()['score']);
+    }
 }

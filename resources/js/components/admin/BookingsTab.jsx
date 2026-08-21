@@ -101,7 +101,7 @@ export default function BookingsTab() {
               <div className="text-xs text-slate-500">{r.email}{r.phone ? ` · ${r.phone}` : ''}</div>
             </td>
             <td className="px-3 py-3 text-slate-600">{r.student ?? <span className="text-slate-400">—</span>}</td>
-            <td className="px-3 py-3 text-slate-600">{r.course?.name || r.subject || <span className="text-slate-400">General enquiry</span>}</td>
+            <td className="px-3 py-3 text-slate-600">{r.subject || r.course?.name || <span className="text-slate-400">General enquiry</span>}</td>
             <td className="px-3 py-3">
               <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">
                 {TYPE_LABEL[r.type] ?? r.type}
