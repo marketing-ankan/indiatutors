@@ -50,6 +50,16 @@ return new class extends Migration
     public function up(): void
     {
         if (Schema::hasTable('material_handovers')) {
+            // The table existing is not the same fact as the table being
+            // finished: MySQL emits the unique index as its own ALTER after the
+            // CREATE, so a run cut between the two leaves a table whose only
+            // integrity rule is missing — and a bare hasTable guard would then
+            // skip past it for ever, letting the same file be handed to the same
+            // login twice. Cheap to check, silent to get wrong.
+            if (! Schema::hasIndex('material_handovers', ['course_material_id', 'to_user_id'], 'unique')) {
+                Schema::table('material_handovers', fn (Blueprint $t) => $t->unique(['course_material_id', 'to_user_id']));
+            }
+
             return;
         }
 

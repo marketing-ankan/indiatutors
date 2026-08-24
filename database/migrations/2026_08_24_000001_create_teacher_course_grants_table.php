@@ -36,6 +36,16 @@ return new class extends Migration
     public function up(): void
     {
         if (Schema::hasTable('teacher_course_grants')) {
+            // The table existing is not the same fact as the table being
+            // finished: MySQL emits the unique index as its own ALTER after the
+            // CREATE, so a run cut between the two leaves the table without the
+            // one rule the design above rests on — and a bare hasTable guard
+            // would skip past it for ever, letting the same course be granted
+            // twice and doubling every count built on it.
+            if (! Schema::hasIndex('teacher_course_grants', ['tutor_id', 'course_id'], 'unique')) {
+                Schema::table('teacher_course_grants', fn (Blueprint $t) => $t->unique(['tutor_id', 'course_id']));
+            }
+
             return;
         }
 

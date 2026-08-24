@@ -24,6 +24,14 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        // MySQL cannot roll back a CREATE, and Laravel records the migration
+        // only once up() returns — so a deploy killed anywhere in this file
+        // would otherwise make every retry die on "table already exists" and
+        // block every migration queued behind it.
+        if (Schema::hasTable('video_course_requests')) {
+            return;
+        }
+
         Schema::create('video_course_requests', function (Blueprint $t) {
             $t->id();
 

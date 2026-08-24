@@ -22,15 +22,30 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::table('video_courses', function (Blueprint $t) {
-            $t->string('sku', 120)->nullable()->unique()->after('id');
-        });
+        // Guarded per object, not per file. Each of these is a separate ALTER
+        // that MySQL commits on the spot, and the backfill below runs for as
+        // long as the catalogue is long — so a killed deploy leaves some of this
+        // committed with no migrations row, and an unguarded retry would fail on
+        // "duplicate column sku" for ever, blocking everything behind it.
+        if (! Schema::hasColumn('video_courses', 'sku')) {
+            Schema::table('video_courses', function (Blueprint $t) {
+                $t->string('sku', 120)->nullable()->after('id');
+            });
+        }
 
-        Schema::table('order_items', function (Blueprint $t) {
-            // Not unique and not a foreign key: many lines may sell the same
-            // product, and the line has to outlive the product.
-            $t->string('sku', 120)->nullable()->after('video_course_id');
-        });
+        // Its own statement, after the column, so it needs its own guard: a
+        // column present without its index is a real state to land in.
+        if (! Schema::hasIndex('video_courses', ['sku'], 'unique')) {
+            Schema::table('video_courses', fn (Blueprint $t) => $t->unique('sku'));
+        }
+
+        if (! Schema::hasColumn('order_items', 'sku')) {
+            Schema::table('order_items', function (Blueprint $t) {
+                // Not unique and not a foreign key: many lines may sell the same
+                // product, and the line has to outlive the product.
+                $t->string('sku', 120)->nullable()->after('video_course_id');
+            });
+        }
 
         $this->backfill();
     }
