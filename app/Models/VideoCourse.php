@@ -5,6 +5,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class VideoCourse extends Model {
+    /** A recorded course is a product too, and needs the same stable code. */
+    protected static function booted(): void
+    {
+        static::creating(function (VideoCourse $v) {
+            if (! $v->sku) $v->sku = \App\Support\Sku::next(\App\Support\Sku::VIDEO);
+        });
+    }
+
     protected $guarded = [];
     protected $casts = ['price' => 'integer', 'position' => 'integer', 'is_published' => 'boolean'];
 

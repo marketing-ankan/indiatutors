@@ -11,6 +11,7 @@ use App\Models\AppNotification;
 use App\Models\AuditLog;
 use App\Models\ClassAbsence;
 use App\Models\ClassLog;
+use App\Models\ContactMessage;
 use App\Models\Course;
 use App\Models\CourseProposal;
 use App\Models\DemoRequest;
@@ -20,9 +21,11 @@ use App\Models\Order;
 use App\Models\RescheduleRequest;
 use App\Models\Review;
 use App\Models\Student;
+use App\Models\SupportTicket;
 use App\Models\TeacherApplication;
 use App\Models\User;
 use App\Models\TeacherProfile;
+use App\Models\TuitionRequirement;
 use App\Models\Tutor;
 use App\Support\SubstituteFinder;
 use App\Support\TeacherPerformance;
@@ -68,13 +71,23 @@ class AdminController extends Controller {
 
     /** Cart orders (guest checkout), newest first, with status/month/search filters. */
     public function orders(Request $request) {
-        $q = Order::query()->with(['items:id,order_id,name,price,qty', 'user:id,name,email'])->latest();
+        // sku listed explicitly: a column left out of this select is null on the
+        // resource, which reads exactly like a product that never had a code.
+        $q = Order::query()->with(['items:id,order_id,sku,name,price,qty', 'user:id,name,email'])->latest();
         if ($s = $request->string('status')->toString()) $q->where('status', $s);
         $this->applyMonth($q, $request->string('month')->toString());
         if ($s = trim($request->string('q')->toString())) {
             $q->where(fn ($w) => $w->where('first_name', 'like', "%{$s}%")
                 ->orWhere('last_name', 'like', "%{$s}%")
                 ->orWhere('email', 'like', "%{$s}%")
+                // Staff are given the ORDER NUMBER by the customer, so that
+                // is what they will paste in. Searching only the primary key
+                // meant the one identifier a caller can read out found nothing.
+                ->orWhere('order_number', 'like', "%{$s}%")
+                ->orWhere('invoice_number', 'like', "%{$s}%")
+                // ...and by what was bought. A coordinator handed a product
+                // code should be able to find every order carrying it.
+                ->orWhereHas('items', fn ($i) => $i->where('sku', 'like', "%{$s}%"))
                 ->orWhere('id', ltrim($s, '#')));
         }
         return AdminOrderResource::collection($q->paginate(20));
@@ -101,6 +114,18 @@ class AdminController extends Controller {
      * with nothing to justify it. Cancel it instead — that path revokes cleanly.
      */
     public function destroyOrder(Order $order) {
+        // An issued invoice number is gone from the series if this row goes,
+        // and a tax invoice series with a hole in it is the thing somebody has
+        // to account for later. The guard keyed off `status`, which is mutable
+        // — two clicks (paid -> pending -> Delete) removed an issued number.
+        // The remedy for a reversed sale is a cancellation that KEEPS the
+        // number, never deletion.
+        if ($order->invoice_number) {
+            return response()->json([
+                'message' => "Invoice {$order->invoice_number} has been issued for this order, so it cannot be deleted. Cancel it instead — the invoice number stays in the series either way.",
+            ], 422);
+        }
+
         if ($order->status === 'paid') {
             return response()->json([
                 'message' => 'A paid order cannot be deleted — it is the record behind any course access it granted. Cancel it instead.',
@@ -190,7 +215,18 @@ class AdminController extends Controller {
         // right. What differs between them is only what each side may SEE.
         $rows = TutorMatcher::rank(
             Tutor::published()->get(),
-            $demoRequest->subject,
+            // Subject first, then the course — and BookingsTab's row renders it
+            // the same way round, so the heading a coordinator reads and the
+            // shortlist underneath describe one booking identically.
+            //
+            // Both halves of that were wrong before. The shortlist read only
+            // the subject, so a family who picked "Carnatic Vocal Music" from a
+            // course page and left the free-text box empty was shown under that
+            // heading and matched against nothing, while the site's only vocal
+            // teacher went unoffered. The row read the course first, so when
+            // the two disagreed the heading described one request and the
+            // suggestions answered another.
+            $demoRequest->subject ?: $demoRequest->course?->name,
             $demoRequest->grade,
             $demoRequest->city,
             $wantsHome,
@@ -595,11 +631,35 @@ class AdminController extends Controller {
                 'users'    => User::count(),
                 'audit'    => AuditLog::count(),
             ],
+            // What is sitting unattended. Four of these were missing, and the
+            // Overview does not merely omit them — it prints "Nothing waiting
+            // on staff right now" in green whenever this list comes back empty.
+            // Support tickets, website enquiries, home-tuition requirements and
+            // reschedule requests could all be piling up behind that reassurance.
             'needs_attention' => [
                 'applications_awaiting' => $appsAwaiting,
                 'reviews_pending'       => Review::where('status', 'pending')->count(),
                 'bookings_new'          => DemoRequest::where('status', 'new')->count(),
                 'proposals_pending'     => CourseProposal::where('status', 'pending')->count(),
+                'support_open'          => SupportTicket::where('status', 'open')->count(),
+                'messages_new'          => ContactMessage::where('status', 'new')->count(),
+                'requirements_open'     => TuitionRequirement::where('status', 'open')->count(),
+                'reschedules_pending'   => RescheduleRequest::where('status', 'pending')->count(),
+                // A booking with a teacher on it but no date is the stall
+                // nothing was watching: it has left the "new" queue, so it
+                // reads as handled everywhere, while the family waits for a
+                // time that was never set.
+                //
+                // A positive list of the in-flight statuses, not a blocklist of
+                // the finished ones. Every terminal state is legitimately
+                // dateless — completed, converted, no_show and closed all are —
+                // and naming them to exclude means the next status anybody adds
+                // starts silently raising a false alarm. Listing what still
+                // needs a date fails the safe way instead.
+                'demos_unscheduled'     => DemoRequest::whereNotNull('assigned_tutor_id')
+                    ->whereNull('scheduled_at')
+                    ->whereIn('status', ['new', 'contacted', 'scheduled'])
+                    ->count(),
             ],
         ]]);
     }

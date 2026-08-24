@@ -5,6 +5,7 @@ use App\Http\Resources\AdminOrderResource;
 use App\Models\Course;
 use App\Models\Order;
 use App\Models\VideoCourse;
+use App\Support\SiteSettings;
 use App\Models\VideoEntitlement;
 use App\Support\RateCard;
 use App\Support\Razorpay;
@@ -48,6 +49,18 @@ class OrderController extends Controller {
 
         $courses = Course::whereIn('slug', $courseSlugs)->published()->get();
         $videos  = VideoCourse::whereIn('slug', $videoSlugs)->published()->get();
+
+        // "Coming soon" is a statement about whether the product is on sale, so
+        // it has to hold on the SERVER. It was enforced only in the two React
+        // pages, which means POST /api/orders happily took payment for a
+        // recorded course that does not exist yet — minting a real order, a
+        // real invoice number and a signed invoice URL for it. A stale tab, a
+        // cached bundle or anyone posting directly reaches that path.
+        if ($videos->isNotEmpty() && SiteSettings::get('video_courses_status') !== 'live') {
+            return response()->json([
+                'message' => 'Our recorded courses are not on sale yet. Everything else in your cart can still be checked out.',
+            ], 422);
+        }
         if ($courses->isEmpty() && $videos->isEmpty()) {
             return response()->json(['message' => 'None of the cart items are available.'], 422);
         }
@@ -99,12 +112,15 @@ class OrderController extends Controller {
                 // "Chess" at a number the customer cannot account for.
                 $label = $rate !== null ? "{$c->name} — {$plan}, {$level}" : $c->name;
 
-                $order->items()->create(['course_id' => $c->id, 'name' => $label, 'price' => $price, 'qty' => 1]);
+                // The code is COPIED onto the line, not looked up later. An
+                // order line is a record of a sale and has to keep saying what
+                // was sold after the product is renamed, re-coded or deleted.
+                $order->items()->create(['course_id' => $c->id, 'sku' => $c->sku, 'name' => $label, 'price' => $price, 'qty' => 1]);
                 $total += $price;
             }
             foreach ($videos as $v) {
                 $price = (float) $v->price;
-                $order->items()->create(['video_course_id' => $v->id, 'name' => $v->title.' (video course)', 'price' => $price, 'qty' => 1]);
+                $order->items()->create(['video_course_id' => $v->id, 'sku' => $v->sku, 'name' => $v->title.' (video course)', 'price' => $price, 'qty' => 1]);
                 $total += $price;
             }
             $order->update(['total' => $total]);
@@ -191,14 +207,26 @@ class OrderController extends Controller {
 
     private static function orderPayload(Order $order): array {
         return [
-            'number'         => $order->id,
+            // The order's own number, not its primary key. "#123" told every
+            // customer how many orders the business had ever taken, and could
+            // not survive anything that renumbered rows.
+            'number'         => $order->order_number ?: ('#' . $order->id),
+            'invoice_number' => $order->invoice_number,
+            // Signed, and time-limited, because checkout is open to guests:
+            // they have no account to authenticate with, so the URL itself has
+            // to be the credential. Thirty days is long enough to keep a
+            // receipt and short enough that a forwarded link stops working.
+            // Staff can always re-issue from the console.
+            'invoice_url'    => \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                'orders.invoice', now()->addDays(30), ['order' => $order->id],
+            ),
             'date'           => $order->created_at->toDateString(),
             'email'          => $order->email,
             'total'          => $order->total,
             'currency'       => $order->currency,
             'payment_method' => $order->payment_method,
             'status'         => $order->status,
-            'items'          => $order->items->map(fn ($i) => ['name' => $i->name, 'price' => $i->price, 'qty' => $i->qty]),
+            'items'          => $order->items->map(fn ($i) => ['sku' => $i->sku, 'name' => $i->name, 'price' => $i->price, 'qty' => $i->qty]),
         ];
     }
 }

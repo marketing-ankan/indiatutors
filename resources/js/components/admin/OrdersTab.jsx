@@ -72,7 +72,19 @@ export default function OrdersTab() {
         minWidth={980}
         renderRow={o => (
           <tr key={o.id} className="align-top">
-            <td className="px-3 py-3 font-bold text-slate-800">#{o.id}</td>
+            {/* The order NUMBER is what a customer reads out on the phone, so
+                it leads. The database id stays visible underneath because
+                every other console screen and the audit log still key on it. */}
+            <td className="px-3 py-3 font-bold text-slate-800">
+              {o.order_number || `#${o.id}`}
+              {o.invoice_number && (
+                <span className="mt-0.5 block text-[11px] font-semibold text-green-700">{o.invoice_number}</span>
+              )}
+              <a href={o.invoice_url} target="_blank" rel="noopener noreferrer"
+                className="mt-1 block text-[11px] font-semibold text-brand-600 hover:underline">
+                Invoice PDF ↓
+              </a>
+            </td>
             <td className="px-3 py-3">
               <div className="text-slate-800">{o.customer}</div>
               <div className="text-xs text-slate-500">{o.email}</div>
@@ -82,7 +94,17 @@ export default function OrdersTab() {
                 : <div className="text-[11px] text-slate-400">Guest checkout</div>}
             </td>
             <td className="px-3 py-3 text-slate-600">
-              {(o.items || []).map(i => i.name).join(', ') || <span className="text-slate-400">—</span>}
+              {/* The product CODE under each line, because that is what a
+                  report, an export and this row can all agree on — a title
+                  can be edited, and then they no longer name the same thing. */}
+              {(o.items || []).length === 0
+                ? <span className="text-slate-400">—</span>
+                : (o.items || []).map(i => (
+                    <div key={i.id} className="mb-1 last:mb-0">
+                      {i.name}
+                      {i.sku && <span className="ml-1.5 text-[11px] font-semibold text-slate-400">{i.sku}</span>}
+                    </div>
+                  ))}
             </td>
             <td className="px-3 py-3 font-bold tabular-nums text-slate-800">{inr(o.total)}</td>
             <td className="px-3 py-3"><StatusBadge status={o.status} /></td>

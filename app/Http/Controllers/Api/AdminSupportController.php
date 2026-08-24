@@ -5,8 +5,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\SupportTicketResource;
 use App\Models\AppNotification;
 use App\Models\AuditLog;
+use App\Mail\SupportReplyMail;
 use App\Models\SupportTicket;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 /** The inbox. Everything a customer or visitor sends now arrives here. */
@@ -60,24 +63,102 @@ class AdminSupportController extends Controller
         return new SupportTicketResource($ticket->load(['messages', 'enrollment.course:id,name']));
     }
 
+    /**
+     * Reply to a ticket, and be honest about whether the reply actually went
+     * anywhere.
+     *
+     * This used to end with AppNotification::send($ticket->user_id, ...), which
+     * is a silent no-op when that id is null — and it is null for every enquiry
+     * that came from the public contact form, because the sender has no account.
+     * addMessage() then moved the ticket to `answered`, dropping it out of the
+     * open queue. So the whole path succeeded end to end while the person who
+     * wrote in received nothing at all, and the ticket disappeared from the one
+     * list that would have shown them still waiting.
+     *
+     * Three ways a reply reaches someone, in order of what we actually have:
+     *
+     *   account       the in-app thread, which is where they already read it
+     *   guest + SMTP  email, to the address they typed into the form
+     *   neither       nobody. Which is a fact staff must be told, not hidden.
+     *
+     * In the third case the message is still recorded — staff wrote it, and
+     * that is a record worth keeping — but the ticket stays OPEN, because the
+     * work is not done until a human sends it by hand. Leaving the queue is
+     * what makes this class of failure invisible.
+     */
     public function reply(Request $request, SupportTicket $ticket)
     {
         $data = $request->validate(['message' => ['required', 'string', 'max:5000']]);
 
         $ticket->addMessage($data['message'], $request->user(), true);
 
-        // The customer is not sitting on this page. Without a notification the
-        // reply is as invisible as the enquiry used to be.
-        AppNotification::send(
-            $ticket->user_id,
-            'support_reply',
-            'We replied to your message',
-            \Illuminate\Support\Str::limit($ticket->subject ?: $data['message'], 90),
-        );
+        $delivery = $this->deliverReply($ticket, $data['message']);
 
-        AuditLog::record('support_reply', 'support_ticket', $ticket->id, $ticket->code);
+        // Undelivered means unfinished. addMessage() has already marked this
+        // answered; put it back so it keeps showing up as needing a reply.
+        if ($delivery['status'] === 'undelivered') {
+            $ticket->forceFill(['status' => 'open'])->save();
+        }
 
-        return new SupportTicketResource($ticket->fresh()->load(['messages', 'enrollment.course:id,name']));
+        AuditLog::record('support_reply', 'support_ticket', $ticket->id, $ticket->code, [
+            'delivery' => $delivery['status'],
+        ]);
+
+        return (new SupportTicketResource($ticket->fresh()->load(['messages', 'enrollment.course:id,name'])))
+            ->additional(['meta' => ['delivery' => $delivery]]);
+    }
+
+    /**
+     * @return array{status: string, detail: string}
+     */
+    private function deliverReply(SupportTicket $ticket, string $body): array
+    {
+        if ($ticket->user_id) {
+            AppNotification::send(
+                $ticket->user_id,
+                'support_reply',
+                'We replied to your message',
+                Str::limit($ticket->subject ?: $body, 90),
+            );
+
+            return ['status' => 'in_app', 'detail' => 'Shown on their dashboard.'];
+        }
+
+        if (! filter_var((string) $ticket->email, FILTER_VALIDATE_EMAIL)) {
+            return [
+                'status' => 'undelivered',
+                'detail' => 'This enquiry has no account and no usable email address. Reply by phone — the ticket stays open until you close it.',
+            ];
+        }
+
+        // `log` is the default until SMTP is configured. Writing the reply into
+        // storage/logs is not delivery, and reporting it as sent is how staff
+        // end up believing a queue is cleared. Same call LeadNotifier makes.
+        if (config('mail.default') === 'log') {
+            return [
+                'status' => 'undelivered',
+                'detail' => "Email is not configured on this server, so nothing was sent to {$ticket->email}. Send this reply by hand — the ticket stays open until you close it.",
+            ];
+        }
+
+        try {
+            Mail::to($ticket->email)->send(new SupportReplyMail(
+                $ticket->code,
+                $ticket->subject,
+                $body,
+                $ticket->name,
+            ));
+        } catch (\Throwable $e) {
+            // A bounced or refused send must not read as a delivered one.
+            report($e);
+
+            return [
+                'status' => 'undelivered',
+                'detail' => "Could not email {$ticket->email}. Send this reply by hand — the ticket stays open until you close it.",
+            ];
+        }
+
+        return ['status' => 'email', 'detail' => "Emailed to {$ticket->email}."];
     }
 
     public function update(Request $request, SupportTicket $ticket)

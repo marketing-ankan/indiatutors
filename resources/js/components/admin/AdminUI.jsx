@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { X, Search, Loader2 } from 'lucide-react';
 
 // The shared vocabulary of the console: filter chips, search, tables, pagers,
@@ -48,27 +48,33 @@ export function SearchBox({ value, onChange, placeholder = 'Search…', classNam
  * scrolls sideways.
  */
 export function AdminTable({ cols, rows, renderRow, loading, empty, minWidth = 720 }) {
+  const blank = loading || !rows.length;
+
   return (
-    <div className="mt-4 overflow-x-auto">
-      <table className="w-full text-sm" style={{ minWidth }}>
-        <thead>
-          <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
-            {cols.map(c => <th key={c} className="px-3 py-2 font-bold whitespace-nowrap">{c}</th>)}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100">
-          {loading && (
-            <tr><td colSpan={cols.length} className="px-3 py-10 text-center text-slate-400">
-              <Loader2 className="mx-auto h-5 w-5 animate-spin" />
-            </td></tr>
-          )}
-          {!loading && !rows.length && (
-            <tr><td colSpan={cols.length} className="px-3 py-10 text-center text-slate-400">{empty}</td></tr>
-          )}
-          {!loading && rows.map(renderRow)}
-        </tbody>
-      </table>
-    </div>
+    <>
+      <div className="mt-4 overflow-x-auto">
+        <table className="w-full text-sm" style={{ minWidth }}>
+          <thead>
+            <tr className="text-left text-xs uppercase tracking-wide text-slate-500">
+              {cols.map(c => <th key={c} className="px-3 py-2 font-bold whitespace-nowrap">{c}</th>)}
+            </tr>
+          </thead>
+          {!blank && <tbody className="divide-y divide-slate-100">{rows.map(renderRow)}</tbody>}
+        </table>
+      </div>
+
+      {/* Outside the scroller on purpose. A spinner or an empty-state sentence
+          placed in a cell inherits the table's min-width, so on a narrow screen
+          the very message explaining that there is nothing here was itself cut
+          off — 463px of it unreachable at 768px — and had to be scrolled
+          sideways to read. Nothing about "there are no rows" needs the column
+          grid, so it sits in the panel's own width instead. */}
+      {blank && (
+        <div className="px-3 py-10 text-center text-sm text-slate-400">
+          {loading ? <Loader2 className="mx-auto h-5 w-5 animate-spin" /> : empty}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -111,16 +117,34 @@ export function StatusBadge({ status, children }) {
 }
 
 export function Modal({ title, subtitle, onClose, children, wide = false }) {
+  const overlay = useRef(null);
+  // The handler is registered once, on mount, so it must read onClose through a
+  // ref rather than close over the value it was created with.
+  const closeRef = useRef(onClose);
+  useEffect(() => { closeRef.current = onClose; });
+
   // Escape closes it — a modal you can only leave with the mouse is a modal
-  // that traps keyboard users.
+  // that traps keyboard users. Only the topmost one, though: a ConfirmDialog is
+  // itself a Modal, and the materials screen raises one from inside an open
+  // modal. Escape is a window event, so without this test both handlers ran and
+  // cancelling a delete also tore down the modal behind it, taking the
+  // half-filled upload form with it. Topmost is read off the DOM (the marker
+  // below) rather than tracked in a mount-order stack, because every overlay
+  // shares one z-index: the last one in document order is the one actually
+  // painted on top, whatever order they mounted in.
   useEffect(() => {
-    const onKey = e => { if (e.key === 'Escape') onClose(); };
+    const onKey = e => {
+      if (e.key !== 'Escape') return;
+      const open = document.querySelectorAll('[data-admin-modal]');
+      if (open[open.length - 1] === overlay.current) closeRef.current();
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  }, []);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 sm:items-center" onClick={onClose}>
+    <div ref={overlay} data-admin-modal=""
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 sm:items-center" onClick={onClose}>
       <div onClick={e => e.stopPropagation()}
         className={`w-full rounded-2xl bg-white p-5 shadow-xl ${wide ? 'max-w-2xl' : 'max-w-md'}`}>
         <div className="mb-4 flex items-start justify-between gap-3">

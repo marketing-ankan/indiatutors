@@ -7,6 +7,11 @@ class AdminOrderResource extends JsonResource {
     public function toArray(Request $request): array {
         return [
             'id'            => $this->id,
+            // Staff quote this on the phone and search by it, so it has to
+            // be here as well as on the customer's copy.
+            'order_number'  => $this->order_number,
+            'invoice_number'=> $this->invoice_number,
+            'invoice_url'   => route('orders.invoice', ['order' => $this->id]),
             'customer'      => trim($this->first_name . ' ' . ($this->last_name ?? '')),
             'email'         => $this->email,
             'phone'         => $this->phone,
@@ -21,7 +26,7 @@ class AdminOrderResource extends JsonResource {
             // shows the typed-in name instead of pretending there is an account.
             'user'          => $this->whenLoaded('user', fn () => $this->user?->only(['id', 'name', 'email'])),
             'items'         => $this->whenLoaded('items', fn () => $this->items->map(fn ($i) => [
-                'id' => $i->id, 'name' => $i->name, 'price' => (float) $i->price, 'qty' => $i->qty,
+                'id' => $i->id, 'sku' => $i->sku, 'name' => $i->name, 'price' => (float) $i->price, 'qty' => $i->qty,
             ])),
             'created_at'    => optional($this->created_at)->toDateTimeString(),
         ];

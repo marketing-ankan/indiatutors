@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Check, Plus, X, Sparkles } from 'lucide-react';
+import VideoDemandPanel from './VideoDemandPanel.jsx';
 import {
   fetchAdminEvents, createAdminEvent, updateAdminEvent, deleteAdminEvent,
   fetchAdminVideoCourses, createAdminVideoCourse, updateAdminVideoCourse, deleteAdminVideoCourse,
@@ -600,6 +601,10 @@ export function VideoCoursesTab() {
           ))}
         </div>
       )}
+
+      {/* Demand for courses that do not exist yet. Sits with the catalogue
+          because it is the same decision: what to make next. */}
+      <VideoDemandPanel />
     </div>
   );
 }

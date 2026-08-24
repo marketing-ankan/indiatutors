@@ -14,6 +14,9 @@ export const FALLBACK = {
   contact_email: 'connect@indiatutorsonline.com',
   contact_address: 'New Town, Kolkata — 700161',
   contact_locality: 'New Town, Kolkata',
+  // Default CLOSED. If the settings request fails we must not flash a buy
+  // button for a catalogue that is not ready to sell.
+  video_courses_status: 'coming_soon',
   footer_blurb: "India's premium online tutor marketplace — connecting students with verified experts across academics, music, coding, languages, and the arts. Based in New Town, Kolkata & serving pan-India.",
   socials: {
     whatsapp: 'https://wa.me/919330811581',

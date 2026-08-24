@@ -20,12 +20,27 @@ export default function OverviewTab({ overview }) {
 
   const t = overview.tiles;
   const need = overview.needs_attention;
+  const s = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
   // Each entry is only a queue if it has something in it.
+  //
+  // Order matters: this list is read top-down, and the green "nothing waiting"
+  // panel below only appears when every one of these is zero. Four queues used
+  // to be missing from it entirely — support, website enquiries, home tuition
+  // and reschedules — so unanswered families sat behind a green reassurance
+  // that staff had nothing to do. Anything a person is waiting on belongs here.
   const queues = [
-    need.applications_awaiting > 0 && ['teachers', `${need.applications_awaiting} teacher application${need.applications_awaiting === 1 ? '' : 's'} awaiting review`],
-    need.bookings_new > 0 && ['bookings', `${need.bookings_new} new booking${need.bookings_new === 1 ? '' : 's'} not yet assigned`],
-    need.reviews_pending > 0 && ['reviews', `${need.reviews_pending} review${need.reviews_pending === 1 ? '' : 's'} waiting to be moderated`],
-    need.proposals_pending > 0 && ['content', `${need.proposals_pending} course proposal${need.proposals_pending === 1 ? '' : 's'} from teachers`],
+    need.applications_awaiting > 0 && ['teachers',  `${s(need.applications_awaiting, 'teacher application', 'teacher applications')} awaiting review`],
+    need.bookings_new > 0          && ['bookings',  `${s(need.bookings_new, 'new booking', 'new bookings')} not yet assigned`],
+    // Assigned but dateless — out of the "new" queue, so it reads as handled
+    // everywhere while the family waits for a time nobody set.
+    need.demos_unscheduled > 0     && ['bookings',  `${s(need.demos_unscheduled, 'booking has', 'bookings have')} a teacher but no date yet`],
+    need.support_open > 0          && ['support',   `${s(need.support_open, 'support ticket', 'support tickets')} open`],
+    need.messages_new > 0          && ['support',   `${s(need.messages_new, 'website enquiry', 'website enquiries')} unread`],
+    need.requirements_open > 0     && ['physical',  `${s(need.requirements_open, 'home-tuition requirement', 'home-tuition requirements')} unmatched`],
+    need.reschedules_pending > 0   && ['bookings',  `${s(need.reschedules_pending, 'reschedule request', 'reschedule requests')} to answer`],
+    need.reviews_pending > 0       && ['reviews',   `${s(need.reviews_pending, 'review', 'reviews')} waiting to be moderated`],
+    need.proposals_pending > 0     && ['content',   `${s(need.proposals_pending, 'course proposal', 'course proposals')} from teachers`],
   ].filter(Boolean);
 
   return (
@@ -42,8 +57,10 @@ export default function OverviewTab({ overview }) {
             <AlertTriangle className="h-4 w-4" /> Needs attention
           </h3>
           <ul className="mt-2 space-y-1">
+            {/* Keyed on the text, not the tab — several queues now link to the
+                same tab, and a repeated key silently drops list items. */}
             {queues.map(([tab, text]) => (
-              <li key={tab}>
+              <li key={text}>
                 <Link to={`#ac-${tab}`} replace className="text-sm font-semibold text-amber-900 underline-offset-2 hover:underline">
                   {text} →
                 </Link>

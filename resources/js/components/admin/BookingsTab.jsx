@@ -101,7 +101,7 @@ export default function BookingsTab() {
               <div className="text-xs text-slate-500">{r.email}{r.phone ? ` · ${r.phone}` : ''}</div>
             </td>
             <td className="px-3 py-3 text-slate-600">{r.student ?? <span className="text-slate-400">—</span>}</td>
-            <td className="px-3 py-3 text-slate-600">{r.course?.name || r.subject || <span className="text-slate-400">General enquiry</span>}</td>
+            <td className="px-3 py-3 text-slate-600">{r.subject || r.course?.name || <span className="text-slate-400">General enquiry</span>}</td>
             <td className="px-3 py-3">
               <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">
                 {TYPE_LABEL[r.type] ?? r.type}
@@ -218,7 +218,8 @@ function BookingDetails({ booking, onClose, onChanged }) {
       <div className="mt-5 border-t border-slate-100 pt-4">
         {/* Clear the roster filter on pick, or the select can hide the chosen
             option and render as unselected while the id stays armed. */}
-        <DemoSuggestions bookingId={booking.id} onPick={id => { setTutorId(String(id)); setTutorQuery(''); }} />
+        <DemoSuggestions bookingId={booking.id} subject={booking.subject}
+          onPick={id => { setTutorId(String(id)); setTutorQuery(''); }} />
 
         <label className="mb-1 block text-xs font-semibold text-slate-700">Record the assigned tutor</label>
         <input value={tutorQuery} onChange={e => setTutorQuery(e.target.value)}
@@ -400,15 +401,39 @@ function TrackRecord({ p }) {
   );
 }
 
-function DemoSuggestions({ bookingId, onPick }) {
-  const { data, isLoading } = useQuery({
+function DemoSuggestions({ bookingId, subject, onPick }) {
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['admin-demo-suggestions', bookingId],
     queryFn: () => fetchDemoSuggestions(bookingId),
     staleTime: 60_000,
   });
 
   if (isLoading) return <p className="mb-3 text-xs text-slate-400">Ranking suggested tutors…</p>;
-  if (!data || data.data.length === 0) return null; // nothing scored — the plain roster below is the honest view
+
+  // An empty shortlist used to render nothing at all, which was fine only
+  // while the matcher was loose enough that something almost always scored.
+  // Now that a named subject is a hard requirement, "nobody" is a real and
+  // frequent answer — 58 of the 110 courses have no tutor who teaches them —
+  // and a blank space cannot be told apart from a panel that failed to load.
+  // Say which it is: one of these is a recruiting problem, the other is a bug.
+  if (isError) {
+    return (
+      <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
+        Could not rank suggestions. Assign from the full roster below.
+      </p>
+    );
+  }
+
+  if (!data || data.data.length === 0) {
+    return (
+      <div className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
+        <strong>No tutor on the roster teaches {subject ? `“${subject}”` : 'this subject'}.</strong>{' '}
+        This is not a filter you can widen — assign the closest fit from the full roster below, or
+        add a tutor who covers it. Worth logging either way: it is a subject families are asking for
+        and nobody can take.
+      </div>
+    );
+  }
 
   return (
     <div className="mb-4">

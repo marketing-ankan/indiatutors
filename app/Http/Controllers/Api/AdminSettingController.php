@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\Setting;
 use App\Support\SiteSettings;
+use App\Support\TaxSettings;
 use Illuminate\Http\Request;
 
 // Settings staff can change without a deploy. Whitelisted on purpose: the table
@@ -16,11 +17,15 @@ class AdminSettingController extends Controller
     public function index()
     {
         return response()->json([
-            'data' => SiteSettings::all(),
+            // Site fields and tax fields merged into one payload, because the
+            // form posts them back as one object. A field the form writes but
+            // this does not return reads back as undefined and is wiped by the
+            // next save — the round trip has to be closed at both ends.
+            'data' => SiteSettings::all() + TaxSettings::all(),
             // The console shows what each field falls back to when cleared, so
             // "blank" never looks like "broken".
-            'defaults' => collect(SiteSettings::FIELDS)->map(fn ($f) => $f[0]),
-            'labels'   => collect(SiteSettings::FIELDS)->map(fn ($f) => $f[2]),
+            'defaults' => collect(SiteSettings::FIELDS + TaxSettings::FIELDS)->map(fn ($f) => $f[0]),
+            'labels'   => collect(SiteSettings::FIELDS + TaxSettings::FIELDS)->map(fn ($f) => $f[2]),
             'backups'  => $this->backupStatus(),
         ]);
     }
@@ -62,10 +67,15 @@ class AdminSettingController extends Controller
 
     public function update(Request $request)
     {
-        $data = $request->validate(SiteSettings::rules());
+        // Tax configuration is edited on the same screen and saved by the same
+        // request. Kept as a separate FIELDS map because these are not display
+        // details — gst_enabled and the rate decide what a legal document says,
+        // and SiteSettings::all() is published to every visitor.
+        $data = $request->validate(SiteSettings::rules() + TaxSettings::rules());
 
         foreach ($data as $key => $value) {
-            if (array_key_exists($key, SiteSettings::FIELDS)) {
+            if (array_key_exists($key, SiteSettings::FIELDS)
+                || array_key_exists($key, TaxSettings::FIELDS)) {
                 // Store '' rather than null for a cleared field. Laravel's
                 // ConvertEmptyStringsToNull turns a blank input into null, which
                 // is indistinguishable from "never set" — so clearing a social
