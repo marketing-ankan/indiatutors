@@ -267,6 +267,25 @@ recorded here in his own terms so the next reader does not re-guess them.*
   deck cannot reach a class because someone uploaded it early.
   *Known gap: targeting is by `course_id`, so enrolments created from a free-text demo (no course) get
   no company material. Same data gap that surfaced in E2.*
+  **2026-08-24 — the console and the distribution chain.** Until now the endpoints existed and nothing in
+  the SPA called them: an admin had no way to upload or hand out a file at all. Two things closed that.
+  *Admin console, `Materials` tab* — the teacher roster the owner sketched, filtered by subject and by the
+  ten root categories, showing upcoming classes and classes already taken, with per-teacher material
+  handout. Subject→course matching lives in `App\Support\SubjectCourseMap` and is deliberately
+  PRECISION-BIASED: a subject must HEAD the course name or one of its phrases, because `\bScience\b`
+  matches "Social Science". The cost is real misses (`Violin` does not reach "Carnatic Violin"), so a
+  miss is never presented as a catalogue gap — the UI says "search the catalogue" and offers a
+  give-any-course-by-hand picker. `teacher_course_grants` is the explicit staff act of handing a teacher a
+  course, which is what lets a teacher who has no students YET prepare from the material.
+  *The chain* — `material_handovers` records the teacher→student hop with delivery state
+  (`first_viewed_at`, `downloaded_at`, `download_count`), surfaced to all four roles and merged with the
+  grants into one admin trail (`AdminHandoverController`). Student entitlement stays derived and is only
+  ADDED to: a learner reads a file via their course OR via an explicit handover, never otherwise.
+  ⚠️ **Open decision for the owner.** `unique(course_material_id, to_user_id)` means two siblings who share
+  a guardian login and have no logins of their own collide: the second child's send is reported in
+  `skipped` rather than silently overwriting the first. Widening the index to include `student_id` records
+  both, but then one login opening one file cannot say WHICH child read it — a read receipt that names a
+  child who never looked is the kind of invented figure this project has twice had to delete.
 - ⬜ ~~**E4. Company-provided teaching material.**~~ *Merged into E3 above — see why.*
   **The company supplies the PPT/PDF** for a given class or syllabus; the teacher teaches from it, and
   **the same file is given to the enrolled student**. So E3 and E4 are two ends of ONE artefact: one

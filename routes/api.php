@@ -21,7 +21,10 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\CourseController;
+use App\Http\Controllers\Api\AdminTeacherMaterialController;
+use App\Http\Controllers\Api\AdminHandoverController;
 use App\Http\Controllers\Api\CourseMaterialController;
+use App\Http\Controllers\Api\MaterialHandoverController;
 use App\Http\Controllers\Api\DemoRequestController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\ExamUpdateController;
@@ -210,6 +213,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // enrolments, re-checked on download.
     Route::get('/my/course-materials',                    [CourseMaterialController::class, 'mine']);
     Route::get('/course-materials/{material}/download',   [CourseMaterialController::class, 'download']);
+    // A learner marking a handed-over file as opened. Deliberately outside any
+    // schema guard: the two routes above must keep working when the handovers
+    // table is missing, and this one is only ever called about a row that exists.
+    Route::post('/my/handovers/{handover}/seen',          [MaterialHandoverController::class, 'markSeen']);
 
     // Student portfolio (Phase 6)
     Route::get('/students/{student}/portfolio',  [PortfolioController::class, 'index']);
@@ -266,6 +273,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/teacher/enrollments/{enrollment}/materials',    [TeacherController::class, 'materials']);
     Route::post('/teacher/enrollments/{enrollment}/materials',   [TeacherController::class, 'storeMaterial']);
     Route::delete('/teacher/enrollments/{enrollment}/materials/{material}', [TeacherController::class, 'destroyMaterial']);
+    // Hop two of the chain: the teacher handing a company file to one of their
+    // own students. Every route rebuilds the roster from active enrolments, so a
+    // teacher can never reach a student they do not teach.
+    Route::get ('/teacher/handover-recipients',                   [MaterialHandoverController::class, 'recipients']);
+    Route::post('/teacher/course-materials/{material}/send',      [MaterialHandoverController::class, 'send'])->middleware('throttle:30,1');
+    Route::get ('/teacher/course-materials/{material}/handovers', [MaterialHandoverController::class, 'handovers']);
     Route::get('/teacher/proposals',  [TeacherController::class, 'proposals']);
     Route::post('/teacher/proposals', [TeacherController::class, 'storeProposal']);
     Route::get('/teacher/reschedules',              [TeacherController::class, 'reschedules']);
@@ -357,6 +370,27 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/course-materials',                 [CourseMaterialController::class, 'store']);
         Route::patch('/course-materials/{material}',     [CourseMaterialController::class, 'update']);
         Route::delete('/course-materials/{material}',    [CourseMaterialController::class, 'destroy']);
+        // The teachers' side of the same files: who teaches what, what they have
+        // coming up, and whether they can open anything at all. A teacher's
+        // access is derived from enrolments, so the one who most needs the
+        // syllabus — approved last week, no students yet — is entitled to
+        // nothing until staff hand it over here.
+        // /filters is registered before /{tutor} or the literal would be read as
+        // a tutor id and 404. Guarded like the support and physical tabs: these
+        // ship with a migration, and a deploy that has not run it yet should say
+        // so rather than 500 on a missing table.
+        Route::middleware(\App\Http\Middleware\EnsureTeacherMaterialSchema::class)->group(function () {
+            Route::get('/teacher-materials/filters',              [AdminTeacherMaterialController::class, 'filters']);
+            Route::get('/teacher-materials',                      [AdminTeacherMaterialController::class, 'index']);
+            Route::get('/teacher-materials/{tutor}',              [AdminTeacherMaterialController::class, 'show']);
+            Route::post('/teacher-materials/{tutor}/courses',     [AdminTeacherMaterialController::class, 'storeCourse']);
+            Route::delete('/teacher-material-grants/{grant}',     [AdminTeacherMaterialController::class, 'destroyGrant']);
+        });
+        // Both hops of the chain in one ledger — staff to teacher, teacher to
+        // student. Carries its own guard rather than joining the group above,
+        // because it needs material_handovers as well as teacher_course_grants.
+        Route::get('/material-handovers',                [AdminHandoverController::class, 'index']);
+        Route::delete('/material-handovers/{handover}',  [AdminHandoverController::class, 'destroy']);
         Route::get('/achievements',                      [StudentAchievementController::class, 'adminIndex']);
         Route::patch('/achievements/{achievement}',      [StudentAchievementController::class, 'adminUpdate']);
         Route::get('/reviews',                           [ReviewController::class, 'adminIndex']);

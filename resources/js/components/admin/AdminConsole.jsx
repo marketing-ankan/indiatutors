@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutGrid, GraduationCap, Users, CalendarClock, ReceiptText, Star,
   BookOpen, UserCog, ScrollText, CalendarDays, Video, Megaphone, Wrench, TrendingUp, Home, LifeBuoy,
-  SlidersHorizontal,
+  SlidersHorizontal, FolderOpen,
 } from 'lucide-react';
 import { fetchAdminOverview } from '../../lib/api.js';
 import OverviewTab from './OverviewTab.jsx';
@@ -17,6 +17,7 @@ import UsersTab from './UsersTab.jsx';
 import AuditTab from './AuditTab.jsx';
 import PhysicalTab from './PhysicalTab.jsx';
 import SupportTab from './SupportTab.jsx';
+import MaterialsTab from './MaterialsTab.jsx';
 import { EventsTab, VideoCoursesTab, ContentTab, AnalyticsTab } from './LegacyTabs.jsx';
 import SettingsTab from './SettingsTab.jsx';
 
@@ -38,6 +39,9 @@ const TABS = [
   { key: 'support',  label: 'Support',   Icon: LifeBuoy,       Panel: SupportTab },
   { key: 'reviews',  label: 'Reviews',   Icon: Star,           Panel: ReviewsTab,   count: 'reviews' },
   { key: 'courses',  label: 'Courses',   Icon: BookOpen,       Panel: CoursesTab,   count: 'courses' },
+  // Sits next to Courses because it is the other half of one: the catalogue is
+  // what a course IS, this is what a teacher is given to teach it from.
+  { key: 'materials', label: 'Materials', Icon: FolderOpen,    Panel: MaterialsTab },
   { key: 'users',    label: 'Users',     Icon: UserCog,        Panel: UsersTab,     count: 'users' },
   { key: 'audit',    label: 'Audit',     Icon: ScrollText,     Panel: AuditTab,     count: 'audit' },
   // Areas this platform has that the reference console does not. They keep

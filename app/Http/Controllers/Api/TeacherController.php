@@ -9,6 +9,7 @@ use App\Http\Resources\TeacherDemoResource;
 use App\Http\Resources\TeacherEnrollmentResource;
 use App\Http\Resources\TeacherProfileResource;
 use App\Models\AppNotification;
+use App\Models\AuditLog;
 use App\Models\ClassLog;
 use App\Models\ClassMaterial;
 use App\Models\CurriculumItem;
@@ -344,12 +345,32 @@ class TeacherController extends Controller {
             'link_url'      => $data['link_url'] ?? null,
         ]);
 
-        AppNotification::send(
-            $enrollment->student?->user_id,
-            'material_shared',
-            'New material from your teacher',
-            "\"{$material->title}\" was shared for " . ($enrollment->student?->name ?? 'your student') . '.',
-        );
+        // Both logins, not just the guardian's. students.user_id is the parent
+        // who created the profile and students.account_user_id is the student's
+        // own account — notifying only the first meant a student with their own
+        // login was never told their teacher had shared anything, and the file
+        // sat unread in a dashboard nobody was pointed at. The two ids can be
+        // the same person, or the second can be absent, so the list is
+        // deduplicated and nulls dropped.
+        $student = $enrollment->student;
+        $recipients = array_values(array_unique(array_filter([
+            $student?->user_id, $student?->account_user_id,
+        ])));
+        foreach ($recipients as $userId) {
+            AppNotification::send(
+                $userId,
+                'material_shared',
+                'New material from your teacher',
+                "\"{$material->title}\" was shared for " . ($student?->name ?? 'your student') . '.',
+            );
+        }
+
+        // Teacher uploads reach a family directly, and the console tells its
+        // operators every material movement is recorded. Adding and removing one
+        // wrote nothing at all, so the trail began at the company's files and
+        // went silent on the teacher's own.
+        AuditLog::record('class_material_added', 'enrollment', $enrollment->id,
+            $student?->name, ['title' => $material->title, 'type' => $material->type]);
 
         return (new ClassMaterialResource($material))->response()->setStatusCode(201);
     }
@@ -358,7 +379,12 @@ class TeacherController extends Controller {
         $this->authorizeEnrollment($request, $enrollment);
         abort_unless($material->enrollment_id === $enrollment->id, 404);
         if ($material->path) Storage::disk('local')->delete($material->path);
+        $title = $material->title;
         $material->delete();
+
+        AuditLog::record('class_material_deleted', 'enrollment', $enrollment->id,
+            $enrollment->student?->name, ['title' => $title]);
+
         return response()->json(['message' => 'Removed.']);
     }
 

@@ -89,9 +89,14 @@ class EnrollmentController extends Controller {
             ->with(['enrollment.student:id,name', 'enrollment.course:id,name', 'tutor:id,name'])
             ->orderBy('held_on')->get();
 
-        $out  = [];
-        $seen = [];
+        $out   = [];
+        $seen  = [];
+        $slots = [];
         foreach ($logs as $l) {
+            // A dated log wins for its whole date: class_logs carries no time, so
+            // where the timetable holds two slots that day there is no way to say
+            // which one the teacher meant, and listing both could show one class
+            // twice.
             $key = $l->enrollment_id . '|' . $l->held_on->toDateString();
             $seen[$key] = true;
             $out[] = [
@@ -126,7 +131,14 @@ class EnrollmentController extends Controller {
 
                 $key = $sch->enrollment_id . '|' . $day->toDateString();
                 if (isset($seen[$key])) continue;   // the teacher already dated this one
-                $seen[$key] = true;
+
+                // Slot against slot, keyed on the time too. enrollment_schedules
+                // is unique on (enrollment, weekday, start_time), so a child can
+                // legitimately have Monday 5pm and Monday 7pm — on a date-only
+                // key the second one vanished from the card.
+                $slot = $key . '|' . $sch->start_time;
+                if (isset($slots[$slot])) continue;
+                $slots[$slot] = true;
 
                 $absence = $absences[$key] ?? null;
                 $note = match ($absence?->status) {

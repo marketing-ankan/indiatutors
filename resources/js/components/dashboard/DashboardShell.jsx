@@ -1,12 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   LayoutGrid, BookOpen, Award, Trophy, LifeBuoy, CalendarClock, FolderOpen,
-  Clock, LogOut, Menu, X, Users, ShieldCheck,
+  Clock, LogOut, Menu, X, Users, ShieldCheck, Send, AlertCircle,
 } from 'lucide-react';
 import { fetchMyRecord, fetchMyEnrollments, fetchCourses, fetchTeacherDemos, fetchOnlineAllowance,
-  fetchMyCourseMaterials, downloadCourseMaterial } from '../../lib/api.js';
+  fetchMyCourseMaterials, downloadCourseMaterial,
+  fetchHandoverRecipients, sendCourseMaterial, fetchMaterialHandovers, markHandoverSeen } from '../../lib/api.js';
+// The console's kit, borrowed rather than re-cut. The recipient picker is a
+// modal, and every date on it is a date the admin's handover trail prints too —
+// two formatters would eventually disagree about the same delivery.
+import { Modal, StatusBadge, errText, day, inp, btnPrimary, btnGhost } from '../admin/AdminUI.jsx';
 import { useAuth } from '../../lib/auth.jsx';
 
 /**
@@ -420,35 +425,117 @@ export function KeepLearning() {
 // One endpoint serves all three roles, so the copy has to change voice: a
 // teacher is not "enrolled in" the class they teach, and a parent's materials
 // arrive through their child.
+//
+// `sent` / `sentBlurb` name the SECOND way a file can arrive: a teacher picked
+// it out and handed it over. That is a promise from a person, where a course
+// group is an entitlement that came with the purchase — so the two are never
+// merged into one list.
 const MATERIALS_COPY = {
   student: {
     blurb: 'Notes, slides and worksheets for the classes you are enrolled in.',
     empty: 'Nothing shared yet. Material appears here once you are enrolled in a class and your teacher or our team publishes it.',
+    sent: 'Sent to you by your teacher',
+    sentBlurb: 'Your teacher picked these out and sent them to you.',
+    courseTitle: 'From your classes',
   },
   parent: {
     blurb: "Notes, slides and worksheets for the classes your children are enrolled in.",
     empty: "Nothing shared yet. Material appears here once a child is enrolled and their teacher or our team publishes it.",
+    sent: 'Sent by a teacher',
+    sentBlurb: 'Files a teacher sent to a child on your account, and whether they have been opened yet.',
+    courseTitle: "From your children's classes",
   },
   teacher: {
-    blurb: 'Notes, slides and worksheets published for the courses you teach.',
-    empty: 'Nothing published yet for your courses. Company material our team uploads appears here.',
+    blurb: 'Notes, slides and worksheets published for the courses you teach. Send any of them on to a student you teach.',
+    empty: 'Nothing published yet for your courses. Company material our team uploads appears here, ready to send on.',
+    sent: 'Sent to you',
+    sentBlurb: 'Files someone handed to you directly.',
+    courseTitle: 'From your courses',
   },
 };
 
+/**
+ * One vocabulary for delivery state, so the teacher's copy of a row and the
+ * family's copy can never describe the same handover differently. The tones are
+ * the console's own status words, which is why "sent" borrows `pending`: the
+ * file is waiting on the reader, not finished with.
+ */
+const handoverState = (h) => {
+  if (h?.downloaded_at) return { tone: 'completed', label: 'Downloaded' };
+  if (h?.first_viewed_at) return { tone: 'scheduled', label: 'Opened' };
+  return { tone: 'pending', label: 'Not opened yet' };
+};
+
+// A row is one DELIVERY, not one file: a guardian with two children who were
+// each sent the same deck gets two rows carrying the same material id. Keying
+// React — and the download spinner — on the material alone would collide them,
+// so anything that identifies a row goes through here.
+const rowKey = (m) => (m.handover ? `h${m.handover.id}` : `m${m.id}`);
+
 export function ClassMaterialsSection({ children, audience = 'student' }) {
   const copy = MATERIALS_COPY[audience] ?? MATERIALS_COPY.student;
-  const { data: groups = [], isLoading } = useQuery({
+  const qc = useQueryClient();
+  const { data: groups = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['my-course-materials'],
     queryFn: fetchMyCourseMaterials,
   });
 
   const [busy, setBusy] = useState(null);
-  const total = groups.reduce((a, g) => a + g.materials.length, 0);
+  const [err, setErr] = useState('');
+  const [sendFor, setSendFor] = useState(null);   // teacher only
+
+  // The endpoint groups by course AND adds a group for handed-over material, so
+  // one file can legitimately arrive twice: the course entitles the reader to it
+  // and a teacher also sent it. Splitting on the `handover` object rather than on
+  // which group a row came in means it is listed once, under the promise that
+  // actually explains why it is there.
+  //
+  // Two sets, because the two questions differ. The handed list is deduplicated
+  // per HANDOVER: the server sends one entry per delivery so a guardian sees a
+  // row per child, and folding those onto the material id silently deleted the
+  // second child's whole delivery record. The course groups still drop by
+  // MATERIAL id — that is the "listed once" rule above, and it is about the file.
+  const handed = [];
+  const handedIds = new Set();
+  const handedMaterialIds = new Set();
+  groups.forEach(g => (g.materials ?? []).forEach(m => {
+    if (!m.handover || handedIds.has(m.handover.id)) return;
+    handedIds.add(m.handover.id);
+    handedMaterialIds.add(m.id);
+    handed.push({ ...m, course: m.course ?? g.course });
+  }));
+  const courseGroups = groups
+    .map(g => ({ course: g.course, materials: (g.materials ?? []).filter(m => !handedMaterialIds.has(m.id)) }))
+    .filter(g => g.materials.length);
+  const total = handed.length + courseGroups.reduce((a, g) => a + g.materials.length, 0);
+
+  // Opening a handed-over file is what tells the teacher it landed. Only the
+  // recipient's own reading counts, and the SERVER decides who that is — it
+  // stamps only when the caller is the addressee. Gating this on the student
+  // role instead was wrong for the case it matters most in: where a child has
+  // no login the send is addressed to the guardian, so the guardian's open is
+  // the genuine receipt, and refusing to report it left those handovers reading
+  // "not opened yet" forever.
+  const ack = async (m) => {
+    if (!m.handover || m.handover.first_viewed_at) return;
+    try {
+      await markHandoverSeen(m.handover.id);
+      qc.invalidateQueries({ queryKey: ['my-course-materials'] });
+    } catch { /* the file opened; a missed read-receipt is not worth an error */ }
+  };
 
   const get = async (m) => {
-    setBusy(m.id);
-    try { await downloadCourseMaterial(m.id, m.title); } finally { setBusy(null); }
+    setBusy(rowKey(m)); setErr('');
+    try {
+      await downloadCourseMaterial(m.id, m.title);
+      await ack(m);
+    } catch (e) {
+      setErr(errText(e, 'That file would not open just now — please try again.'));
+    } finally { setBusy(null); }
   };
+
+  const rowProps = { audience, busy, onGet: get, onOpen: ack,
+    onSend: audience === 'teacher' ? setSendFor : null };
 
   return (
     <>
@@ -458,48 +545,303 @@ export function ClassMaterialsSection({ children, audience = 'student' }) {
         </h2>
         <p className="mt-1 text-xs text-slate-500">{copy.blurb}</p>
 
+        {/* Three outcomes, three different sentences. "Nothing yet" is the normal
+            first view on this platform and has to read as calm and finished;
+            a failed request has to read as something that can be retried. */}
         {isLoading ? (
           <p className="mt-3 text-sm text-slate-400">Loading…</p>
+        ) : isError ? (
+          <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-red-100">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span className="min-w-0">We could not load your materials just now.</span>
+            <button type="button" onClick={() => refetch()} className="font-bold underline hover:no-underline">Try again</button>
+          </div>
         ) : total === 0 ? (
           <p className="mt-3 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-500 ring-1 ring-slate-100">
             {copy.empty}
           </p>
         ) : (
-          <div className="mt-4 space-y-5">
-            {groups.map(g => (
-              <div key={g.course?.id ?? 'x'}>
-                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{g.course?.name}</p>
-                <ul className="mt-2 space-y-1.5">
-                  {g.materials.map(m => (
-                    <li key={m.id} className="flex flex-wrap items-center gap-2 rounded-lg px-3 py-2 ring-1 ring-slate-100">
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm font-semibold text-slate-800">{m.title}</span>
-                        {m.description && <span className="block truncate text-xs text-slate-500">{m.description}</span>}
-                      </span>
-                      <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-slate-500">{m.type}</span>
-                      {m.has_file ? (
-                        <button onClick={() => get(m)} disabled={busy === m.id}
-                          className="rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700 disabled:opacity-60">
-                          {busy === m.id ? 'Opening…' : 'Download'}
-                        </button>
-                      ) : m.link_url ? (
-                        <a href={m.link_url} target="_blank" rel="noopener noreferrer"
-                          className="rounded-lg px-3 py-1.5 text-xs font-bold text-brand-700 ring-1 ring-brand-200 hover:bg-brand-50">
-                          Open ↗
-                        </a>
-                      ) : null}
-                    </li>
-                  ))}
+          <>
+            {err && (
+              <p className="mt-3 rounded-lg bg-red-50 px-4 py-2 text-xs font-semibold text-red-700 ring-1 ring-red-100">{err}</p>
+            )}
+
+            {handed.length > 0 && (
+              <div className="mt-4 rounded-xl bg-brand-50/60 p-3 ring-1 ring-brand-100 sm:p-4">
+                <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-brand-800">
+                  <Send className="h-3.5 w-3.5 shrink-0" />{copy.sent}
+                </p>
+                <p className="mt-0.5 text-xs text-brand-900/70">{copy.sentBlurb}</p>
+                <ul className="mt-2.5 space-y-1.5">
+                  {handed.map(m => <MaterialRow key={rowKey(m)} m={m} {...rowProps} />)}
                 </ul>
               </div>
-            ))}
-          </div>
+            )}
+
+            {courseGroups.length > 0 && (
+              <div className="mt-4 space-y-5">
+                {/* Only worth a heading once there is a second kind of arrival to
+                    tell it apart from. */}
+                {handed.length > 0 && (
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-400">{copy.courseTitle}</p>
+                )}
+                {courseGroups.map((g, i) => (
+                  // Indexed fallback: a material whose enrolment has no course
+                  // (the normal state of the one enrolment in this database)
+                  // groups under a null course, and two of those would collide
+                  // on a shared literal key.
+                  <div key={g.course?.id ?? `ungrouped-${i}`}>
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{g.course?.name || 'Your classes'}</p>
+                    <ul className="mt-2 space-y-1.5">
+                      {g.materials.map(m => <MaterialRow key={rowKey(m)} m={m} {...rowProps} />)}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </section>
 
       {/* Video courses, when the learner owns any — this hides itself. */}
       {children}
+
+      {sendFor && <SendMaterialModal material={sendFor} onClose={() => setSendFor(null)} />}
     </>
+  );
+}
+
+/**
+ * One row, three roles. A parent never gets the send control and a student never
+ * sees another child's name — both of those come from `audience`, not from what
+ * happens to be in the payload, so a widened endpoint could not quietly turn a
+ * reader into a sender.
+ */
+function MaterialRow({ m, audience, busy, onGet, onOpen, onSend }) {
+  const h = m.handover;
+  const st = h ? handoverState(h) : null;
+  // Per delivery, not per file, or a guardian downloading one child's copy would
+  // put the sibling's row into "Opening…" as well.
+  const busyNow = busy === rowKey(m);
+  // "New" is the student's own unread marker. A parent has not been sent
+  // anything, so nothing is new to them.
+  const isNew = h && !h.first_viewed_at && audience === 'student';
+
+  return (
+    <li className={`flex flex-wrap items-center gap-2 rounded-lg px-3 py-2 ring-1 ${h ? 'bg-white ring-brand-200' : 'ring-slate-100'}`}>
+      <span className="min-w-0 flex-1">
+        <span className="flex flex-wrap items-center gap-1.5">
+          <span className="min-w-0 max-w-full truncate text-sm font-semibold text-slate-800">{m.title}</span>
+          {isNew && <span className="rounded-full bg-brand-600 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">New</span>}
+        </span>
+        {m.description && <span className="block truncate text-xs text-slate-500">{m.description}</span>}
+
+        {h && (
+          <span className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-brand-800">
+            <Send className="h-3 w-3 shrink-0" />
+            <span className="font-semibold">
+              {audience === 'parent' && h.student ? `Sent to ${h.student}` : 'Sent to you'}
+              {h.sent_by ? ` by ${h.sent_by}` : ''}
+            </span>
+            <span className="text-brand-700/70">· {day(h.sent_at)}</span>
+            {/* The teacher already sees this state in their own panel; showing it
+                back to the student would be telling them what they just did. It
+                is the parent who is watching. */}
+            {audience === 'parent' && <StatusBadge status={st.tone}>{st.label}</StatusBadge>}
+            {audience === 'parent' && h.download_count > 0 && (
+              <span className="text-slate-500">{h.download_count}× downloaded</span>
+            )}
+          </span>
+        )}
+        {h?.note && <span className="mt-0.5 block text-xs italic text-slate-500">“{h.note}”</span>}
+      </span>
+
+      {m.type && <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-slate-500">{m.type}</span>}
+
+      {onSend && (
+        <button type="button" onClick={() => onSend(m)}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold text-brand-700 ring-1 ring-brand-200 hover:bg-brand-50">
+          <Send className="h-3.5 w-3.5" />Send to student
+        </button>
+      )}
+
+      {m.has_file ? (
+        <button onClick={() => onGet(m)} disabled={busyNow}
+          className="shrink-0 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-700 disabled:opacity-60">
+          {busyNow ? 'Opening…' : 'Download'}
+        </button>
+      ) : m.link_url ? (
+        <a href={m.link_url} target="_blank" rel="noopener noreferrer" onClick={() => onOpen(m)}
+          className="shrink-0 rounded-lg px-3 py-1.5 text-xs font-bold text-brand-700 ring-1 ring-brand-200 hover:bg-brand-50">
+          Open ↗
+        </a>
+      ) : null}
+    </li>
+  );
+}
+
+/**
+ * The teacher's half of the hop: hand one file to the students they teach.
+ *
+ * The recipient list is the teacher's OWN active enrolments — the server decides
+ * that, and rejects the whole request if a student on it is not theirs, so this
+ * cannot reach a family the teacher does not teach even if the list were stale.
+ *
+ * Sending the same file to the same student twice is deliberately harmless: the
+ * server updates the existing ledger row rather than writing a second one, which
+ * is what keeps "does this student have this file" an answerable question.
+ */
+function SendMaterialModal({ material, onClose }) {
+  // Keyed on the material, because already_sent is an answer ABOUT this file —
+  // a roster cached without one would report "not sent yet" for every student.
+  const recipients = useQuery({
+    queryKey: ['handover-recipients', material.id],
+    queryFn: () => fetchHandoverRecipients(material.id),
+  });
+  const handovers  = useQuery({ queryKey: ['material-handovers', material.id], queryFn: () => fetchMaterialHandovers(material.id) });
+
+  const [picked, setPicked] = useState([]);
+  const [note, setNote] = useState('');
+  const [result, setResult] = useState(null);
+
+  const rows = recipients.data ?? [];
+  const sentRows = handovers.data ?? [];
+
+  const send = useMutation({
+    mutationFn: () => sendCourseMaterial(material.id, { student_ids: picked, note: note.trim() || null }),
+    onSuccess: (r) => {
+      setResult(r); setPicked([]); setNote('');
+      handovers.refetch();
+      recipients.refetch();
+    },
+  });
+
+  const toggle = (id) => setPicked(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+  const nameFor = (id) => rows.find(r => r.student_id === id)?.name ?? `Student #${id}`;
+
+  // The server answers this per student id, now that the roster is fetched for
+  // this material. It used to fall back to matching the ledger by NAME, which
+  // flagged both of two students called Ravi the moment either was sent the file.
+  const wasSent = (r) => r.already_sent === true;
+
+  return (
+    <Modal wide title="Send to a student" subtitle={material.title} onClose={onClose}>
+      <div className="max-h-[45vh] overflow-y-auto pr-0.5">
+        {recipients.isLoading ? (
+          <p className="py-6 text-center text-sm text-slate-400">Loading your students…</p>
+        ) : recipients.isError ? (
+          <div className="flex flex-wrap items-center gap-2 rounded-lg bg-red-50 px-3 py-2.5 text-sm text-red-700 ring-1 ring-red-100">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span className="min-w-0">We could not load your students.</span>
+            <button type="button" onClick={() => recipients.refetch()} className="font-bold underline hover:no-underline">Try again</button>
+          </div>
+        ) : !rows.length ? (
+          <p className="rounded-lg bg-slate-50 px-3 py-2.5 text-sm text-slate-500 ring-1 ring-slate-100">
+            You have no active students yet. Once a demo is converted to an enrolment, the students you
+            teach appear here and you can send them material.
+          </p>
+        ) : (
+          <ul className="space-y-1.5">
+            {rows.map(r => (
+              <li key={r.student_id}>
+                <label className="flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 ring-1 ring-slate-100 hover:bg-slate-50">
+                  <input type="checkbox" checked={picked.includes(r.student_id)} onChange={() => toggle(r.student_id)}
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded ring-1 ring-slate-300 accent-brand-600" />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex flex-wrap items-center gap-1.5">
+                      <span className="min-w-0 max-w-full truncate text-sm font-semibold text-slate-800">{r.name}</span>
+                      {wasSent(r) && (
+                        <span className="rounded-full bg-green-50 px-1.5 py-0.5 text-[10px] font-bold uppercase text-green-700">Already sent</span>
+                      )}
+                    </span>
+                    <span className="block truncate text-xs text-slate-500">{r.course || 'Class not named yet'}</span>
+                    {/* Never hidden. Without a login of their own the file lands in
+                        the guardian's account, and a teacher who thinks they sent
+                        it to the child has been told something untrue. */}
+                    {r.has_own_login === false && (
+                      <span className="mt-1 block rounded bg-amber-50 px-2 py-1 text-[11px] font-semibold leading-snug text-amber-800">
+                        Goes to the parent's account — this student has no login yet.
+                      </span>
+                    )}
+                  </span>
+                </label>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {rows.length > 0 && (
+        <div className="mt-3">
+          <label className="block">
+            <span className="mb-1 block text-[11px] font-semibold text-slate-600">Note (optional)</span>
+            <input value={note} maxLength={300} onChange={e => setNote(e.target.value)}
+              placeholder="e.g. Read pages 4–9 before Thursday" className={inp} />
+          </label>
+        </div>
+      )}
+
+      {send.isError && (
+        <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-red-100">{errText(send.error)}</p>
+      )}
+
+      {result && (
+        <>
+          <p className="mt-3 rounded-lg bg-green-50 px-3 py-2 text-sm font-semibold text-green-800 ring-1 ring-green-100">
+            Sent to {result.sent} {result.sent === 1 ? 'student' : 'students'}.
+          </p>
+          {result.skipped?.length > 0 && (
+            <ul className="mt-2 space-y-1 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900 ring-1 ring-amber-100">
+              {result.skipped.map(s => <li key={s.student_id}><b>{nameFor(s.student_id)}</b> — {s.reason}</li>)}
+            </ul>
+          )}
+        </>
+      )}
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button type="button" onClick={() => send.mutate()} disabled={!picked.length || send.isPending}
+          className={btnPrimary}>
+          <Send className="h-4 w-4" />
+          {send.isPending ? 'Sending…' : picked.length ? `Send to ${picked.length}` : 'Send'}
+        </button>
+        <button type="button" onClick={onClose} className={btnGhost}>Close</button>
+      </div>
+
+      {/* Who already has it, and what they did with it. Loaded whether or not
+          anything was just sent — "I sent this last week, did they open it?" is
+          the same question. */}
+      <div className="mt-5 border-t border-slate-100 pt-4">
+        <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Already sent to</p>
+        {handovers.isLoading ? (
+          <p className="mt-2 text-sm text-slate-400">Loading…</p>
+        ) : handovers.isError ? (
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-red-700">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span>We could not load who has this yet.</span>
+            <button type="button" onClick={() => handovers.refetch()} className="font-bold underline hover:no-underline">Try again</button>
+          </div>
+        ) : !sentRows.length ? (
+          <p className="mt-2 text-sm text-slate-500">Nobody yet — nothing has been sent from this file.</p>
+        ) : (
+          // Capped: the picker above already scrolls, and an uncapped ledger
+          // under it is what pushes a centred modal off the top of a laptop.
+          <ul className="mt-2 max-h-[30vh] space-y-1.5 overflow-y-auto pr-0.5">
+            {sentRows.map((h, i) => {
+              const st = handoverState(h);
+              return (
+                <li key={h.id ?? `${h.student}-${h.sent_at}-${i}`}
+                  className="flex flex-wrap items-center gap-2 rounded-lg px-3 py-2 ring-1 ring-slate-100">
+                  <span className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800">{h.student || 'Student'}</span>
+                  <span className="text-xs text-slate-500">{day(h.sent_at)}</span>
+                  <StatusBadge status={st.tone}>{st.label}</StatusBadge>
+                  {h.download_count > 0 && <span className="text-[11px] text-slate-400">{h.download_count}×</span>}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    </Modal>
   );
 }
 

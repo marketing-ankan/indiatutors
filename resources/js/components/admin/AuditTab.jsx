@@ -6,14 +6,21 @@ import { AdminTable, Chips, SearchBox, Pager } from './AdminUI.jsx';
 // Who did what, and when. The log starts from the moment this shipped — there
 // is no history to reconstruct, and inventing one would be worse than the gap.
 
+// These are object_type values, matched exactly by the server. A chip for a
+// type nothing writes is a filter that always comes back empty and looks like a
+// broken screen, so each one here is a string confirmed to be in use.
 const TYPES = [
   { key: '', label: 'All' },
   { key: 'user', label: 'Accounts' },
   { key: 'teacher_application', label: 'Teacher applications' },
   { key: 'teacher_profile', label: 'Teacher profiles' },
+  // Course grants and teacher logins are recorded against the tutor record, not
+  // the profile — a separate table and a separate id.
+  { key: 'tutor', label: 'Teacher records' },
   { key: 'order', label: 'Orders' },
   { key: 'review', label: 'Reviews' },
   { key: 'course', label: 'Courses' },
+  { key: 'course_material', label: 'Material sends' },
   { key: 'booking', label: 'Bookings' },
 ];
 
@@ -42,6 +49,20 @@ const ACTION_LABEL = {
   course_added: 'course created', course_updated: 'course edited', course_deleted: 'course deleted',
   booking_deleted: 'booking deleted', student_updated: 'student edited', student_linked: 'student account linked',
   setting_updated: 'setting changed',
+  teacher_account_provisioned: 'teacher login created', tutor_listing_adopted: 'listing linked to a teacher account',
+  // The material chain, both hops. Unlike the type chips above, an entry here
+  // costs nothing if the action is never written — it is keyed on the action
+  // string, so a spare one is dead weight while a missing one shows staff a raw
+  // database value. teacher_course_revoked is the contract's name for the
+  // removal; teacher_course_grant_removed is what the controller writes today.
+  course_material_added: 'material added to a course', course_material_updated: 'material edited',
+  course_material_deleted: 'material deleted',
+  teacher_course_granted: 'course given to a teacher',
+  teacher_course_revoked: 'course taken back from a teacher',
+  teacher_course_grant_removed: 'course taken back from a teacher',
+  material_sent_to_student: 'material sent to a student',
+  material_handover_revoked: 'material send revoked',
+  class_material_added: 'teacher uploaded material', class_material_deleted: 'teacher material deleted',
 };
 
 const detail = d => {

@@ -292,6 +292,39 @@ export const fetchAdminAudit       = async (p={}) => { const { data } = await ap
 export const fetchAdminSettings    = async () => { const { data } = await api.get('/admin/settings'); return data.data; };
 export const saveAdminSettings     = async (p) => { const { data } = await api.put('/admin/settings', p); return data.data; };
 
+// --- Teacher materials -------------------------------------------------------
+// The roster behind the Materials tab, and the grant that hands a course's
+// material to a teacher who has no enrolment on it yet.
+export const fetchTeacherMaterialRoster  = async (p={}) => { const { data } = await api.get('/admin/teacher-materials', { params:p }); return data; };
+export const fetchTeacherMaterialFilters = async () => { const { data } = await api.get('/admin/teacher-materials/filters'); return data; };
+export const fetchTeacherMaterialDetail  = async (tutorId) => { const { data } = await api.get(`/admin/teacher-materials/${tutorId}`); return data.data; };
+export const grantTeacherCourse       = async (tutorId, p) => { const { data } = await api.post(`/admin/teacher-materials/${tutorId}/courses`, p); return data.data ?? data; };
+export const revokeTeacherCourseGrant = async (grantId) => { await api.delete(`/admin/teacher-material-grants/${grantId}`); };
+// Company material lives in course_materials, which already had admin CRUD and
+// a family-facing reader — so uploads go through the existing endpoint rather
+// than a second path that could write files the dashboard never lists.
+export const createCourseMaterial = async (formData) => { const { data } = await api.post('/admin/course-materials', formData); return data.data ?? data; };
+export const updateCourseMaterial = async (id, p) => { const { data } = await api.patch(`/admin/course-materials/${id}`, p); return data.data ?? data; };
+export const deleteCourseMaterial = async (id) => { await api.delete(`/admin/course-materials/${id}`); };
+
+// --- Material handovers ------------------------------------------------------
+// The second hop of the distribution chain. Admin grants a COURSE to a teacher
+// (grantTeacherCourse, above); the teacher then hands ONE file to ONE student,
+// and material_handovers is the ledger both hops are read back out of.
+// material_id is what makes `already_sent` a real answer rather than false on
+// every row — without it the caller can only guess, and guessing by name marks
+// the wrong child when two students share one.
+export const fetchHandoverRecipients = async (materialId) => { const { data } = await api.get('/teacher/handover-recipients', { params: materialId ? { material_id: materialId } : {} }); return data.data; };
+export const sendCourseMaterial      = async (materialId, p) => { const { data } = await api.post(`/teacher/course-materials/${materialId}/send`, p); return data.data ?? data; };
+export const fetchMaterialHandovers  = async (materialId) => { const { data } = await api.get(`/teacher/course-materials/${materialId}/handovers`); return data.data; };
+// Stamps first_viewed_at once. The server never overwrites an earlier stamp, so
+// this is safe to fire on every open rather than only the first.
+export const markHandoverSeen        = async (handoverId) => { const { data } = await api.post(`/my/handovers/${handoverId}/seen`); return data?.data ?? data; };
+// The whole envelope, not .data: the trail carries `totals` beside `data` and
+// `meta`, and the tiles above the table are counted from it.
+export const fetchAdminHandovers     = async (p={}) => { const { data } = await api.get('/admin/material-handovers', { params:p }); return data; };
+export const revokeHandover          = async (handoverId) => { await api.delete(`/admin/material-handovers/${handoverId}`); };
+
 // --- Support -----------------------------------------------------------------
 // The customer's half of the inbox. The public /contact form (submitContact
 // above) opens a ticket in the same queue.
